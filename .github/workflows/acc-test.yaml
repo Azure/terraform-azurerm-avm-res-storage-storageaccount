@@ -16,7 +16,7 @@ permissions:
 
 jobs:
   acc-tests:
-    runs-on: [self-hosted, 1ES.Pool=<YOUR_REPO_NAME>]
+    runs-on: [self-hosted, 1ES.Pool=terraform-azure-storage-account]
     environment:
       name: acctests
     steps:
