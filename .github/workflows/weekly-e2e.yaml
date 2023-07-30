@@ -9,7 +9,7 @@ permissions:
 
 jobs:
   full-e2e-check:
-    runs-on: [self-hosted, 1ES.Pool=<YOUR_REPO_NAME>]
+    runs-on: [self-hosted, 1ES.Pool=terraform-azure-storage-account]
     environment:
       name: crontests
     steps:

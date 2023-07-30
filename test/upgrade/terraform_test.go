@@ -1,13 +1,14 @@
 package upgrade
 
 import (
+	"os"
 	"testing"
 
 	test_helper "github.com/Azure/terraform-module-test-helper"
 	"github.com/gruntwork-io/terratest/modules/terraform"
 )
 
-func TestExampleUpgrade_basic(t *testing.T) {
+func TestComplete(t *testing.T) {
 	currentRoot, err := test_helper.GetCurrentModuleRootPath()
 	if err != nil {
 		t.FailNow()
@@ -16,7 +17,12 @@ func TestExampleUpgrade_basic(t *testing.T) {
 	if err != nil {
 		t.FailNow()
 	}
-	test_helper.ModuleUpgradeTest(t, "Azure", "terraform-verified-module", "examples/basic", currentRoot, terraform.Options{
-		Upgrade: true,
+	vars := make(map[string]any, 0)
+	identityId := os.Getenv("MSI_ID")
+	if identityId != "" {
+		vars["managed_identity_principal_id"] = identityId
+	}
+	test_helper.ModuleUpgradeTest(t, "Azure", "terraform-azurerm-storage-account", "examples/complete", currentRoot, terraform.Options{
+		Vars: vars,
 	}, currentMajorVersion)
 }
