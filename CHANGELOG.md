@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased](https://github.com/Azure/terraform-azure-storage-account/tree/HEAD)
+## [v0.1.0](https://github.com/Azure/terraform-azure-storage-account/tree/v0.1.0) (2023-08-06)
 
 **Merged pull requests:**
 
