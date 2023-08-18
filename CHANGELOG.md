@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased](https://github.com/Azure/terraform-azure-storage-account/tree/HEAD)
+
+**Merged pull requests:**
+
+- Bump github.com/Azure/terraform-module-test-helper from 0.14.0 to 0.16.0 in /test [\#5](https://github.com/Azure/terraform-azure-storage-account/pull/5) ([dependabot[bot]](https://github.com/apps/dependabot))
+
 ## [v0.1.0](https://github.com/Azure/terraform-azure-storage-account/tree/v0.1.0) (2023-08-06)
 
 **Merged pull requests:**
