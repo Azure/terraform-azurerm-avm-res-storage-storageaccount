@@ -62,7 +62,7 @@ EOT
   nullable    = false
 }
 
-variable "new_private_endpoint" {
+variable "private_endpoints" {
   type = object({
     resource_group_name = optional(string)
     subnet_id           = string
