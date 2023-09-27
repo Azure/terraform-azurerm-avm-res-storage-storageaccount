@@ -138,7 +138,7 @@ module "this" {
       name = "table${random_string.this.result}1"
     }
   }
-  new_private_endpoint = {
+  private_endpoints = {
     subnet_id = azurerm_subnet.private.id
     private_service_connection = {
       name_prefix = "pe_"
@@ -188,7 +188,7 @@ module "another_container" {
       container_access_type = "private"
     }
   }
-  new_private_endpoint = {
+  private_endpoints = {
     subnet_id = azurerm_subnet.private.id
     private_service_connection = {
       name_prefix = "pe_"

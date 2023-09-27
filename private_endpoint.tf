@@ -1,20 +1,20 @@
 resource "azurerm_private_endpoint" "this" {
-  for_each = var.new_private_endpoint == null ? toset([]) : local.private_endpoints
+  for_each = var.private_endpoints == null ? toset([]) : local.private_endpoints
 
   location            = azurerm_storage_account.this.location
   name                = "${each.value}_${azurerm_storage_account.this.name}"
-  resource_group_name = coalesce(var.new_private_endpoint.resource_group_name, azurerm_storage_account.this.resource_group_name)
-  subnet_id           = var.new_private_endpoint.subnet_id
-  tags                = var.new_private_endpoint.tags
+  resource_group_name = coalesce(var.private_endpoints.resource_group_name, azurerm_storage_account.this.resource_group_name)
+  subnet_id           = var.private_endpoints.subnet_id
+  tags                = var.private_endpoints.tags
 
   private_service_connection {
     is_manual_connection           = false
-    name                           = "${var.new_private_endpoint.private_service_connection.name_prefix}${each.value}"
+    name                           = "${var.private_endpoints.private_service_connection.name_prefix}${each.value}"
     private_connection_resource_id = azurerm_storage_account.this.id
     subresource_names              = [each.value]
   }
   dynamic "timeouts" {
-    for_each = var.new_private_endpoint.timeouts == null ? [] : [var.new_private_endpoint.timeouts]
+    for_each = var.private_endpoints.timeouts == null ? [] : [var.private_endpoints.timeouts]
     content {
       create = timeouts.value.create
       delete = timeouts.value.delete
