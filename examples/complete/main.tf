@@ -58,11 +58,11 @@ module "this" {
       name                  = "blob-container-${random_pet.this.id}-1"
       container_access_type = "private"
     }
-      blob_container2 = {
+    blob_container2 = {
       name                  = "blob-container-${random_pet.this.id}-2"
       container_access_type = "private"
     }
-          blob_container3 = {
+    blob_container3 = {
       name                  = "blob-container-${random_pet.this.id}-3"
       container_access_type = "private"
     }
@@ -71,10 +71,10 @@ module "this" {
     queue1 = {
       name = "queue-${random_pet.this.id}-1"
     }
-     queue2 = {
+    queue2 = {
       name = "queue-${random_pet.this.id}-2"
     }
-     queue3 = {
+    queue3 = {
       name = "queue-${random_pet.this.id}-3"
     }
   }
@@ -84,6 +84,18 @@ module "this" {
     }
     table1 = {
       name = "table${random_pet.this.id}b"
+    }
+
+  }
+
+  storage_share = {
+    share1 = {
+      name  = "share-${random_pet.this.id}-1"
+      quota = 50
+    }
+    share2 = {
+      name  = "share-${random_pet.this.id}-2"
+      quota = 50
     }
   }
 }
