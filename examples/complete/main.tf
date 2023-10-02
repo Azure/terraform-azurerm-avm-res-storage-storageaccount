@@ -54,19 +54,36 @@ module "this" {
     }
   }
   storage_container = {
-    blob_container = {
-      name                  = "blob-container-${random_pet.this.id}"
+    blob_container1 = {
+      name                  = "blob-container-${random_pet.this.id}-1"
+      container_access_type = "private"
+    }
+      blob_container2 = {
+      name                  = "blob-container-${random_pet.this.id}-2"
+      container_access_type = "private"
+    }
+          blob_container3 = {
+      name                  = "blob-container-${random_pet.this.id}-3"
       container_access_type = "private"
     }
   }
   storage_queue = {
-    queue0 = {
-      name = "queue-${random_pet.this.id}"
+    queue1 = {
+      name = "queue-${random_pet.this.id}-1"
+    }
+     queue2 = {
+      name = "queue-${random_pet.this.id}-2"
+    }
+     queue3 = {
+      name = "queue-${random_pet.this.id}-3"
     }
   }
   storage_table = {
     table0 = {
-      name = "table${random_pet.this.id}"
+      name = "table${random_pet.this.id}a"
+    }
+    table1 = {
+      name = "table${random_pet.this.id}b"
     }
   }
 }
