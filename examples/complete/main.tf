@@ -87,7 +87,6 @@ module "this" {
     }
 
   }
-
   storage_share = {
     share1 = {
       name  = "share-${random_pet.this.id}-1"
@@ -97,5 +96,47 @@ module "this" {
       name  = "share-${random_pet.this.id}-2"
       quota = 50
     }
+  }
+ 
+  diagnostic_settings_blob = {
+    blob11 = {
+      name                       = "diag"
+      log_analytics_workspace_id = azurerm_log_analytics_workspace.this.id
+      category_group             = ["audit", "alllogs"]
+      metric_categories          = ["AllMetrics"]
+
+    }
+
+  }
+    diagnostic_settings_queue = {
+    queue = {
+      name                       = "diag"
+      log_analytics_workspace_id = azurerm_log_analytics_workspace.this.id
+      category_group             = ["audit", "alllogs"]
+      metric_categories          = ["AllMetrics"]
+
+    }
+
+  }  
+   diagnostic_settings_table= {
+    queue = {
+      name                       = "diag"
+      log_analytics_workspace_id = azurerm_log_analytics_workspace.this.id
+      category_group             = ["audit", "alllogs"]
+      metric_categories          = ["AllMetrics"]
+
+    }
+
+  }
+
+     diagnostic_settings_file= {
+    queue = {
+      name                       = "diag"
+      log_analytics_workspace_id = azurerm_log_analytics_workspace.this.id
+      category_group             = ["audit", "alllogs"]
+      metric_categories          = ["AllMetrics"]
+
+    }
+
   }
 }

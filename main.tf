@@ -289,7 +289,7 @@ resource "azurerm_storage_account_network_rules" "this" {
       endpoint_resource_id = azurerm_private_endpoint.this[private_link_access.value].id
       endpoint_tenant_id   = data.azurerm_client_config.this.tenant_id
     }
-  } 
+  }
   dynamic "timeouts" {
     for_each = var.storage_account_network_rules.timeouts == null ? [] : [var.storage_account_network_rules.timeouts]
     content {
@@ -477,3 +477,104 @@ resource "azurerm_storage_share" "this" {
     }
   }
 }
+
+// Resource Block for Diagnostic Settings
+
+resource "azurerm_monitor_diagnostic_setting" "blob" {
+  for_each = var.diagnostic_settings_blob == null ? {} : var.diagnostic_settings_blob
+  name               = each.value.name
+  target_resource_id = "${azurerm_storage_account.this.id}/blobServices/default/"
+ 
+  log_analytics_workspace_id = each.value.log_analytics_workspace_id
+
+  dynamic "enabled_log" {
+    for_each = each.value.category_group
+    
+
+    content {
+      category_group = enabled_log.value
+    }
+
+
+  }
+  dynamic "metric" {
+for_each = each.value.metric_categories
+   
+    content {
+      category = metric.value
+    }
+  }
+
+}
+
+# Enable Diagnostic Settings for Queue
+resource "azurerm_monitor_diagnostic_setting" "queue" {
+  for_each = var.diagnostic_settings_queue == null ? {} : var.diagnostic_settings_queue
+  #for_each = var.diagnostic_settings
+  
+  name               = each.value.name
+  target_resource_id = "${azurerm_storage_account.this.id}/queueServices/default/"
+ 
+  log_analytics_workspace_id = each.value.log_analytics_workspace_id
+
+  dynamic "enabled_log" {
+    for_each = each.value.category_group
+    
+
+    content {
+      category_group = enabled_log.value
+    }
+
+
+  }
+  dynamic "metric" {
+for_each = each.value.metric_categories
+   
+    content {
+      category = metric.value
+    }
+  }
+
+}
+
+resource "azurerm_monitor_diagnostic_setting" "table" {
+  for_each = var.diagnostic_settings_table == null ? {} : var.diagnostic_settings_table
+  #for_each = var.diagnostic_settings
+  
+  name               = each.value.name
+  target_resource_id = "${azurerm_storage_account.this.id}/tableServices/default/"
+ 
+  log_analytics_workspace_id = each.value.log_analytics_workspace_id
+
+  dynamic "enabled_log" {
+    for_each = each.value.category_group
+    
+
+    content {
+      category_group = enabled_log.value
+    }
+
+
+  }
+  dynamic "metric" {
+for_each = each.value.metric_categories
+   
+    content {
+      category = metric.value
+    }
+  }
+
+}
+
+
+
+
+
+  
+
+
+
+
+
+
+
