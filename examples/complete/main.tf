@@ -36,8 +36,7 @@ module "this" {
     role_assignment_1 = {
       role_definition_id_or_name       = "Contributor"
       principal_id                     = "7fa7c11f-8a64-4f17-8c79-163fa82f5a36"
-     #principal_type                   = "User"
-      #skip_service_principal_aad_check = 
+      skip_service_principal_aad_check = false
     },
 
   }
