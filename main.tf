@@ -481,15 +481,15 @@ resource "azurerm_storage_share" "this" {
 // Resource Block for Diagnostic Settings
 
 resource "azurerm_monitor_diagnostic_setting" "blob" {
-  for_each = var.diagnostic_settings_blob == null ? {} : var.diagnostic_settings_blob
+  for_each           = var.diagnostic_settings_blob == null ? {} : var.diagnostic_settings_blob
   name               = each.value.name
   target_resource_id = "${azurerm_storage_account.this.id}/blobServices/default/"
- 
+
   log_analytics_workspace_id = each.value.log_analytics_workspace_id
 
   dynamic "enabled_log" {
     for_each = each.value.category_group
-    
+
 
     content {
       category_group = enabled_log.value
@@ -498,8 +498,8 @@ resource "azurerm_monitor_diagnostic_setting" "blob" {
 
   }
   dynamic "metric" {
-for_each = each.value.metric_categories
-   
+    for_each = each.value.metric_categories
+
     content {
       category = metric.value
     }
@@ -511,15 +511,15 @@ for_each = each.value.metric_categories
 resource "azurerm_monitor_diagnostic_setting" "queue" {
   for_each = var.diagnostic_settings_queue == null ? {} : var.diagnostic_settings_queue
   #for_each = var.diagnostic_settings
-  
+
   name               = each.value.name
   target_resource_id = "${azurerm_storage_account.this.id}/queueServices/default/"
- 
+
   log_analytics_workspace_id = each.value.log_analytics_workspace_id
 
   dynamic "enabled_log" {
     for_each = each.value.category_group
-    
+
 
     content {
       category_group = enabled_log.value
@@ -528,8 +528,8 @@ resource "azurerm_monitor_diagnostic_setting" "queue" {
 
   }
   dynamic "metric" {
-for_each = each.value.metric_categories
-   
+    for_each = each.value.metric_categories
+
     content {
       category = metric.value
     }
@@ -540,15 +540,15 @@ for_each = each.value.metric_categories
 resource "azurerm_monitor_diagnostic_setting" "table" {
   for_each = var.diagnostic_settings_table == null ? {} : var.diagnostic_settings_table
   #for_each = var.diagnostic_settings
-  
+
   name               = each.value.name
   target_resource_id = "${azurerm_storage_account.this.id}/tableServices/default/"
- 
+
   log_analytics_workspace_id = each.value.log_analytics_workspace_id
 
   dynamic "enabled_log" {
     for_each = each.value.category_group
-    
+
 
     content {
       category_group = enabled_log.value
@@ -557,8 +557,8 @@ resource "azurerm_monitor_diagnostic_setting" "table" {
 
   }
   dynamic "metric" {
-for_each = each.value.metric_categories
-   
+    for_each = each.value.metric_categories
+
     content {
       category = metric.value
     }
@@ -566,11 +566,52 @@ for_each = each.value.metric_categories
 
 }
 
+resource "azurerm_monitor_diagnostic_setting" "azure_file" {
+  for_each = var.diagnostic_settings_file == null ? {} : var.diagnostic_settings_file
+  #for_each = var.diagnostic_settings
+
+  name               = each.value.name
+  target_resource_id = "${azurerm_storage_account.this.id}/fileServices/default/"
+
+  log_analytics_workspace_id = each.value.log_analytics_workspace_id
+
+  dynamic "enabled_log" {
+    for_each = each.value.category_group
+
+
+    content {
+      category_group = enabled_log.value
+    }
+
+
+  }
+  dynamic "metric" {
+    for_each = each.value.metric_categories
+
+    content {
+      category = metric.value
+    }
+  }
+
+}
+
+resource "azurerm_role_assignment" "this" {
+  for_each                               = var.role_assignments
+  scope                                  = azurerm_storage_account.this.id
+  role_definition_id                     = strcontains(lower(each.value.role_definition_id_or_name), lower(local.role_definition_resource_substring)) ? each.value.role_definition_id_or_name : null
+  role_definition_name                   = strcontains(lower(each.value.role_definition_id_or_name), lower(local.role_definition_resource_substring)) ? null : each.value.role_definition_id_or_name
+  principal_id                           = each.value.principal_id
+  #principal_type                         = each.value.principal_type
+  condition                              = each.value.condition
+  condition_version                      = each.value.condition_version
+  skip_service_principal_aad_check       = each.value.skip_service_principal_aad_check
+  delegated_managed_identity_resource_id = each.value.delegated_managed_identity_resource_id
+}
 
 
 
 
-  
+
 
 
 

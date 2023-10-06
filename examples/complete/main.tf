@@ -32,6 +32,16 @@ module "this" {
   storage_account_name                     = "tfmodstoracc${random_pet.this.id}"
   storage_account_resource_group_name      = azurerm_resource_group.this.name
   storage_account_min_tls_version          = "TLS1_2"
+  role_assignments = {
+    role_assignment_1 = {
+      role_definition_id_or_name       = "Contributor"
+      principal_id                     = "7fa7c11f-8a64-4f17-8c79-163fa82f5a36"
+     #principal_type                   = "User"
+      #skip_service_principal_aad_check = 
+    },
+
+  }
+
   storage_account_network_rules = {
     bypass         = ["AzureServices"]
     default_action = "Deny"
@@ -97,7 +107,7 @@ module "this" {
       quota = 50
     }
   }
- 
+
   diagnostic_settings_blob = {
     blob11 = {
       name                       = "diag"
@@ -108,7 +118,7 @@ module "this" {
     }
 
   }
-    diagnostic_settings_queue = {
+  diagnostic_settings_queue = {
     queue = {
       name                       = "diag"
       log_analytics_workspace_id = azurerm_log_analytics_workspace.this.id
@@ -117,8 +127,8 @@ module "this" {
 
     }
 
-  }  
-   diagnostic_settings_table= {
+  }
+  diagnostic_settings_table = {
     queue = {
       name                       = "diag"
       log_analytics_workspace_id = azurerm_log_analytics_workspace.this.id
@@ -129,7 +139,7 @@ module "this" {
 
   }
 
-     diagnostic_settings_file= {
+  diagnostic_settings_file = {
     queue = {
       name                       = "diag"
       log_analytics_workspace_id = azurerm_log_analytics_workspace.this.id
@@ -140,3 +150,4 @@ module "this" {
 
   }
 }
+

@@ -6,3 +6,7 @@ locals {
   queue_endpoint           = length(var.storage_queue) == 0 ? [] : ["queue"]
   table_endpoint           = length(var.storage_table) == 0 ? [] : ["table"]
 }
+
+locals {
+  role_definition_resource_substring = "/providers/Microsoft.Authorization/roleDefinitions"
+}
