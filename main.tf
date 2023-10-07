@@ -24,7 +24,7 @@ resource "azurerm_storage_account" "this" {
   table_encryption_key_type         = var.storage_account_table_encryption_key_type
   tags                              = var.storage_account_tags
 
-  dynamic "azure_files_authentication" {
+   dynamic "azure_files_authentication" {
     for_each = var.storage_account_azure_files_authentication == null ? [] : [
       var.storage_account_azure_files_authentication
     ]
@@ -222,6 +222,8 @@ resource "azurerm_storage_account" "this" {
       customer_managed_key
     ]
   }
+
+  
 }
 
 resource "azurerm_storage_account_local_user" "this" {
@@ -607,8 +609,16 @@ resource "azurerm_role_assignment" "this" {
   delegated_managed_identity_resource_id = each.value.delegated_managed_identity_resource_id
 }
 
+# Resource Block for Locks
+ resource "azurerm_management_lock" "storage_account" {
+ count = var.lock_storage_account != null ? 1 : 0
+ name = coalesce(var.lock_storage_account.name, "lock-${azurerm_storage_account.this.name}")
+ scope = azurerm_storage_account.this.id
+ lock_level = var.lock_storage_account.lock_level
 
-
+depends_on = [ azurerm_storage_account.this ]
+   
+ }
 
 
 

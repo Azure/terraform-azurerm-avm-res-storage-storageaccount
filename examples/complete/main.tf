@@ -148,5 +148,9 @@ module "this" {
     }
 
   }
+    lock_storage_account = {
+    name = "lock-${module.this.storage_account_name}"
+   lock_level = "CanNotDelete"
+  }
 }
 

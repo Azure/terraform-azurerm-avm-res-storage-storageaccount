@@ -945,3 +945,17 @@ variable "role_assignments" {
   DESCRIPTION
 }
 
+# Variable for Locks
+variable "lock_storage_account" {
+    type = object({
+      name = optional(string, null)
+      lock_level = optional(string, "None")
+    })
+    description = "The lock level to apply to the Storage Account. Possible values are `None`, `CanNotDelete`, and `ReadOnly`."
+    default     = {}
+    nullable    = false
+    validation {
+      condition     = contains(["CanNotDelete", "ReadOnly", "None"], var.lock_storage_account.lock_level)
+      error_message = "The lock level must be one of: 'None', 'CanNotDelete', or 'ReadOnly'."
+    }
+  }
