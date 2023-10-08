@@ -610,10 +610,21 @@ resource "azurerm_role_assignment" "this" {
 }
 
 # Resource Block for Locks #TODO SHould complete the locks with dependant resources.
+
  resource "azurerm_management_lock" "storage_account" {
  count = var.lock_storage_account != null ? 1 : 0
  name = coalesce(var.lock_storage_account.name, "lock-${azurerm_storage_account.this.name}")
  scope = azurerm_storage_account.this.id
+ lock_level = var.lock_storage_account.lock_level
+
+depends_on = [ azurerm_storage_account.this ]
+   
+ }
+ #TODO SHould complete the locks with multipal dependant identity resources.
+ resource "azurerm_management_lock" "storage_account_identity" {
+ count = var.lock_storage_account != null ? 1 : 0
+ name = coalesce(var.lock_storage_account.name, "lock-${azurerm_storage_account.this.name}")
+ scope = tolist(azurerm_storage_account.this.identity[0].identity_ids)[0]
  lock_level = var.lock_storage_account.lock_level
 
 depends_on = [ azurerm_storage_account.this ]
