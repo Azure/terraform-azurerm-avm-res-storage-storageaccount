@@ -609,7 +609,7 @@ resource "azurerm_role_assignment" "this" {
   delegated_managed_identity_resource_id = each.value.delegated_managed_identity_resource_id
 }
 
-# Resource Block for Locks
+# Resource Block for Locks #TODO SHould complete the locks with dependant resources.
  resource "azurerm_management_lock" "storage_account" {
  count = var.lock_storage_account != null ? 1 : 0
  name = coalesce(var.lock_storage_account.name, "lock-${azurerm_storage_account.this.name}")
@@ -619,6 +619,8 @@ resource "azurerm_role_assignment" "this" {
 depends_on = [ azurerm_storage_account.this ]
    
  }
+
+ 
 
 
 

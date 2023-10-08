@@ -32,6 +32,10 @@ module "this" {
   storage_account_name                     = "tfmodstoracc${random_pet.this.id}"
   storage_account_resource_group_name      = azurerm_resource_group.this.name
   storage_account_min_tls_version          = "TLS1_2"
+  storage_account_tags = {
+    env = "dev"
+    owner = "IT"
+  }
   role_assignments = {
     role_assignment_1 = {
       role_definition_id_or_name       = "Contributor"
