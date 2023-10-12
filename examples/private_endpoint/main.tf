@@ -106,6 +106,11 @@ module "this" {
   storage_account_name                     = "tfmodstoracc${random_string.this.result}"
   storage_account_resource_group_name      = azurerm_resource_group.this.name
   storage_account_min_tls_version          = "TLS1_2"
+  lock = {
+    name = "lock"
+    kind = "CanNotDelete"
+  }
+
   storage_account_network_rules = {
     bypass                     = ["AzureServices"]
     default_action             = "Deny"
@@ -140,17 +145,22 @@ module "this" {
   }
   private_endpoints = {
     subnet_id = azurerm_subnet.private.id
+    #lock_level = "None"
     private_service_connection = {
       name_prefix = "pe_"
     }
   }
+
   private_dns_zones_for_private_link = {
     for endpoint in local.endpoints : endpoint => {
       resource_group_name       = azurerm_resource_group.this.name
       name                      = azurerm_private_dns_zone.private_links[endpoint].name
       virtual_network_link_name = azurerm_private_dns_zone_virtual_network_link.private_links[endpoint].name
+      lock_level = "None"
     }
+
   }
+
   private_dns_zones_for_public_endpoint = {
     for endpoint in local.endpoints : endpoint => {
       resource_group_name       = azurerm_resource_group.this.name
@@ -158,10 +168,11 @@ module "this" {
       virtual_network_link_name = azurerm_private_dns_zone_virtual_network_link.public_endpoints[endpoint].name
     }
   }
+
 }
 
 
-
+/*
 module "another_container" {
   #checkov:skip=CKV_AZURE_34:It's a known issue that Checkov cannot work prefect along with module
   #checkov:skip=CKV_AZURE_35:It's a known issue that Checkov cannot work prefect along with module
@@ -208,7 +219,8 @@ module "another_container" {
       virtual_network_link_name = azurerm_private_dns_zone_virtual_network_link.public_endpoints["blob"].name
     }
   }
-}
+
+*/
 
 resource "azurerm_log_analytics_storage_insights" "this" {
   name                 = "storageinsight"

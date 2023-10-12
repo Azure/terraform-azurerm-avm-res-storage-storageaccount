@@ -67,6 +67,7 @@ variable "private_endpoints" {
     resource_group_name = optional(string)
     subnet_id           = string
     tags                = optional(map(string))
+    lock_level              = optional(string)
     private_service_connection = object({
       name_prefix = string
     })
@@ -117,6 +118,7 @@ variable "private_dns_zones_for_private_link" {
     resource_group_name       = string
     name                      = string
     virtual_network_link_name = string
+    lock_level = optional(string)
   }))
   default     = {}
   description = <<-EOT
@@ -140,6 +142,7 @@ variable "private_dns_zones_for_public_endpoint" {
     resource_group_name       = string
     name                      = string
     virtual_network_link_name = string
+    lock_level                = optional(string)
   }))
   default     = {}
   description = <<-EOT
@@ -933,29 +936,39 @@ variable "role_assignments" {
   default     = {}
   description = <<DESCRIPTION
   A map of role assignments to create on the Key Vault. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
-  
+
   - `role_definition_id_or_name` - The ID or name of the role definition to assign to the principal.
   - `principal_id` - The ID of the principal to assign the role to.
   - `description` - The description of the role assignment.
   - `skip_service_principal_aad_check` - If set to true, skips the Azure Active Directory check for the service principal in the tenant. Defaults to false.
   - `condition` - The condition which will be used to scope the role assignment.
   - `condition_version` - The version of the condition syntax. Leave as `null` if you are not using a condition, if you are then valid values are '2.0'.
-  
+
   > Note: only set `skip_service_principal_aad_check` to true if you are assigning a role to a service principal.
   DESCRIPTION
 }
 
 # Variable for Locks
-variable "lock_storage_account" {
-    type = object({
-      name = optional(string, null)
-      lock_level = optional(string, "None")
-    })
-    description = "The lock level to apply to the Storage Account. Possible values are `None`, `CanNotDelete`, and `ReadOnly`."
-    default     = {}
-    nullable    = false
-    validation {
-      condition     = contains(["CanNotDelete", "ReadOnly", "None"], var.lock_storage_account.lock_level)
-      error_message = "The lock level must be one of: 'None', 'CanNotDelete', or 'ReadOnly'."
+variable "lock" {
+  type = object({
+    name = optional(string, null)
+    kind = optional(string, "None")
+  })
+  description = <<LOCK
+    "The lock level to apply to this Storage Account and all of it's child resources. The default value is none. Possible values are `None`, `CanNotDelete`, and `ReadOnly`. Set the lock value on child resource values explicitly to override any inherited locks."
+
+    Example Inputs:
+    ```terraform
+    lock = {
+      name = "lock-{resourcename}" # optional
+      type = "CanNotDelete"
     }
+    ```
+    LOCK
+  default     = {}
+  nullable    = false
+  validation {
+    condition     = contains(["CanNotDelete", "ReadOnly", "None"], var.lock.kind)
+    error_message = "The lock level must be one of: 'None', 'CanNotDelete', or 'ReadOnly'."
   }
+}

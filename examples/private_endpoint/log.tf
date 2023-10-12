@@ -5,7 +5,7 @@ resource "azurerm_log_analytics_workspace" "this" {
   retention_in_days   = 30
   sku                 = "PerGB2018"
 }
-
+/*
 resource "azurerm_log_analytics_storage_insights" "another_account" {
   name                 = "anotherstorageinsight"
   resource_group_name  = azurerm_resource_group.this.name
@@ -16,3 +16,4 @@ resource "azurerm_log_analytics_storage_insights" "another_account" {
 
   depends_on = [module.another_container]
 }
+*/

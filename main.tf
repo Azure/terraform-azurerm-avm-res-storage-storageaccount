@@ -223,7 +223,7 @@ resource "azurerm_storage_account" "this" {
     ]
   }
 
-  
+
 }
 
 resource "azurerm_storage_account_local_user" "this" {
@@ -285,13 +285,16 @@ resource "azurerm_storage_account_network_rules" "this" {
       endpoint_tenant_id   = private_link_access.value.endpoint_tenant_id
     }
   }
+  /*
   dynamic "private_link_access" {
     for_each = var.private_endpoints == null ? [] : local.private_endpoints
     content {
       endpoint_resource_id = azurerm_private_endpoint.this[private_link_access.value].id
       endpoint_tenant_id   = data.azurerm_client_config.this.tenant_id
     }
+
   }
+  */
   dynamic "timeouts" {
     for_each = var.storage_account_network_rules.timeouts == null ? [] : [var.storage_account_network_rules.timeouts]
     content {
@@ -611,31 +614,41 @@ resource "azurerm_role_assignment" "this" {
 
 # Resource Block for Locks #TODO SHould complete the locks with dependant resources.
 
- resource "azurerm_management_lock" "storage_account" {
- count = var.lock_storage_account != null ? 1 : 0
- name = coalesce(var.lock_storage_account.name, "lock-${azurerm_storage_account.this.name}")
- scope = azurerm_storage_account.this.id
- lock_level = var.lock_storage_account.lock_level
-
-depends_on = [ azurerm_storage_account.this ]
-   
- }
- #TODO SHould complete the locks with multipal dependant identity resources.
- resource "azurerm_management_lock" "storage_account_identity" {
- count = var.lock_storage_account != null ? 1 : 0
- name = coalesce(var.lock_storage_account.name, "lock-${azurerm_storage_account.this.name}")
- scope = tolist(azurerm_storage_account.this.identity[0].identity_ids)[0]
- lock_level = var.lock_storage_account.lock_level
-
-depends_on = [ azurerm_storage_account.this ]
-   
- }
-
- 
+resource "azurerm_management_lock" "this-storage_account" {
+  count      = var.lock.kind != "None" ? 1 : 0
+  name       = coalesce(var.storage_account_name, "lock-${var.storage_account_name}")
+  scope      = azurerm_storage_account.this.id
+  lock_level = var.lock.kind
 
 
+  depends_on = [
+    azurerm_storage_account.this
+  ]
+}
+
+resource "azurerm_management_lock" "this-private_endpoints" {
+  for_each = {for key,value in local.private_endpoints : key => value if coalesce(var.private_endpoints.lock_level, var.lock.kind) != "None"}
+  name       = coalesce(azurerm_private_endpoint.this[each.value].name, "lock-${azurerm_private_endpoint.this[each.value].name}")
+  scope = azurerm_private_endpoint.this[each.value].id
+  lock_level = var.lock.kind
 
 
+}
+
+resource "azurerm_management_lock" "this-private_dns_zone" {
+  for_each = {for key,value in var.private_dns_zones_for_public_endpoint : key => value if coalesce(value.lock_level, var.lock.kind) != "None"}
+  name = coalesce(data.azurerm_private_dns_zone.public_endpoint[each. key].name, "lock-${data.azurerm_private_dns_zone.public_endpoint[each.key].name}")
+  scope = data.azurerm_private_dns_zone.public_endpoint[each.key].id
+  lock_level = var.lock.kind
+
+}
+resource "azurerm_management_lock" "this_private" {
+  for_each = {for key,value in var.private_dns_zones_for_private_link : key => value if coalesce(value.lock_level, var.lock.kind) != "None"}
+   name = coalesce(data.azurerm_private_dns_zone.private_link[each. key].name, "lock-${data.azurerm_private_dns_zone.private_link[each.key].name}")
+   scope = data.azurerm_private_dns_zone.private_link[each.key].id
+  lock_level = var.lock.kind
+
+}
 
 
 
