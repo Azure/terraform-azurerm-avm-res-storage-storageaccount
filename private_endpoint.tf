@@ -62,6 +62,8 @@ data "azurerm_private_dns_zone" "public_endpoint" {
   resource_group_name = var.private_dns_zones_for_public_endpoint[each.value].resource_group_name
 }
 
+
+
 resource "azurerm_private_dns_a_record" "private" {
   for_each = local.private_endpoints
 

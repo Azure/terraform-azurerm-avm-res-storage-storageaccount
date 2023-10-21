@@ -85,6 +85,8 @@ resource "azurerm_private_dns_zone_virtual_network_link" "public_endpoints" {
   virtual_network_id    = azurerm_virtual_network.vnet.id
 }
 
+
+
 module "public_ip" {
   count = var.bypass_ip_cidr == null ? 1 : 0
 

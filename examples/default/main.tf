@@ -1,5 +1,6 @@
 resource "random_pet" "this" {
   length = 1
+
 }
 
 resource "azurerm_resource_group" "this" {
@@ -32,6 +33,10 @@ module "this" {
   storage_account_name                     = "tfmodstoracc${random_pet.this.id}"
   storage_account_resource_group_name      = azurerm_resource_group.this.name
   storage_account_min_tls_version          = "TLS1_2"
+  lock = {
+    name = "lock"
+    kind = "CanNotDelete"
+  }
   storage_account_tags = {
     env = "dev"
     owner = "IT"
@@ -141,7 +146,6 @@ module "this" {
     }
 
   }
-
   diagnostic_settings_file = {
     queue = {
       name                       = "diag"
@@ -152,9 +156,6 @@ module "this" {
     }
 
   }
-    lock_storage_account = {
-    name = "lock-${module.this.storage_account_name}"
-   lock_level = "CanNotDelete"
-  }
+
 }
 
