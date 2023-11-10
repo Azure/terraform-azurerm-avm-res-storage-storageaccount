@@ -277,19 +277,13 @@ resource "azurerm_storage_account_network_rules" "this" {
   virtual_network_subnet_ids = var.storage_account_network_rules.virtual_network_subnet_ids
 
   dynamic "private_link_access" {
-    for_each = var.storage_account_network_rules.private_link_access == null ? [] : var.storage_account_network_rules.private_link_access
+    for_each = var.new_private_endpoint.resource_access_rule_resource_ids == null ? [] : var.new_private_endpoint.resource_access_rule_resource_ids
     content {
-      endpoint_resource_id = private_link_access.value.endpoint_resource_id
-      endpoint_tenant_id   = private_link_access.value.endpoint_tenant_id
-    }
-  }
-  dynamic "private_link_access" {
-    for_each = var.new_private_endpoint == null ? [] : local.private_endpoints
-    content {
-      endpoint_resource_id = azurerm_private_endpoint.this[private_link_access.value].id
+      endpoint_resource_id = private_link_access.value
       endpoint_tenant_id   = data.azurerm_client_config.this.tenant_id
     }
   }
+
   dynamic "timeouts" {
     for_each = var.storage_account_network_rules.timeouts == null ? [] : [var.storage_account_network_rules.timeouts]
     content {
