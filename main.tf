@@ -359,8 +359,8 @@ resource "azurerm_storage_account_customer_managed_key" "this" {
   for_each = try(var.storage_account_customer_managed_key.key_vault_access_policy.identity_keys, {})
 
   key_name                  = var.storage_account_customer_managed_key.key_name
-  key_vault_id              = var.storage_account_customer_managed_key.key_vault_id
   storage_account_id        = azurerm_storage_account.this.id
+  key_vault_id              = var.storage_account_customer_managed_key.key_vault_id
   key_version               = var.storage_account_customer_managed_key.key_version
   user_assigned_identity_id = var.storage_account_identity.identity_ids[each.value]
 

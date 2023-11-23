@@ -1,16 +1,16 @@
 # Changelog
 
-## [Unreleased](https://github.com/Azure/terraform-azure-storage-account/tree/HEAD)
+## [Unreleased](https://github.com/Azure/terraform-azurerm-avm-res-storage-storageaccount/tree/HEAD)
 
 **Merged pull requests:**
 
-- Bump github.com/Azure/terraform-module-test-helper from 0.14.0 to 0.16.0 in /test [\#5](https://github.com/Azure/terraform-azure-storage-account/pull/5) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump github.com/Azure/terraform-module-test-helper from 0.14.0 to 0.16.0 in /test [\#5](https://github.com/Azure/terraform-azurerm-avm-res-storage-storageaccount/pull/5) ([dependabot[bot]](https://github.com/apps/dependabot))
 
-## [v0.1.0](https://github.com/Azure/terraform-azure-storage-account/tree/v0.1.0) (2023-08-06)
+## [v0.1.0](https://github.com/Azure/terraform-azurerm-avm-res-storage-storageaccount/tree/v0.1.0) (2023-08-06)
 
 **Merged pull requests:**
 
-- init commit [\#1](https://github.com/Azure/terraform-azure-storage-account/pull/1) ([lonegunmanb](https://github.com/lonegunmanb))
+- init commit [\#1](https://github.com/Azure/terraform-azurerm-avm-res-storage-storageaccount/pull/1) ([lonegunmanb](https://github.com/lonegunmanb))
 
 
 
