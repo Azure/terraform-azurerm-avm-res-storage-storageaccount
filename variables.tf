@@ -64,9 +64,10 @@ EOT
 
 variable "new_private_endpoint" {
   type = object({
-    resource_group_name = optional(string)
-    subnet_id           = string
-    tags                = optional(map(string))
+    resource_group_name               = optional(string)
+    resource_access_rule_resource_ids = optional(list(string))
+    subnet_id                         = string
+    tags                              = optional(map(string))
     private_service_connection = object({
       name_prefix = string
     })
