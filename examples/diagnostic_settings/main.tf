@@ -57,14 +57,15 @@ module "this" {
   #checkov:skip=CKV2_AZURE_21:It's a known issue that Checkov cannot work prefect along with module
   source = "../.."
 
-  account_replication_type  = "LRS"
-  account_tier              = "Standard"
-  account_kind              = "StorageV2"
-  location                  = azurerm_resource_group.this.location
-  name                      = module.naming.storage_account.name_unique
-  resource_group_name       = azurerm_resource_group.this.name
-  min_tls_version           = "TLS1_2"
-  shared_access_key_enabled = true
+  account_replication_type      = "LRS"
+  account_tier                  = "Standard"
+  account_kind                  = "StorageV2"
+  location                      = azurerm_resource_group.this.location
+  name                          = module.naming.storage_account.name_unique
+  resource_group_name           = azurerm_resource_group.this.name
+  min_tls_version               = "TLS1_2"
+  shared_access_key_enabled     = true
+  public_network_access_enabled = true
 
   tags = {
     env   = "dev"
