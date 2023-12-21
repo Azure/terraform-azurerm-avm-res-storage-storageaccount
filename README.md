@@ -21,45 +21,45 @@ This Terraform module is designed to create Azure Storage Accounts and its relat
 
 The following requirements are needed by this module:
 
-* <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.3.0)
+- <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.3.0)
 
-* <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) (1.9.0, < 2.0.0)
+- <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) (1.9.0, < 2.0.0)
 
-* <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (>= 3.71.0, < 4.0.0)
+- <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (>= 3.71.0, < 4.0.0)
 
-* <a name="requirement_random"></a> [random](#requirement\_random) (>= 3.5.0, < 4.0.0)
+- <a name="requirement_random"></a> [random](#requirement\_random) (>= 3.5.0, < 4.0.0)
 
 ## Providers
 
 The following providers are used by this module:
 
-* <a name="provider_azapi"></a> [azapi](#provider\_azapi) (1.9.0, < 2.0.0)
+- <a name="provider_azapi"></a> [azapi](#provider\_azapi) (1.9.0, < 2.0.0)
 
-* <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) (>= 3.71.0, < 4.0.0)
+- <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) (>= 3.71.0, < 4.0.0)
 
-* <a name="provider_random"></a> [random](#provider\_random) (>= 3.5.0, < 4.0.0)
+- <a name="provider_random"></a> [random](#provider\_random) (>= 3.5.0, < 4.0.0)
 
 ## Resources
 
 The following resources are used by this module:
 
-* [azapi_resource.containers](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
-* [azurerm_key_vault_access_policy.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault_access_policy) (resource)
-* [azurerm_management_lock.this-storage_account](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/management_lock) (resource)
-* [azurerm_private_endpoint.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint) (resource)
-* [azurerm_private_endpoint_application_security_group_association.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint_application_security_group_association) (resource)
-* [azurerm_resource_group_template_deployment.telemetry](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group_template_deployment) (resource)
-* [azurerm_role_assignment.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) (resource)
-* [azurerm_storage_account.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account) (resource)
-* [azurerm_storage_account_customer_managed_key.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account_customer_managed_key) (resource)
-* [azurerm_storage_account_local_user.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account_local_user) (resource)
-* [azurerm_storage_account_network_rules.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account_network_rules) (resource)
-* [azurerm_storage_queue.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_queue) (resource)
-* [azurerm_storage_share.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_share) (resource)
-* [azurerm_storage_table.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_table) (resource)
-* [random_id.telem](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/id) (resource)
-* [azurerm_client_config.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/client_config) (data source)
-* [azurerm_resource_group.rg](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/resource_group) (data source)
+- [azapi_resource.containers](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
+- [azurerm_key_vault_access_policy.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault_access_policy) (resource)
+- [azurerm_management_lock.this-storage_account](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/management_lock) (resource)
+- [azurerm_private_endpoint.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint) (resource)
+- [azurerm_private_endpoint_application_security_group_association.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint_application_security_group_association) (resource)
+- [azurerm_resource_group_template_deployment.telemetry](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group_template_deployment) (resource)
+- [azurerm_role_assignment.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) (resource)
+- [azurerm_storage_account.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account) (resource)
+- [azurerm_storage_account_customer_managed_key.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account_customer_managed_key) (resource)
+- [azurerm_storage_account_local_user.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account_local_user) (resource)
+- [azurerm_storage_account_network_rules.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account_network_rules) (resource)
+- [azurerm_storage_queue.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_queue) (resource)
+- [azurerm_storage_share.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_share) (resource)
+- [azurerm_storage_table.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_table) (resource)
+- [random_id.telem](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/id) (resource)
+- [azurerm_client_config.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/client_config) (data source)
+- [azurerm_resource_group.rg](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/resource_group) (data source)
 
 <!-- markdownlint-disable MD013 -->
 ## Required Inputs
@@ -136,12 +136,12 @@ Description: - `directory_type` - (Required) Specifies the directory service use
 
 ---
 `active_directory` block supports the following:
-* `domain_guid` - (Required) Specifies the domain GUID.
-* `domain_name` - (Required) Specifies the primary domain that the AD DNS server is authoritative for.
-* `domain_sid` - (Required) Specifies the security identifier (SID).
-* `forest_name` - (Required) Specifies the Active Directory forest.
-* `netbios_domain_name` - (Required) Specifies the NetBIOS domain name.
-* `storage_sid` - (Required) Specifies the security identifier (SID) for Azure Storage.
+- `domain_guid` - (Required) Specifies the domain GUID.
+- `domain_name` - (Required) Specifies the primary domain that the AD DNS server is authoritative for.
+- `domain_sid` - (Required) Specifies the security identifier (SID).
+- `forest_name` - (Required) Specifies the Active Directory forest.
+- `netbios_domain_name` - (Required) Specifies the NetBIOS domain name.
+- `storage_sid` - (Required) Specifies the security identifier (SID) for Azure Storage.
 
 Type:
 
@@ -164,43 +164,43 @@ Default: `null`
 ### <a name="input_blob_properties"></a> [blob\_properties](#input\_blob\_properties)
 
 Description: - `change_feed_enabled` - (Optional) Is the blob service properties for change feed events enabled? Default to `false`.
-* `change_feed_retention_in_days` - (Optional) The duration of change feed events retention in days. The possible values are between 1 and 146000 days (400 years). Setting this to null (or omit this in the configuration file) indicates an infinite retention of the change feed.
-* `default_service_version` - (Optional) The API Version which should be used by default for requests to the Data Plane API if an incoming request doesn't specify an API Version.
-* `last_access_time_enabled` - (Optional) Is the last access time based tracking enabled? Default to `false`.
-* `versioning_enabled` - (Optional) Is versioning enabled? Default to `false`.
+- `change_feed_retention_in_days` - (Optional) The duration of change feed events retention in days. The possible values are between 1 and 146000 days (400 years). Setting this to null (or omit this in the configuration file) indicates an infinite retention of the change feed.
+- `default_service_version` - (Optional) The API Version which should be used by default for requests to the Data Plane API if an incoming request doesn't specify an API Version.
+- `last_access_time_enabled` - (Optional) Is the last access time based tracking enabled? Default to `false`.
+- `versioning_enabled` - (Optional) Is versioning enabled? Default to `false`.
 
 ---
 `container_delete_retention_policy` block supports the following:
-* `days` - (Optional) Specifies the number of days that the container should be retained, between `1` and `365` days. Defaults to `7`.
+- `days` - (Optional) Specifies the number of days that the container should be retained, between `1` and `365` days. Defaults to `7`.
 
 ---
 `cors_rule` block supports the following:
-* `allowed_headers` - (Required) A list of headers that are allowed to be a part of the cross-origin request.
-* `allowed_methods` - (Required) A list of HTTP methods that are allowed to be executed by the origin. Valid options are `DELETE`, `GET`, `HEAD`, `MERGE`, `POST`, `OPTIONS`, `PUT` or `PATCH`.
-* `allowed_origins` - (Required) A list of origin domains that will be allowed by CORS.
-* `exposed_headers` - (Required) A list of response headers that are exposed to CORS clients.
-* `max_age_in_seconds` - (Required) The number of seconds the client should cache a preflight response.
+- `allowed_headers` - (Required) A list of headers that are allowed to be a part of the cross-origin request.
+- `allowed_methods` - (Required) A list of HTTP methods that are allowed to be executed by the origin. Valid options are `DELETE`, `GET`, `HEAD`, `MERGE`, `POST`, `OPTIONS`, `PUT` or `PATCH`.
+- `allowed_origins` - (Required) A list of origin domains that will be allowed by CORS.
+- `exposed_headers` - (Required) A list of response headers that are exposed to CORS clients.
+- `max_age_in_seconds` - (Required) The number of seconds the client should cache a preflight response.
 
 ---
 `delete_retention_policy` block supports the following:
-* `days` - (Optional) Specifies the number of days that the blob should be retained, between `1` and `365` days. Defaults to `7`.
+- `days` - (Optional) Specifies the number of days that the blob should be retained, between `1` and `365` days. Defaults to `7`.
 
 ---
 `diagnostic_settings` block supports the following:
-* `name` - (Optional) The name of the diagnostic setting. Defaults to `null`.
-* `log_categories` - (Optional) A set of log categories to enable. Defaults to an empty set.
-* `log_groups` - (Optional) A set of log groups to enable. Defaults to `["allLogs"]`.
-* `metric_categories` - (Optional) A set of metric categories to enable. Defaults to `["AllMetrics"]`.
-* `log_analytics_destination_type` - (Optional) The destination type for log analytics. Defaults to `"Dedicated"`.
-* `workspace_resource_id` - (Optional) The resource ID of the Log Analytics workspace. Defaults to `null`.
-* `resource_id` - (Optional) The resource ID of the target resource for diagnostics. Defaults to `null`.
-* `event_hub_authorization_rule_resource_id` - (Optional) The resource ID of the Event Hub authorization rule. Defaults to `null`.
-* `event_hub_name` - (Optional) The name of the Event Hub. Defaults to `null`.
-* `marketplace_partner_resource_id` - (Optional) The resource ID of the marketplace partner. Defaults to `null`.
+- `name` - (Optional) The name of the diagnostic setting. Defaults to `null`.
+- `log_categories` - (Optional) A set of log categories to enable. Defaults to an empty set.
+- `log_groups` - (Optional) A set of log groups to enable. Defaults to `["allLogs"]`.
+- `metric_categories` - (Optional) A set of metric categories to enable. Defaults to `["AllMetrics"]`.
+- `log_analytics_destination_type` - (Optional) The destination type for log analytics. Defaults to `"Dedicated"`.
+- `workspace_resource_id` - (Optional) The resource ID of the Log Analytics workspace. Defaults to `null`.
+- `resource_id` - (Optional) The resource ID of the target resource for diagnostics. Defaults to `null`.
+- `event_hub_authorization_rule_resource_id` - (Optional) The resource ID of the Event Hub authorization rule. Defaults to `null`.
+- `event_hub_name` - (Optional) The name of the Event Hub. Defaults to `null`.
+- `marketplace_partner_resource_id` - (Optional) The resource ID of the marketplace partner. Defaults to `null`.
 
 ---
 `restore_policy` block supports the following:
-* `days` - (Required) Specifies the number of days that the blob can be restored, between `1` and `365` days. This must be less than the `days` specified for `delete_retention_policy`.
+- `days` - (Required) Specifies the number of days that the blob can be restored, between `1` and `365` days. This must be less than the `days` specified for `delete_retention_policy`.
 
 Type:
 
@@ -247,15 +247,15 @@ Default: `null`
 ### <a name="input_containers"></a> [containers](#input\_containers)
 
 Description: - `container_access_type` - (Optional) The Access Level configured for this Container. Possible values are `Blob`, `Container` or `None`. Defaults to `None`.
-* `metadata` - (Optional) A mapping of MetaData for this Container. All metadata keys should be lowercase.
-* `name` - (Required) The name of the Container which should be created within the Storage Account. Changing this forces a new resource to be created.
+- `metadata` - (Optional) A mapping of MetaData for this Container. All metadata keys should be lowercase.
+- `name` - (Required) The name of the Container which should be created within the Storage Account. Changing this forces a new resource to be created.
 
 ---
 `timeouts` block supports the following:
-* `create` - (Defaults to 30 minutes) Used when creating the Storage Container.
-* `delete` - (Defaults to 30 minutes) Used when deleting the Storage Container.
-* `read` - (Defaults to 5 minutes) Used when retrieving the Storage Container.
-* `update` - (Defaults to 30 minutes) Used when updating the Storage Container.
+- `create` - (Defaults to 30 minutes) Used when creating the Storage Container.
+- `delete` - (Defaults to 30 minutes) Used when deleting the Storage Container.
+- `read` - (Defaults to 5 minutes) Used when retrieving the Storage Container.
+- `update` - (Defaults to 30 minutes) Used when updating the Storage Container.
 
 Type:
 
@@ -297,7 +297,7 @@ Default: `false`
 ### <a name="input_custom_domain"></a> [custom\_domain](#input\_custom\_domain)
 
 Description: - `name` - (Required) The Custom Domain Name to use for the Storage Account, which will be validated by Azure.
-* `use_subdomain` - (Optional) Should the Custom Domain Name be validated by using indirect CNAME validation?
+- `use_subdomain` - (Optional) Should the Custom Domain Name be validated by using indirect CNAME validation?
 
 Type:
 
@@ -339,16 +339,16 @@ Default: `null`
 
 Description:   A map of diagnostic settings to create on the Key Vault. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
 
-* `name` - (Optional) The name of the diagnostic setting. One will be generated if not set, however this will not be unique if you want to create multiple diagnostic setting resources.
-* `log_categories` - (Optional) A set of log categories to send to the log analytics workspace. Defaults to `[]`.
-* `log_groups` - (Optional) A set of log groups to send to the log analytics workspace. Defaults to `["allLogs"]`.
-* `metric_categories` - (Optional) A set of metric categories to send to the log analytics workspace. Defaults to `["AllMetrics"]`.
-* `log_analytics_destination_type` - (Optional) The destination type for the diagnostic setting. Possible values are `Dedicated` and `AzureDiagnostics`. Defaults to `Dedicated`.
-* `workspace_resource_id` - (Optional) The resource ID of the log analytics workspace to send logs and metrics to.
-* `storage_account_resource_id` - (Optional) The resource ID of the storage account to send logs and metrics to.
-* `event_hub_authorization_rule_resource_id` - (Optional) The resource ID of the event hub authorization rule to send logs and metrics to.
-* `event_hub_name` - (Optional) The name of the event hub. If none is specified, the default event hub will be selected.
-* `marketplace_partner_resource_id` - (Optional) The full ARM resource ID of the Marketplace resource to which you would like to send Diagnostic LogsLogs.
+  - `name` - (Optional) The name of the diagnostic setting. One will be generated if not set, however this will not be unique if you want to create multiple diagnostic setting resources.
+  - `log_categories` - (Optional) A set of log categories to send to the log analytics workspace. Defaults to `[]`.
+  - `log_groups` - (Optional) A set of log groups to send to the log analytics workspace. Defaults to `["allLogs"]`.
+  - `metric_categories` - (Optional) A set of metric categories to send to the log analytics workspace. Defaults to `["AllMetrics"]`.
+  - `log_analytics_destination_type` - (Optional) The destination type for the diagnostic setting. Possible values are `Dedicated` and `AzureDiagnostics`. Defaults to `Dedicated`.
+  - `workspace_resource_id` - (Optional) The resource ID of the log analytics workspace to send logs and metrics to.
+  - `storage_account_resource_id` - (Optional) The resource ID of the storage account to send logs and metrics to.
+  - `event_hub_authorization_rule_resource_id` - (Optional) The resource ID of the event hub authorization rule to send logs and metrics to.
+  - `event_hub_name` - (Optional) The name of the event hub. If none is specified, the default event hub will be selected.
+  - `marketplace_partner_resource_id` - (Optional) The full ARM resource ID of the Marketplace resource to which you would like to send Diagnostic LogsLogs.
 
 Type:
 
@@ -388,7 +388,7 @@ Default: `true`
 ### <a name="input_enable_telemetry"></a> [enable\_telemetry](#input\_enable\_telemetry)
 
 Description: This variable controls whether or not telemetry is enabled for the module.  
-For more information see <https://aka.ms/avm/telemetryinfo>.  
+For more information see https://aka.ms/avm/telemetryinfo.  
 If it is set to false, then no telemetry will be collected.
 
 Type: `bool`
@@ -398,8 +398,8 @@ Default: `true`
 ### <a name="input_immutability_policy"></a> [immutability\_policy](#input\_immutability\_policy)
 
 Description: - `allow_protected_append_writes` - (Required) When enabled, new blocks can be written to an append blob while maintaining immutability protection and compliance. Only new blocks can be added and any existing blocks cannot be modified or deleted.
-* `period_since_creation_in_days` - (Required) The immutability period for the blobs in the container since the policy creation, in days.
-* `state` - (Required) Defines the mode of the policy. `Disabled` state disables the policy, `Unlocked` state allows increase and decrease of immutability retention time and also allows toggling allowProtectedAppendWrites property, `Locked` state only allows the increase of the immutability retention time. A policy can only be created in a Disabled or Unlocked state and can be toggled between the two states. Only a policy in an Unlocked state can transition to a Locked state which cannot be reverted.
+- `period_since_creation_in_days` - (Required) The immutability period for the blobs in the container since the policy creation, in days.
+- `state` - (Required) Defines the mode of the policy. `Disabled` state disables the policy, `Unlocked` state allows increase and decrease of immutability retention time and also allows toggling allowProtectedAppendWrites property, `Locked` state only allows the increase of the immutability retention time. A policy can only be created in a Disabled or Unlocked state and can be toggled between the two states. Only a policy in an Unlocked state can transition to a Locked state which cannot be reverted.
 
 Type:
 
@@ -433,16 +433,16 @@ Default: `null`
 
 Description: Since storage account's customer managed key might require key vault permission, you can create the corresponding permission by setting this variable.
 
-* `key_permissions` - (Optional) A map of list of key permissions, key is user assigned identity id, the element in value list must be one or more from the following: `Backup`, `Create`, `Decrypt`, Delete, `Encrypt`, `Get`, `Import`, `List`, `Purge`, `Recover`, `Restore`, `Sign`, `UnwrapKey`, `Update`, `Verify`, `WrapKey`, `Release`, `Rotate`, `GetRotationPolicy` and `SetRotationPolicy`. Defaults to `["Get", "UnwrapKey", "WrapKey"]`
-* `identity_principle_id` - (Required) The principal ID of managed identity. Changing this forces a new resource to be created.
-* `identity_tenant_id` - (Required) The tenant ID of managed identity. Changing this forces a new resource to be created.
+- `key_permissions` - (Optional) A map of list of key permissions, key is user assigned identity id, the element in value list must be one or more from the following: `Backup`, `Create`, `Decrypt`, Delete, `Encrypt`, `Get`, `Import`, `List`, `Purge`, `Recover`, `Restore`, `Sign`, `UnwrapKey`, `Update`, `Verify`, `WrapKey`, `Release`, `Rotate`, `GetRotationPolicy` and `SetRotationPolicy`. Defaults to `["Get", "UnwrapKey", "WrapKey"]`
+- `identity_principle_id` - (Required) The principal ID of managed identity. Changing this forces a new resource to be created.
+- `identity_tenant_id` - (Required) The tenant ID of managed identity. Changing this forces a new resource to be created.
 
 ---
 `timeouts` block supports the following:
-* `create` - (Defaults to 30 minutes) Used when creating the Key Vault Access Policy.
-* `delete` - (Defaults to 30 minutes) Used when deleting the Key Vault Access Policy.
-* `read` - (Defaults to 5 minutes) Used when retrieving the Key Vault Access Policy.
-* `update` - (Defaults to 30 minutes) Used when updating the Key Vault Access Policy.
+- `create` - (Defaults to 30 minutes) Used when creating the Key Vault Access Policy.
+- `delete` - (Defaults to 30 minutes) Used when deleting the Key Vault Access Policy.
+- `read` - (Defaults to 5 minutes) Used when retrieving the Key Vault Access Policy.
+- `update` - (Defaults to 30 minutes) Used when updating the Key Vault Access Policy.
 
 Type:
 
@@ -477,34 +477,34 @@ Default: `null`
 ### <a name="input_local_user"></a> [local\_user](#input\_local\_user)
 
 Description: - `home_directory` - (Optional) The home directory of the Storage Account Local User.
-* `name` - (Required) The name which should be used for this Storage Account Local User. Changing this forces a new Storage Account Local User to be created.
-* `ssh_key_enabled` - (Optional) Specifies whether SSH Key Authentication is enabled. Defaults to `false`.
-* `ssh_password_enabled` - (Optional) Specifies whether SSH Password Authentication is enabled. Defaults to `false`.
+- `name` - (Required) The name which should be used for this Storage Account Local User. Changing this forces a new Storage Account Local User to be created.
+- `ssh_key_enabled` - (Optional) Specifies whether SSH Key Authentication is enabled. Defaults to `false`.
+- `ssh_password_enabled` - (Optional) Specifies whether SSH Password Authentication is enabled. Defaults to `false`.
 
 ---
 `permission_scope` block supports the following:
-* `resource_name` - (Required) The container name (when `service` is set to `blob`) or the file share name (when `service` is set to `file`), used by the Storage Account Local User.
-* `service` - (Required) The storage service used by this Storage Account Local User. Possible values are `blob` and `file`.
+- `resource_name` - (Required) The container name (when `service` is set to `blob`) or the file share name (when `service` is set to `file`), used by the Storage Account Local User.
+- `service` - (Required) The storage service used by this Storage Account Local User. Possible values are `blob` and `file`.
 
 ---
 `permissions` block supports the following:
-* `create` - (Optional) Specifies if the Local User has the create permission for this scope. Defaults to `false`.
-* `delete` - (Optional) Specifies if the Local User has the delete permission for this scope. Defaults to `false`.
-* `list` - (Optional) Specifies if the Local User has the list permission for this scope. Defaults to `false`.
-* `read` - (Optional) Specifies if the Local User has the read permission for this scope. Defaults to `false`.
-* `write` - (Optional) Specifies if the Local User has the write permission for this scope. Defaults to `false`.
+- `create` - (Optional) Specifies if the Local User has the create permission for this scope. Defaults to `false`.
+- `delete` - (Optional) Specifies if the Local User has the delete permission for this scope. Defaults to `false`.
+- `list` - (Optional) Specifies if the Local User has the list permission for this scope. Defaults to `false`.
+- `read` - (Optional) Specifies if the Local User has the read permission for this scope. Defaults to `false`.
+- `write` - (Optional) Specifies if the Local User has the write permission for this scope. Defaults to `false`.
 
 ---
 `ssh_authorized_key` block supports the following:
-* `description` - (Optional) The description of this SSH authorized key.
-* `key` - (Required) The public key value of this SSH authorized key.
+- `description` - (Optional) The description of this SSH authorized key.
+- `key` - (Required) The public key value of this SSH authorized key.
 
 ---
 `timeouts` block supports the following:
-* `create` - (Defaults to 30 minutes) Used when creating the Storage Account Local User.
-* `delete` - (Defaults to 30 minutes) Used when deleting the Storage Account Local User.
-* `read` - (Defaults to 5 minutes) Used when retrieving the Storage Account Local User.
-* `update` - (Defaults to 30 minutes) Used when updating the Storage Account Local User.
+- `create` - (Defaults to 30 minutes) Used when creating the Storage Account Local User.
+- `delete` - (Defaults to 30 minutes) Used when deleting the Storage Account Local User.
+- `read` - (Defaults to 5 minutes) Used when retrieving the Storage Account Local User.
+- `update` - (Defaults to 30 minutes) Used when updating the Storage Account Local User.
 
 Type:
 
@@ -590,22 +590,22 @@ Default: `"TLS1_2"`
 ### <a name="input_network_rules"></a> [network\_rules](#input\_network\_rules)
 
 Description: - `bypass` - (Optional) Specifies whether traffic is bypassed for Logging/Metrics/AzureServices. Valid options are any combination of `Logging`, `Metrics`, `AzureServices`, or `None`.
-* `default_action` - (Required) Specifies the default action of allow or deny when no other rules match. Valid options are `Deny` or `Allow`.
-* `ip_rules` - (Optional) List of public IP or IP ranges in CIDR Format. Only IPv4 addresses are allowed. Private IP address ranges (as defined in [RFC 1918](https://tools.ietf.org/html/rfc1918#section-3)) are not allowed.
-* `storage_account_id` - (Required) Specifies the ID of the storage account. Changing this forces a new resource to be created.
-* `virtual_network_subnet_ids` - (Optional) A list of virtual network subnet ids to secure the storage account.
+- `default_action` - (Required) Specifies the default action of allow or deny when no other rules match. Valid options are `Deny` or `Allow`.
+- `ip_rules` - (Optional) List of public IP or IP ranges in CIDR Format. Only IPv4 addresses are allowed. Private IP address ranges (as defined in [RFC 1918](https://tools.ietf.org/html/rfc1918#section-3)) are not allowed.
+- `storage_account_id` - (Required) Specifies the ID of the storage account. Changing this forces a new resource to be created.
+- `virtual_network_subnet_ids` - (Optional) A list of virtual network subnet ids to secure the storage account.
 
 ---
 `private_link_access` block supports the following:
-* `endpoint_resource_id` - (Required) The resource id of the resource access rule to be granted access.
-* `endpoint_tenant_id` - (Optional) The tenant id of the resource of the resource access rule to be granted access. Defaults to the current tenant id.
+- `endpoint_resource_id` - (Required) The resource id of the resource access rule to be granted access.
+- `endpoint_tenant_id` - (Optional) The tenant id of the resource of the resource access rule to be granted access. Defaults to the current tenant id.
 
 ---
 `timeouts` block supports the following:
-* `create` - (Defaults to 60 minutes) Used when creating the  Network Rules for this Storage Account.
-* `delete` - (Defaults to 60 minutes) Used when deleting the Network Rules for this Storage Account.
-* `read` - (Defaults to 5 minutes) Used when retrieving the Network Rules for this Storage Account.
-* `update` - (Defaults to 60 minutes) Used when updating the Network Rules for this Storage Account.
+- `create` - (Defaults to 60 minutes) Used when creating the  Network Rules for this Storage Account.
+- `delete` - (Defaults to 60 minutes) Used when deleting the Network Rules for this Storage Account.
+- `read` - (Defaults to 5 minutes) Used when retrieving the Network Rules for this Storage Account.
+- `update` - (Defaults to 60 minutes) Used when updating the Network Rules for this Storage Account.
 
 Type:
 
@@ -642,22 +642,22 @@ Default: `false`
 
 Description: A map of private endpoints to create on the resource. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
 
-* `name` - (Optional) The name of the private endpoint. One will be generated if not set.
-* `role_assignments` - (Optional) A map of role assignments to create on the private endpoint. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time. See `var.role_assignments` for more information.
-* `lock` - (Optional) The lock level to apply to the private endpoint. Default is `None`. Possible values are `None`, `CanNotDelete`, and `ReadOnly`.
-* `tags` - (Optional) A mapping of tags to assign to the private endpoint.
-* `subnet_resource_id` - The resource ID of the subnet to deploy the private endpoint in.
-* `subresource_name` - The service name of the private endpoint.  Possible value are `blob`, 'dfs', 'file', `queue`, `table`, and `web`.
-* `private_dns_zone_group_name` - (Optional) The name of the private DNS zone group. One will be generated if not set.
-* `private_dns_zone_resource_ids` - (Optional) A set of resource IDs of private DNS zones to associate with the private endpoint. If not set, no zone groups will be created and the private endpoint will not be associated with any private DNS zones. DNS records must be managed external to this module.
-* `application_security_group_resource_ids` - (Optional) A map of resource IDs of application security groups to associate with the private endpoint. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
-* `private_service_connection_name` - (Optional) The name of the private service connection. One will be generated if not set.
-* `network_interface_name` - (Optional) The name of the network interface. One will be generated if not set.
-* `location` - (Optional) The Azure location where the resources will be deployed. Defaults to the location of the resource group.
-* `resource_group_name` - (Optional) The resource group where the resources will be deployed. Defaults to the resource group of the resource.
-* `ip_configurations` - (Optional) A map of IP configurations to create on the private endpoint. If not specified the platform will create one. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
-  * `name` - The name of the IP configuration.
-  * `private_ip_address` - The private IP address of the IP configuration.
+- `name` - (Optional) The name of the private endpoint. One will be generated if not set.
+- `role_assignments` - (Optional) A map of role assignments to create on the private endpoint. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time. See `var.role_assignments` for more information.
+- `lock` - (Optional) The lock level to apply to the private endpoint. Default is `None`. Possible values are `None`, `CanNotDelete`, and `ReadOnly`.
+- `tags` - (Optional) A mapping of tags to assign to the private endpoint.
+- `subnet_resource_id` - The resource ID of the subnet to deploy the private endpoint in.
+- `subresource_name` - The service name of the private endpoint.  Possible value are `blob`, 'dfs', 'file', `queue`, `table`, and `web`.
+- `private_dns_zone_group_name` - (Optional) The name of the private DNS zone group. One will be generated if not set.
+- `private_dns_zone_resource_ids` - (Optional) A set of resource IDs of private DNS zones to associate with the private endpoint. If not set, no zone groups will be created and the private endpoint will not be associated with any private DNS zones. DNS records must be managed external to this module.
+- `application_security_group_resource_ids` - (Optional) A map of resource IDs of application security groups to associate with the private endpoint. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
+- `private_service_connection_name` - (Optional) The name of the private service connection. One will be generated if not set.
+- `network_interface_name` - (Optional) The name of the network interface. One will be generated if not set.
+- `location` - (Optional) The Azure location where the resources will be deployed. Defaults to the location of the resource group.
+- `resource_group_name` - (Optional) The resource group where the resources will be deployed. Defaults to the resource group of the resource.
+- `ip_configurations` - (Optional) A map of IP configurations to create on the private endpoint. If not specified the platform will create one. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
+  - `name` - The name of the IP configuration.
+  - `private_ip_address` - The private IP address of the IP configuration.
 
 Type:
 
@@ -714,50 +714,49 @@ Default: `null`
 
 ### <a name="input_queue_properties"></a> [queue\_properties](#input\_queue\_properties)
 
-Description
+Description:
 ---
-
 `cors_rule` block supports the following:
-* `allowed_headers` - (Required) A list of headers that are allowed to be a part of the cross-origin request.
-* `allowed_methods` - (Required) A list of HTTP methods that are allowed to be executed by the origin. Valid options are `DELETE`, `GET`, `HEAD`, `MERGE`, `POST`, `OPTIONS`, `PUT` or `PATCH`.
-* `allowed_origins` - (Required) A list of origin domains that will be allowed by CORS.
-* `exposed_headers` - (Required) A list of response headers that are exposed to CORS clients.
-* `max_age_in_seconds` - (Required) The number of seconds the client should cache a preflight response.
+- `allowed_headers` - (Required) A list of headers that are allowed to be a part of the cross-origin request.
+- `allowed_methods` - (Required) A list of HTTP methods that are allowed to be executed by the origin. Valid options are `DELETE`, `GET`, `HEAD`, `MERGE`, `POST`, `OPTIONS`, `PUT` or `PATCH`.
+- `allowed_origins` - (Required) A list of origin domains that will be allowed by CORS.
+- `exposed_headers` - (Required) A list of response headers that are exposed to CORS clients.
+- `max_age_in_seconds` - (Required) The number of seconds the client should cache a preflight response.
 
 ---
 `diagnostic_settings` block supports the following:
-* `name` - (Optional) The name of the diagnostic setting. Defaults to `null`.
-* `log_categories` - (Optional) A set of log categories to enable. Defaults to an empty set.
-* `log_groups` - (Optional) A set of log groups to enable. Defaults to `["allLogs"]`.
-* `metric_categories` - (Optional) A set of metric categories to enable. Defaults to `["AllMetrics"]`.
-* `log_analytics_destination_type` - (Optional) The destination type for log analytics. Defaults to `"Dedicated"`.
-* `workspace_resource_id` - (Optional) The resource ID of the Log Analytics workspace. Defaults to `null`.
-* `resource_id` - (Optional) The resource ID of the target resource for diagnostics. Defaults to `null`.
-* `event_hub_authorization_rule_resource_id` - (Optional) The resource ID of the Event Hub authorization rule. Defaults to `null`.
-* `event_hub_name` - (Optional) The name of the Event Hub. Defaults to `null`.
-* `marketplace_partner_resource_id` - (Optional) The resource ID of the marketplace partner. Defaults to `null`.
+- `name` - (Optional) The name of the diagnostic setting. Defaults to `null`.
+- `log_categories` - (Optional) A set of log categories to enable. Defaults to an empty set.
+- `log_groups` - (Optional) A set of log groups to enable. Defaults to `["allLogs"]`.
+- `metric_categories` - (Optional) A set of metric categories to enable. Defaults to `["AllMetrics"]`.
+- `log_analytics_destination_type` - (Optional) The destination type for log analytics. Defaults to `"Dedicated"`.
+- `workspace_resource_id` - (Optional) The resource ID of the Log Analytics workspace. Defaults to `null`.
+- `resource_id` - (Optional) The resource ID of the target resource for diagnostics. Defaults to `null`.
+- `event_hub_authorization_rule_resource_id` - (Optional) The resource ID of the Event Hub authorization rule. Defaults to `null`.
+- `event_hub_name` - (Optional) The name of the Event Hub. Defaults to `null`.
+- `marketplace_partner_resource_id` - (Optional) The resource ID of the marketplace partner. Defaults to `null`.
 
 ---
 `hour_metrics` block supports the following:
-* `enabled` - (Required) Indicates whether hour metrics are enabled for the Queue service.
-* `include_apis` - (Optional) Indicates whether metrics should generate summary statistics for called API operations.
-* `retention_policy_days` - (Optional) Specifies the number of days that logs will be retained.
-* `version` - (Required) The version of storage analytics to configure.
+- `enabled` - (Required) Indicates whether hour metrics are enabled for the Queue service.
+- `include_apis` - (Optional) Indicates whether metrics should generate summary statistics for called API operations.
+- `retention_policy_days` - (Optional) Specifies the number of days that logs will be retained.
+- `version` - (Required) The version of storage analytics to configure.
 
 ---
 `logging` block supports the following:
-* `delete` - (Required) Indicates whether all delete requests should be logged.
-* `read` - (Required) Indicates whether all read requests should be logged.
-* `retention_policy_days` - (Optional) Specifies the number of days that logs will be retained.
-* `version` - (Required) The version of storage analytics to configure.
-* `write` - (Required) Indicates whether all write requests should be logged.
+- `delete` - (Required) Indicates whether all delete requests should be logged.
+- `read` - (Required) Indicates whether all read requests should be logged.
+- `retention_policy_days` - (Optional) Specifies the number of days that logs will be retained.
+- `version` - (Required) The version of storage analytics to configure.
+- `write` - (Required) Indicates whether all write requests should be logged.
 
 ---
 `minute_metrics` block supports the following:
-* `enabled` - (Required) Indicates whether minute metrics are enabled for the Queue service.
-* `include_apis` - (Optional) Indicates whether metrics should generate summary statistics for called API operations.
-* `retention_policy_days` - (Optional) Specifies the number of days that logs will be retained.
-* `version` - (Required) The version of storage analytics to configure.
+- `enabled` - (Required) Indicates whether minute metrics are enabled for the Queue service.
+- `include_apis` - (Optional) Indicates whether metrics should generate summary statistics for called API operations.
+- `retention_policy_days` - (Optional) Specifies the number of days that logs will be retained.
+- `version` - (Required) The version of storage analytics to configure.
 
 Type:
 
@@ -809,14 +808,14 @@ Default: `null`
 ### <a name="input_queues"></a> [queues](#input\_queues)
 
 Description: - `metadata` - (Optional) A mapping of MetaData which should be assigned to this Storage Queue.
-* `name` - (Required) The name of the Queue which should be created within the Storage Account. Must be unique within the storage account the queue is located. Changing this forces a new resource to be created.
+- `name` - (Required) The name of the Queue which should be created within the Storage Account. Must be unique within the storage account the queue is located. Changing this forces a new resource to be created.
 
 ---
 `timeouts` block supports the following:
-* `create` - (Defaults to 30 minutes) Used when creating the Storage Queue.
-* `delete` - (Defaults to 30 minutes) Used when deleting the Storage Queue.
-* `read` - (Defaults to 5 minutes) Used when retrieving the Storage Queue.
-* `update` - (Defaults to 30 minutes) Used when updating the Storage Queue.
+- `create` - (Defaults to 30 minutes) Used when creating the Storage Queue.
+- `delete` - (Defaults to 30 minutes) Used when deleting the Storage Queue.
+- `read` - (Defaults to 5 minutes) Used when retrieving the Storage Queue.
+- `update` - (Defaults to 30 minutes) Used when updating the Storage Queue.
 
 Type:
 
@@ -839,12 +838,12 @@ Default: `{}`
 
 Description: A map of role assignments to create on the resource. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
 
-* `role_definition_id_or_name` - The ID or name of the role definition to assign to the principal.
-* `principal_id` - The ID of the principal to assign the role to.
-* `description` - The description of the role assignment.
-* `skip_service_principal_aad_check` - If set to true, skips the Azure Active Directory check for the service principal in the tenant. Defaults to false.
-* `condition` - The condition which will be used to scope the role assignment.
-* `condition_version` - The version of the condition syntax. Valid values are '2.0'.
+- `role_definition_id_or_name` - The ID or name of the role definition to assign to the principal.
+- `principal_id` - The ID of the principal to assign the role to.
+- `description` - The description of the role assignment.
+- `skip_service_principal_aad_check` - If set to true, skips the Azure Active Directory check for the service principal in the tenant. Defaults to false.
+- `condition` - The condition which will be used to scope the role assignment.
+- `condition_version` - The version of the condition syntax. Valid values are '2.0'.
 
 > Note: only set `skip_service_principal_aad_check` to true if you are assigning a role to a service principal.
 
@@ -867,8 +866,8 @@ Default: `{}`
 ### <a name="input_routing"></a> [routing](#input\_routing)
 
 Description: - `choice` - (Optional) Specifies the kind of network routing opted by the user. Possible values are `InternetRouting` and `MicrosoftRouting`. Defaults to `MicrosoftRouting`.
-* `publish_internet_endpoints` - (Optional) Should internet routing storage endpoints be published? Defaults to `false`.
-* `publish_microsoft_endpoints` - (Optional) Should Microsoft routing storage endpoints be published? Defaults to `false`.
+- `publish_internet_endpoints` - (Optional) Should internet routing storage endpoints be published? Defaults to `false`.
+- `publish_microsoft_endpoints` - (Optional) Should Microsoft routing storage endpoints be published? Defaults to `false`.
 
 Type:
 
@@ -885,7 +884,7 @@ Default: `null`
 ### <a name="input_sas_policy"></a> [sas\_policy](#input\_sas\_policy)
 
 Description: - `expiration_action` - (Optional) The SAS expiration action. The only possible value is `Log` at this moment. Defaults to `Log`.
-* `expiration_period` - (Required) The SAS expiration period in format of `DD.HH:MM:SS`.
+- `expiration_period` - (Required) The SAS expiration period in format of `DD.HH:MM:SS`.
 
 Type:
 
@@ -908,40 +907,39 @@ Default: `false`
 
 ### <a name="input_share_properties"></a> [share\_properties](#input\_share\_properties)
 
-Description
+Description:
 ---
-
 `cors_rule` block supports the following:
-* `allowed_headers` - (Required) A list of headers that are allowed to be a part of the cross-origin request.
-* `allowed_methods` - (Required) A list of HTTP methods that are allowed to be executed by the origin. Valid options are `DELETE`, `GET`, `HEAD`, `MERGE`, `POST`, `OPTIONS`, `PUT` or `PATCH`.
-* `allowed_origins` - (Required) A list of origin domains that will be allowed by CORS.
-* `exposed_headers` - (Required) A list of response headers that are exposed to CORS clients.
-* `max_age_in_seconds` - (Required) The number of seconds the client should cache a preflight response.
+- `allowed_headers` - (Required) A list of headers that are allowed to be a part of the cross-origin request.
+- `allowed_methods` - (Required) A list of HTTP methods that are allowed to be executed by the origin. Valid options are `DELETE`, `GET`, `HEAD`, `MERGE`, `POST`, `OPTIONS`, `PUT` or `PATCH`.
+- `allowed_origins` - (Required) A list of origin domains that will be allowed by CORS.
+- `exposed_headers` - (Required) A list of response headers that are exposed to CORS clients.
+- `max_age_in_seconds` - (Required) The number of seconds the client should cache a preflight response.
 
 ---
 `diagnostic_settings` block supports the following:
-* `name` - (Optional) The name of the diagnostic setting. Defaults to `null`.
-* `log_categories` - (Optional) A set of log categories to enable. Defaults to an empty set.
-* `log_groups` - (Optional) A set of log groups to enable. Defaults to `["allLogs"]`.
-* `metric_categories` - (Optional) A set of metric categories to enable. Defaults to `["AllMetrics"]`.
-* `log_analytics_destination_type` - (Optional) The destination type for log analytics. Defaults to `"Dedicated"`.
-* `workspace_resource_id` - (Optional) The resource ID of the Log Analytics workspace. Defaults to `null`.
-* `resource_id` - (Optional) The resource ID of the target resource for diagnostics. Defaults to `null`.
-* `event_hub_authorization_rule_resource_id` - (Optional) The resource ID of the Event Hub authorization rule. Defaults to `null`.
-* `event_hub_name` - (Optional) The name of the Event Hub. Defaults to `null`.
-* `marketplace_partner_resource_id` - (Optional) The resource ID of the marketplace partner. Defaults to `null`.
+- `name` - (Optional) The name of the diagnostic setting. Defaults to `null`.
+- `log_categories` - (Optional) A set of log categories to enable. Defaults to an empty set.
+- `log_groups` - (Optional) A set of log groups to enable. Defaults to `["allLogs"]`.
+- `metric_categories` - (Optional) A set of metric categories to enable. Defaults to `["AllMetrics"]`.
+- `log_analytics_destination_type` - (Optional) The destination type for log analytics. Defaults to `"Dedicated"`.
+- `workspace_resource_id` - (Optional) The resource ID of the Log Analytics workspace. Defaults to `null`.
+- `resource_id` - (Optional) The resource ID of the target resource for diagnostics. Defaults to `null`.
+- `event_hub_authorization_rule_resource_id` - (Optional) The resource ID of the Event Hub authorization rule. Defaults to `null`.
+- `event_hub_name` - (Optional) The name of the Event Hub. Defaults to `null`.
+- `marketplace_partner_resource_id` - (Optional) The resource ID of the marketplace partner. Defaults to `null`.
 
 ---
 `retention_policy` block supports the following:
-* `days` - (Optional) Specifies the number of days that the `azurerm_shares` should be retained, between `1` and `365` days. Defaults to `7`.
+- `days` - (Optional) Specifies the number of days that the `azurerm_shares` should be retained, between `1` and `365` days. Defaults to `7`.
 
 ---
 `smb` block supports the following:
-* `authentication_types` - (Optional) A set of SMB authentication methods. Possible values are `NTLMv2`, and `Kerberos`.
-* `channel_encryption_type` - (Optional) A set of SMB channel encryption. Possible values are `AES-128-CCM`, `AES-128-GCM`, and `AES-256-GCM`.
-* `kerberos_ticket_encryption_type` - (Optional) A set of Kerberos ticket encryption. Possible values are `RC4-HMAC`, and `AES-256`.
-* `multichannel_enabled` - (Optional) Indicates whether multichannel is enabled. Defaults to `false`. This is only supported on Premium storage accounts.
-* `versions` - (Optional) A set of SMB protocol versions. Possible values are `SMB2.1`, `SMB3.0`, and `SMB3.1.1`.
+- `authentication_types` - (Optional) A set of SMB authentication methods. Possible values are `NTLMv2`, and `Kerberos`.
+- `channel_encryption_type` - (Optional) A set of SMB channel encryption. Possible values are `AES-128-CCM`, `AES-128-GCM`, and `AES-256-GCM`.
+- `kerberos_ticket_encryption_type` - (Optional) A set of Kerberos ticket encryption. Possible values are `RC4-HMAC`, and `AES-256`.
+- `multichannel_enabled` - (Optional) Indicates whether multichannel is enabled. Defaults to `false`. This is only supported on Premium storage accounts.
+- `versions` - (Optional) A set of SMB protocol versions. Possible values are `SMB2.1`, `SMB3.0`, and `SMB3.1.1`.
 
 Type:
 
@@ -992,27 +990,27 @@ Default: `false`
 ### <a name="input_shares"></a> [shares](#input\_shares)
 
 Description: - `access_tier` - (Optional) The access tier of the File Share. Possible values are `Hot`, `Cool` and `TransactionOptimized`, `Premium`.
-* `enabled_protocol` - (Optional) The protocol used for the share. Possible values are `SMB` and `NFS`. The `SMB` indicates the share can be accessed by SMBv3.0, SMBv2.1 and REST. The `NFS` indicates the share can be accessed by NFSv4.1. Defaults to `SMB`. Changing this forces a new resource to be created.
-* `metadata` - (Optional) A mapping of MetaData for this File Share.
-* `name` - (Required) The name of the share. Must be unique within the storage account where the share is located. Changing this forces a new resource to be created.
-* `quota` - (Required) The maximum size of the share, in gigabytes. For Standard storage accounts, this must be `1`GB (or higher) and at most `5120` GB (`5` TB). For Premium FileStorage storage accounts, this must be greater than 100 GB and at most `102400` GB (`100` TB).
+- `enabled_protocol` - (Optional) The protocol used for the share. Possible values are `SMB` and `NFS`. The `SMB` indicates the share can be accessed by SMBv3.0, SMBv2.1 and REST. The `NFS` indicates the share can be accessed by NFSv4.1. Defaults to `SMB`. Changing this forces a new resource to be created.
+- `metadata` - (Optional) A mapping of MetaData for this File Share.
+- `name` - (Required) The name of the share. Must be unique within the storage account where the share is located. Changing this forces a new resource to be created.
+- `quota` - (Required) The maximum size of the share, in gigabytes. For Standard storage accounts, this must be `1`GB (or higher) and at most `5120` GB (`5` TB). For Premium FileStorage storage accounts, this must be greater than 100 GB and at most `102400` GB (`100` TB).
 
 ---
 `acl` block supports the following:
-* `id` - (Required) The ID which should be used for this Shared Identifier.
+- `id` - (Required) The ID which should be used for this Shared Identifier.
 
 ---
 `access_policy` block supports the following:
-* `expiry` - (Optional) The time at which this Access Policy should be valid until, in [ISO8601](https://en.wikipedia.org/wiki/ISO_8601) format.
-* `permissions` - (Required) The permissions which should be associated with this Shared Identifier. Possible value is combination of `r` (read), `w` (write), `d` (delete), and `l` (list).
-* `start` - (Optional) The time at which this Access Policy should be valid from, in [ISO8601](https://en.wikipedia.org/wiki/ISO_8601) format.
+- `expiry` - (Optional) The time at which this Access Policy should be valid until, in [ISO8601](https://en.wikipedia.org/wiki/ISO_8601) format.
+- `permissions` - (Required) The permissions which should be associated with this Shared Identifier. Possible value is combination of `r` (read), `w` (write), `d` (delete), and `l` (list).
+- `start` - (Optional) The time at which this Access Policy should be valid from, in [ISO8601](https://en.wikipedia.org/wiki/ISO_8601) format.
 
 ---
 `timeouts` block supports the following:
-* `create` - (Defaults to 30 minutes) Used when creating the Storage Share.
-* `delete` - (Defaults to 30 minutes) Used when deleting the Storage Share.
-* `read` - (Defaults to 5 minutes) Used when retrieving the Storage Share.
-* `update` - (Defaults to 30 minutes) Used when updating the Storage Share.
+- `create` - (Defaults to 30 minutes) Used when creating the Storage Share.
+- `delete` - (Defaults to 30 minutes) Used when deleting the Storage Share.
+- `read` - (Defaults to 5 minutes) Used when retrieving the Storage Share.
+- `update` - (Defaults to 30 minutes) Used when updating the Storage Share.
 
 Type:
 
@@ -1045,7 +1043,7 @@ Default: `{}`
 ### <a name="input_static_website"></a> [static\_website](#input\_static\_website)
 
 Description: - `error_404_document` - (Optional) The absolute path to a custom webpage that should be used when a request is made which does not correspond to an existing file.
-* `index_document` - (Optional) The webpage that Azure Storage serves for requests to the root of a website or any subfolder. For example, index.html. The value is case-sensitive.
+- `index_document` - (Optional) The webpage that Azure Storage serves for requests to the root of a website or any subfolder. For example, index.html. The value is case-sensitive.
 
 Type:
 
@@ -1068,32 +1066,31 @@ Default: `null`
 
 ### <a name="input_table_properties"></a> [table\_properties](#input\_table\_properties)
 
-Description
+Description:
 ---
-
 `cors_rule` block supports the following:
-* `allowed_headers` - (Required) A list of headers that are allowed to be a part of the cross-origin request.
-* `allowed_methods` - (Required) A list of HTTP methods that are allowed to be executed by the origin. Valid options are `DELETE`, `GET`, `HEAD`, `MERGE`, `POST`, `OPTIONS`, `PUT` or `PATCH`.
-* `allowed_origins` - (Required) A list of origin domains that will be allowed by CORS.
-* `exposed_headers` - (Required) A list of response headers that are exposed to CORS clients.
-* `max_age_in_seconds` - (Required) The number of seconds the client should cache a preflight response.
+- `allowed_headers` - (Required) A list of headers that are allowed to be a part of the cross-origin request.
+- `allowed_methods` - (Required) A list of HTTP methods that are allowed to be executed by the origin. Valid options are `DELETE`, `GET`, `HEAD`, `MERGE`, `POST`, `OPTIONS`, `PUT` or `PATCH`.
+- `allowed_origins` - (Required) A list of origin domains that will be allowed by CORS.
+- `exposed_headers` - (Required) A list of response headers that are exposed to CORS clients.
+- `max_age_in_seconds` - (Required) The number of seconds the client should cache a preflight response.
 
 ---
 `diagnostic_settings` block supports the following:
-* `name` - (Optional) The name of the diagnostic setting. Defaults to `null`.
-* `log_categories` - (Optional) A set of log categories to enable. Defaults to an empty set.
-* `log_groups` - (Optional) A set of log groups to enable. Defaults to `["allLogs"]`.
-* `metric_categories` - (Optional) A set of metric categories to enable. Defaults to `["AllMetrics"]`.
-* `log_analytics_destination_type` - (Optional) The destination type for log analytics. Defaults to `"Dedicated"`.
-* `workspace_resource_id` - (Optional) The resource ID of the Log Analytics workspace. Defaults to `null`.
-* `resource_id` - (Optional) The resource ID of the target resource for diagnostics. Defaults to `null`.
-* `event_hub_authorization_rule_resource_id` - (Optional) The resource ID of the Event Hub authorization rule. Defaults to `null`.
-* `event_hub_name` - (Optional) The name of the Event Hub. Defaults to `null`.
-* `marketplace_partner_resource_id` - (Optional) The resource ID of the marketplace partner. Defaults to `null`.
+- `name` - (Optional) The name of the diagnostic setting. Defaults to `null`.
+- `log_categories` - (Optional) A set of log categories to enable. Defaults to an empty set.
+- `log_groups` - (Optional) A set of log groups to enable. Defaults to `["allLogs"]`.
+- `metric_categories` - (Optional) A set of metric categories to enable. Defaults to `["AllMetrics"]`.
+- `log_analytics_destination_type` - (Optional) The destination type for log analytics. Defaults to `"Dedicated"`.
+- `workspace_resource_id` - (Optional) The resource ID of the Log Analytics workspace. Defaults to `null`.
+- `resource_id` - (Optional) The resource ID of the target resource for diagnostics. Defaults to `null`.
+- `event_hub_authorization_rule_resource_id` - (Optional) The resource ID of the Event Hub authorization rule. Defaults to `null`.
+- `event_hub_name` - (Optional) The name of the Event Hub. Defaults to `null`.
+- `marketplace_partner_resource_id` - (Optional) The resource ID of the marketplace partner. Defaults to `null`.
 
 ---
 `retention_policy` block supports the following:
-* `days` - (Optional) Specifies the number of days that the `azurerm_shares` should be retained, between `1` and `365` days. Defaults to `7`.
+- `days` - (Optional) Specifies the number of days that the `azurerm_shares` should be retained, between `1` and `365` days. Defaults to `7`.
 
 Type:
 
@@ -1129,20 +1126,20 @@ Description: - `name` - (Required) The name of the storage table. Only Alphanume
 
 ---
 `acl` block supports the following:
-* `id` - (Required) The ID which should be used for this Shared Identifier.
+- `id` - (Required) The ID which should be used for this Shared Identifier.
 
 ---
 `access_policy` block supports the following:
-* `expiry` - (Required) The ISO8061 UTC time at which this Access Policy should be valid until.
-* `permissions` - (Required) The permissions which should associated with this Shared Identifier.
-* `start` - (Required) The ISO8061 UTC time at which this Access Policy should be valid from.
+- `expiry` - (Required) The ISO8061 UTC time at which this Access Policy should be valid until.
+- `permissions` - (Required) The permissions which should associated with this Shared Identifier.
+- `start` - (Required) The ISO8061 UTC time at which this Access Policy should be valid from.
 
 ---
 `timeouts` block supports the following:
-* `create` - (Defaults to 30 minutes) Used when creating the Storage Table.
-* `delete` - (Defaults to 30 minutes) Used when deleting the Storage Table.
-* `read` - (Defaults to 5 minutes) Used when retrieving the Storage Table.
-* `update` - (Defaults to 30 minutes) Used when updating the Storage Table.
+- `create` - (Defaults to 30 minutes) Used when creating the Storage Table.
+- `delete` - (Defaults to 30 minutes) Used when deleting the Storage Table.
+- `read` - (Defaults to 5 minutes) Used when retrieving the Storage Table.
+- `update` - (Defaults to 30 minutes) Used when updating the Storage Table.
 
 Type:
 
@@ -1179,9 +1176,9 @@ Default: `{}`
 ### <a name="input_timeouts"></a> [timeouts](#input\_timeouts)
 
 Description: - `create` - (Defaults to 60 minutes) Used when creating the Storage Account.
-* `delete` - (Defaults to 60 minutes) Used when deleting the Storage Account.
-* `read` - (Defaults to 5 minutes) Used when retrieving the Storage Account.
-* `update` - (Defaults to 60 minutes) Used when updating the Storage Account.
+- `delete` - (Defaults to 60 minutes) Used when deleting the Storage Account.
+- `read` - (Defaults to 5 minutes) Used when retrieving the Storage Account.
+- `update` - (Defaults to 60 minutes) Used when updating the Storage Account.
 
 Type:
 

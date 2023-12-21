@@ -20,7 +20,7 @@ provider "azurerm" {
     }
   }
   skip_provider_registration = true
-  storage_use_azuread        = true
+  storage_use_azuread        = false
 }
 
 resource "random_pet" "this" {
@@ -66,10 +66,6 @@ module "this" {
   min_tls_version           = "TLS1_2"
   shared_access_key_enabled = true
 
-  lock = {
-    name = "lock"
-    kind = "CanNotDelete"
-  }
   tags = {
     env   = "dev"
     owner = "IT"

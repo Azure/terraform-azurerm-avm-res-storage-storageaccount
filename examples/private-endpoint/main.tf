@@ -20,7 +20,7 @@ provider "azurerm" {
     }
   }
   skip_provider_registration = true
-  storage_use_azuread        = true
+  storage_use_azuread        = false
 }
 
 resource "random_string" "this" {
