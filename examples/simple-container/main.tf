@@ -36,10 +36,13 @@ module "storage_account" {
   # source             = "Azure/avm-<res/ptn>-<name>/azurerm"
   name                = module.naming.storage_account.name_unique
   resource_group_name = azurerm_resource_group.this.name
-}
 
-# illustrate what the outputs look like
-output "resource_id" {
-  description = "Example illustrating how to fetch the resource id."
-  value       = module.storage_account.resource.id
+  account_replication_type = "LRS"
+  account_tier             = "Standard"
+
+  containers = {
+    blob_container = {
+      name = module.naming.storage_container.name_unique
+    }
+  }
 }
