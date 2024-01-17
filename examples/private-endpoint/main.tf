@@ -100,13 +100,10 @@ resource "azurerm_private_dns_zone" "this" {
 }
 
 module "this" {
-  #checkov:skip=CKV_AZURE_34:It's a known issue that Checkov cannot work prefect along with module
-  #checkov:skip=CKV_AZURE_35:It's a known issue that Checkov cannot work prefect along with module
-  #checkov:skip=CKV2_AZURE_20:It's a known issue that Checkov cannot work prefect along with module
-  #checkov:skip=CKV2_AZURE_21:It's a known issue that Checkov cannot work prefect along with module
+
   source = "../.."
 
-  account_replication_type      = "LRS"
+  account_replication_type      = "RAGZRS"
   account_tier                  = "Standard"
   account_kind                  = "StorageV2"
   location                      = azurerm_resource_group.this.location
@@ -115,6 +112,10 @@ module "this" {
   min_tls_version               = "TLS1_2"
   shared_access_key_enabled     = true
   public_network_access_enabled = true
+  lock = {
+    name = "lock"
+    kind = "CanNotDelete"
+  }
 
   # TODO re-introduce once the rest is working
   # network_rules = {
