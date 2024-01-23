@@ -135,48 +135,61 @@ module "this" {
     }
   }
 
-  blob_properties = {
-    diagnostic_settings = {
-      blob11 = {
-        name                       = "diag"
-        log_analytics_workspace_id = azurerm_log_analytics_workspace.this.id
-        category_group             = ["audit", "alllogs"]
-        metric_categories          = ["AllMetrics"]
-      }
+  diagnostic_settings_storage = {
+    storage = {
+      name                       = "diag"
+      log_analytics_workspace_id = azurerm_log_analytics_workspace.this.id
+      log_categories             = ["audit", "alllogs"]
+      metric_categories          = ["AllMetrics"]
+      #log_groups                 = ["allLogs"]
+
     }
+
+  }
+  diagnostic_settings_blob = {
+    blob11 = {
+      name                       = "diag"
+      log_analytics_workspace_id = azurerm_log_analytics_workspace.this.id
+      log_categories             = ["audit", "alllogs"]
+      metric_categories          = ["AllMetrics"]
+      #log_groups                 = ["allLogs"]
+
+    }
+
+  }
+  diagnostic_settings_queue = {
+    queue = {
+      name                       = "diag"
+      log_analytics_workspace_id = azurerm_log_analytics_workspace.this.id
+      log_categories             = ["audit", "alllogs"]
+      metric_categories          = ["AllMetrics"]
+
+    }
+
+  }
+  diagnostic_settings_table = {
+    queue = {
+      name                       = "diag"
+      log_analytics_workspace_id = azurerm_log_analytics_workspace.this.id
+      log_categories             = ["audit", "alllogs"]
+      metric_categories          = ["AllMetrics"]
+
+    }
+
+  }
+  diagnostic_settings_file = {
+    queue = {
+      name                       = "diag"
+      log_analytics_workspace_id = azurerm_log_analytics_workspace.this.id
+      log_categories             = ["audit", "alllogs"]
+      metric_categories          = ["AllMetrics"]
+
+    }
+
   }
 
-  queue_properties = {
-    diagnostic_settings = {
-      queue = {
-        name                       = "diag"
-        log_analytics_workspace_id = azurerm_log_analytics_workspace.this.id
-        category_group             = ["audit", "alllogs"]
-        metric_categories          = ["AllMetrics"]
-      }
-    }
-  }
-
-  table_properties = {
-    diagnostic_settings = {
-      table = {
-        name                       = "diag"
-        log_analytics_workspace_id = azurerm_log_analytics_workspace.this.id
-        category_group             = ["audit", "alllogs"]
-        metric_categories          = ["AllMetrics"]
-      }
-    }
-  }
-
-  share_properties = {
-    diagnostic_settings = {
-      share = {
-        name                       = "diag"
-        log_analytics_workspace_id = azurerm_log_analytics_workspace.this.id
-        category_group             = ["audit", "alllogs"]
-        metric_categories          = ["AllMetrics"]
-      }
-    }
-  }
 }
+
+
+
 

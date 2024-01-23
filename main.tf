@@ -523,7 +523,7 @@ resource "azurerm_management_lock" "this-storage_account" {
     azurerm_storage_account.this
   ]
 }
-
+/*
 resource "azurerm_management_lock" "this-private_endpoints" {
   for_each   = { for key, value in local.private_endpoints : key => value if coalesce(value.lock_level, var.lock.kind) != "None" }
   name       = coalesce(azurerm_private_endpoint.this[each.value].name, "lock-${azurerm_private_endpoint.this[each.value].name}")
@@ -532,3 +532,4 @@ resource "azurerm_management_lock" "this-private_endpoints" {
 
 
 }
+*/
