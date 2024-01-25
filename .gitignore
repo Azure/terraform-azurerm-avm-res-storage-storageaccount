@@ -67,3 +67,21 @@ test/go.sum
 
 TestRecord/
 **/TestRecord.md.tmp
+**/.terraform/*
+*.tfstate.*
+*.tfvars.json
+*_override.tf
+*_override.tf.json
+*tfplan*
+.terraform.lock.hcl
+.terraformrc
+avm.tflint.hcl
+avm.tflint.merged.hcl
+avm.tflint_example.hcl
+avm.tflint_example.merged.hcl
+avmmakefile
+crash.*.log
+crash.log
+override.tf
+override.tf.json
+terraform.rc
