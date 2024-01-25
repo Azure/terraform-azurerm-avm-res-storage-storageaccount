@@ -25,12 +25,11 @@ provider "azurerm" {
 
 resource "random_pet" "this" {
   length = 1
-
 }
 
 resource "azurerm_resource_group" "this" {
-  name     = module.naming.resource_group.name_unique
   location = "AustraliaEast"
+  name     = module.naming.resource_group.name_unique
 }
 
 resource "random_string" "table_acl_id" {

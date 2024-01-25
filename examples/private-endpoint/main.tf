@@ -37,8 +37,8 @@ module "naming" {
 
 # This is required for resource modules
 resource "azurerm_resource_group" "this" {
-  name     = module.naming.resource_group.name_unique
   location = "AustraliaEast"
+  name     = module.naming.resource_group.name_unique
 }
 
 resource "azurerm_virtual_network" "vnet" {
@@ -112,9 +112,23 @@ module "this" {
   min_tls_version               = "TLS1_2"
   shared_access_key_enabled     = true
   public_network_access_enabled = true
-  lock = {
+  tags = {
+    env   = "Dev"
+    owner = "John Doe"
+    dept  = "IT"
+  }
+  /*lock = {
     name = "lock"
     kind = "CanNotDelete"
+  }*/
+  role_assignments = {
+    role_assignment_1 = {
+      role_definition_id_or_name       = "Contributor"
+      principal_id                     = "3c244fd8-81dc-4f55-9ddb-c88d4544cb9c"
+      skip_service_principal_aad_check = true
+    },
+
+
   }
 
   # TODO re-introduce once the rest is working
@@ -132,7 +146,12 @@ module "this" {
     blob_container1 = {
       name                  = "blob-container-${random_string.this.result}-1"
       container_access_type = "private"
+
+
     }
+
+
+
   }
   queues = {
     queue0 = {
@@ -162,6 +181,12 @@ module "this" {
       # these are optional but illustrate making well-aligned service connection & NIC names.
       private_service_connection_name = "psc-${endpoint}-${module.naming.storage_account.name_unique}"
       network_interface_name          = "nic-pe-${endpoint}-${module.naming.storage_account.name_unique}"
+      inherit_tags                    = true
+      tags = {
+        env   = "Dev2"
+        owner = "John Doe2"
+        dept  = "IT2"
+      }
     }
   }
 
@@ -178,3 +203,5 @@ resource "azurerm_log_analytics_storage_insights" "this" {
 
   depends_on = [module.this]
 }
+
+

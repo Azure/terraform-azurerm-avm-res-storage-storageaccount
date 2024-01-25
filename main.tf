@@ -275,7 +275,8 @@ resource "azurerm_storage_account_local_user" "this" {
 }
 
 resource "azurerm_storage_account_network_rules" "this" {
-  count                      = var.network_rules != null ? 1 : 0
+  count = var.network_rules != null ? 1 : 0
+
   default_action             = var.network_rules.default_action
   storage_account_id         = azurerm_storage_account.this.id
   bypass                     = var.network_rules.bypass
@@ -289,7 +290,6 @@ resource "azurerm_storage_account_network_rules" "this" {
       endpoint_tenant_id   = private_link_access.value.endpoint_tenant_id
     }
   }
-
   dynamic "private_link_access" {
     for_each = var.private_endpoints == null ? [] : local.private_endpoints
     content {
@@ -298,7 +298,6 @@ resource "azurerm_storage_account_network_rules" "this" {
     }
 
   }
-
   dynamic "timeouts" {
     for_each = var.network_rules.timeouts == null ? [] : [var.network_rules.timeouts]
     content {
@@ -309,29 +308,29 @@ resource "azurerm_storage_account_network_rules" "this" {
     }
   }
 
+  depends_on = [azurerm_private_endpoint.this]
+
   lifecycle {
     precondition {
       condition     = var.private_endpoints == null || var.network_rules.private_link_access == null
       error_message = "Cannot set `private_link_access` when `var.private_endpoints` is not `null`."
     }
   }
-
-  depends_on = [azurerm_private_endpoint.this]
 }
 
 # This uses azapi in order to avoid having to grant data plane permissions
 resource "azapi_resource" "containers" {
   for_each = var.containers
 
-  type      = "Microsoft.Storage/storageAccounts/blobServices/containers@2022-09-01"
-  name      = each.value.name
-  parent_id = "${azurerm_storage_account.this.id}/blobServices/default"
+  type = "Microsoft.Storage/storageAccounts/blobServices/containers@2022-09-01"
   body = jsonencode({
     properties = {
       metadata     = each.value.metadata
       publicAccess = each.value.public_access
     }
   })
+  name      = each.value.name
+  parent_id = "${azurerm_storage_account.this.id}/blobServices/default"
 
   dynamic "timeouts" {
     for_each = each.value.timeouts == null ? [] : [each.value.timeouts]
@@ -352,19 +351,6 @@ resource "azurerm_key_vault_access_policy" "this" {
   tenant_id       = each.value.identity_tenant_id
   key_permissions = each.value.key_permissions
 
-  # TODO timeouts isn't in AVM spec, leave out for now.
-  # dynamic "timeouts" {
-  #   for_each = var.customer_managed_key.timeouts == null ? [] : [
-  #     var.customer_managed_key.timeouts
-  #   ]
-  #   content {
-  #     create = timeouts.value.create
-  #     delete = timeouts.value.delete
-  #     read   = timeouts.value.read
-  #     update = timeouts.value.update
-  #   }
-  # }
-
   lifecycle {
     precondition {
       condition     = var.managed_identities != null && !var.managed_identities.system_assigned && (var.account_kind == "StorageV2" || var.account_tier == "Premium")
@@ -377,23 +363,10 @@ resource "azurerm_storage_account_customer_managed_key" "this" {
   for_each = try(var.customer_managed_key.key_vault_access_policy.identity_keys, {})
 
   key_name                  = var.customer_managed_key.key_name
-  key_vault_id              = var.customer_managed_key.key_vault_resource_id
   storage_account_id        = azurerm_storage_account.this.id
+  key_vault_id              = var.customer_managed_key.key_vault_resource_id
   key_version               = var.customer_managed_key.key_version
   user_assigned_identity_id = var.managed_identities.user_assigned_resource_ids[each.value]
-
-  # return to this as the AVM spec doesn't have timeouts in the CMK declaration
-  # dynamic "timeouts" {
-  #   for_each = var.customer_managed_key.timeouts == null ? [] : [
-  #     var.customer_managed_key.timeouts
-  #   ]
-  #   content {
-  #     create = timeouts.value.create
-  #     delete = timeouts.value.delete
-  #     read   = timeouts.value.read
-  #     update = timeouts.value.update
-  #   }
-  # }
 
   depends_on = [azurerm_key_vault_access_policy.this]
 
@@ -500,9 +473,22 @@ resource "azurerm_storage_share" "this" {
 // Resource Block for Diagnostic Settings
 
 
-resource "azurerm_role_assignment" "this" {
-  for_each                               = var.role_assignments
+resource "azurerm_role_assignment" "storage_account" {
+  for_each = var.role_assignments
+
+  principal_id                           = each.value.principal_id
   scope                                  = azurerm_storage_account.this.id
+  condition                              = each.value.condition
+  condition_version                      = each.value.condition_version
+  delegated_managed_identity_resource_id = each.value.delegated_managed_identity_resource_id
+  role_definition_id                     = strcontains(lower(each.value.role_definition_id_or_name), lower(local.role_definition_resource_substring)) ? each.value.role_definition_id_or_name : null
+  role_definition_name                   = strcontains(lower(each.value.role_definition_id_or_name), lower(local.role_definition_resource_substring)) ? null : each.value.role_definition_id_or_name
+  skip_service_principal_aad_check       = each.value.skip_service_principal_aad_check
+}
+/*
+resource "azurerm_role_assignment" "private_endpoint" {
+  for_each                               = var.role_assignments
+  scope                                  = azurerm_private_endpoint.this[each.value].id
   role_definition_id                     = strcontains(lower(each.value.role_definition_id_or_name), lower(local.role_definition_resource_substring)) ? each.value.role_definition_id_or_name : null
   role_definition_name                   = strcontains(lower(each.value.role_definition_id_or_name), lower(local.role_definition_resource_substring)) ? null : each.value.role_definition_id_or_name
   principal_id                           = each.value.principal_id
@@ -511,13 +497,14 @@ resource "azurerm_role_assignment" "this" {
   skip_service_principal_aad_check       = each.value.skip_service_principal_aad_check
   delegated_managed_identity_resource_id = each.value.delegated_managed_identity_resource_id
 }
-
+*/
 # Resource Block for Locks #TODO Should complete the locks with dependant resources.
 resource "azurerm_management_lock" "this-storage_account" {
-  count      = var.lock.kind != "None" ? 1 : 0
+  count = var.lock.kind != "None" ? 1 : 0
+
+  lock_level = var.lock.kind
   name       = coalesce(var.lock.name, "lock-${var.name}")
   scope      = azurerm_storage_account.this.id
-  lock_level = var.lock.kind
 
   depends_on = [
     azurerm_storage_account.this
