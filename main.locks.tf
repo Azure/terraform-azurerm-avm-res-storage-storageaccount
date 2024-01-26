@@ -1,5 +1,5 @@
 # Resource Block for Locks #TODO Should complete the locks with dependant resources.
-resource "azurerm_management_lock" "this-storage_account" {
+resource "azurerm_management_lock" "this_storage_account" {
   count = var.lock.kind != "None" ? 1 : 0
 
   lock_level = var.lock.kind
