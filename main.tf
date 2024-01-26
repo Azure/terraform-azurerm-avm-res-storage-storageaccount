@@ -472,9 +472,6 @@ resource "azurerm_storage_share" "this" {
   }
 }
 
-// Resource Block for Diagnostic Settings
-
-
 resource "azurerm_role_assignment" "storage_account" {
   for_each = var.role_assignments
 
