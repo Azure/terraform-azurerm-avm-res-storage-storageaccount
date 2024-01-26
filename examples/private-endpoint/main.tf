@@ -99,6 +99,12 @@ resource "azurerm_private_dns_zone" "this" {
   resource_group_name = azurerm_resource_group.this.name
 }
 
+resource "azurerm_user_assigned_identity" "example_identity" {
+  location            = azurerm_resource_group.this.location
+  name                = module.naming.user_assigned_identity.name_unique
+  resource_group_name = azurerm_resource_group.this.name
+}
+
 module "this" {
 
   source = "../.."
@@ -112,15 +118,26 @@ module "this" {
   min_tls_version               = "TLS1_2"
   shared_access_key_enabled     = true
   public_network_access_enabled = true
+  managed_identities = {
+    system_assigned            = false
+    user_assigned_resource_ids = [azurerm_user_assigned_identity.example_identity.id]
+    # "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/{identityName}",
+    #"/subscriptions/{subscriptionId2}/resourceGroups/{resourceGroupName2}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/{identityName2}"
+
+
+  }
+
   tags = {
     env   = "Dev"
     owner = "John Doe"
     dept  = "IT"
   }
-  /*lock = {
+
+  lock = {
     name = "lock"
-    kind = "CanNotDelete"
-  }*/
+    kind = "None"
+  }
+
   role_assignments = {
     role_assignment_1 = {
       role_definition_id_or_name       = "Contributor"
@@ -182,6 +199,13 @@ module "this" {
       private_service_connection_name = "psc-${endpoint}-${module.naming.storage_account.name_unique}"
       network_interface_name          = "nic-pe-${endpoint}-${module.naming.storage_account.name_unique}"
       inherit_tags                    = true
+      inherit_lock                    = true
+
+      lock = {
+        name = "lock"
+        kind = "None"
+      }
+
       tags = {
         env   = "Dev2"
         owner = "John Doe2"

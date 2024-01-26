@@ -133,7 +133,7 @@ variable "private_endpoints" {
     })), {})
     lock = optional(object({
       name = optional(string, null)
-      kind = optional(string, "None")
+      kind = optional(string, null)
     }), {})
     tags                                    = optional(map(any), null)
     subnet_resource_id                      = string
@@ -145,6 +145,7 @@ variable "private_endpoints" {
     network_interface_name                  = optional(string, null)
     location                                = optional(string, null)
     inherit_tags                            = optional(bool, false)
+    inherit_lock                            = optional(bool, false)
     resource_group_name                     = optional(string, null)
     ip_configurations = optional(map(object({
       name               = string

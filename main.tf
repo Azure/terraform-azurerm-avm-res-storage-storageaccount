@@ -102,9 +102,11 @@ resource "azurerm_storage_account" "this" {
     }
   }
   dynamic "identity" {
-    for_each = var.managed_identities == {} ? [] : [var.managed_identities]
+    #for_each = var.managed_identities == {} ? [] : [var.managed_identities]
+    for_each = (var.managed_identities.system_assigned || length(var.managed_identities.user_assigned_resource_ids) > 0) ? { this = var.managed_identities } : {}
     content {
-      type         = identity.value.system_assigned && length(identity.value.user_assigned_resource_ids) > 0 ? "SystemAssigned, UserAssigned" : length(identity.value.user_assigned_resource_ids) > 0 ? "UserAssigned" : "SystemAssigned"
+      type = identity.value.system_assigned && length(identity.value.user_assigned_resource_ids) > 0 ? "SystemAssigned, UserAssigned" : length(identity.value.user_assigned_resource_ids) > 0 ? "UserAssigned" : "SystemAssigned"
+      #identity_ids = identity.value.user_assigned_resource_ids
       identity_ids = identity.value.user_assigned_resource_ids
     }
   }
@@ -498,25 +500,5 @@ resource "azurerm_role_assignment" "private_endpoint" {
   delegated_managed_identity_resource_id = each.value.delegated_managed_identity_resource_id
 }
 */
-# Resource Block for Locks #TODO Should complete the locks with dependant resources.
-resource "azurerm_management_lock" "this-storage_account" {
-  count = var.lock.kind != "None" ? 1 : 0
-
-  lock_level = var.lock.kind
-  name       = coalesce(var.lock.name, "lock-${var.name}")
-  scope      = azurerm_storage_account.this.id
-
-  depends_on = [
-    azurerm_storage_account.this
-  ]
-}
-/*
-resource "azurerm_management_lock" "this-private_endpoints" {
-  for_each   = { for key, value in local.private_endpoints : key => value if coalesce(value.lock_level, var.lock.kind) != "None" }
-  name       = coalesce(azurerm_private_endpoint.this[each.value].name, "lock-${azurerm_private_endpoint.this[each.value].name}")
-  scope      = azurerm_private_endpoint.this[each.value].id
-  lock_level = var.lock.kind
 
 
-}
-*/
