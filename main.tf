@@ -1,32 +1,37 @@
+data "azurerm_client_config" "this" {}
+
+data "azurerm_resource_group" "rg" {
+  name = var.resource_group_name
+}
 resource "azurerm_storage_account" "this" {
-  account_replication_type          = var.storage_account_account_replication_type
-  account_tier                      = var.storage_account_account_tier
-  location                          = var.storage_account_location
-  name                              = var.storage_account_name
-  resource_group_name               = var.storage_account_resource_group_name
-  access_tier                       = var.storage_account_access_tier
-  account_kind                      = var.storage_account_account_kind
-  allow_nested_items_to_be_public   = var.storage_account_allow_nested_items_to_be_public
-  allowed_copy_scope                = var.storage_account_allowed_copy_scope
-  cross_tenant_replication_enabled  = var.storage_account_cross_tenant_replication_enabled
-  default_to_oauth_authentication   = var.storage_account_default_to_oauth_authentication
-  edge_zone                         = var.storage_account_edge_zone
-  enable_https_traffic_only         = var.storage_account_enable_https_traffic_only
-  infrastructure_encryption_enabled = var.storage_account_infrastructure_encryption_enabled
-  is_hns_enabled                    = var.storage_account_is_hns_enabled
-  large_file_share_enabled          = var.storage_account_large_file_share_enabled
-  min_tls_version                   = var.storage_account_min_tls_version
-  nfsv3_enabled                     = var.storage_account_nfsv3_enabled
-  public_network_access_enabled     = var.storage_account_public_network_access_enabled
-  queue_encryption_key_type         = var.storage_account_queue_encryption_key_type
-  sftp_enabled                      = var.storage_account_sftp_enabled
-  shared_access_key_enabled         = var.storage_account_shared_access_key_enabled
-  table_encryption_key_type         = var.storage_account_table_encryption_key_type
-  tags                              = var.storage_account_tags
+  account_replication_type          = var.account_replication_type
+  account_tier                      = var.account_tier
+  location                          = local.location
+  name                              = var.name
+  resource_group_name               = var.resource_group_name
+  access_tier                       = var.access_tier
+  account_kind                      = var.account_kind
+  allow_nested_items_to_be_public   = var.allow_nested_items_to_be_public
+  allowed_copy_scope                = var.allowed_copy_scope
+  cross_tenant_replication_enabled  = var.cross_tenant_replication_enabled
+  default_to_oauth_authentication   = var.default_to_oauth_authentication
+  edge_zone                         = var.edge_zone
+  enable_https_traffic_only         = var.enable_https_traffic_only
+  infrastructure_encryption_enabled = var.infrastructure_encryption_enabled
+  is_hns_enabled                    = var.is_hns_enabled
+  large_file_share_enabled          = var.large_file_share_enabled
+  min_tls_version                   = var.min_tls_version
+  nfsv3_enabled                     = var.nfsv3_enabled
+  public_network_access_enabled     = var.public_network_access_enabled
+  queue_encryption_key_type         = var.queue_encryption_key_type
+  sftp_enabled                      = var.sftp_enabled
+  shared_access_key_enabled         = var.shared_access_key_enabled
+  table_encryption_key_type         = var.table_encryption_key_type
+  tags                              = var.tags
 
   dynamic "azure_files_authentication" {
-    for_each = var.storage_account_azure_files_authentication == null ? [] : [
-      var.storage_account_azure_files_authentication
+    for_each = var.azure_files_authentication == null ? [] : [
+      var.azure_files_authentication
     ]
     content {
       directory_type = azure_files_authentication.value.directory_type
@@ -47,7 +52,7 @@ resource "azurerm_storage_account" "this" {
     }
   }
   dynamic "blob_properties" {
-    for_each = var.storage_account_blob_properties == null ? [] : [var.storage_account_blob_properties]
+    for_each = var.blob_properties == null ? [] : [var.blob_properties]
     content {
       change_feed_enabled           = blob_properties.value.change_feed_enabled
       change_feed_retention_in_days = blob_properties.value.change_feed_retention_in_days
@@ -90,21 +95,23 @@ resource "azurerm_storage_account" "this" {
     }
   }
   dynamic "custom_domain" {
-    for_each = var.storage_account_custom_domain == null ? [] : [var.storage_account_custom_domain]
+    for_each = var.custom_domain == null ? [] : [var.custom_domain]
     content {
       name          = custom_domain.value.name
       use_subdomain = custom_domain.value.use_subdomain
     }
   }
   dynamic "identity" {
-    for_each = var.storage_account_identity == null ? [] : [var.storage_account_identity]
+    #for_each = var.managed_identities == {} ? [] : [var.managed_identities]
+    for_each = (var.managed_identities.system_assigned || length(var.managed_identities.user_assigned_resource_ids) > 0) ? { this = var.managed_identities } : {}
     content {
-      type         = identity.value.type
-      identity_ids = toset(values(identity.value.identity_ids))
+      type = identity.value.system_assigned && length(identity.value.user_assigned_resource_ids) > 0 ? "SystemAssigned, UserAssigned" : length(identity.value.user_assigned_resource_ids) > 0 ? "UserAssigned" : "SystemAssigned"
+      #identity_ids = identity.value.user_assigned_resource_ids
+      identity_ids = identity.value.user_assigned_resource_ids
     }
   }
   dynamic "immutability_policy" {
-    for_each = var.storage_account_immutability_policy == null ? [] : [var.storage_account_immutability_policy]
+    for_each = var.immutability_policy == null ? [] : [var.immutability_policy]
     content {
       allow_protected_append_writes = immutability_policy.value.allow_protected_append_writes
       period_since_creation_in_days = immutability_policy.value.period_since_creation_in_days
@@ -112,7 +119,7 @@ resource "azurerm_storage_account" "this" {
     }
   }
   dynamic "queue_properties" {
-    for_each = var.storage_account_queue_properties == null ? [] : [var.storage_account_queue_properties]
+    for_each = var.queue_properties == null ? [] : [var.queue_properties]
     content {
       dynamic "cors_rule" {
         for_each = queue_properties.value.cors_rule == null ? [] : queue_properties.value.cors_rule
@@ -155,7 +162,7 @@ resource "azurerm_storage_account" "this" {
     }
   }
   dynamic "routing" {
-    for_each = var.storage_account_routing == null ? [] : [var.storage_account_routing]
+    for_each = var.routing == null ? [] : [var.routing]
     content {
       choice                      = routing.value.choice
       publish_internet_endpoints  = routing.value.publish_internet_endpoints
@@ -163,14 +170,14 @@ resource "azurerm_storage_account" "this" {
     }
   }
   dynamic "sas_policy" {
-    for_each = var.storage_account_sas_policy == null ? [] : [var.storage_account_sas_policy]
+    for_each = var.sas_policy == null ? [] : [var.sas_policy]
     content {
       expiration_period = sas_policy.value.expiration_period
       expiration_action = sas_policy.value.expiration_action
     }
   }
   dynamic "share_properties" {
-    for_each = var.storage_account_share_properties == null ? [] : [var.storage_account_share_properties]
+    for_each = var.share_properties == null ? [] : [var.share_properties]
     content {
       dynamic "cors_rule" {
         for_each = share_properties.value.cors_rule == null ? [] : share_properties.value.cors_rule
@@ -201,14 +208,14 @@ resource "azurerm_storage_account" "this" {
     }
   }
   dynamic "static_website" {
-    for_each = var.storage_account_static_website == null ? [] : [var.storage_account_static_website]
+    for_each = var.static_website == null ? [] : [var.static_website]
     content {
       error_404_document = static_website.value.error_404_document
       index_document     = static_website.value.index_document
     }
   }
   dynamic "timeouts" {
-    for_each = var.storage_account_timeouts == null ? [] : [var.storage_account_timeouts]
+    for_each = var.timeouts == null ? [] : [var.timeouts]
     content {
       create = timeouts.value.create
       delete = timeouts.value.delete
@@ -225,7 +232,7 @@ resource "azurerm_storage_account" "this" {
 }
 
 resource "azurerm_storage_account_local_user" "this" {
-  for_each = var.storage_account_local_user
+  for_each = var.local_user
 
   name                 = each.value.name
   storage_account_id   = azurerm_storage_account.this.id
@@ -270,28 +277,31 @@ resource "azurerm_storage_account_local_user" "this" {
 }
 
 resource "azurerm_storage_account_network_rules" "this" {
-  default_action             = var.storage_account_network_rules.default_action
+  count = var.network_rules != null ? 1 : 0
+
+  default_action             = var.network_rules.default_action
   storage_account_id         = azurerm_storage_account.this.id
-  bypass                     = var.storage_account_network_rules.bypass
-  ip_rules                   = var.storage_account_network_rules.ip_rules
-  virtual_network_subnet_ids = var.storage_account_network_rules.virtual_network_subnet_ids
+  bypass                     = var.network_rules.bypass
+  ip_rules                   = var.network_rules.ip_rules
+  virtual_network_subnet_ids = var.network_rules.virtual_network_subnet_ids
 
   dynamic "private_link_access" {
-    for_each = var.storage_account_network_rules.private_link_access == null ? [] : var.storage_account_network_rules.private_link_access
+    for_each = var.network_rules.private_link_access == null ? [] : var.network_rules.private_link_access
     content {
       endpoint_resource_id = private_link_access.value.endpoint_resource_id
       endpoint_tenant_id   = private_link_access.value.endpoint_tenant_id
     }
   }
   dynamic "private_link_access" {
-    for_each = var.new_private_endpoint == null ? [] : local.private_endpoints
+    for_each = var.private_endpoints == null ? [] : local.private_endpoints
     content {
       endpoint_resource_id = azurerm_private_endpoint.this[private_link_access.value].id
       endpoint_tenant_id   = data.azurerm_client_config.this.tenant_id
     }
+
   }
   dynamic "timeouts" {
-    for_each = var.storage_account_network_rules.timeouts == null ? [] : [var.storage_account_network_rules.timeouts]
+    for_each = var.network_rules.timeouts == null ? [] : [var.network_rules.timeouts]
     content {
       create = timeouts.value.create
       delete = timeouts.value.delete
@@ -300,21 +310,29 @@ resource "azurerm_storage_account_network_rules" "this" {
     }
   }
 
+  depends_on = [azurerm_private_endpoint.this]
+
   lifecycle {
     precondition {
-      condition     = var.new_private_endpoint == null || var.storage_account_network_rules.private_link_access == null
-      error_message = "Cannot set `private_link_access` when `var.new_private_endpoint` is not `null`."
+      condition     = var.private_endpoints == null || var.network_rules.private_link_access == null
+      error_message = "Cannot set `private_link_access` when `var.private_endpoints` is not `null`."
     }
   }
 }
 
-resource "azurerm_storage_container" "this" {
-  for_each = var.storage_container
+# This uses azapi in order to avoid having to grant data plane permissions
+resource "azapi_resource" "containers" {
+  for_each = var.containers
 
-  name                  = each.value.name
-  storage_account_name  = azurerm_storage_account.this.name
-  container_access_type = each.value.container_access_type
-  metadata              = each.value.metadata
+  type = "Microsoft.Storage/storageAccounts/blobServices/containers@2022-09-01"
+  body = jsonencode({
+    properties = {
+      metadata     = each.value.metadata
+      publicAccess = each.value.public_access
+    }
+  })
+  name      = each.value.name
+  parent_id = "${azurerm_storage_account.this.id}/blobServices/default"
 
   dynamic "timeouts" {
     for_each = each.value.timeouts == null ? [] : [each.value.timeouts]
@@ -330,64 +348,40 @@ resource "azurerm_storage_container" "this" {
 resource "azurerm_key_vault_access_policy" "this" {
   for_each = var.key_vault_access_policy
 
-  key_vault_id    = var.storage_account_customer_managed_key.key_vault_id
+  key_vault_id    = var.customer_managed_key.key_vault_resource_id
   object_id       = each.value.identity_principle_id
   tenant_id       = each.value.identity_tenant_id
   key_permissions = each.value.key_permissions
 
-  dynamic "timeouts" {
-    for_each = var.storage_account_customer_managed_key.timeouts == null ? [] : [
-      var.storage_account_customer_managed_key.timeouts
-    ]
-    content {
-      create = timeouts.value.create
-      delete = timeouts.value.delete
-      read   = timeouts.value.read
-      update = timeouts.value.update
-    }
-  }
-
   lifecycle {
     precondition {
-      condition     = var.storage_account_identity != null && var.storage_account_identity.type == "UserAssigned" && (var.storage_account_account_kind == "StorageV2" || var.storage_account_account_tier == "Premium")
-      error_message = "`var.storage_account_customer_managed_key` can only be set when the `account_kind` is set to `StorageV2` or `account_tier` set to `Premium`, and the identity type is `UserAssigned`."
+      condition     = var.managed_identities != null && !var.managed_identities.system_assigned && (var.account_kind == "StorageV2" || var.account_tier == "Premium")
+      error_message = "`var.customer_managed_key` can only be set when the `account_kind` is set to `StorageV2` or `account_tier` set to `Premium`, and the identity type is `UserAssigned`."
     }
   }
 }
 
 resource "azurerm_storage_account_customer_managed_key" "this" {
-  for_each = try(var.storage_account_customer_managed_key.key_vault_access_policy.identity_keys, {})
+  for_each = try(var.customer_managed_key.key_vault_access_policy.identity_keys, {})
 
-  key_name                  = var.storage_account_customer_managed_key.key_name
+  key_name                  = var.customer_managed_key.key_name
   storage_account_id        = azurerm_storage_account.this.id
-  key_vault_id              = var.storage_account_customer_managed_key.key_vault_id
-  key_version               = var.storage_account_customer_managed_key.key_version
-  user_assigned_identity_id = var.storage_account_identity.identity_ids[each.value]
-
-  dynamic "timeouts" {
-    for_each = var.storage_account_customer_managed_key.timeouts == null ? [] : [
-      var.storage_account_customer_managed_key.timeouts
-    ]
-    content {
-      create = timeouts.value.create
-      delete = timeouts.value.delete
-      read   = timeouts.value.read
-      update = timeouts.value.update
-    }
-  }
+  key_vault_id              = var.customer_managed_key.key_vault_resource_id
+  key_version               = var.customer_managed_key.key_version
+  user_assigned_identity_id = var.managed_identities.user_assigned_resource_ids[each.value]
 
   depends_on = [azurerm_key_vault_access_policy.this]
 
   lifecycle {
     precondition {
-      condition     = var.storage_account_identity != null && var.storage_account_identity.type == "UserAssigned" && (var.storage_account_account_kind == "StorageV2" || var.storage_account_account_tier == "Premium")
-      error_message = "`var.storage_account_customer_managed_key` can only be set when the `account_kind` is set to `StorageV2` or `account_tier` set to `Premium`, and the identity type is `UserAssigned`."
+      condition     = var.managed_identities != null && length(var.managed_identities.user_assigned_resource_ids) > 0 && (var.account_kind == "StorageV2" || var.account_tier == "Premium")
+      error_message = "`var.customer_managed_key` can only be set when the `account_kind` is set to `StorageV2` or `account_tier` set to `Premium`, and the identity type is `UserAssigned`."
     }
   }
 }
 
 resource "azurerm_storage_queue" "this" {
-  for_each = var.storage_queue
+  for_each = var.queues
 
   name                 = each.value.name
   storage_account_name = azurerm_storage_account.this.name
@@ -404,11 +398,11 @@ resource "azurerm_storage_queue" "this" {
   }
 
   # We need to create these storage service in serialize otherwise we might meet dns issue
-  depends_on = [azurerm_storage_container.this]
+  depends_on = [azapi_resource.containers]
 }
 
 resource "azurerm_storage_table" "this" {
-  for_each = var.storage_table
+  for_each = var.tables
 
   name                 = each.value.name
   storage_account_name = azurerm_storage_account.this.name
@@ -439,11 +433,11 @@ resource "azurerm_storage_table" "this" {
   }
 
   # We need to create these storage service in serialize otherwise we might meet dns issue
-  depends_on = [azurerm_storage_container.this, azurerm_storage_queue.this]
+  depends_on = [azapi_resource.containers, azurerm_storage_queue.this]
 }
 
 resource "azurerm_storage_share" "this" {
-  for_each = var.storage_share
+  for_each = var.shares
 
   name                 = each.value.name
   quota                = each.value.quota
@@ -477,3 +471,34 @@ resource "azurerm_storage_share" "this" {
     }
   }
 }
+
+// Resource Block for Diagnostic Settings
+
+
+resource "azurerm_role_assignment" "storage_account" {
+  for_each = var.role_assignments
+
+  principal_id                           = each.value.principal_id
+  scope                                  = azurerm_storage_account.this.id
+  condition                              = each.value.condition
+  condition_version                      = each.value.condition_version
+  delegated_managed_identity_resource_id = each.value.delegated_managed_identity_resource_id
+  role_definition_id                     = strcontains(lower(each.value.role_definition_id_or_name), lower(local.role_definition_resource_substring)) ? each.value.role_definition_id_or_name : null
+  role_definition_name                   = strcontains(lower(each.value.role_definition_id_or_name), lower(local.role_definition_resource_substring)) ? null : each.value.role_definition_id_or_name
+  skip_service_principal_aad_check       = each.value.skip_service_principal_aad_check
+}
+/*
+resource "azurerm_role_assignment" "private_endpoint" {
+  for_each                               = var.role_assignments
+  scope                                  = azurerm_private_endpoint.this[each.value].id
+  role_definition_id                     = strcontains(lower(each.value.role_definition_id_or_name), lower(local.role_definition_resource_substring)) ? each.value.role_definition_id_or_name : null
+  role_definition_name                   = strcontains(lower(each.value.role_definition_id_or_name), lower(local.role_definition_resource_substring)) ? null : each.value.role_definition_id_or_name
+  principal_id                           = each.value.principal_id
+  condition                              = each.value.condition
+  condition_version                      = each.value.condition_version
+  skip_service_principal_aad_check       = each.value.skip_service_principal_aad_check
+  delegated_managed_identity_resource_id = each.value.delegated_managed_identity_resource_id
+}
+*/
+
+

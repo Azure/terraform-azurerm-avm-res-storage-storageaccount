@@ -1,6 +1,12 @@
+---
 version: 2
+
 updates:
-  - package-ecosystem: "gomod"
-    directory: "/test"
+  - package-ecosystem: gomod
+    directory: /tests
     schedule:
-      interval: "weekly"
+      interval: daily
+  - package-ecosystem: "github-actions"
+    directory: "/.github/workflows"
+    schedule:
+      interval: daily

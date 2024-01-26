@@ -16,4 +16,3 @@ configuration:
     prBody: |
       This repository needs the standard workflow and policy files to ensure compliance.
     file:
-
