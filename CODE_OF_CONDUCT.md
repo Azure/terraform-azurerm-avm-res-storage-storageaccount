@@ -1,5 +1,9 @@
-# Code of Conduct
+# Microsoft Open Source Code of Conduct
 
-This code of conduct outlines expectations for participation in Microsoft-managed open source communities, as well as steps for reporting unacceptable behavior. We are committed to providing a welcoming and inspiring community for all. People violating this code of conduct may be banned from the community.
+This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
 
-Please read the full text at [https://opensource.microsoft.com/codeofconduct/](https://opensource.microsoft.com/codeofconduct/)
+Resources:
+
+- [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/)
+- [Microsoft Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/)
+- Contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with questions or concerns
