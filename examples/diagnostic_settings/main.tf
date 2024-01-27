@@ -134,7 +134,7 @@ module "this" {
     }
   }
 
-  diagnostic_settings_storage = {
+  diagnostic_settings_storage_account = {
     storage = {
       name                       = "diag"
       log_analytics_workspace_id = azurerm_log_analytics_workspace.this.id
