@@ -39,7 +39,7 @@ variable "tags" {
   default     = {}
 }
 
-//required AVM interfaces
+# required AVM interfaces
 variable "customer_managed_key" {
   type = object({
     key_vault_resource_id              = optional(string, null)
@@ -47,7 +47,26 @@ variable "customer_managed_key" {
     key_version                        = optional(string, null)
     user_assigned_identity_resource_id = optional(string, null)
   })
-  default = {}
+  default     = {}
+  description = <<DESCRIPTION
+    Defines a customer managed key to use for encryption.
+
+    object({
+      key_vault_resource_id              = (Required) - The full Azure Resource ID of the key_vault where the customer managed key will be referenced from.
+      key_name                           = (Required) - The key name for the customer managed key in the key vault.
+      key_version                        = (Optional) - The version of the key to use
+      user_assigned_identity_resource_id = (Optional) - The user assigned identity to use when access the key vault
+    })
+
+    Example Inputs:
+    ```terraform
+    customer_managed_key = {
+      key_vault_resource_id = "/subscriptions/0000000-0000-0000-0000-000000000000/resourceGroups/test-resource-group/providers/Microsoft.KeyVault/vaults/example-key-vault"
+      key_name              = "sample-customer-key"
+    }
+    ```
+
+   DESCRIPTION
 }
 
 variable "diagnostic_settings" {

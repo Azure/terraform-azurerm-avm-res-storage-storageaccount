@@ -1,7 +1,7 @@
 
 # Enable Diagnostic Settings for Storage account
-resource "azurerm_monitor_diagnostic_setting" "storage" {
-  for_each = var.diagnostic_settings_storage == null ? {} : var.diagnostic_settings_storage
+resource "azurerm_monitor_diagnostic_setting" "storage_account" {
+  for_each = var.diagnostic_settings_storage_account == null ? {} : var.diagnostic_settings_storage_account
 
   name                       = each.value.name
   target_resource_id         = azurerm_storage_account.this.id
