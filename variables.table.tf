@@ -47,7 +47,7 @@ variable "table_encryption_key_type" {
   default     = null
   description = "(Optional) The encryption type of the table service. Possible values are `Service` and `Account`. Changing this forces a new resource to be created. Default value is `Service`."
 }
-
+/*
 variable "table_properties" {
   type = object({
     cors_rule = optional(list(object({
@@ -100,3 +100,4 @@ variable "table_properties" {
 
 EOT
 }
+*/
