@@ -344,7 +344,7 @@ resource "azapi_resource" "containers" {
     }
   }
 }
-
+/*
 resource "azurerm_key_vault_access_policy" "this" {
   for_each = var.key_vault_access_policy
 
@@ -379,7 +379,7 @@ resource "azurerm_storage_account_customer_managed_key" "this" {
     }
   }
 }
-
+*/
 resource "azurerm_storage_queue" "this" {
   for_each = var.queues
 
