@@ -1,3 +1,4 @@
+
 resource "azurerm_private_endpoint" "this" {
   for_each = var.private_endpoints
 
@@ -41,3 +42,5 @@ resource "azurerm_private_endpoint_application_security_group_association" "this
   application_security_group_id = each.value.asg_resource_id
   private_endpoint_id           = azurerm_private_endpoint.this[each.value.pe_key].id
 }
+
+

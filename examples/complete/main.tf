@@ -1,14 +1,14 @@
 terraform {
-  required_version = ">= 1.3.0"
+  required_version = ">= 1.0.0"
 
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = ">= 3.63.0, < 4.0"
+      version = ">= 3.7.0, < 4.0.0"
     }
     random = {
       source  = "hashicorp/random"
-      version = ">= 3.3.2, < 4.0"
+      version = ">= 3.5.0, < 4.0.0"
     }
   }
 }
@@ -100,6 +100,14 @@ resource "azurerm_private_dns_zone" "this" {
   resource_group_name = azurerm_resource_group.this.name
 }
 
+resource "azurerm_private_dns_zone_virtual_network_link" "private_links" {
+  for_each = azurerm_private_dns_zone.this
+
+  name                  = "${each.key}_${azurerm_virtual_network.vnet.name}-link"
+  private_dns_zone_name = azurerm_private_dns_zone.this[each.key].name
+  resource_group_name   = azurerm_resource_group.this.name
+  virtual_network_id    = azurerm_virtual_network.vnet.id
+}
 
 data "azurerm_client_config" "current" {}
 
@@ -137,6 +145,8 @@ module "avm-res-keyvault-vault" {
     create = "60s"
   }
 
+
+
   tags = {
     Dep = "IT"
   }
@@ -160,6 +170,12 @@ module "this" {
     user_assigned_resource_ids = [azurerm_user_assigned_identity.example_identity.id]
 
   }
+  customer_managed_key = {
+    key_vault_resource_id              = module.avm-res-keyvault-vault.resource.id
+    key_name                           = "sample-customer-key"
+    user_assigned_identity_resource_id = azurerm_user_assigned_identity.example_identity.id
+
+  }
 
   tags = {
     env   = "Dev"
@@ -179,7 +195,7 @@ module "this" {
       skip_service_principal_aad_check = false
     },
     role_assignment_2 = {
-      role_definition_id_or_name       = "Cognitive Services OpenAI Contributor"
+      role_definition_id_or_name       = "Owner"
       principal_id                     = data.azurerm_client_config.current.object_id
       skip_service_principal_aad_check = false
     },
@@ -204,8 +220,6 @@ module "this" {
 
 
     }
-
-
 
   }
   queues = {
@@ -274,5 +288,6 @@ resource "azurerm_log_analytics_storage_insights" "this" {
 
   depends_on = [module.this]
 }
+
 
 

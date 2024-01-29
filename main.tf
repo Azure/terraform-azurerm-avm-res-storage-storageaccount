@@ -285,6 +285,7 @@ resource "azurerm_storage_account_network_rules" "this" {
   ip_rules                   = var.network_rules.ip_rules
   virtual_network_subnet_ids = var.network_rules.virtual_network_subnet_ids
 
+
   dynamic "private_link_access" {
     for_each = var.network_rules.private_link_access == null ? [] : var.network_rules.private_link_access
     content {
@@ -292,14 +293,15 @@ resource "azurerm_storage_account_network_rules" "this" {
       endpoint_tenant_id   = private_link_access.value.endpoint_tenant_id
     }
   }
-  dynamic "private_link_access" {
+
+  /*dynamic "private_link_access" {
     for_each = var.private_endpoints == null ? [] : local.private_endpoints
     content {
       endpoint_resource_id = azurerm_private_endpoint.this[private_link_access.value].id
       endpoint_tenant_id   = data.azurerm_client_config.this.tenant_id
     }
 
-  }
+  }*/
   dynamic "timeouts" {
     for_each = var.network_rules.timeouts == null ? [] : [var.network_rules.timeouts]
     content {
@@ -345,21 +347,6 @@ resource "azapi_resource" "containers" {
   }
 }
 /*
-resource "azurerm_key_vault_access_policy" "this" {
-  for_each = var.key_vault_access_policy
-
-  key_vault_id    = var.customer_managed_key.key_vault_resource_id
-  object_id       = each.value.identity_principle_id
-  tenant_id       = each.value.identity_tenant_id
-  key_permissions = each.value.key_permissions
-
-  lifecycle {
-    precondition {
-      condition     = var.managed_identities != null && !var.managed_identities.system_assigned && (var.account_kind == "StorageV2" || var.account_tier == "Premium")
-      error_message = "`var.customer_managed_key` can only be set when the `account_kind` is set to `StorageV2` or `account_tier` set to `Premium`, and the identity type is `UserAssigned`."
-    }
-  }
-}
 
 resource "azurerm_storage_account_customer_managed_key" "this" {
   for_each = try(var.customer_managed_key.key_vault_access_policy.identity_keys, {})
