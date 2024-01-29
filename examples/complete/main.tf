@@ -100,13 +100,19 @@ resource "azurerm_private_dns_zone" "this" {
   resource_group_name = azurerm_resource_group.this.name
 }
 
+
+data "azurerm_client_config" "current" {}
+
 resource "azurerm_user_assigned_identity" "example_identity" {
   location            = azurerm_resource_group.this.location
   name                = module.naming.user_assigned_identity.name_unique
   resource_group_name = azurerm_resource_group.this.name
 }
 
-data "azurerm_client_config" "current" {}
+data "azurerm_role_definition" "example" {
+  name = "Contributor"
+
+}
 
 #create a keyvault for storing the credential with RBAC for the deployment user
 module "avm-res-keyvault-vault" {
@@ -132,7 +138,7 @@ module "avm-res-keyvault-vault" {
   }
 
   tags = {
-    scenario = "Ubuntu_w_ssh"
+    Dep = "IT"
   }
 }
 
@@ -140,7 +146,7 @@ module "this" {
 
   source = "../.."
 
-  account_replication_type      = "RAGZRS"
+  account_replication_type      = "GRS"
   account_tier                  = "Standard"
   account_kind                  = "StorageV2"
   location                      = azurerm_resource_group.this.location
@@ -150,11 +156,8 @@ module "this" {
   shared_access_key_enabled     = true
   public_network_access_enabled = true
   managed_identities = {
-    system_assigned            = false
+    system_assigned            = true
     user_assigned_resource_ids = [azurerm_user_assigned_identity.example_identity.id]
-    # "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/{identityName}",
-    #"/subscriptions/{subscriptionId2}/resourceGroups/{resourceGroupName2}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/{identityName2}"
-
 
   }
 
@@ -171,21 +174,25 @@ module "this" {
 
   role_assignments = {
     role_assignment_1 = {
-      role_definition_id_or_name       = "Contributor"
-      principal_id                     = "3c244fd8-81dc-4f55-9ddb-c88d4544cb9c"
-      skip_service_principal_aad_check = true
+      role_definition_id_or_name       = data.azurerm_role_definition.example.id
+      principal_id                     = data.azurerm_client_config.current.object_id
+      skip_service_principal_aad_check = false
+    },
+    role_assignment_2 = {
+      role_definition_id_or_name       = "Cognitive Services OpenAI Contributor"
+      principal_id                     = data.azurerm_client_config.current.object_id
+      skip_service_principal_aad_check = false
     },
 
 
   }
+  network_rules = {
+    bypass                     = ["AzureServices"]
+    default_action             = "Deny"
+    ip_rules                   = [try(module.public_ip[0].public_ip, var.bypass_ip_cidr)]
+    virtual_network_subnet_ids = toset([azurerm_subnet.private.id])
+  }
 
-  # TODO re-introduce once the rest is working
-  # network_rules = {
-  #   bypass                     = ["AzureServices"]
-  #   default_action             = "Deny"
-  #   ip_rules                   = [try(module.public_ip[0].public_ip, var.bypass_ip_cidr)]
-  #   virtual_network_subnet_ids = toset([azurerm_subnet.private.id])
-  # }
   containers = {
     blob_container0 = {
       name                  = "blob-container-${random_string.this.result}-0"
@@ -242,7 +249,16 @@ module "this" {
         owner = "John Doe2"
         dept  = "IT2"
       }
+
+      role_assignments = {
+        role_assignment_1 = {
+          role_definition_id_or_name = data.azurerm_role_definition.example.id
+          principal_id               = data.azurerm_client_config.current.object_id
+        }
+      }
     }
+
+
   }
 
 }
