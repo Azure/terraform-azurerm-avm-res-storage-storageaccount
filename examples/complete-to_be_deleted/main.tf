@@ -20,7 +20,7 @@ provider "azurerm" {
     }
   }
   skip_provider_registration = true
-  storage_use_azuread        = false
+  storage_use_azuread        = true
 }
 
 resource "random_string" "this" {
@@ -28,8 +28,6 @@ resource "random_string" "this" {
   special = false
   upper   = false
 }
-
-
 # This ensures we have unique CAF compliant names for our resources.
 module "naming" {
   source  = "Azure/naming/azurerm"
@@ -98,6 +96,10 @@ resource "azurerm_private_dns_zone" "this" {
 
   name                = "privatelink.${each.value}.core.windows.net"
   resource_group_name = azurerm_resource_group.this.name
+
+  tags = {
+    env = "Dev"
+  }
 }
 
 resource "azurerm_private_dns_zone_virtual_network_link" "private_links" {
@@ -140,13 +142,9 @@ module "avm-res-keyvault-vault" {
       principal_id               = data.azurerm_client_config.current.object_id
     }
   }
-
   wait_for_rbac_before_secret_operations = {
     create = "60s"
   }
-
-
-
   tags = {
     Dep = "IT"
   }
@@ -168,7 +166,6 @@ module "this" {
   managed_identities = {
     system_assigned            = true
     user_assigned_resource_ids = [azurerm_user_assigned_identity.example_identity.id]
-
   }
   customer_managed_key = {
     key_vault_resource_id              = module.avm-res-keyvault-vault.resource.id
@@ -176,18 +173,15 @@ module "this" {
     user_assigned_identity_resource_id = azurerm_user_assigned_identity.example_identity.id
 
   }
-
   tags = {
     env   = "Dev"
     owner = "John Doe"
     dept  = "IT"
   }
-
-  lock = {
+  /*lock = {
     name = "lock"
     kind = "None"
-  }
-
+  } */
   role_assignments = {
     role_assignment_1 = {
       role_definition_id_or_name       = data.azurerm_role_definition.example.id
@@ -199,7 +193,6 @@ module "this" {
       principal_id                     = data.azurerm_client_config.current.object_id
       skip_service_principal_aad_check = false
     },
-
 
   }
   network_rules = {
@@ -217,8 +210,6 @@ module "this" {
     blob_container1 = {
       name                  = "blob-container-${random_string.this.result}-1"
       container_access_type = "private"
-
-
     }
 
   }
@@ -239,6 +230,73 @@ module "this" {
     }
   }
 
+  shares = {
+    share0 = {
+      name  = "share-${random_string.this.result}-0"
+      quota = 10
+    }
+    share1 = {
+      name  = "share-${random_string.this.result}-1"
+      quota = 10
+    }
+  }
+  # setting up diagnostic settings for storage account
+  diagnostic_settings_storage_account = {
+    storage = {
+      name                       = "diag"
+      log_analytics_workspace_id = azurerm_log_analytics_workspace.this.id
+      log_categories             = ["audit", "alllogs"]
+      metric_categories          = ["AllMetrics"]
+      #log_groups                 = ["allLogs"]
+
+    }
+
+  }
+  # setting up diagnostic settings for blob
+  diagnostic_settings_blob = {
+    blob11 = {
+      name                       = "diag"
+      log_analytics_workspace_id = azurerm_log_analytics_workspace.this.id
+      log_categories             = ["audit", "alllogs"]
+      metric_categories          = ["AllMetrics"]
+      #log_groups                 = ["allLogs"]
+
+    }
+
+  }
+  # setting up diagnostic settings for queue
+  diagnostic_settings_queue = {
+    queue = {
+      name                       = "diag"
+      log_analytics_workspace_id = azurerm_log_analytics_workspace.this.id
+      log_categories             = ["audit", "alllogs"]
+      metric_categories          = ["AllMetrics"]
+
+    }
+
+  }
+  # setting up diagnostic settings for table
+  diagnostic_settings_table = {
+    queue = {
+      name                       = "diag"
+      log_analytics_workspace_id = azurerm_log_analytics_workspace.this.id
+      log_categories             = ["audit", "alllogs"]
+      metric_categories          = ["AllMetrics"]
+
+    }
+
+  }
+  diagnostic_settings_file = {
+    queue = {
+      name                       = "diag"
+      log_analytics_workspace_id = azurerm_log_analytics_workspace.this.id
+      log_categories             = ["audit", "alllogs"]
+      metric_categories          = ["AllMetrics"]
+
+    }
+
+  }
+
   private_endpoints = {
     for endpoint in local.endpoints :
     endpoint => {
@@ -250,19 +308,16 @@ module "this" {
       # these are optional but illustrate making well-aligned service connection & NIC names.
       private_service_connection_name = "psc-${endpoint}-${module.naming.storage_account.name_unique}"
       network_interface_name          = "nic-pe-${endpoint}-${module.naming.storage_account.name_unique}"
-      inherit_tags                    = true
-      inherit_lock                    = true
-
-      lock = {
-        name = "lock"
-        kind = "None"
-      }
+      inherit_tags                    = false
+      inherit_lock                    = false
 
       tags = {
-        env   = "Dev2"
-        owner = "John Doe2"
-        dept  = "IT2"
+        env   = "Prod"
+        owner = "Matt "
+        dept  = "IT"
       }
+
+
 
       role_assignments = {
         role_assignment_1 = {
@@ -277,6 +332,15 @@ module "this" {
 
 }
 
+#Log Analytics Workspace for diagnostic settings
+resource "azurerm_log_analytics_workspace" "this" {
+  location            = azurerm_resource_group.this.location
+  name                = module.naming.log_analytics_workspace.name_unique
+  resource_group_name = azurerm_resource_group.this.name
+  sku                 = "PerGB2018"
+}
+
+/*
 resource "azurerm_log_analytics_storage_insights" "this" {
   name                 = "si-${module.naming.log_analytics_workspace.name_unique}"
   resource_group_name  = azurerm_resource_group.this.name
@@ -288,6 +352,6 @@ resource "azurerm_log_analytics_storage_insights" "this" {
 
   depends_on = [module.this]
 }
-
+*/
 
 

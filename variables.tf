@@ -13,7 +13,6 @@ variable "resource_group_name" {
   type        = string
   description = "The resource group where the resources will be deployed."
 }
-
 variable "location" {
   type        = string
   default     = null
@@ -65,7 +64,6 @@ variable "customer_managed_key" {
       key_name              = "sample-customer-key"
     }
     ```
-
    DESCRIPTION
 }
 
@@ -126,7 +124,6 @@ variable "private_endpoints" {
     network_interface_name                  = optional(string, null)
     location                                = optional(string, null)
     inherit_tags                            = optional(bool, false)
-    inherit_lock                            = optional(bool, false)
     resource_group_name                     = optional(string, null)
     ip_configurations = optional(map(object({
       name               = string
