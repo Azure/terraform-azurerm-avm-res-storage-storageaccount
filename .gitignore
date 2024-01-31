@@ -69,3 +69,5 @@ crash.log
 override.tf
 override.tf.json
 terraform.rc
+*.md.tmp
+.DS_Store
