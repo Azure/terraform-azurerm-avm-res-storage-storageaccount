@@ -102,11 +102,10 @@ resource "azurerm_storage_account" "this" {
     }
   }
   dynamic "identity" {
-    #for_each = var.managed_identities == {} ? [] : [var.managed_identities]
+
     for_each = (var.managed_identities.system_assigned || length(var.managed_identities.user_assigned_resource_ids) > 0) ? { this = var.managed_identities } : {}
     content {
-      type = identity.value.system_assigned && length(identity.value.user_assigned_resource_ids) > 0 ? "SystemAssigned, UserAssigned" : length(identity.value.user_assigned_resource_ids) > 0 ? "UserAssigned" : "SystemAssigned"
-      #identity_ids = identity.value.user_assigned_resource_ids
+      type         = identity.value.system_assigned && length(identity.value.user_assigned_resource_ids) > 0 ? "SystemAssigned, UserAssigned" : length(identity.value.user_assigned_resource_ids) > 0 ? "UserAssigned" : "SystemAssigned"
       identity_ids = identity.value.user_assigned_resource_ids
     }
   }
@@ -223,12 +222,6 @@ resource "azurerm_storage_account" "this" {
       update = timeouts.value.update
     }
   }
-
-  lifecycle {
-    ignore_changes = [
-      customer_managed_key
-    ]
-  }
 }
 
 resource "azurerm_storage_account_local_user" "this" {
@@ -293,15 +286,6 @@ resource "azurerm_storage_account_network_rules" "this" {
       endpoint_tenant_id   = private_link_access.value.endpoint_tenant_id
     }
   }
-
-  /*dynamic "private_link_access" {
-    for_each = var.private_endpoints == null ? [] : local.private_endpoints
-    content {
-      endpoint_resource_id = azurerm_private_endpoint.this[private_link_access.value].id
-      endpoint_tenant_id   = data.azurerm_client_config.this.tenant_id
-    }
-
-  }*/
   dynamic "timeouts" {
     for_each = var.network_rules.timeouts == null ? [] : [var.network_rules.timeouts]
     content {
@@ -346,8 +330,6 @@ resource "azapi_resource" "containers" {
     }
   }
 }
-/*
-
 resource "azurerm_storage_account_customer_managed_key" "this" {
   for_each = try(var.customer_managed_key.key_vault_access_policy.identity_keys, {})
 
@@ -357,7 +339,7 @@ resource "azurerm_storage_account_customer_managed_key" "this" {
   key_version               = var.customer_managed_key.key_version
   user_assigned_identity_id = var.managed_identities.user_assigned_resource_ids[each.value]
 
-  depends_on = [azurerm_key_vault_access_policy.this]
+  depends_on = [azurerm_storage_account.this]
 
   lifecycle {
     precondition {
@@ -366,7 +348,7 @@ resource "azurerm_storage_account_customer_managed_key" "this" {
     }
   }
 }
-*/
+
 resource "azurerm_storage_queue" "this" {
   for_each = var.queues
 
@@ -457,6 +439,7 @@ resource "azurerm_storage_share" "this" {
       update = timeouts.value.update
     }
   }
+
 }
 
 resource "azurerm_role_assignment" "storage_account" {
