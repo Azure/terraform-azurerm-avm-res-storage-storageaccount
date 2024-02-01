@@ -23,6 +23,17 @@ provider "azurerm" {
   storage_use_azuread        = true
 }
 
+# This allows us to randomize the region for the resource group.
+module "regions" {
+  source  = "Azure/regions/azurerm"
+  version = "0.5.1"
+}
+
+resource "random_integer" "region_index" {
+  min = 0
+  max = length(module.regions.regions) - 1
+}
+
 resource "random_string" "this" {
   length  = 6
   special = false
@@ -36,8 +47,8 @@ module "naming" {
 
 # This is required for resource modules
 resource "azurerm_resource_group" "this" {
-  location = "AustraliaEast"
   name     = module.naming.resource_group.name_unique
+  location = module.regions.regions[random_integer.region_index.result].name
 }
 
 resource "azurerm_virtual_network" "vnet" {
@@ -78,10 +89,6 @@ resource "azurerm_network_security_rule" "no_internet" {
   destination_port_range      = "*"
   source_address_prefix       = azurerm_subnet.private.address_prefixes[0]
   source_port_range           = "*"
-}
-
-locals {
-  endpoints = toset(["blob", "queue", "table"])
 }
 
 module "public_ip" {
@@ -229,8 +236,6 @@ module "this" {
       log_analytics_workspace_id = azurerm_log_analytics_workspace.this.id
       log_categories             = ["audit", "alllogs"]
       metric_categories          = ["AllMetrics"]
-      #log_groups                 = ["allLogs"]
-
     }
 
   }
@@ -241,8 +246,6 @@ module "this" {
       log_analytics_workspace_id = azurerm_log_analytics_workspace.this.id
       log_categories             = ["audit", "alllogs"]
       metric_categories          = ["AllMetrics"]
-      #log_groups                 = ["allLogs"]
-
     }
 
   }

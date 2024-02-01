@@ -26,7 +26,6 @@ variable "name" {
   type        = string
   description = "The name of the resource."
   validation {
-    # see https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules
     condition     = can(regex("^[a-z0-9]{3,24}$", var.name))
     error_message = "The name must be between 3 and 24 characters, valid characters are lowercase letters and numbers."
   }
@@ -38,7 +37,6 @@ variable "tags" {
   default     = {}
 }
 
-# required AVM interfaces
 variable "customer_managed_key" {
   type = object({
     key_vault_resource_id              = optional(string, null)
@@ -96,8 +94,6 @@ variable "managed_identities" {
   nullable    = false
 }
 
-# specific DNS information for storage account private endpoints
-# https://learn.microsoft.com/en-us/azure/storage/common/storage-private-endpoints
 variable "private_endpoints" {
   type = map(object({
     name = optional(string, null)

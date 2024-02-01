@@ -12,7 +12,15 @@ terraform {
     }
   }
 }
+module "regions" {
+  source  = "Azure/regions/azurerm"
+  version = "0.5.1"
+}
 
+resource "random_integer" "region_index" {
+  min = 0
+  max = length(module.regions.regions) - 1
+}
 provider "azurerm" {
   features {
     resource_group {
@@ -36,8 +44,8 @@ module "naming" {
 
 # This is required for resource modules
 resource "azurerm_resource_group" "this" {
-  location = "AustraliaEast"
   name     = module.naming.resource_group.name_unique
+  location = module.regions.regions[random_integer.region_index.result].name
 }
 
 resource "azurerm_virtual_network" "vnet" {
@@ -81,7 +89,7 @@ resource "azurerm_network_security_rule" "no_internet" {
 }
 
 locals {
-  endpoints = toset(["blob", "queue", "table"])
+  endpoints = toset(["blob", "queue", "table", "file"])
 }
 
 module "public_ip" {
@@ -127,7 +135,7 @@ data "azurerm_role_definition" "example" {
 #create a keyvault for storing the credential with RBAC for the deployment user
 module "avm-res-keyvault-vault" {
   source              = "Azure/avm-res-keyvault-vault/azurerm"
-  version             = ">= 0.5.0"
+  version             = "0.5.0"
   tenant_id           = data.azurerm_client_config.current.tenant_id
   name                = module.naming.key_vault.name_unique
   resource_group_name = azurerm_resource_group.this.name
