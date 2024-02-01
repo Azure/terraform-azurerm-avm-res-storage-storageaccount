@@ -145,7 +145,14 @@ module "avm-res-keyvault-vault" {
       role_definition_id_or_name = "Key Vault Administrator"
       principal_id               = data.azurerm_client_config.current.object_id
     }
+
+    customer_managed_key = {
+      role_definition_id_or_name = "Key Vault Crypto Officer"
+      principal_id               = azurerm_user_assigned_identity.example_identity.principal_id
+    }
   }
+
+
   wait_for_rbac_before_secret_operations = {
     create = "60s"
   }
@@ -158,15 +165,16 @@ module "this" {
 
   source = "../.."
 
-  account_replication_type      = "GRS"
-  account_tier                  = "Standard"
-  account_kind                  = "StorageV2"
-  location                      = azurerm_resource_group.this.location
-  name                          = module.naming.storage_account.name_unique
-  resource_group_name           = azurerm_resource_group.this.name
-  min_tls_version               = "TLS1_2"
-  shared_access_key_enabled     = true
-  public_network_access_enabled = true
+  account_replication_type          = "GRS"
+  account_tier                      = "Standard"
+  account_kind                      = "StorageV2"
+  location                          = azurerm_resource_group.this.location
+  name                              = module.naming.storage_account.name_unique
+  resource_group_name               = azurerm_resource_group.this.name
+  min_tls_version                   = "TLS1_2"
+  shared_access_key_enabled         = true
+  infrastructure_encryption_enabled = true
+  public_network_access_enabled     = true
   managed_identities = {
     system_assigned            = true
     user_assigned_resource_ids = [azurerm_user_assigned_identity.example_identity.id]

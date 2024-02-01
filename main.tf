@@ -331,19 +331,18 @@ resource "azapi_resource" "containers" {
   }
 }
 resource "azurerm_storage_account_customer_managed_key" "this" {
-  for_each = try(var.customer_managed_key.key_vault_access_policy.identity_keys, {})
+  count = var.customer_managed_key != null ? 1 : 0
+  #for_each = try(var.customer_managed_key.key_vault_access_policy.identity_keys, {})
 
   key_name                  = var.customer_managed_key.key_name
   storage_account_id        = azurerm_storage_account.this.id
   key_vault_id              = var.customer_managed_key.key_vault_resource_id
   key_version               = var.customer_managed_key.key_version
-  user_assigned_identity_id = var.managed_identities.user_assigned_resource_ids[each.value]
-
-  depends_on = [azurerm_storage_account.this]
+  user_assigned_identity_id = var.customer_managed_key.user_assigned_identity_resource_id
 
   lifecycle {
     precondition {
-      condition     = var.managed_identities != null && length(var.managed_identities.user_assigned_resource_ids) > 0 && (var.account_kind == "StorageV2" || var.account_tier == "Premium")
+      condition     = (var.account_kind == "StorageV2" || var.account_tier == "Premium")
       error_message = "`var.customer_managed_key` can only be set when the `account_kind` is set to `StorageV2` or `account_tier` set to `Premium`, and the identity type is `UserAssigned`."
     }
   }
