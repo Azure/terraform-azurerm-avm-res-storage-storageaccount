@@ -28,24 +28,24 @@ module "regions" {
   source  = "Azure/regions/azurerm"
   version = "0.5.1"
 }
-
+# This allows us to randomize the region for the resource group.
 resource "random_integer" "region_index" {
   min = 0
   max = length(module.regions.regions) - 1
 }
-
+# This allow use to randomize the name of resources
 resource "random_string" "this" {
   length  = 6
   special = false
   upper   = false
 }
-# This ensures we have unique CAF compliant names for our resources.
+# This ensures we have unique CAF compliant names for resources.
 module "naming" {
   source  = "Azure/naming/azurerm"
   version = "0.4.0"
 }
 
-# This is required for resource modules
+
 resource "azurerm_resource_group" "this" {
   name     = module.naming.resource_group.name_unique
   location = module.regions.regions[random_integer.region_index.result].name
@@ -97,7 +97,7 @@ module "public_ip" {
   source  = "lonegunmanb/public-ip/lonegunmanb"
   version = "0.1.0"
 }
-
+# We need this to get the object_id of the current user
 data "azurerm_client_config" "current" {}
 
 resource "azurerm_user_assigned_identity" "example_identity" {
@@ -105,12 +105,11 @@ resource "azurerm_user_assigned_identity" "example_identity" {
   name                = module.naming.user_assigned_identity.name_unique
   resource_group_name = azurerm_resource_group.this.name
 }
-
+# We use the role definition data source to get the id of the Contributor role
 data "azurerm_role_definition" "example" {
   name = "Contributor"
 
 }
-
 module "this" {
 
   source = "../.."
@@ -239,6 +238,7 @@ module "this" {
     }
 
   }
+  # setting up diagnostic settings for file
   diagnostic_settings_file = {
     queue = {
       name                       = "diag"

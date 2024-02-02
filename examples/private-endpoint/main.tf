@@ -12,15 +12,6 @@ terraform {
     }
   }
 }
-module "regions" {
-  source  = "Azure/regions/azurerm"
-  version = "0.5.1"
-}
-
-resource "random_integer" "region_index" {
-  min = 0
-  max = length(module.regions.regions) - 1
-}
 provider "azurerm" {
   features {
     resource_group {
@@ -31,6 +22,17 @@ provider "azurerm" {
   storage_use_azuread        = true
 }
 
+# This allows us to randomize the region for the resource group.
+module "regions" {
+  source  = "Azure/regions/azurerm"
+  version = "0.5.1"
+}
+# This allows us to randomize the region for the resource group.
+resource "random_integer" "region_index" {
+  min = 0
+  max = length(module.regions.regions) - 1
+}
+# This allow use to randomize the name of resources
 resource "random_string" "this" {
   length  = 6
   special = false
@@ -42,7 +44,7 @@ module "naming" {
   version = "0.4.0"
 }
 
-# This is required for resource modules
+
 resource "azurerm_resource_group" "this" {
   name     = module.naming.resource_group.name_unique
   location = module.regions.regions[random_integer.region_index.result].name
