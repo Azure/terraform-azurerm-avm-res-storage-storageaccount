@@ -119,11 +119,11 @@ resource "azurerm_key_vault_key" "example" {
     "wrapKey"
   ]
   key_type     = "RSA"
-  key_vault_id = module.avm-res-keyvault-vault.resource.id
+  key_vault_id = module.avm_res_keyvault_vault.resource.id
   name         = module.naming.key_vault_key.name_unique
   key_size     = 2048
 
-  depends_on = [module.avm-res-keyvault-vault]
+  depends_on = [module.avm_res_keyvault_vault]
 }
 
 #create a keyvault for storing the credential with RBAC for the deployment user
@@ -178,7 +178,7 @@ module "this" {
     user_assigned_resource_ids = [azurerm_user_assigned_identity.example_identity.id]
   }
   customer_managed_key = {
-    key_vault_resource_id              = module.avm-res-keyvault-vault.resource.id
+    key_vault_resource_id              = module.avm_res_keyvault_vault.resource.id
     key_name                           = azurerm_key_vault_key.example.name
     user_assigned_identity_resource_id = azurerm_user_assigned_identity.example_identity.id
 
