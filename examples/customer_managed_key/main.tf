@@ -12,6 +12,16 @@ terraform {
     }
   }
 }
+# This allows us to randomize the region for the resource group.
+module "regions" {
+  source  = "Azure/regions/azurerm"
+  version = "0.3.0"
+}
+
+resource "random_integer" "region_index" {
+  min = 0
+  max = length(module.regions.regions) - 1
+}
 
 provider "azurerm" {
   features {
@@ -23,24 +33,12 @@ provider "azurerm" {
   storage_use_azuread        = true
 }
 
-# This allows us to randomize the region for the resource group.
-module "regions" {
-  source  = "Azure/regions/azurerm"
-  version = "0.3.0"
-}
-# This allows us to randomize the region for the resource group.
-resource "random_integer" "region_index" {
-  min = 0
-  max = length(module.regions.regions) - 1
-}
-
-# This allow use to randomize the name of resources
 resource "random_string" "this" {
   length  = 6
   special = false
   upper   = false
 }
-# This ensures we have unique CAF compliant names for resources.
+# This ensures we have unique CAF compliant names for our resources.
 module "naming" {
   source  = "Azure/naming/azurerm"
   version = "0.4.0"
@@ -98,7 +96,7 @@ module "public_ip" {
   source  = "lonegunmanb/public-ip/lonegunmanb"
   version = "0.1.0"
 }
-# We need this to get the object_id of the current user
+
 data "azurerm_client_config" "current" {}
 
 resource "azurerm_user_assigned_identity" "example_identity" {
@@ -106,28 +104,86 @@ resource "azurerm_user_assigned_identity" "example_identity" {
   name                = module.naming.user_assigned_identity.name_unique
   resource_group_name = azurerm_resource_group.this.name
 }
-# We use the role definition data source to get the id of the Contributor role
+
 data "azurerm_role_definition" "example" {
   name = "Contributor"
 
+}
+#Create a Customer Managed Key for a Storage Account.
+resource "azurerm_key_vault_key" "example" {
+  name         = module.naming.key_vault_key.name_unique
+  key_vault_id = module.avm-res-keyvault-vault.resource.id
+  key_type     = "RSA"
+  key_size     = 2048
+  key_opts = [
+    "decrypt",
+    "encrypt",
+    "sign",
+    "unwrapKey",
+    "verify",
+    "wrapKey"
+  ]
+
+  depends_on = [module.avm-res-keyvault-vault]
+
+}
+
+#create a keyvault for storing the credential with RBAC for the deployment user
+module "avm-res-keyvault-vault" {
+  source              = "Azure/avm-res-keyvault-vault/azurerm"
+  version             = "0.5.1"
+  tenant_id           = data.azurerm_client_config.current.tenant_id
+  name                = module.naming.key_vault.name_unique
+  resource_group_name = azurerm_resource_group.this.name
+  location            = azurerm_resource_group.this.location
+  network_acls = {
+    default_action = "Allow"
+  }
+
+  role_assignments = {
+    deployment_user_secrets = {
+      role_definition_id_or_name = "Key Vault Administrator"
+      principal_id               = data.azurerm_client_config.current.object_id
+    }
+
+    customer_managed_key = {
+      role_definition_id_or_name = "Key Vault Crypto Officer"
+      principal_id               = azurerm_user_assigned_identity.example_identity.principal_id
+    }
+  }
+
+
+  wait_for_rbac_before_secret_operations = {
+    create = "60s"
+  }
+  tags = {
+    Dep = "IT"
+  }
 }
 
 module "this" {
 
   source = "../.."
 
-  account_replication_type      = "GRS"
-  account_tier                  = "Standard"
-  account_kind                  = "StorageV2"
-  location                      = azurerm_resource_group.this.location
-  name                          = module.naming.storage_account.name_unique
-  resource_group_name           = azurerm_resource_group.this.name
-  min_tls_version               = "TLS1_2"
-  shared_access_key_enabled     = true
-  public_network_access_enabled = true
+  account_replication_type          = "GRS"
+  account_tier                      = "Standard"
+  account_kind                      = "StorageV2"
+  location                          = azurerm_resource_group.this.location
+  name                              = module.naming.storage_account.name_unique
+  resource_group_name               = azurerm_resource_group.this.name
+  min_tls_version                   = "TLS1_2"
+  shared_access_key_enabled         = true
+  infrastructure_encryption_enabled = true
+  public_network_access_enabled     = true
   managed_identities = {
     system_assigned            = true
     user_assigned_resource_ids = [azurerm_user_assigned_identity.example_identity.id]
+  }
+  customer_managed_key = {
+    key_vault_resource_id              = module.avm-res-keyvault-vault.resource.id
+    key_name                           = azurerm_key_vault_key.example.name
+    user_assigned_identity_resource_id = azurerm_user_assigned_identity.example_identity.id
+
   }
   tags = {
     env   = "Dev"

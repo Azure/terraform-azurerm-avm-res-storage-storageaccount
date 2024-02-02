@@ -1,6 +1,4 @@
 
-# Diagnostic Settings for Storage account and sub storage resources
-
 variable "diagnostic_settings_storage_account" {
   type = map(object({
     name                                     = optional(string, null)

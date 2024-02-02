@@ -26,14 +26,13 @@ provider "azurerm" {
 # This allows us to randomize the region for the resource group.
 module "regions" {
   source  = "Azure/regions/azurerm"
-  version = "0.3.0"
+  version = "0.5.1"
 }
 # This allows us to randomize the region for the resource group.
 resource "random_integer" "region_index" {
   min = 0
   max = length(module.regions.regions) - 1
 }
-
 # This allow use to randomize the name of resources
 resource "random_string" "this" {
   length  = 6
@@ -46,7 +45,7 @@ module "naming" {
   version = "0.4.0"
 }
 
-# This is required for resource modules
+
 resource "azurerm_resource_group" "this" {
   name     = module.naming.resource_group.name_unique
   location = module.regions.regions[random_integer.region_index.result].name
@@ -111,7 +110,6 @@ data "azurerm_role_definition" "example" {
   name = "Contributor"
 
 }
-
 module "this" {
 
   source = "../.."
@@ -198,4 +196,65 @@ module "this" {
       quota = 10
     }
   }
+  # setting up diagnostic settings for storage account
+  diagnostic_settings_storage_account = {
+    storage = {
+      name                       = "diag"
+      log_analytics_workspace_id = azurerm_log_analytics_workspace.this.id
+      log_categories             = ["audit", "alllogs"]
+      metric_categories          = ["AllMetrics"]
+    }
+
+  }
+  # setting up diagnostic settings for blob
+  diagnostic_settings_blob = {
+    blob11 = {
+      name                       = "diag"
+      log_analytics_workspace_id = azurerm_log_analytics_workspace.this.id
+      log_categories             = ["audit", "alllogs"]
+      metric_categories          = ["AllMetrics"]
+    }
+
+  }
+  # setting up diagnostic settings for queue
+  diagnostic_settings_queue = {
+    queue = {
+      name                       = "diag"
+      log_analytics_workspace_id = azurerm_log_analytics_workspace.this.id
+      log_categories             = ["audit", "alllogs"]
+      metric_categories          = ["AllMetrics"]
+
+    }
+
+  }
+  # setting up diagnostic settings for table
+  diagnostic_settings_table = {
+    queue = {
+      name                       = "diag"
+      log_analytics_workspace_id = azurerm_log_analytics_workspace.this.id
+      log_categories             = ["audit", "alllogs"]
+      metric_categories          = ["AllMetrics"]
+
+    }
+
+  }
+  # setting up diagnostic settings for file
+  diagnostic_settings_file = {
+    queue = {
+      name                       = "diag"
+      log_analytics_workspace_id = azurerm_log_analytics_workspace.this.id
+      log_categories             = ["audit", "alllogs"]
+      metric_categories          = ["AllMetrics"]
+
+    }
+
+  }
+}
+
+#Log Analytics Workspace for diagnostic settings
+resource "azurerm_log_analytics_workspace" "this" {
+  location            = azurerm_resource_group.this.location
+  name                = module.naming.log_analytics_workspace.name_unique
+  resource_group_name = azurerm_resource_group.this.name
+  sku                 = "PerGB2018"
 }

@@ -1,18 +1,17 @@
 terraform {
-  required_version = ">= 1.3.0"
+  required_version = ">= 1.0.0"
 
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = ">= 3.63.0, < 4.0"
+      version = ">= 3.7.0, < 4.0.0"
     }
     random = {
       source  = "hashicorp/random"
-      version = ">= 3.3.2, < 4.0"
+      version = ">= 3.5.0, < 4.0.0"
     }
   }
 }
-
 provider "azurerm" {
   features {
     resource_group {
@@ -20,25 +19,35 @@ provider "azurerm" {
     }
   }
   skip_provider_registration = true
-  storage_use_azuread        = false
+  storage_use_azuread        = true
 }
 
+# This allows us to randomize the region for the resource group.
+module "regions" {
+  source  = "Azure/regions/azurerm"
+  version = "0.5.1"
+}
+# This allows us to randomize the region for the resource group.
+resource "random_integer" "region_index" {
+  min = 0
+  max = length(module.regions.regions) - 1
+}
+# This allow use to randomize the name of resources
 resource "random_string" "this" {
   length  = 6
   special = false
   upper   = false
 }
-
 # This ensures we have unique CAF compliant names for our resources.
 module "naming" {
   source  = "Azure/naming/azurerm"
   version = "0.4.0"
 }
 
-# This is required for resource modules
+
 resource "azurerm_resource_group" "this" {
-  location = "AustraliaEast"
   name     = module.naming.resource_group.name_unique
+  location = module.regions.regions[random_integer.region_index.result].name
 }
 
 resource "azurerm_virtual_network" "vnet" {
@@ -82,7 +91,7 @@ resource "azurerm_network_security_rule" "no_internet" {
 }
 
 locals {
-  endpoints = toset(["blob", "queue", "table"])
+  endpoints = toset(["blob", "queue", "table", "file"])
 }
 
 module "public_ip" {
@@ -97,7 +106,22 @@ resource "azurerm_private_dns_zone" "this" {
 
   name                = "privatelink.${each.value}.core.windows.net"
   resource_group_name = azurerm_resource_group.this.name
+
+  tags = {
+    env = "Dev"
+  }
 }
+
+resource "azurerm_private_dns_zone_virtual_network_link" "private_links" {
+  for_each = azurerm_private_dns_zone.this
+
+  name                  = "${each.key}_${azurerm_virtual_network.vnet.name}-link"
+  private_dns_zone_name = azurerm_private_dns_zone.this[each.key].name
+  resource_group_name   = azurerm_resource_group.this.name
+  virtual_network_id    = azurerm_virtual_network.vnet.id
+}
+
+data "azurerm_client_config" "current" {}
 
 resource "azurerm_user_assigned_identity" "example_identity" {
   location            = azurerm_resource_group.this.location
@@ -105,11 +129,17 @@ resource "azurerm_user_assigned_identity" "example_identity" {
   resource_group_name = azurerm_resource_group.this.name
 }
 
+data "azurerm_role_definition" "example" {
+  name = "Contributor"
+
+}
+
+#create azure storage account
 module "this" {
 
   source = "../.."
 
-  account_replication_type      = "RAGZRS"
+  account_replication_type      = "GRS"
   account_tier                  = "Standard"
   account_kind                  = "StorageV2"
   location                      = azurerm_resource_group.this.location
@@ -119,42 +149,38 @@ module "this" {
   shared_access_key_enabled     = true
   public_network_access_enabled = true
   managed_identities = {
-    system_assigned            = false
+    system_assigned            = true
     user_assigned_resource_ids = [azurerm_user_assigned_identity.example_identity.id]
-    # "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/{identityName}",
-    #"/subscriptions/{subscriptionId2}/resourceGroups/{resourceGroupName2}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/{identityName2}"
-
-
   }
-
   tags = {
     env   = "Dev"
     owner = "John Doe"
     dept  = "IT"
   }
-
-  lock = {
+  /*lock = {
     name = "lock"
     kind = "None"
-  }
-
+  } */
   role_assignments = {
     role_assignment_1 = {
-      role_definition_id_or_name       = "Contributor"
-      principal_id                     = "3c244fd8-81dc-4f55-9ddb-c88d4544cb9c"
-      skip_service_principal_aad_check = true
+      role_definition_id_or_name       = data.azurerm_role_definition.example.id
+      principal_id                     = data.azurerm_client_config.current.object_id
+      skip_service_principal_aad_check = false
+    },
+    role_assignment_2 = {
+      role_definition_id_or_name       = "Owner"
+      principal_id                     = data.azurerm_client_config.current.object_id
+      skip_service_principal_aad_check = false
     },
 
-
+  }
+  network_rules = {
+    bypass                     = ["AzureServices"]
+    default_action             = "Deny"
+    ip_rules                   = [try(module.public_ip[0].public_ip, var.bypass_ip_cidr)]
+    virtual_network_subnet_ids = toset([azurerm_subnet.private.id])
   }
 
-  # TODO re-introduce once the rest is working
-  # network_rules = {
-  #   bypass                     = ["AzureServices"]
-  #   default_action             = "Deny"
-  #   ip_rules                   = [try(module.public_ip[0].public_ip, var.bypass_ip_cidr)]
-  #   virtual_network_subnet_ids = toset([azurerm_subnet.private.id])
-  # }
   containers = {
     blob_container0 = {
       name                  = "blob-container-${random_string.this.result}-0"
@@ -163,11 +189,7 @@ module "this" {
     blob_container1 = {
       name                  = "blob-container-${random_string.this.result}-1"
       container_access_type = "private"
-
-
     }
-
-
 
   }
   queues = {
@@ -187,6 +209,17 @@ module "this" {
     }
   }
 
+  shares = {
+    share0 = {
+      name  = "share-${random_string.this.result}-0"
+      quota = 10
+    }
+    share1 = {
+      name  = "share-${random_string.this.result}-1"
+      quota = 10
+    }
+  }
+  #create a private endpoint for each endpoint type
   private_endpoints = {
     for endpoint in local.endpoints :
     endpoint => {
@@ -198,34 +231,25 @@ module "this" {
       # these are optional but illustrate making well-aligned service connection & NIC names.
       private_service_connection_name = "psc-${endpoint}-${module.naming.storage_account.name_unique}"
       network_interface_name          = "nic-pe-${endpoint}-${module.naming.storage_account.name_unique}"
-      inherit_tags                    = true
-      inherit_lock                    = true
-
-      lock = {
-        name = "lock"
-        kind = "None"
-      }
+      inherit_tags                    = false
+      inherit_lock                    = false
 
       tags = {
-        env   = "Dev2"
-        owner = "John Doe2"
-        dept  = "IT2"
+        env   = "Prod"
+        owner = "Matt "
+        dept  = "IT"
+      }
+
+      role_assignments = {
+        role_assignment_1 = {
+          role_definition_id_or_name = data.azurerm_role_definition.example.id
+          principal_id               = data.azurerm_client_config.current.object_id
+        }
       }
     }
+
+
   }
 
 }
-
-resource "azurerm_log_analytics_storage_insights" "this" {
-  name                 = "si-${module.naming.log_analytics_workspace.name_unique}"
-  resource_group_name  = azurerm_resource_group.this.name
-  storage_account_id   = module.this.id
-  storage_account_key  = module.this.resource.primary_access_key
-  workspace_id         = azurerm_log_analytics_workspace.this.id
-  blob_container_names = [for c in module.this.containers : c.name]
-  table_names          = [for t in module.this.tables : t.name]
-
-  depends_on = [module.this]
-}
-
 

@@ -102,11 +102,10 @@ resource "azurerm_storage_account" "this" {
     }
   }
   dynamic "identity" {
-    #for_each = var.managed_identities == {} ? [] : [var.managed_identities]
+
     for_each = (var.managed_identities.system_assigned || length(var.managed_identities.user_assigned_resource_ids) > 0) ? { this = var.managed_identities } : {}
     content {
-      type = identity.value.system_assigned && length(identity.value.user_assigned_resource_ids) > 0 ? "SystemAssigned, UserAssigned" : length(identity.value.user_assigned_resource_ids) > 0 ? "UserAssigned" : "SystemAssigned"
-      #identity_ids = identity.value.user_assigned_resource_ids
+      type         = identity.value.system_assigned && length(identity.value.user_assigned_resource_ids) > 0 ? "SystemAssigned, UserAssigned" : length(identity.value.user_assigned_resource_ids) > 0 ? "UserAssigned" : "SystemAssigned"
       identity_ids = identity.value.user_assigned_resource_ids
     }
   }
@@ -223,12 +222,6 @@ resource "azurerm_storage_account" "this" {
       update = timeouts.value.update
     }
   }
-
-  lifecycle {
-    ignore_changes = [
-      customer_managed_key
-    ]
-  }
 }
 
 resource "azurerm_storage_account_local_user" "this" {
@@ -285,20 +278,13 @@ resource "azurerm_storage_account_network_rules" "this" {
   ip_rules                   = var.network_rules.ip_rules
   virtual_network_subnet_ids = var.network_rules.virtual_network_subnet_ids
 
+
   dynamic "private_link_access" {
     for_each = var.network_rules.private_link_access == null ? [] : var.network_rules.private_link_access
     content {
       endpoint_resource_id = private_link_access.value.endpoint_resource_id
       endpoint_tenant_id   = private_link_access.value.endpoint_tenant_id
     }
-  }
-  dynamic "private_link_access" {
-    for_each = var.private_endpoints == null ? [] : local.private_endpoints
-    content {
-      endpoint_resource_id = azurerm_private_endpoint.this[private_link_access.value].id
-      endpoint_tenant_id   = data.azurerm_client_config.this.tenant_id
-    }
-
   }
   dynamic "timeouts" {
     for_each = var.network_rules.timeouts == null ? [] : [var.network_rules.timeouts]
@@ -344,37 +330,19 @@ resource "azapi_resource" "containers" {
     }
   }
 }
-
-resource "azurerm_key_vault_access_policy" "this" {
-  for_each = var.key_vault_access_policy
-
-  key_vault_id    = var.customer_managed_key.key_vault_resource_id
-  object_id       = each.value.identity_principle_id
-  tenant_id       = each.value.identity_tenant_id
-  key_permissions = each.value.key_permissions
-
-  lifecycle {
-    precondition {
-      condition     = var.managed_identities != null && !var.managed_identities.system_assigned && (var.account_kind == "StorageV2" || var.account_tier == "Premium")
-      error_message = "`var.customer_managed_key` can only be set when the `account_kind` is set to `StorageV2` or `account_tier` set to `Premium`, and the identity type is `UserAssigned`."
-    }
-  }
-}
-
 resource "azurerm_storage_account_customer_managed_key" "this" {
-  for_each = try(var.customer_managed_key.key_vault_access_policy.identity_keys, {})
+  count = var.customer_managed_key != null ? 1 : 0
+  #for_each = try(var.customer_managed_key.key_vault_access_policy.identity_keys, {})
 
   key_name                  = var.customer_managed_key.key_name
   storage_account_id        = azurerm_storage_account.this.id
   key_vault_id              = var.customer_managed_key.key_vault_resource_id
   key_version               = var.customer_managed_key.key_version
-  user_assigned_identity_id = var.managed_identities.user_assigned_resource_ids[each.value]
-
-  depends_on = [azurerm_key_vault_access_policy.this]
+  user_assigned_identity_id = var.customer_managed_key.user_assigned_identity_resource_id
 
   lifecycle {
     precondition {
-      condition     = var.managed_identities != null && length(var.managed_identities.user_assigned_resource_ids) > 0 && (var.account_kind == "StorageV2" || var.account_tier == "Premium")
+      condition     = (var.account_kind == "StorageV2" || var.account_tier == "Premium")
       error_message = "`var.customer_managed_key` can only be set when the `account_kind` is set to `StorageV2` or `account_tier` set to `Premium`, and the identity type is `UserAssigned`."
     }
   }
@@ -470,6 +438,7 @@ resource "azurerm_storage_share" "this" {
       update = timeouts.value.update
     }
   }
+
 }
 
 resource "azurerm_role_assignment" "storage_account" {
@@ -484,18 +453,19 @@ resource "azurerm_role_assignment" "storage_account" {
   role_definition_name                   = strcontains(lower(each.value.role_definition_id_or_name), lower(local.role_definition_resource_substring)) ? null : each.value.role_definition_id_or_name
   skip_service_principal_aad_check       = each.value.skip_service_principal_aad_check
 }
-/*
+
 resource "azurerm_role_assignment" "private_endpoint" {
-  for_each                               = var.role_assignments
-  scope                                  = azurerm_private_endpoint.this[each.value].id
-  role_definition_id                     = strcontains(lower(each.value.role_definition_id_or_name), lower(local.role_definition_resource_substring)) ? each.value.role_definition_id_or_name : null
-  role_definition_name                   = strcontains(lower(each.value.role_definition_id_or_name), lower(local.role_definition_resource_substring)) ? null : each.value.role_definition_id_or_name
-  principal_id                           = each.value.principal_id
-  condition                              = each.value.condition
-  condition_version                      = each.value.condition_version
-  skip_service_principal_aad_check       = each.value.skip_service_principal_aad_check
-  delegated_managed_identity_resource_id = each.value.delegated_managed_identity_resource_id
+  for_each = local.pe_role_assignments
+
+  scope                                  = azurerm_private_endpoint.this[each.value.private_endpoint_key].id
+  role_definition_id                     = strcontains(lower(each.value.role_assignment.role_definition_id_or_name), lower(local.role_definition_resource_substring)) ? each.value.role_assignment.role_definition_id_or_name : null
+  role_definition_name                   = strcontains(lower(each.value.role_assignment.role_definition_id_or_name), lower(local.role_definition_resource_substring)) ? null : each.value.role_assignment.role_definition_id_or_name
+  principal_id                           = each.value.role_assignment.principal_id
+  condition                              = each.value.role_assignment.condition
+  condition_version                      = each.value.role_assignment.condition_version
+  skip_service_principal_aad_check       = each.value.role_assignment.skip_service_principal_aad_check
+  delegated_managed_identity_resource_id = each.value.role_assignment.delegated_managed_identity_resource_id
 }
-*/
+
 
 

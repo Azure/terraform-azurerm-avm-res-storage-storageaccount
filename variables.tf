@@ -13,7 +13,6 @@ variable "resource_group_name" {
   type        = string
   description = "The resource group where the resources will be deployed."
 }
-
 variable "location" {
   type        = string
   default     = null
@@ -27,7 +26,6 @@ variable "name" {
   type        = string
   description = "The name of the resource."
   validation {
-    # see https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules
     condition     = can(regex("^[a-z0-9]{3,24}$", var.name))
     error_message = "The name must be between 3 and 24 characters, valid characters are lowercase letters and numbers."
   }
@@ -39,15 +37,14 @@ variable "tags" {
   default     = {}
 }
 
-# required AVM interfaces
 variable "customer_managed_key" {
   type = object({
-    key_vault_resource_id              = optional(string, null)
-    key_name                           = optional(string, null)
+    key_vault_resource_id              = string
+    key_name                           = string
     key_version                        = optional(string, null)
-    user_assigned_identity_resource_id = optional(string, null)
+    user_assigned_identity_resource_id = string
   })
-  default     = {}
+  default     = null
   description = <<DESCRIPTION
     Defines a customer managed key to use for encryption.
 
@@ -65,7 +62,6 @@ variable "customer_managed_key" {
       key_name              = "sample-customer-key"
     }
     ```
-
    DESCRIPTION
 }
 
@@ -98,8 +94,6 @@ variable "managed_identities" {
   nullable    = false
 }
 
-# specific DNS information for storage account private endpoints
-# https://learn.microsoft.com/en-us/azure/storage/common/storage-private-endpoints
 variable "private_endpoints" {
   type = map(object({
     name = optional(string, null)
@@ -126,7 +120,6 @@ variable "private_endpoints" {
     network_interface_name                  = optional(string, null)
     location                                = optional(string, null)
     inherit_tags                            = optional(bool, false)
-    inherit_lock                            = optional(bool, false)
     resource_group_name                     = optional(string, null)
     ip_configurations = optional(map(object({
       name               = string

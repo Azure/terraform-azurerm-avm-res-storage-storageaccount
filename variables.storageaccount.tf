@@ -169,10 +169,10 @@ variable "min_tls_version" {
 
 variable "network_rules" {
   type = object({
-    bypass                     = optional(set(string), ["Logging", "Metrics", "AzureServices"])
+    bypass                     = optional(set(string), [])
     default_action             = optional(string, "Deny")
     ip_rules                   = optional(set(string), [])
-    virtual_network_subnet_ids = optional(set(string))
+    virtual_network_subnet_ids = optional(set(string), [])
     private_link_access = optional(list(object({
       endpoint_resource_id = string
       endpoint_tenant_id   = optional(string)
@@ -184,9 +184,11 @@ variable "network_rules" {
       update = optional(string)
     }))
   })
-  default = null
+  default = {}
 
   description = <<-EOT
+ > Note the default value for this variable will block all public access to the storage account. If you want to disable all network rules, set this value to `null`.
+ 
  - `bypass` - (Optional) Specifies whether traffic is bypassed for Logging/Metrics/AzureServices. Valid options are any combination of `Logging`, `Metrics`, `AzureServices`, or `None`.
  - `default_action` - (Required) Specifies the default action of allow or deny when no other rules match. Valid options are `Deny` or `Allow`.
  - `ip_rules` - (Optional) List of public IP or IP ranges in CIDR Format. Only IPv4 addresses are allowed. Private IP address ranges (as defined in [RFC 1918](https://tools.ietf.org/html/rfc1918#section-3)) are not allowed.

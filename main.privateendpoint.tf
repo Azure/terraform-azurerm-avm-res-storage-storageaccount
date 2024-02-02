@@ -1,3 +1,4 @@
+
 resource "azurerm_private_endpoint" "this" {
   for_each = var.private_endpoints
 
