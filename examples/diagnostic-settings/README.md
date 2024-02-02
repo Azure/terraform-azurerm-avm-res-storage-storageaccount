@@ -310,7 +310,7 @@ The following input variables are optional (have default values):
 
 ### <a name="input_bypass_ip_cidr"></a> [bypass\_ip\_cidr](#input\_bypass\_ip\_cidr)
 
-Description: n/a
+Description: value to bypass the IP CIDR on firewall rules
 
 Type: `string`
 

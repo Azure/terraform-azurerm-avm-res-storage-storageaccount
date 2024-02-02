@@ -123,15 +123,15 @@ resource "azurerm_key_vault_key" "example" {
     "wrapKey"
   ]
   key_type     = "RSA"
-  key_vault_id = module.avm-res-keyvault-vault.resource.id
+  key_vault_id = module.avm_res_keyvault_vault.resource.id
   name         = module.naming.key_vault_key.name_unique
   key_size     = 2048
 
-  depends_on = [module.avm-res-keyvault-vault]
+  depends_on = [module.avm_res_keyvault_vault]
 }
 
 #create a keyvault for storing the credential with RBAC for the deployment user
-module "avm-res-keyvault-vault" {
+module "avm_res_keyvault_vault" {
   source              = "Azure/avm-res-keyvault-vault/azurerm"
   version             = "0.5.1"
   tenant_id           = data.azurerm_client_config.current.tenant_id
@@ -182,7 +182,7 @@ module "this" {
     user_assigned_resource_ids = [azurerm_user_assigned_identity.example_identity.id]
   }
   customer_managed_key = {
-    key_vault_resource_id              = module.avm-res-keyvault-vault.resource.id
+    key_vault_resource_id              = module.avm_res_keyvault_vault.resource.id
     key_name                           = azurerm_key_vault_key.example.name
     user_assigned_identity_resource_id = azurerm_user_assigned_identity.example_identity.id
 
@@ -306,7 +306,7 @@ The following input variables are optional (have default values):
 
 ### <a name="input_bypass_ip_cidr"></a> [bypass\_ip\_cidr](#input\_bypass\_ip\_cidr)
 
-Description: n/a
+Description: value to bypass the IP CIDR on firewall rules
 
 Type: `string`
 
@@ -320,7 +320,7 @@ No outputs.
 
 The following Modules are called:
 
-### <a name="module_avm-res-keyvault-vault"></a> [avm-res-keyvault-vault](#module\_avm-res-keyvault-vault)
+### <a name="module_avm_res_keyvault_vault"></a> [avm\_res\_keyvault\_vault](#module\_avm\_res\_keyvault\_vault)
 
 Source: Azure/avm-res-keyvault-vault/azurerm
 
