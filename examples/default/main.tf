@@ -17,7 +17,7 @@ module "regions" {
   source  = "Azure/regions/azurerm"
   version = "0.3.0"
 }
-
+# This allows us to randomize the region for the resource group.
 resource "random_integer" "region_index" {
   min = 0
   max = length(module.regions.regions) - 1
@@ -96,7 +96,7 @@ module "public_ip" {
   source  = "lonegunmanb/public-ip/lonegunmanb"
   version = "0.1.0"
 }
-
+# We need the current tenant ID to create the user assigned identity
 data "azurerm_client_config" "current" {}
 
 resource "azurerm_user_assigned_identity" "example_identity" {
@@ -104,36 +104,10 @@ resource "azurerm_user_assigned_identity" "example_identity" {
   name                = module.naming.user_assigned_identity.name_unique
   resource_group_name = azurerm_resource_group.this.name
 }
-
+#we need data source to access information about an existing Role Definition
 data "azurerm_role_definition" "example" {
   name = "Contributor"
 
-}
-
-#create a keyvault for storing the credential with RBAC for the deployment user
-module "avm-res-keyvault-vault" {
-  source              = "Azure/avm-res-keyvault-vault/azurerm"
-  version             = "0.5.1"
-  tenant_id           = data.azurerm_client_config.current.tenant_id
-  name                = module.naming.key_vault.name_unique
-  resource_group_name = azurerm_resource_group.this.name
-  location            = azurerm_resource_group.this.location
-  network_acls = {
-    default_action = "Allow"
-  }
-
-  role_assignments = {
-    deployment_user_secrets = {
-      role_definition_id_or_name = "Key Vault Secrets Officer"
-      principal_id               = data.azurerm_client_config.current.object_id
-    }
-  }
-  wait_for_rbac_before_secret_operations = {
-    create = "60s"
-  }
-  tags = {
-    Dep = "IT"
-  }
 }
 
 module "this" {
@@ -152,12 +126,6 @@ module "this" {
   managed_identities = {
     system_assigned            = true
     user_assigned_resource_ids = [azurerm_user_assigned_identity.example_identity.id]
-  }
-  customer_managed_key = {
-    key_vault_resource_id              = module.avm-res-keyvault-vault.resource.id
-    key_name                           = "sample-customer-key"
-    user_assigned_identity_resource_id = azurerm_user_assigned_identity.example_identity.id
-
   }
   tags = {
     env   = "Dev"

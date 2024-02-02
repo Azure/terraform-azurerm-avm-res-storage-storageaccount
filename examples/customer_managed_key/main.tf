@@ -111,7 +111,7 @@ data "azurerm_role_definition" "example" {
 }
 #Create a Customer Managed Key for a Storage Account.
 resource "azurerm_key_vault_key" "example" {
-  name         = "tfex-key"
+  name         = module.naming.key_vault_key.name_unique
   key_vault_id = module.avm-res-keyvault-vault.resource.id
   key_type     = "RSA"
   key_size     = 2048
