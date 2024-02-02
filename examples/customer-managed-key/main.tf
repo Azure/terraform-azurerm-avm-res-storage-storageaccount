@@ -127,7 +127,7 @@ resource "azurerm_key_vault_key" "example" {
 }
 
 #create a keyvault for storing the credential with RBAC for the deployment user
-module "avm-res-keyvault-vault" {
+module "avm_res_keyvault_vault" {
   source              = "Azure/avm-res-keyvault-vault/azurerm"
   version             = "0.5.1"
   tenant_id           = data.azurerm_client_config.current.tenant_id
