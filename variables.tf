@@ -1,40 +1,17 @@
-variable "enable_telemetry" {
-  type        = bool
-  default     = true
-  description = <<DESCRIPTION
-This variable controls whether or not telemetry is enabled for the module.
-For more information see https://aka.ms/avm/telemetryinfo.
-If it is set to false, then no telemetry will be collected.
-DESCRIPTION
-}
-
-# This is required for most resource modules
-variable "resource_group_name" {
-  type        = string
-  description = "The resource group where the resources will be deployed."
-}
-variable "location" {
-  type        = string
-  default     = null
-  description = <<DESCRIPTION
-Azure region where the resource should be deployed.
-If null, the location will be inferred from the resource group location.
-DESCRIPTION
-}
-
 variable "name" {
   type        = string
   description = "The name of the resource."
+
   validation {
     condition     = can(regex("^[a-z0-9]{3,24}$", var.name))
     error_message = "The name must be between 3 and 24 characters, valid characters are lowercase letters and numbers."
   }
 }
 
-variable "tags" {
-  type        = map(string)
-  description = "Custom tags to apply to the resource."
-  default     = {}
+# This is required for most resource modules
+variable "resource_group_name" {
+  type        = string
+  description = "The resource group where the resources will be deployed."
 }
 
 variable "customer_managed_key" {
@@ -65,14 +42,34 @@ variable "customer_managed_key" {
    DESCRIPTION
 }
 
+variable "enable_telemetry" {
+  type        = bool
+  default     = true
+  description = <<DESCRIPTION
+This variable controls whether or not telemetry is enabled for the module.
+For more information see https://aka.ms/avm/telemetryinfo.
+If it is set to false, then no telemetry will be collected.
+DESCRIPTION
+}
+
+variable "location" {
+  type        = string
+  default     = null
+  description = <<DESCRIPTION
+Azure region where the resource should be deployed.
+If null, the location will be inferred from the resource group location.
+DESCRIPTION
+}
+
 variable "lock" {
   type = object({
     name = optional(string, null)
     kind = optional(string, "None")
   })
-  description = "The lock level to apply. Default is `None`. Possible values are `None`, `CanNotDelete`, and `ReadOnly`."
   default     = {}
+  description = "The lock level to apply. Default is `None`. Possible values are `None`, `CanNotDelete`, and `ReadOnly`."
   nullable    = false
+
   validation {
     condition     = contains(["CanNotDelete", "ReadOnly", "None"], var.lock.kind)
     error_message = "The lock level must be one of: 'None', 'CanNotDelete', or 'ReadOnly'."
@@ -172,4 +169,10 @@ A map of role assignments to create on the resource. The map key is deliberately
 
 > Note: only set `skip_service_principal_aad_check` to true if you are assigning a role to a service principal.
 DESCRIPTION
+}
+
+variable "tags" {
+  type        = map(string)
+  default     = {}
+  description = "Custom tags to apply to the resource."
 }

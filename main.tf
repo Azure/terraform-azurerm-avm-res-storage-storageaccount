@@ -278,7 +278,6 @@ resource "azurerm_storage_account_network_rules" "this" {
   ip_rules                   = var.network_rules.ip_rules
   virtual_network_subnet_ids = var.network_rules.virtual_network_subnet_ids
 
-
   dynamic "private_link_access" {
     for_each = var.network_rules.private_link_access == null ? [] : var.network_rules.private_link_access
     content {
@@ -332,7 +331,6 @@ resource "azapi_resource" "containers" {
 }
 resource "azurerm_storage_account_customer_managed_key" "this" {
   count = var.customer_managed_key != null ? 1 : 0
-  #for_each = try(var.customer_managed_key.key_vault_access_policy.identity_keys, {})
 
   key_name                  = var.customer_managed_key.key_name
   storage_account_id        = azurerm_storage_account.this.id
@@ -438,7 +436,6 @@ resource "azurerm_storage_share" "this" {
       update = timeouts.value.update
     }
   }
-
 }
 
 resource "azurerm_role_assignment" "storage_account" {
@@ -457,14 +454,14 @@ resource "azurerm_role_assignment" "storage_account" {
 resource "azurerm_role_assignment" "private_endpoint" {
   for_each = local.pe_role_assignments
 
-  scope                                  = azurerm_private_endpoint.this[each.value.private_endpoint_key].id
-  role_definition_id                     = strcontains(lower(each.value.role_assignment.role_definition_id_or_name), lower(local.role_definition_resource_substring)) ? each.value.role_assignment.role_definition_id_or_name : null
-  role_definition_name                   = strcontains(lower(each.value.role_assignment.role_definition_id_or_name), lower(local.role_definition_resource_substring)) ? null : each.value.role_assignment.role_definition_id_or_name
   principal_id                           = each.value.role_assignment.principal_id
+  scope                                  = azurerm_private_endpoint.this[each.value.private_endpoint_key].id
   condition                              = each.value.role_assignment.condition
   condition_version                      = each.value.role_assignment.condition_version
-  skip_service_principal_aad_check       = each.value.role_assignment.skip_service_principal_aad_check
   delegated_managed_identity_resource_id = each.value.role_assignment.delegated_managed_identity_resource_id
+  role_definition_id                     = strcontains(lower(each.value.role_assignment.role_definition_id_or_name), lower(local.role_definition_resource_substring)) ? each.value.role_assignment.role_definition_id_or_name : null
+  role_definition_name                   = strcontains(lower(each.value.role_assignment.role_definition_id_or_name), lower(local.role_definition_resource_substring)) ? null : each.value.role_assignment.role_definition_id_or_name
+  skip_service_principal_aad_check       = each.value.role_assignment.skip_service_principal_aad_check
 }
 
 

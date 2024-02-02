@@ -31,7 +31,6 @@ resource "azurerm_private_endpoint" "this" {
     content {
       name                 = each.value.private_dns_zone_group_name
       private_dns_zone_ids = each.value.private_dns_zone_resource_ids
-
     }
   }
 }
