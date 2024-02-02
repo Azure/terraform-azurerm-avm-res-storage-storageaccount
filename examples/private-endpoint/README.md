@@ -35,8 +35,8 @@ module "regions" {
 }
 # This allows us to randomize the region for the resource group.
 resource "random_integer" "region_index" {
-  min = 0
   max = length(module.regions.regions) - 1
+  min = 0
 }
 # This allow use to randomize the name of resources
 resource "random_string" "this" {
@@ -52,8 +52,8 @@ module "naming" {
 
 
 resource "azurerm_resource_group" "this" {
-  name     = module.naming.resource_group.name_unique
   location = module.regions.regions[random_integer.region_index.result].name
+  name     = module.naming.resource_group.name_unique
 }
 
 resource "azurerm_virtual_network" "vnet" {
@@ -112,7 +112,6 @@ resource "azurerm_private_dns_zone" "this" {
 
   name                = "privatelink.${each.value}.core.windows.net"
   resource_group_name = azurerm_resource_group.this.name
-
   tags = {
     env = "Dev"
   }
@@ -137,7 +136,6 @@ resource "azurerm_user_assigned_identity" "example_identity" {
 
 data "azurerm_role_definition" "example" {
   name = "Contributor"
-
 }
 
 #create azure storage account
@@ -309,7 +307,7 @@ The following input variables are optional (have default values):
 
 ### <a name="input_bypass_ip_cidr"></a> [bypass\_ip\_cidr](#input\_bypass\_ip\_cidr)
 
-Description: n/a
+Description: value to bypass the IP CIDR on firewall rules
 
 Type: `string`
 

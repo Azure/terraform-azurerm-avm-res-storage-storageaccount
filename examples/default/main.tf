@@ -30,8 +30,8 @@ module "regions" {
 }
 # This allows us to randomize the region for the resource group.
 resource "random_integer" "region_index" {
-  min = 0
   max = length(module.regions.regions) - 1
+  min = 0
 }
 
 # This allow use to randomize the name of resources
@@ -48,8 +48,8 @@ module "naming" {
 
 # This is required for resource modules
 resource "azurerm_resource_group" "this" {
-  name     = module.naming.resource_group.name_unique
   location = module.regions.regions[random_integer.region_index.result].name
+  name     = module.naming.resource_group.name_unique
 }
 
 resource "azurerm_virtual_network" "vnet" {
@@ -109,7 +109,6 @@ resource "azurerm_user_assigned_identity" "example_identity" {
 # We use the role definition data source to get the id of the Contributor role
 data "azurerm_role_definition" "example" {
   name = "Contributor"
-
 }
 
 module "this" {
