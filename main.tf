@@ -222,6 +222,12 @@ resource "azurerm_storage_account" "this" {
       update = timeouts.value.update
     }
   }
+
+  lifecycle {
+    ignore_changes = [
+      customer_managed_key
+    ]
+  }
 }
 
 resource "azurerm_storage_account_local_user" "this" {
