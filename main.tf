@@ -222,6 +222,7 @@ resource "azurerm_storage_account" "this" {
       update = timeouts.value.update
     }
   }
+
   lifecycle {
     ignore_changes = [
       customer_managed_key
@@ -308,7 +309,6 @@ resource "azurerm_storage_account_network_rules" "this" {
       error_message = "Cannot set `private_link_access` when `var.private_endpoints` is not `null`."
     }
   }
-
 }
 
 # This uses azapi in order to avoid having to grant data plane permissions
