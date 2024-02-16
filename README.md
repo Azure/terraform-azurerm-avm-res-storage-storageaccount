@@ -42,6 +42,8 @@ The following providers are used by this module:
 
 - <a name="provider_random"></a> [random](#provider\_random) (>= 3.5.0, < 4.0.0)
 
+- <a name="provider_time"></a> [time](#provider\_time)
+
 ## Resources
 
 The following resources are used by this module:
@@ -56,8 +58,12 @@ The following resources are used by this module:
 - [azurerm_private_endpoint.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint) (resource)
 - [azurerm_private_endpoint_application_security_group_association.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint_application_security_group_association) (resource)
 - [azurerm_resource_group_template_deployment.telemetry](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group_template_deployment) (resource)
+- [azurerm_role_assignment.containers](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) (resource)
 - [azurerm_role_assignment.private_endpoint](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) (resource)
+- [azurerm_role_assignment.queues](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) (resource)
+- [azurerm_role_assignment.shares](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) (resource)
 - [azurerm_role_assignment.storage_account](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) (resource)
+- [azurerm_role_assignment.tables](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) (resource)
 - [azurerm_storage_account.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account) (resource)
 - [azurerm_storage_account_customer_managed_key.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account_customer_managed_key) (resource)
 - [azurerm_storage_account_local_user.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account_local_user) (resource)
@@ -66,6 +72,10 @@ The following resources are used by this module:
 - [azurerm_storage_share.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_share) (resource)
 - [azurerm_storage_table.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_table) (resource)
 - [random_id.telemetry](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/id) (resource)
+- [time_sleep.wait_for_rbac_before_container_operations](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/sleep) (resource)
+- [time_sleep.wait_for_rbac_before_queue_operations](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/sleep) (resource)
+- [time_sleep.wait_for_rbac_before_share_operations](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/sleep) (resource)
+- [time_sleep.wait_for_rbac_before_table_operations](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/sleep) (resource)
 - [azurerm_client_config.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/client_config) (data source)
 - [azurerm_resource_group.rg](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/resource_group) (data source)
 
@@ -257,6 +267,8 @@ Default: `null`
 Description: - `container_access_type` - (Optional) The Access Level configured for this Container. Possible values are `Blob`, `Container` or `None`. Defaults to `None`.
 - `metadata` - (Optional) A mapping of MetaData for this Container. All metadata keys should be lowercase.
 - `name` - (Required) The name of the Container which should be created within the Storage Account. Changing this forces a new resource to be created.
+
+Supply role assignments in the same way as for `var.role_assignments`.
 
 ---
 `timeouts` block supports the following:
@@ -883,48 +895,50 @@ Default: `null`
 ### <a name="input_queue_properties"></a> [queue\_properties](#input\_queue\_properties)
 
 Description:
----
-`cors_rule` block supports the following:
-- `allowed_headers` - (Required) A list of headers that are allowed to be a part of the cross-origin request.
-- `allowed_methods` - (Required) A list of HTTP methods that are allowed to be executed by the origin. Valid options are `DELETE`, `GET`, `HEAD`, `MERGE`, `POST`, `OPTIONS`, `PUT` or `PATCH`.
-- `allowed_origins` - (Required) A list of origin domains that will be allowed by CORS.
-- `exposed_headers` - (Required) A list of response headers that are exposed to CORS clients.
-- `max_age_in_seconds` - (Required) The number of seconds the client should cache a preflight response.
+ ---
+ `cors_rule` block supports the following:
+ - `allowed_headers` - (Required) A list of headers that are allowed to be a part of the cross-origin request.
+ - `allowed_methods` - (Required) A list of HTTP methods that are allowed to be executed by the origin. Valid options are `DELETE`, `GET`, `HEAD`, `MERGE`, `POST`, `OPTIONS`, `PUT` or `PATCH`.
+ - `allowed_origins` - (Required) A list of origin domains that will be allowed by CORS.
+ - `exposed_headers` - (Required) A list of response headers that are exposed to CORS clients.
+ - `max_age_in_seconds` - (Required) The number of seconds the client should cache a preflight response.
 
----
-`diagnostic_settings` block supports the following:
-- `name` - (Optional) The name of the diagnostic setting. Defaults to `null`.
-- `log_categories` - (Optional) A set of log categories to enable. Defaults to an empty set.
-- `log_groups` - (Optional) A set of log groups to enable. Defaults to `["allLogs"]`.
-- `metric_categories` - (Optional) A set of metric categories to enable. Defaults to `["AllMetrics"]`.
-- `log_analytics_destination_type` - (Optional) The destination type for log analytics. Defaults to `"Dedicated"`.
-- `workspace_resource_id` - (Optional) The resource ID of the Log Analytics workspace. Defaults to `null`.
-- `resource_id` - (Optional) The resource ID of the target resource for diagnostics. Defaults to `null`.
-- `event_hub_authorization_rule_resource_id` - (Optional) The resource ID of the Event Hub authorization rule. Defaults to `null`.
-- `event_hub_name` - (Optional) The name of the Event Hub. Defaults to `null`.
-- `marketplace_partner_resource_id` - (Optional) The resource ID of the marketplace partner. Defaults to `null`.
+ ---
+ `diagnostic_settings` block supports the following:
+ - `name` - (Optional) The name of the diagnostic setting. Defaults to `null`.
+ - `log_categories` - (Optional) A set of log categories to enable. Defaults to an empty set.
+ - `log_groups` - (Optional) A set of log groups to enable. Defaults to `["allLogs"]`.
+ - `metric_categories` - (Optional) A set of metric categories to enable. Defaults to `["AllMetrics"]`.
+ - `log_analytics_destination_type` - (Optional) The destination type for log analytics. Defaults to `"Dedicated"`.
+ - `workspace_resource_id` - (Optional) The resource ID of the Log Analytics workspace. Defaults to `null`.
+ - `resource_id` - (Optional) The resource ID of the target resource for diagnostics. Defaults to `null`.
+ - `event_hub_authorization_rule_resource_id` - (Optional) The resource ID of the Event Hub authorization rule. Defaults to `null`.
+ - `event_hub_name` - (Optional) The name of the Event Hub. Defaults to `null`.
+ - `marketplace_partner_resource_id` - (Optional) The resource ID of the marketplace partner. Defaults to `null`.
 
----
-`hour_metrics` block supports the following:
-- `enabled` - (Required) Indicates whether hour metrics are enabled for the Queue service.
-- `include_apis` - (Optional) Indicates whether metrics should generate summary statistics for called API operations.
-- `retention_policy_days` - (Optional) Specifies the number of days that logs will be retained.
-- `version` - (Required) The version of storage analytics to configure.
+ ---
+ `hour_metrics` block supports the following:
+ - `enabled` - (Required) Indicates whether hour metrics are enabled for the Queue service.
+ - `include_apis` - (Optional) Indicates whether metrics should generate summary statistics for called API operations.
+ - `retention_policy_days` - (Optional) Specifies the number of days that logs will be retained.
+ - `version` - (Required) The version of storage analytics to configure.
 
----
-`logging` block supports the following:
-- `delete` - (Required) Indicates whether all delete requests should be logged.
-- `read` - (Required) Indicates whether all read requests should be logged.
-- `retention_policy_days` - (Optional) Specifies the number of days that logs will be retained.
-- `version` - (Required) The version of storage analytics to configure.
-- `write` - (Required) Indicates whether all write requests should be logged.
+ ---
+ `logging` block supports the following:
+ - `delete` - (Required) Indicates whether all delete requests should be logged.
+ - `read` - (Required) Indicates whether all read requests should be logged.
+ - `retention_policy_days` - (Optional) Specifies the number of days that logs will be retained.
+ - `version` - (Required) The version of storage analytics to configure.
+ - `write` - (Required) Indicates whether all write requests should be logged.
 
----
-`minute_metrics` block supports the following:
-- `enabled` - (Required) Indicates whether minute metrics are enabled for the Queue service.
-- `include_apis` - (Optional) Indicates whether metrics should generate summary statistics for called API operations.
-- `retention_policy_days` - (Optional) Specifies the number of days that logs will be retained.
-- `version` - (Required) The version of storage analytics to configure.
+ ---
+ `minute_metrics` block supports the following:
+ - `enabled` - (Required) Indicates whether minute metrics are enabled for the Queue service.
+ - `include_apis` - (Optional) Indicates whether metrics should generate summary statistics for called API operations.
+ - `retention_policy_days` - (Optional) Specifies the number of days that logs will be retained.
+ - `version` - (Required) The version of storage analytics to configure.
+
+Supply role assignments in the same way as for `var.role_assignments`.
 
 Type:
 
@@ -968,6 +982,15 @@ object({
       retention_policy_days = optional(number)
       version               = string
     }))
+    role_assignments = optional(map(object({
+      role_definition_id_or_name             = string
+      principal_id                           = string
+      description                            = optional(string, null)
+      skip_service_principal_aad_check       = optional(bool, false)
+      condition                              = optional(string, null)
+      condition_version                      = optional(string, null)
+      delegated_managed_identity_resource_id = optional(string, null)
+    })), {})
   })
 ```
 
@@ -1157,28 +1180,30 @@ Default: `false`
 
 ### <a name="input_shares"></a> [shares](#input\_shares)
 
-Description: - `access_tier` - (Optional) The access tier of the File Share. Possible values are `Hot`, `Cool` and `TransactionOptimized`, `Premium`.
-- `enabled_protocol` - (Optional) The protocol used for the share. Possible values are `SMB` and `NFS`. The `SMB` indicates the share can be accessed by SMBv3.0, SMBv2.1 and REST. The `NFS` indicates the share can be accessed by NFSv4.1. Defaults to `SMB`. Changing this forces a new resource to be created.
-- `metadata` - (Optional) A mapping of MetaData for this File Share.
-- `name` - (Required) The name of the share. Must be unique within the storage account where the share is located. Changing this forces a new resource to be created.
-- `quota` - (Required) The maximum size of the share, in gigabytes. For Standard storage accounts, this must be `1`GB (or higher) and at most `5120` GB (`5` TB). For Premium FileStorage storage accounts, this must be greater than 100 GB and at most `102400` GB (`100` TB).
+Description:  - `access_tier` - (Optional) The access tier of the File Share. Possible values are `Hot`, `Cool` and `TransactionOptimized`, `Premium`.
+ - `enabled_protocol` - (Optional) The protocol used for the share. Possible values are `SMB` and `NFS`. The `SMB` indicates the share can be accessed by SMBv3.0, SMBv2.1 and REST. The `NFS` indicates the share can be accessed by NFSv4.1. Defaults to `SMB`. Changing this forces a new resource to be created.
+ - `metadata` - (Optional) A mapping of MetaData for this File Share.
+ - `name` - (Required) The name of the share. Must be unique within the storage account where the share is located. Changing this forces a new resource to be created.
+ - `quota` - (Required) The maximum size of the share, in gigabytes. For Standard storage accounts, this must be `1`GB (or higher) and at most `5120` GB (`5` TB). For Premium FileStorage storage accounts, this must be greater than 100 GB and at most `102400` GB (`100` TB).
 
----
-`acl` block supports the following:
-- `id` - (Required) The ID which should be used for this Shared Identifier.
+ ---
+ `acl` block supports the following:
+ - `id` - (Required) The ID which should be used for this Shared Identifier.
 
----
-`access_policy` block supports the following:
-- `expiry` - (Optional) The time at which this Access Policy should be valid until, in [ISO8601](https://en.wikipedia.org/wiki/ISO_8601) format.
-- `permissions` - (Required) The permissions which should be associated with this Shared Identifier. Possible value is combination of `r` (read), `w` (write), `d` (delete), and `l` (list).
-- `start` - (Optional) The time at which this Access Policy should be valid from, in [ISO8601](https://en.wikipedia.org/wiki/ISO_8601) format.
+ ---
+ `access_policy` block supports the following:
+ - `expiry` - (Optional) The time at which this Access Policy should be valid until, in [ISO8601](https://en.wikipedia.org/wiki/ISO_8601) format.
+ - `permissions` - (Required) The permissions which should be associated with this Shared Identifier. Possible value is combination of `r` (read), `w` (write), `d` (delete), and `l` (list).
+ - `start` - (Optional) The time at which this Access Policy should be valid from, in [ISO8601](https://en.wikipedia.org/wiki/ISO_8601) format.
 
----
-`timeouts` block supports the following:
-- `create` - (Defaults to 30 minutes) Used when creating the Storage Share.
-- `delete` - (Defaults to 30 minutes) Used when deleting the Storage Share.
-- `read` - (Defaults to 5 minutes) Used when retrieving the Storage Share.
-- `update` - (Defaults to 30 minutes) Used when updating the Storage Share.
+ ---
+ `timeouts` block supports the following:
+ - `create` - (Defaults to 30 minutes) Used when creating the Storage Share.
+ - `delete` - (Defaults to 30 minutes) Used when deleting the Storage Share.
+ - `read` - (Defaults to 5 minutes) Used when retrieving the Storage Share.
+ - `update` - (Defaults to 30 minutes) Used when updating the Storage Share.
+
+Supply role assignments in the same way as for `var.role_assignments`.
 
 Type:
 
@@ -1197,6 +1222,15 @@ map(object({
         start       = optional(string)
       })))
     })))
+    role_assignments = optional(map(object({
+      role_definition_id_or_name             = string
+      principal_id                           = string
+      description                            = optional(string, null)
+      skip_service_principal_aad_check       = optional(bool, false)
+      condition                              = optional(string, null)
+      condition_version                      = optional(string, null)
+      delegated_managed_identity_resource_id = optional(string, null)
+    })), {})
     timeouts = optional(object({
       create = optional(string)
       delete = optional(string)
@@ -1234,24 +1268,26 @@ Default: `null`
 
 ### <a name="input_tables"></a> [tables](#input\_tables)
 
-Description: - `name` - (Required) The name of the storage table. Only Alphanumeric characters allowed, starting with a letter. Must be unique within the storage account the table is located. Changing this forces a new resource to be created.
+Description:  - `name` - (Required) The name of the storage table. Only Alphanumeric characters allowed, starting with a letter. Must be unique within the storage account the table is located. Changing this forces a new resource to be created.
 
----
-`acl` block supports the following:
-- `id` - (Required) The ID which should be used for this Shared Identifier.
+ ---
+ `acl` block supports the following:
+ - `id` - (Required) The ID which should be used for this Shared Identifier.
 
----
-`access_policy` block supports the following:
-- `expiry` - (Required) The ISO8061 UTC time at which this Access Policy should be valid until.
-- `permissions` - (Required) The permissions which should associated with this Shared Identifier.
-- `start` - (Required) The ISO8061 UTC time at which this Access Policy should be valid from.
+ ---
+ `access_policy` block supports the following:
+ - `expiry` - (Required) The ISO8061 UTC time at which this Access Policy should be valid until.
+ - `permissions` - (Required) The permissions which should associated with this Shared Identifier.
+ - `start` - (Required) The ISO8061 UTC time at which this Access Policy should be valid from.
 
----
-`timeouts` block supports the following:
-- `create` - (Defaults to 30 minutes) Used when creating the Storage Table.
-- `delete` - (Defaults to 30 minutes) Used when deleting the Storage Table.
-- `read` - (Defaults to 5 minutes) Used when retrieving the Storage Table.
-- `update` - (Defaults to 30 minutes) Used when updating the Storage Table.
+ ---
+ `timeouts` block supports the following:
+ - `create` - (Defaults to 30 minutes) Used when creating the Storage Table.
+ - `delete` - (Defaults to 30 minutes) Used when deleting the Storage Table.
+ - `read` - (Defaults to 5 minutes) Used when retrieving the Storage Table.
+ - `update` - (Defaults to 30 minutes) Used when updating the Storage Table.
+
+Supply role assignments in the same way as for `var.role_assignments`.
 
 Type:
 
@@ -1266,6 +1302,17 @@ map(object({
         start       = string
       })))
     })))
+
+    role_assignments = optional(map(object({
+      role_definition_id_or_name             = string
+      principal_id                           = string
+      description                            = optional(string, null)
+      skip_service_principal_aad_check       = optional(bool, false)
+      condition                              = optional(string, null)
+      condition_version                      = optional(string, null)
+      delegated_managed_identity_resource_id = optional(string, null)
+    })), {})
+
     timeouts = optional(object({
       create = optional(string)
       delete = optional(string)
@@ -1304,6 +1351,78 @@ object({
 ```
 
 Default: `null`
+
+### <a name="input_wait_for_rbac_before_container_operations"></a> [wait\_for\_rbac\_before\_container\_operations](#input\_wait\_for\_rbac\_before\_container\_operations)
+
+Description: This variable controls the amount of time to wait before performing container operations.  
+It only applies when `var.role_assignments` and `var.containers` are both set.  
+This is useful when you are creating role assignments on the container and immediately creating containers in it.  
+The default is 30 seconds for create and 0 seconds for destroy.
+
+Type:
+
+```hcl
+object({
+    create  = optional(string, "30s")
+    destroy = optional(string, "0s")
+  })
+```
+
+Default: `{}`
+
+### <a name="input_wait_for_rbac_before_queue_operations"></a> [wait\_for\_rbac\_before\_queue\_operations](#input\_wait\_for\_rbac\_before\_queue\_operations)
+
+Description: This variable controls the amount of time to wait before performing queue operations.  
+It only applies when `var.role_assignments` and `var.queues` are both set.  
+This is useful when you are creating role assignments on the queue and immediately creating queues in it.  
+The default is 30 seconds for create and 0 seconds for destroy.
+
+Type:
+
+```hcl
+object({
+    create  = optional(string, "30s")
+    destroy = optional(string, "0s")
+  })
+```
+
+Default: `{}`
+
+### <a name="input_wait_for_rbac_before_share_operations"></a> [wait\_for\_rbac\_before\_share\_operations](#input\_wait\_for\_rbac\_before\_share\_operations)
+
+Description: This variable controls the amount of time to wait before performing share operations.  
+It only applies when `var.role_assignments` and `var.shares` are both set.  
+This is useful when you are creating role assignments on the share and immediately creating shares in it.  
+The default is 30 seconds for create and 0 seconds for destroy.
+
+Type:
+
+```hcl
+object({
+    create  = optional(string, "30s")
+    destroy = optional(string, "0s")
+  })
+```
+
+Default: `{}`
+
+### <a name="input_wait_for_rbac_before_table_operations"></a> [wait\_for\_rbac\_before\_table\_operations](#input\_wait\_for\_rbac\_before\_table\_operations)
+
+Description: This variable controls the amount of time to wait before performing table operations.  
+It only applies when `var.role_assignments` and `var.tables` are both set.  
+This is useful when you are creating role assignments on the table and immediately creating tables in it.  
+The default is 30 seconds for create and 0 seconds for destroy.
+
+Type:
+
+```hcl
+object({
+    create  = optional(string, "30s")
+    destroy = optional(string, "0s")
+  })
+```
+
+Default: `{}`
 
 ## Outputs
 

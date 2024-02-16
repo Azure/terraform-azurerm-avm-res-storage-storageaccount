@@ -311,30 +311,6 @@ resource "azurerm_storage_account_network_rules" "this" {
   }
 }
 
-# This uses azapi in order to avoid having to grant data plane permissions
-resource "azapi_resource" "containers" {
-  for_each = var.containers
-
-  type = "Microsoft.Storage/storageAccounts/blobServices/containers@2022-09-01"
-  body = jsonencode({
-    properties = {
-      metadata     = each.value.metadata
-      publicAccess = each.value.public_access
-    }
-  })
-  name      = each.value.name
-  parent_id = "${azurerm_storage_account.this.id}/blobServices/default"
-
-  dynamic "timeouts" {
-    for_each = each.value.timeouts == null ? [] : [each.value.timeouts]
-    content {
-      create = timeouts.value.create
-      delete = timeouts.value.delete
-      read   = timeouts.value.read
-      update = timeouts.value.update
-    }
-  }
-}
 resource "azurerm_storage_account_customer_managed_key" "this" {
   count = var.customer_managed_key != null ? 1 : 0
 
@@ -352,97 +328,11 @@ resource "azurerm_storage_account_customer_managed_key" "this" {
   }
 }
 
-resource "azurerm_storage_queue" "this" {
-  for_each = var.queues
 
-  name                 = each.value.name
-  storage_account_name = azurerm_storage_account.this.name
-  metadata             = each.value.metadata
 
-  dynamic "timeouts" {
-    for_each = each.value.timeouts == null ? [] : [each.value.timeouts]
-    content {
-      create = timeouts.value.create
-      delete = timeouts.value.delete
-      read   = timeouts.value.read
-      update = timeouts.value.update
-    }
-  }
 
-  # We need to create these storage service in serialize otherwise we might meet dns issue
-  depends_on = [azapi_resource.containers]
-}
 
-resource "azurerm_storage_table" "this" {
-  for_each = var.tables
 
-  name                 = each.value.name
-  storage_account_name = azurerm_storage_account.this.name
-
-  dynamic "acl" {
-    for_each = each.value.acl == null ? [] : each.value.acl
-    content {
-      id = acl.value.id
-
-      dynamic "access_policy" {
-        for_each = acl.value.access_policy == null ? [] : acl.value.access_policy
-        content {
-          expiry      = access_policy.value.expiry
-          permissions = access_policy.value.permissions
-          start       = access_policy.value.start
-        }
-      }
-    }
-  }
-  dynamic "timeouts" {
-    for_each = each.value.timeouts == null ? [] : [each.value.timeouts]
-    content {
-      create = timeouts.value.create
-      delete = timeouts.value.delete
-      read   = timeouts.value.read
-      update = timeouts.value.update
-    }
-  }
-
-  # We need to create these storage service in serialize otherwise we might meet dns issue
-  depends_on = [azapi_resource.containers, azurerm_storage_queue.this]
-}
-
-resource "azurerm_storage_share" "this" {
-  for_each = var.shares
-
-  name                 = each.value.name
-  quota                = each.value.quota
-  storage_account_name = azurerm_storage_account.this.name
-  access_tier          = each.value.access_tier
-  enabled_protocol     = each.value.enabled_protocol
-  metadata             = each.value.metadata
-
-  dynamic "acl" {
-    for_each = each.value.acl == null ? [] : each.value.acl
-    content {
-      id = acl.value.id
-
-      dynamic "access_policy" {
-        for_each = acl.value.access_policy == null ? [] : acl.value.access_policy
-        content {
-          permissions = access_policy.value.permissions
-          expiry      = access_policy.value.expiry
-          start       = access_policy.value.start
-        }
-      }
-    }
-  }
-  dynamic "timeouts" {
-    for_each = each.value.timeouts == null ? [] : [each.value.timeouts]
-    content {
-      create = timeouts.value.create
-      delete = timeouts.value.delete
-      read   = timeouts.value.read
-      update = timeouts.value.update
-    }
-  }
-}
 
 resource "azurerm_role_assignment" "storage_account" {
   for_each = var.role_assignments
@@ -457,18 +347,32 @@ resource "azurerm_role_assignment" "storage_account" {
   skip_service_principal_aad_check       = each.value.skip_service_principal_aad_check
 }
 
-resource "azurerm_role_assignment" "private_endpoint" {
-  for_each = local.pe_role_assignments
+# Enable Diagnostic Settings for Storage account
+resource "azurerm_monitor_diagnostic_setting" "storage_account" {
+  for_each = var.diagnostic_settings_storage_account == null ? {} : var.diagnostic_settings_storage_account
 
-  principal_id                           = each.value.role_assignment.principal_id
-  scope                                  = azurerm_private_endpoint.this[each.value.private_endpoint_key].id
-  condition                              = each.value.role_assignment.condition
-  condition_version                      = each.value.role_assignment.condition_version
-  delegated_managed_identity_resource_id = each.value.role_assignment.delegated_managed_identity_resource_id
-  role_definition_id                     = strcontains(lower(each.value.role_assignment.role_definition_id_or_name), lower(local.role_definition_resource_substring)) ? each.value.role_assignment.role_definition_id_or_name : null
-  role_definition_name                   = strcontains(lower(each.value.role_assignment.role_definition_id_or_name), lower(local.role_definition_resource_substring)) ? null : each.value.role_assignment.role_definition_id_or_name
-  skip_service_principal_aad_check       = each.value.role_assignment.skip_service_principal_aad_check
+  name                       = each.value.name
+  target_resource_id         = azurerm_storage_account.this.id
+  log_analytics_workspace_id = each.value.log_analytics_workspace_id
+
+  dynamic "metric" {
+    for_each = each.value.metric_categories
+    content {
+      category = metric.value
+    }
+  }
 }
 
+# Resource Block for Locks for storage account
+resource "azurerm_management_lock" "this_storage_account" {
+  count = var.lock.kind != "None" ? 1 : 0
 
+  lock_level = var.lock.kind
+  name       = coalesce(var.lock.name, "lock-${var.name}")
+  scope      = azurerm_storage_account.this.id
+
+  depends_on = [
+    azurerm_storage_account.this
+  ]
+}
 

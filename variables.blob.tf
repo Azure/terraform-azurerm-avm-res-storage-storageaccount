@@ -27,6 +27,8 @@ variable "containers" {
  - `metadata` - (Optional) A mapping of MetaData for this Container. All metadata keys should be lowercase.
  - `name` - (Required) The name of the Container which should be created within the Storage Account. Changing this forces a new resource to be created.
 
+ Supply role assignments in the same way as for `var.role_assignments`.
+
  ---
  `timeouts` block supports the following:
  - `create` - (Defaults to 30 minutes) Used when creating the Storage Container.
@@ -134,4 +136,18 @@ variable "blob_properties" {
  `restore_policy` block supports the following:
  - `days` - (Required) Specifies the number of days that the blob can be restored, between `1` and `365` days. This must be less than the `days` specified for `delete_retention_policy`.
 EOT
+}
+
+variable "wait_for_rbac_before_container_operations" {
+  type = object({
+    create  = optional(string, "30s")
+    destroy = optional(string, "0s")
+  })
+  default     = {}
+  description = <<DESCRIPTION
+This variable controls the amount of time to wait before performing container operations.
+It only applies when `var.role_assignments` and `var.containers` are both set.
+This is useful when you are creating role assignments on the container and immediately creating containers in it.
+The default is 30 seconds for create and 0 seconds for destroy.
+DESCRIPTION
 }

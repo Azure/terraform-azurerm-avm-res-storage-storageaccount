@@ -44,6 +44,15 @@ variable "queue_properties" {
       retention_policy_days = optional(number)
       version               = string
     }))
+    role_assignments = optional(map(object({
+      role_definition_id_or_name             = string
+      principal_id                           = string
+      description                            = optional(string, null)
+      skip_service_principal_aad_check       = optional(bool, false)
+      condition                              = optional(string, null)
+      condition_version                      = optional(string, null)
+      delegated_managed_identity_resource_id = optional(string, null)
+    })), {})
   })
   default     = null
   description = <<-EOT
@@ -90,6 +99,9 @@ variable "queue_properties" {
  - `include_apis` - (Optional) Indicates whether metrics should generate summary statistics for called API operations.
  - `retention_policy_days` - (Optional) Specifies the number of days that logs will be retained.
  - `version` - (Required) The version of storage analytics to configure.
+
+Supply role assignments in the same way as for `var.role_assignments`.
+
 EOT
 }
 
@@ -117,4 +129,18 @@ variable "queues" {
  - `update` - (Defaults to 30 minutes) Used when updating the Storage Queue.
 EOT
   nullable    = false
+}
+
+variable "wait_for_rbac_before_queue_operations" {
+  type = object({
+    create  = optional(string, "30s")
+    destroy = optional(string, "0s")
+  })
+  default     = {}
+  description = <<DESCRIPTION
+This variable controls the amount of time to wait before performing queue operations.
+It only applies when `var.role_assignments` and `var.queues` are both set.
+This is useful when you are creating role assignments on the queue and immediately creating queues in it.
+The default is 30 seconds for create and 0 seconds for destroy.
+DESCRIPTION
 }
