@@ -162,17 +162,21 @@ module "this" {
     blob_container0 = {
       name                  = "blob-container-${random_string.this.result}-0"
       container_access_type = "private"
-      rbac_storage_blob_data_contributor = {
-        role_definition_id_or_name = "Storage Blob Data Contributor"
-        principal_id               = data.azurerm_client_config.current.object_id
+      role_assignments = {
+        rbac_storage_blob_data_contributor = {
+          role_definition_id_or_name = "Storage Blob Data Contributor"
+          principal_id               = data.azurerm_client_config.current.object_id
+        }
       }
     }
     blob_container1 = {
       name                  = "blob-container-${random_string.this.result}-1"
       container_access_type = "private"
-      rbac_storage_blob_data_reader = {
-        role_definition_id_or_name = "Storage Blob Data Reader"
-        principal_id               = data.azurerm_client_config.current.object_id
+      role_assignments = {
+        rbac_storage_blob_data_reader = {
+          role_definition_id_or_name = "Storage Blob Data Reader"
+          principal_id               = data.azurerm_client_config.current.object_id
+        }
       }
     }
 
@@ -180,32 +184,40 @@ module "this" {
   queues = {
     queue0 = {
       name = "queue-${random_string.this.result}-0"
-      rbac_storage_queue_data_reader = {
-        role_definition_id_or_name = "Storage Queue Data Reader"
-        principal_id               = data.azurerm_client_config.current.object_id
+      role_assignments = {
+        rbac_storage_queue_data_reader = {
+          role_definition_id_or_name = "Storage Queue Data Reader"
+          principal_id               = data.azurerm_client_config.current.object_id
+        }
       }
     }
     queue1 = {
       name = "queue-${random_string.this.result}-1"
-      rbac_storage_queue_data_contributor = {
-        role_definition_id_or_name = "Storage Queue Data Contributor"
-        principal_id               = data.azurerm_client_config.current.object_id
+      role_assignments = {
+        rbac_storage_queue_data_contributor = {
+          role_definition_id_or_name = "Storage Queue Data Contributor"
+          principal_id               = data.azurerm_client_config.current.object_id
+        }
       }
     }
   }
   tables = {
     table0 = {
       name = "table${random_string.this.result}0"
-      rbac_storage_table_data_reader = {
-        role_definition_id_or_name = "Storage Table Data Reader"
-        principal_id               = data.azurerm_client_config.current.object_id
+      role_assignments = {
+        rbac_storage_table_data_reader = {
+          role_definition_id_or_name = "Storage Table Data Reader"
+          principal_id               = data.azurerm_client_config.current.object_id
+        }
       }
     }
     table1 = {
       name = "table${random_string.this.result}1"
-      rbac_storage_table_data_contributor = {
-        role_definition_id_or_name = "Storage Table Data Contributor"
-        principal_id               = data.azurerm_client_config.current.object_id
+      role_assignments = {
+        rbac_storage_table_data_contributor = {
+          role_definition_id_or_name = "Storage Table Data Contributor"
+          principal_id               = data.azurerm_client_config.current.object_id
+        }
       }
     }
   }
@@ -214,17 +226,21 @@ module "this" {
     share0 = {
       name  = "share-${random_string.this.result}-0"
       quota = 10
-      rbac_storage_share_data_reader = {
-        role_definition_id_or_name = "Storage File Data SMB Share Reader"
-        principal_id               = data.azurerm_client_config.current.object_id
+      role_assignments = {
+        rbac_storage_share_data_reader = {
+          role_definition_id_or_name = "Storage File Data SMB Share Reader"
+          principal_id               = data.azurerm_client_config.current.object_id
+        }
       }
     }
     share1 = {
       name  = "share-${random_string.this.result}-1"
       quota = 10
-      rbac_storage_share_data_contributor = {
-        role_definition_id_or_name = "Storage File Data SMB Share Contributor"
-        principal_id               = data.azurerm_client_config.current.object_id
+      role_assignments = {
+        rbac_storage_share_data_contributor = {
+          role_definition_id_or_name = "Storage File Data SMB Share Contributor"
+          principal_id               = data.azurerm_client_config.current.object_id
+        }
       }
     }
   }
