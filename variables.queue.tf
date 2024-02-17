@@ -44,15 +44,6 @@ variable "queue_properties" {
       retention_policy_days = optional(number)
       version               = string
     }))
-    role_assignments = optional(map(object({
-      role_definition_id_or_name             = string
-      principal_id                           = string
-      description                            = optional(string, null)
-      skip_service_principal_aad_check       = optional(bool, false)
-      condition                              = optional(string, null)
-      condition_version                      = optional(string, null)
-      delegated_managed_identity_resource_id = optional(string, null)
-    })), {})
   })
   default     = null
   description = <<-EOT
@@ -100,8 +91,6 @@ variable "queue_properties" {
  - `retention_policy_days` - (Optional) Specifies the number of days that logs will be retained.
  - `version` - (Required) The version of storage analytics to configure.
 
-Supply role assignments in the same way as for `var.role_assignments`.
-
 EOT
 }
 
@@ -109,6 +98,15 @@ variable "queues" {
   type = map(object({
     metadata = optional(map(string))
     name     = string
+    role_assignments = optional(map(object({
+      role_definition_id_or_name             = string
+      principal_id                           = string
+      description                            = optional(string, null)
+      skip_service_principal_aad_check       = optional(bool, false)
+      condition                              = optional(string, null)
+      condition_version                      = optional(string, null)
+      delegated_managed_identity_resource_id = optional(string, null)
+    })), {})
     timeouts = optional(object({
       create = optional(string)
       delete = optional(string)
@@ -120,6 +118,8 @@ variable "queues" {
   description = <<-EOT
  - `metadata` - (Optional) A mapping of MetaData which should be assigned to this Storage Queue.
  - `name` - (Required) The name of the Queue which should be created within the Storage Account. Must be unique within the storage account the queue is located. Changing this forces a new resource to be created.
+
+Supply role assignments in the same way as for `var.role_assignments`.
 
  ---
  `timeouts` block supports the following:
