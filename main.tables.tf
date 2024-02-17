@@ -58,7 +58,7 @@ resource "azurerm_monitor_diagnostic_setting" "table" {
 # Enable role assignments for tables
 resource "azurerm_role_assignment" "tables" {
   for_each                               = local.tables_role_assignments
-  scope                                  = azurerm_storage_table.this[each.value.table_key].id
+  scope                                  = azurerm_storage_table.this[each.value.table_key].resource_manager_id
   role_definition_id                     = strcontains(lower(each.value.role_assignment.role_definition_id_or_name), lower(local.role_definition_resource_substring)) ? each.value.role_assignment.role_definition_id_or_name : null
   role_definition_name                   = strcontains(lower(each.value.role_assignment.role_definition_id_or_name), lower(local.role_definition_resource_substring)) ? null : each.value.role_assignment.role_definition_id_or_name
   principal_id                           = each.value.role_assignment.principal_id
