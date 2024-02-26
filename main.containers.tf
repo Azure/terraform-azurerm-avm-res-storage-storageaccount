@@ -23,28 +23,6 @@ resource "azapi_resource" "containers" {
   }
 }
 
-# Enable Diagnostic Settings for Blob
-resource "azurerm_monitor_diagnostic_setting" "blob" {
-  for_each = var.diagnostic_settings_blob == null ? {} : var.diagnostic_settings_blob
-
-  name                       = each.value.name
-  target_resource_id         = "${azurerm_storage_account.this.id}/blobServices/default/"
-  log_analytics_workspace_id = each.value.log_analytics_workspace_id
-
-  dynamic "enabled_log" {
-    for_each = each.value.log_categories
-    content {
-      category_group = enabled_log.value
-    }
-  }
-  dynamic "metric" {
-    for_each = each.value.metric_categories
-    content {
-      category = metric.value
-    }
-  }
-}
-
 # Enable role assignments for containers
 resource "azurerm_role_assignment" "containers" {
   for_each                               = local.containers_role_assignments

@@ -33,28 +33,6 @@ resource "azurerm_storage_table" "this" {
   depends_on = [azapi_resource.containers, azurerm_storage_queue.this]
 }
 
-# Enable Diagnostic Settings for Table
-resource "azurerm_monitor_diagnostic_setting" "table" {
-  for_each = var.diagnostic_settings_table == null ? {} : var.diagnostic_settings_table
-
-  name                       = each.value.name
-  target_resource_id         = "${azurerm_storage_account.this.id}/tableServices/default/"
-  log_analytics_workspace_id = each.value.log_analytics_workspace_id
-
-  dynamic "enabled_log" {
-    for_each = each.value.log_categories
-    content {
-      category_group = enabled_log.value
-    }
-  }
-  dynamic "metric" {
-    for_each = each.value.metric_categories
-    content {
-      category = metric.value
-    }
-  }
-}
-
 # Enable role assignments for tables
 resource "azurerm_role_assignment" "tables" {
   for_each = local.tables_role_assignments

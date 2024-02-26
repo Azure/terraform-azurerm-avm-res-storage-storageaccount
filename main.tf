@@ -328,12 +328,6 @@ resource "azurerm_storage_account_customer_managed_key" "this" {
   }
 }
 
-
-
-
-
-
-
 resource "azurerm_role_assignment" "storage_account" {
   for_each = var.role_assignments
 
@@ -346,33 +340,3 @@ resource "azurerm_role_assignment" "storage_account" {
   role_definition_name                   = strcontains(lower(each.value.role_definition_id_or_name), lower(local.role_definition_resource_substring)) ? null : each.value.role_definition_id_or_name
   skip_service_principal_aad_check       = each.value.skip_service_principal_aad_check
 }
-
-# Enable Diagnostic Settings for Storage account
-resource "azurerm_monitor_diagnostic_setting" "storage_account" {
-  for_each = var.diagnostic_settings_storage_account == null ? {} : var.diagnostic_settings_storage_account
-
-  name                       = each.value.name
-  target_resource_id         = azurerm_storage_account.this.id
-  log_analytics_workspace_id = each.value.log_analytics_workspace_id
-
-  dynamic "metric" {
-    for_each = each.value.metric_categories
-    content {
-      category = metric.value
-    }
-  }
-}
-
-# Resource Block for Locks for storage account
-resource "azurerm_management_lock" "this_storage_account" {
-  count = var.lock.kind != "None" ? 1 : 0
-
-  lock_level = var.lock.kind
-  name       = coalesce(var.lock.name, "lock-${var.name}")
-  scope      = azurerm_storage_account.this.id
-
-  depends_on = [
-    azurerm_storage_account.this
-  ]
-}
-

@@ -34,29 +34,6 @@ resource "azurerm_storage_share" "this" {
   }
 }
 
-# Enable Diagnostic Settings for Azure Files
-resource "azurerm_monitor_diagnostic_setting" "azure_file" {
-  for_each = var.diagnostic_settings_file == null ? {} : var.diagnostic_settings_file
-
-  name                       = each.value.name
-  target_resource_id         = "${azurerm_storage_account.this.id}/fileServices/default/"
-  log_analytics_workspace_id = each.value.log_analytics_workspace_id
-
-  dynamic "enabled_log" {
-    for_each = each.value.log_categories
-    content {
-      category_group = enabled_log.value
-    }
-  }
-  dynamic "metric" {
-    for_each = each.value.metric_categories
-    content {
-      category = metric.value
-    }
-  }
-}
-
-
 # Enable role assignments for shares
 resource "azurerm_role_assignment" "shares" {
   for_each                               = local.shares_role_assignments

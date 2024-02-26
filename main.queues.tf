@@ -19,28 +19,6 @@ resource "azurerm_storage_queue" "this" {
   depends_on = [azapi_resource.containers]
 }
 
-# Enable Diagnostic Settings for Queue
-resource "azurerm_monitor_diagnostic_setting" "queue" {
-  for_each = var.diagnostic_settings_queue == null ? {} : var.diagnostic_settings_queue
-
-  name                       = each.value.name
-  target_resource_id         = "${azurerm_storage_account.this.id}/queueServices/default/"
-  log_analytics_workspace_id = each.value.log_analytics_workspace_id
-
-  dynamic "enabled_log" {
-    for_each = each.value.log_categories
-    content {
-      category_group = enabled_log.value
-    }
-  }
-  dynamic "metric" {
-    for_each = each.value.metric_categories
-    content {
-      category = metric.value
-    }
-  }
-}
-
 # Enable role assignments for queues
 resource "azurerm_role_assignment" "queues" {
   for_each                               = local.queues_role_assignments
