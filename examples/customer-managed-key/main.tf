@@ -12,6 +12,11 @@ terraform {
     }
   }
 }
+
+locals {
+  test_regions = ["eastus", "eastus2", "westus", "westus2"]
+
+}
 # This allows us to randomize the region for the resource group.
 module "regions" {
   source  = "Azure/regions/azurerm"
@@ -19,7 +24,7 @@ module "regions" {
 }
 
 resource "random_integer" "region_index" {
-  max = length(module.regions.regions) - 1
+  max = length(local.test_regions) - 1
   min = 0
 }
 
