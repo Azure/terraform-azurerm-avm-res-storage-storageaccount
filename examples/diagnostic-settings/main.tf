@@ -24,7 +24,6 @@ provider "azurerm" {
 }
 locals {
   test_regions = ["eastus", "eastus2", "westus", "westus2"]
-
 }
 
 # This allows us to randomize the region for the resource group.
