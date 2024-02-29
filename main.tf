@@ -334,6 +334,7 @@ resource "azapi_resource" "containers" {
       update = timeouts.value.update
     }
   }
+  depends_on = [azurerm_storage_account_network_rules.this]
 }
 resource "azurerm_storage_account_customer_managed_key" "this" {
   count = var.customer_managed_key != null ? 1 : 0
@@ -370,7 +371,7 @@ resource "azurerm_storage_queue" "this" {
   }
 
   # We need to create these storage service in serialize otherwise we might meet dns issue
-  depends_on = [azapi_resource.containers]
+  depends_on = [azapi_resource.containers, azurerm_storage_account_network_rules.this]
 }
 
 resource "azurerm_storage_table" "this" {
@@ -405,7 +406,7 @@ resource "azurerm_storage_table" "this" {
   }
 
   # We need to create these storage service in serialize otherwise we might meet dns issue
-  depends_on = [azapi_resource.containers, azurerm_storage_queue.this]
+  depends_on = [azapi_resource.containers, azurerm_storage_queue.this, azurerm_storage_account_network_rules.this]
 }
 
 resource "azurerm_storage_share" "this" {
@@ -442,6 +443,7 @@ resource "azurerm_storage_share" "this" {
       update = timeouts.value.update
     }
   }
+  depends_on = [azurerm_storage_account_network_rules.this]
 }
 
 resource "azurerm_role_assignment" "storage_account" {
