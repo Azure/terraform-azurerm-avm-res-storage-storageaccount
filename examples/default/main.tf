@@ -26,12 +26,6 @@ locals {
   test_regions = ["eastus", "eastus2", "westus", "westus2"]
 
 }
-# This allows us to randomize the region for the resource group.
-module "regions" {
-  source  = "Azure/regions/azurerm"
-  version = "0.3.0"
-}
-# This allows us to randomize the region for the resource group.
 resource "random_integer" "region_index" {
   max = length(local.test_regions) - 1
   min = 0

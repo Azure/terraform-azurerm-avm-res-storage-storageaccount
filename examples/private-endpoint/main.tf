@@ -27,11 +27,6 @@ locals {
 
 }
 # This allows us to randomize the region for the resource group.
-module "regions" {
-  source  = "Azure/regions/azurerm"
-  version = "0.5.1"
-}
-# This allows us to randomize the region for the resource group.
 resource "random_integer" "region_index" {
   max = length(local.test_regions) - 1
   min = 0
@@ -50,7 +45,7 @@ module "naming" {
 
 
 resource "azurerm_resource_group" "this" {
-  location = module.regions.regions[random_integer.region_index.result].name
+  location = local.test_regions[random_integer.region_index.result]
   name     = module.naming.resource_group.name_unique
 }
 
