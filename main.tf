@@ -352,12 +352,17 @@ resource "azurerm_storage_account_customer_managed_key" "this" {
   }
 }
 
-resource "azurerm_storage_queue" "this" {
+resource "azapi_resource" "queues" {
   for_each = var.queues
 
-  name                 = each.value.name
-  storage_account_name = azurerm_storage_account.this.name
-  metadata             = each.value.metadata
+  type = "Microsoft.Storage/storageAccounts/queueServices/queues@2021-02-01"
+  body = jsonencode({
+    properties = {
+      metadata = each.value.metadata
+    }
+  })
+  name      = each.value.name
+  parent_id = "${azurerm_storage_account.this.id}/queueServices/default"
 
   dynamic "timeouts" {
     for_each = each.value.timeouts == null ? [] : [each.value.timeouts]
