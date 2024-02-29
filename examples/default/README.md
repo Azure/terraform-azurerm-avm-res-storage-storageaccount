@@ -28,15 +28,11 @@ provider "azurerm" {
   skip_provider_registration = true
   storage_use_azuread        = true
 }
-
-# This allows us to randomize the region for the resource group.
-module "regions" {
-  source  = "Azure/regions/azurerm"
-  version = "0.3.0"
+locals {
+  test_regions = ["eastus", "eastus2", "westus", "westus2"]
 }
-# This allows us to randomize the region for the resource group.
 resource "random_integer" "region_index" {
-  max = length(module.regions.regions) - 1
+  max = length(local.test_regions) - 1
   min = 0
 }
 
@@ -54,7 +50,7 @@ module "naming" {
 
 # This is required for resource modules
 resource "azurerm_resource_group" "this" {
-  location = module.regions.regions[random_integer.region_index.result].name
+  location = local.test_regions[random_integer.region_index.result]
   name     = module.naming.resource_group.name_unique
 }
 
@@ -160,7 +156,7 @@ module "this" {
   }
   network_rules = {
     bypass                     = ["AzureServices"]
-    default_action             = "Deny"
+    default_action             = "Allow"
     ip_rules                   = [try(module.public_ip[0].public_ip, var.bypass_ip_cidr)]
     virtual_network_subnet_ids = toset([azurerm_subnet.private.id])
   }
@@ -277,12 +273,6 @@ Version: 0.4.0
 Source: lonegunmanb/public-ip/lonegunmanb
 
 Version: 0.1.0
-
-### <a name="module_regions"></a> [regions](#module\_regions)
-
-Source: Azure/regions/azurerm
-
-Version: 0.3.0
 
 ### <a name="module_this"></a> [this](#module\_this)
 

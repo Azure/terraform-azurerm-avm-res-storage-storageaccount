@@ -28,14 +28,12 @@ provider "azurerm" {
   storage_use_azuread        = true
 }
 
-# This allows us to randomize the region for the resource group.
-module "regions" {
-  source  = "Azure/regions/azurerm"
-  version = "0.5.1"
+locals {
+  test_regions = ["eastus", "eastus2", "westus", "westus2"]
 }
 # This allows us to randomize the region for the resource group.
 resource "random_integer" "region_index" {
-  max = length(module.regions.regions) - 1
+  max = length(local.test_regions) - 1
   min = 0
 }
 # This allow use to randomize the name of resources
@@ -52,7 +50,7 @@ module "naming" {
 
 
 resource "azurerm_resource_group" "this" {
-  location = module.regions.regions[random_integer.region_index.result].name
+  location = local.test_regions[random_integer.region_index.result]
   name     = module.naming.resource_group.name_unique
 }
 
@@ -332,12 +330,6 @@ Version: 0.4.0
 Source: lonegunmanb/public-ip/lonegunmanb
 
 Version: 0.1.0
-
-### <a name="module_regions"></a> [regions](#module\_regions)
-
-Source: Azure/regions/azurerm
-
-Version: 0.5.1
 
 ### <a name="module_this"></a> [this](#module\_this)
 

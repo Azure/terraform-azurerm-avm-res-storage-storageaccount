@@ -12,17 +12,14 @@ terraform {
     }
   }
 }
-# This allows us to randomize the region for the resource group.
-module "regions" {
-  source  = "Azure/regions/azurerm"
-  version = "0.3.0"
-}
 
+locals {
+  test_regions = ["eastus", "eastus2", "westus", "westus2"]
+}
 resource "random_integer" "region_index" {
-  max = length(module.regions.regions) - 1
+  max = length(local.test_regions) - 1
   min = 0
 }
-
 provider "azurerm" {
   features {
     resource_group {
@@ -46,7 +43,7 @@ module "naming" {
 
 # This is required for resource modules
 resource "azurerm_resource_group" "this" {
-  location = module.regions.regions[random_integer.region_index.result].name
+  location = local.test_regions[random_integer.region_index.result]
   name     = module.naming.resource_group.name_unique
 }
 
