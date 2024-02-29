@@ -334,6 +334,7 @@ resource "azapi_resource" "containers" {
       update = timeouts.value.update
     }
   }
+
   depends_on = [azurerm_storage_account_network_rules.this]
 }
 resource "azurerm_storage_account_customer_managed_key" "this" {
@@ -443,6 +444,7 @@ resource "azurerm_storage_share" "this" {
       update = timeouts.value.update
     }
   }
+
   depends_on = [azurerm_storage_account_network_rules.this]
 }
 
