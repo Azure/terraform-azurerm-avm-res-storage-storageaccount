@@ -21,26 +21,28 @@ resource "azurerm_storage_queue" "this" {
 
 # Enable role assignments for queues
 resource "azurerm_role_assignment" "queues" {
-  for_each                               = local.queues_role_assignments
-  scope                                  = azurerm_storage_queue.this[each.value.queue_key].resource_manager_id
-  role_definition_id                     = strcontains(lower(each.value.role_assignment.role_definition_id_or_name), lower(local.role_definition_resource_substring)) ? each.value.role_assignment.role_definition_id_or_name : null
-  role_definition_name                   = strcontains(lower(each.value.role_assignment.role_definition_id_or_name), lower(local.role_definition_resource_substring)) ? null : each.value.role_assignment.role_definition_id_or_name
+  for_each = local.queues_role_assignments
+
   principal_id                           = each.value.role_assignment.principal_id
+  scope                                  = azurerm_storage_queue.this[each.value.queue_key].resource_manager_id
   condition                              = each.value.role_assignment.condition
   condition_version                      = each.value.role_assignment.condition_version
-  skip_service_principal_aad_check       = each.value.role_assignment.skip_service_principal_aad_check
   delegated_managed_identity_resource_id = each.value.role_assignment.delegated_managed_identity_resource_id
+  role_definition_id                     = strcontains(lower(each.value.role_assignment.role_definition_id_or_name), lower(local.role_definition_resource_substring)) ? each.value.role_assignment.role_definition_id_or_name : null
+  role_definition_name                   = strcontains(lower(each.value.role_assignment.role_definition_id_or_name), lower(local.role_definition_resource_substring)) ? null : each.value.role_assignment.role_definition_id_or_name
+  skip_service_principal_aad_check       = each.value.role_assignment.skip_service_principal_aad_check
 }
 
 resource "time_sleep" "wait_for_rbac_before_queue_operations" {
   count = length(var.role_assignments) > 0 && length(var.queues) > 0 ? 1 : 0
-  depends_on = [
-    azurerm_role_assignment.storage_account
-  ]
+
   create_duration  = var.wait_for_rbac_before_queue_operations.create
   destroy_duration = var.wait_for_rbac_before_queue_operations.destroy
-
   triggers = {
     role_assignments = jsonencode(var.role_assignments)
   }
+
+  depends_on = [
+    azurerm_role_assignment.storage_account
+  ]
 }
