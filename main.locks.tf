@@ -10,4 +10,3 @@ resource "azurerm_management_lock" "this_storage_account" {
     azurerm_storage_account.this
   ]
 }
-
