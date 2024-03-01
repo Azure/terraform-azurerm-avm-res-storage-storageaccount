@@ -13,6 +13,15 @@ variable "shares" {
         start       = optional(string)
       })))
     })))
+    role_assignments = optional(map(object({
+      role_definition_id_or_name             = string
+      principal_id                           = string
+      description                            = optional(string, null)
+      skip_service_principal_aad_check       = optional(bool, false)
+      condition                              = optional(string, null)
+      condition_version                      = optional(string, null)
+      delegated_managed_identity_resource_id = optional(string, null)
+    })), {})
     timeouts = optional(object({
       create = optional(string)
       delete = optional(string)
@@ -44,6 +53,9 @@ variable "shares" {
  - `delete` - (Defaults to 30 minutes) Used when deleting the Storage Share.
  - `read` - (Defaults to 5 minutes) Used when retrieving the Storage Share.
  - `update` - (Defaults to 30 minutes) Used when updating the Storage Share.
+
+Supply role assignments in the same way as for `var.role_assignments`.
+
 EOT
   nullable    = false
 }
@@ -149,4 +161,18 @@ variable "azure_files_authentication" {
  - `netbios_domain_name` - (Required) Specifies the NetBIOS domain name.
  - `storage_sid` - (Required) Specifies the security identifier (SID) for Azure Storage.
 EOT
+}
+
+variable "wait_for_rbac_before_share_operations" {
+  type = object({
+    create  = optional(string, "30s")
+    destroy = optional(string, "0s")
+  })
+  default     = {}
+  description = <<DESCRIPTION
+This variable controls the amount of time to wait before performing share operations.
+It only applies when `var.role_assignments` and `var.shares` are both set.
+This is useful when you are creating role assignments on the share and immediately creating shares in it.
+The default is 30 seconds for create and 0 seconds for destroy.
+DESCRIPTION
 }

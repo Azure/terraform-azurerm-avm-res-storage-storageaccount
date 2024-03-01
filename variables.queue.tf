@@ -90,6 +90,7 @@ variable "queue_properties" {
  - `include_apis` - (Optional) Indicates whether metrics should generate summary statistics for called API operations.
  - `retention_policy_days` - (Optional) Specifies the number of days that logs will be retained.
  - `version` - (Required) The version of storage analytics to configure.
+
 EOT
 }
 
@@ -97,6 +98,15 @@ variable "queues" {
   type = map(object({
     metadata = optional(map(string))
     name     = string
+    role_assignments = optional(map(object({
+      role_definition_id_or_name             = string
+      principal_id                           = string
+      description                            = optional(string, null)
+      skip_service_principal_aad_check       = optional(bool, false)
+      condition                              = optional(string, null)
+      condition_version                      = optional(string, null)
+      delegated_managed_identity_resource_id = optional(string, null)
+    })), {})
     timeouts = optional(object({
       create = optional(string)
       delete = optional(string)
@@ -109,6 +119,8 @@ variable "queues" {
  - `metadata` - (Optional) A mapping of MetaData which should be assigned to this Storage Queue.
  - `name` - (Required) The name of the Queue which should be created within the Storage Account. Must be unique within the storage account the queue is located. Changing this forces a new resource to be created.
 
+Supply role assignments in the same way as for `var.role_assignments`.
+
  ---
  `timeouts` block supports the following:
  - `create` - (Defaults to 30 minutes) Used when creating the Storage Queue.
@@ -117,4 +129,18 @@ variable "queues" {
  - `update` - (Defaults to 30 minutes) Used when updating the Storage Queue.
 EOT
   nullable    = false
+}
+
+variable "wait_for_rbac_before_queue_operations" {
+  type = object({
+    create  = optional(string, "30s")
+    destroy = optional(string, "0s")
+  })
+  default     = {}
+  description = <<DESCRIPTION
+This variable controls the amount of time to wait before performing queue operations.
+It only applies when `var.role_assignments` and `var.queues` are both set.
+This is useful when you are creating role assignments on the queue and immediately creating queues in it.
+The default is 30 seconds for create and 0 seconds for destroy.
+DESCRIPTION
 }
