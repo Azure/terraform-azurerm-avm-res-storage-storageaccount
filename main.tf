@@ -51,6 +51,27 @@ resource "azurerm_storage_account" "this" {
       }
     }
   }
+
+  dynamic "network_rules" {
+    for_each = var.network_rules == null ? [] : [var.network_rules]
+
+    content {
+      default_action             = network_rules.value.default_action
+      bypass                     = network_rules.value.bypass
+      ip_rules                   = network_rules.value.ip_rules
+      virtual_network_subnet_ids = network_rules.value.virtual_network_subnet_ids
+
+      dynamic "private_link_access" {
+        for_each = var.network_rules.private_link_access == null ? [] : var.network_rules.private_link_access
+        content {
+          endpoint_resource_id = private_link_access.value.endpoint_resource_id
+          endpoint_tenant_id   = private_link_access.value.endpoint_tenant_id
+        }
+      }
+
+    }
+
+  }
   dynamic "blob_properties" {
     for_each = var.blob_properties == null ? [] : [var.blob_properties]
     content {
@@ -227,6 +248,10 @@ resource "azurerm_storage_account" "this" {
     ignore_changes = [
       customer_managed_key
     ]
+    precondition {
+      condition     = var.private_endpoints == null || var.network_rules.private_link_access == null
+      error_message = "Cannot set `private_link_access` when `var.private_endpoints` is not `null`."
+    }
   }
 }
 
@@ -275,41 +300,6 @@ resource "azurerm_storage_account_local_user" "this" {
   }
 }
 
-resource "azurerm_storage_account_network_rules" "this" {
-  count = var.network_rules != null ? 1 : 0
-
-  default_action             = var.network_rules.default_action
-  storage_account_id         = azurerm_storage_account.this.id
-  bypass                     = var.network_rules.bypass
-  ip_rules                   = var.network_rules.ip_rules
-  virtual_network_subnet_ids = var.network_rules.virtual_network_subnet_ids
-
-  dynamic "private_link_access" {
-    for_each = var.network_rules.private_link_access == null ? [] : var.network_rules.private_link_access
-    content {
-      endpoint_resource_id = private_link_access.value.endpoint_resource_id
-      endpoint_tenant_id   = private_link_access.value.endpoint_tenant_id
-    }
-  }
-  dynamic "timeouts" {
-    for_each = var.network_rules.timeouts == null ? [] : [var.network_rules.timeouts]
-    content {
-      create = timeouts.value.create
-      delete = timeouts.value.delete
-      read   = timeouts.value.read
-      update = timeouts.value.update
-    }
-  }
-
-  depends_on = [azurerm_private_endpoint.this]
-
-  lifecycle {
-    precondition {
-      condition     = var.private_endpoints == null || var.network_rules.private_link_access == null
-      error_message = "Cannot set `private_link_access` when `var.private_endpoints` is not `null`."
-    }
-  }
-}
 
 resource "azurerm_storage_account_customer_managed_key" "this" {
   count = var.customer_managed_key != null ? 1 : 0
