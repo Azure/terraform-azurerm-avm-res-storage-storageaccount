@@ -119,7 +119,7 @@ resource "azurerm_storage_account" "this" {
   }
   dynamic "network_rules" {
     # for_each = var.network_rules == null ? [] : [var.network_rules]
-    for_each = var.use_nested_nacl ? [var.network_rules] : []
+    for_each = var.use_nested_nacl ? (var.network_rules != null ? [var.network_rules] : []) : []
     content {
       default_action             = network_rules.value.default_action
       bypass                     = network_rules.value.bypass
@@ -330,7 +330,7 @@ resource "azurerm_role_assignment" "storage_account" {
   skip_service_principal_aad_check       = each.value.skip_service_principal_aad_check
 }
 resource "azurerm_storage_account_network_rules" "this" {
-  count = var.use_nested_nacl ? 0 : length(var.network_rules)
+  count = var.use_nested_nacl ? 0 : var.network_rules == null ? 0 : 1
 
   default_action             = var.network_rules.default_action
   storage_account_id         = azurerm_storage_account.this.id
