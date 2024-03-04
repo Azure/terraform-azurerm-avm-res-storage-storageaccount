@@ -184,11 +184,11 @@ variable "network_rules" {
       update = optional(string)
     }))
   })
-  default = {}
+  default = null
 
   description = <<-EOT
  > Note the default value for this variable will block all public access to the storage account. If you want to disable all network rules, set this value to `null`.
- 
+
  - `bypass` - (Optional) Specifies whether traffic is bypassed for Logging/Metrics/AzureServices. Valid options are any combination of `Logging`, `Metrics`, `AzureServices`, or `None`.
  - `default_action` - (Required) Specifies the default action of allow or deny when no other rules match. Valid options are `Deny` or `Allow`.
  - `ip_rules` - (Optional) List of public IP or IP ranges in CIDR Format. Only IPv4 addresses are allowed. Private IP address ranges (as defined in [RFC 1918](https://tools.ietf.org/html/rfc1918#section-3)) are not allowed.

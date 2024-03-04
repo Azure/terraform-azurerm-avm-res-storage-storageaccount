@@ -247,10 +247,6 @@ resource "azurerm_storage_account" "this" {
       customer_managed_key
     ]
 
-    precondition {
-      condition     = var.private_endpoints == null || var.network_rules.private_link_access == null
-      error_message = "Cannot set `private_link_access` when `var.private_endpoints` is not `null`."
-    }
   }
 }
 
