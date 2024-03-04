@@ -176,3 +176,9 @@ variable "tags" {
   default     = {}
   description = "Custom tags to apply to the resource."
 }
+
+variable "use_nested_nacl" {
+  type        = bool
+  default     = false
+  description = "If set to true, the module will use a nested network ACL to control traffic to the resource"
+}

@@ -69,6 +69,7 @@ The following resources are used by this module:
 - [azurerm_storage_account.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account) (resource)
 - [azurerm_storage_account_customer_managed_key.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account_customer_managed_key) (resource)
 - [azurerm_storage_account_local_user.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account_local_user) (resource)
+- [azurerm_storage_account_network_rules.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account_network_rules) (resource)
 - [azurerm_storage_queue.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_queue) (resource)
 - [azurerm_storage_share.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_share) (resource)
 - [azurerm_storage_table.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_table) (resource)
@@ -1352,6 +1353,14 @@ object({
 ```
 
 Default: `null`
+
+### <a name="input_use_nested_nacl"></a> [use\_nested\_nacl](#input\_use\_nested\_nacl)
+
+Description: If set to true, the module will use a nested network ACL to control traffic to the resource
+
+Type: `bool`
+
+Default: `false`
 
 ### <a name="input_wait_for_rbac_before_container_operations"></a> [wait\_for\_rbac\_before\_container\_operations](#input\_wait\_for\_rbac\_before\_container\_operations)
 
