@@ -246,7 +246,6 @@ resource "azurerm_storage_account" "this" {
     ignore_changes = [
       customer_managed_key
     ]
-
   }
 }
 
