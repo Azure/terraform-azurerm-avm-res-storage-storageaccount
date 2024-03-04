@@ -170,6 +170,7 @@ module "this" {
   shared_access_key_enabled         = true
   infrastructure_encryption_enabled = true
   public_network_access_enabled     = true
+  use_nested_nacl                   = false
   managed_identities = {
     system_assigned            = true
     user_assigned_resource_ids = [azurerm_user_assigned_identity.example_identity.id]
