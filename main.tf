@@ -242,8 +242,6 @@ resource "azurerm_storage_account" "this" {
     }
   }
 
-  # depends_on = [azurerm_role_assignment.storage_account]
-
   lifecycle {
     ignore_changes = [
       customer_managed_key
@@ -327,9 +325,6 @@ resource "azurerm_role_assignment" "storage_account" {
   skip_service_principal_aad_check       = each.value.skip_service_principal_aad_check
 }
 
-resource "time_sleep" "wait_for_rbac_before_storage_account_operations" {
-  count =
-}
 resource "azurerm_storage_account_network_rules" "this" {
   count = var.use_nested_nacl ? 0 : var.network_rules == null ? 0 : 1
 
