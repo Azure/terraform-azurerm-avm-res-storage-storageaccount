@@ -242,7 +242,7 @@ resource "azurerm_storage_account" "this" {
     }
   }
 
-  depends_on = [azurerm_role_assignment.storage_account]
+  # depends_on = [azurerm_role_assignment.storage_account]
 
   lifecycle {
     ignore_changes = [
@@ -325,6 +325,10 @@ resource "azurerm_role_assignment" "storage_account" {
   role_definition_id                     = strcontains(lower(each.value.role_definition_id_or_name), lower(local.role_definition_resource_substring)) ? each.value.role_definition_id_or_name : null
   role_definition_name                   = strcontains(lower(each.value.role_definition_id_or_name), lower(local.role_definition_resource_substring)) ? null : each.value.role_definition_id_or_name
   skip_service_principal_aad_check       = each.value.skip_service_principal_aad_check
+}
+
+resource "time_sleep" "wait_for_rbac_before_storage_account_operations" {
+  count =
 }
 resource "azurerm_storage_account_network_rules" "this" {
   count = var.use_nested_nacl ? 0 : var.network_rules == null ? 0 : 1
