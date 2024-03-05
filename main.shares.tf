@@ -33,7 +33,7 @@ resource "azurerm_storage_share" "this" {
     }
   }
 
-  depends_on = [azurerm_storage_account.this, wait_for_rbac_before_share_operations]
+  depends_on = [azurerm_storage_account.this, time_sleep.wait_for_rbac_before_share_operations]
 }
 
 # Enable role assignments for shares
