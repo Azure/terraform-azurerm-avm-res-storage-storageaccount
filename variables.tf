@@ -188,6 +188,3 @@ variable "use_nested_nacl" {
     - If set to `false`, nested network ACLs will not be used and "azurerm_storage_account_network_rules" resource will be leveraged.
     DESCRIPTION
 }
-
-
-
