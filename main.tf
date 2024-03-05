@@ -247,6 +247,7 @@ resource "azurerm_storage_account" "this" {
       customer_managed_key
     ]
   }
+  depends_on = [azurerm_role_assignment.storage_account]
 }
 
 resource "azurerm_storage_account_local_user" "this" {
