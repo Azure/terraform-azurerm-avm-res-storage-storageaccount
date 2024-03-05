@@ -32,6 +32,7 @@ resource "azurerm_storage_share" "this" {
       update = timeouts.value.update
     }
   }
+  depends_on = [azurerm_storage_account.this, wait_for_rbac_before_share_operations]
 }
 
 # Enable role assignments for shares
