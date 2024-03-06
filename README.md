@@ -1359,7 +1359,7 @@ Default: `null`
 Description:     Controls whether or not to use nested network ACLs for this resource.  
     Nested network ACLs are used to apply network ACLs to the subresources of the storage account, such as blob containers and queues.
 
-    - If set to `true`, nested network ACLs will be used. NACL resource will be created to support scenarios like Azure policy for storage accounts.
+    - If set to `true`, nested network ACLs will be used and will override any network rules. NACL resource will be created to support scenarios like Azure policy for storage accounts.
     - If set to `false`, nested network ACLs will not be used and "azurerm\_storage\_account\_network\_rules" resource will be leveraged.
 
 Type: `bool`
