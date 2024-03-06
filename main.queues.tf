@@ -16,7 +16,7 @@ resource "azurerm_storage_queue" "this" {
   }
 
   # We need to create these storage service in serialize otherwise we might meet dns issue
-  depends_on = [azapi_resource.containers]
+  depends_on = [azapi_resource.containers, time_sleep.wait_for_rbac_before_queue_operations, azurerm_storage_account.this]
 }
 
 # Enable role assignments for queues

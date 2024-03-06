@@ -117,6 +117,25 @@ resource "azurerm_storage_account" "this" {
       state                         = immutability_policy.value.state
     }
   }
+  dynamic "network_rules" {
+    # for_each = var.network_rules == null ? [] : [var.network_rules]
+    for_each = var.use_nested_nacl ? (var.network_rules != null ? [var.network_rules] : []) : []
+    content {
+      default_action             = network_rules.value.default_action
+      bypass                     = network_rules.value.bypass
+      ip_rules                   = network_rules.value.ip_rules
+      virtual_network_subnet_ids = network_rules.value.virtual_network_subnet_ids
+
+      dynamic "private_link_access" {
+        for_each = var.network_rules.private_link_access == null ? [] : var.network_rules.private_link_access
+        content {
+          endpoint_resource_id = private_link_access.value.endpoint_resource_id
+          endpoint_tenant_id   = private_link_access.value.endpoint_tenant_id
+        }
+      }
+    }
+
+  }
   dynamic "queue_properties" {
     for_each = var.queue_properties == null ? [] : [var.queue_properties]
     content {
@@ -275,8 +294,38 @@ resource "azurerm_storage_account_local_user" "this" {
   }
 }
 
+
+resource "azurerm_storage_account_customer_managed_key" "this" {
+  count = var.customer_managed_key != null ? 1 : 0
+
+  key_name                  = var.customer_managed_key.key_name
+  storage_account_id        = azurerm_storage_account.this.id
+  key_vault_id              = var.customer_managed_key.key_vault_resource_id
+  key_version               = var.customer_managed_key.key_version
+  user_assigned_identity_id = var.customer_managed_key.user_assigned_identity_resource_id
+
+  lifecycle {
+    precondition {
+      condition     = (var.account_kind == "StorageV2" || var.account_tier == "Premium")
+      error_message = "`var.customer_managed_key` can only be set when the `account_kind` is set to `StorageV2` or `account_tier` set to `Premium`, and the identity type is `UserAssigned`."
+    }
+  }
+}
+
+resource "azurerm_role_assignment" "storage_account" {
+  for_each = var.role_assignments
+
+  principal_id                           = each.value.principal_id
+  scope                                  = azurerm_storage_account.this.id
+  condition                              = each.value.condition
+  condition_version                      = each.value.condition_version
+  delegated_managed_identity_resource_id = each.value.delegated_managed_identity_resource_id
+  role_definition_id                     = strcontains(lower(each.value.role_definition_id_or_name), lower(local.role_definition_resource_substring)) ? each.value.role_definition_id_or_name : null
+  role_definition_name                   = strcontains(lower(each.value.role_definition_id_or_name), lower(local.role_definition_resource_substring)) ? null : each.value.role_definition_id_or_name
+  skip_service_principal_aad_check       = each.value.skip_service_principal_aad_check
+}
 resource "azurerm_storage_account_network_rules" "this" {
-  count = var.network_rules != null ? 1 : 0
+  count = var.use_nested_nacl ? 0 : var.network_rules == null ? 0 : 1
 
   default_action             = var.network_rules.default_action
   storage_account_id         = azurerm_storage_account.this.id
@@ -309,34 +358,4 @@ resource "azurerm_storage_account_network_rules" "this" {
       error_message = "Cannot set `private_link_access` when `var.private_endpoints` is not `null`."
     }
   }
-}
-
-resource "azurerm_storage_account_customer_managed_key" "this" {
-  count = var.customer_managed_key != null ? 1 : 0
-
-  key_name                  = var.customer_managed_key.key_name
-  storage_account_id        = azurerm_storage_account.this.id
-  key_vault_id              = var.customer_managed_key.key_vault_resource_id
-  key_version               = var.customer_managed_key.key_version
-  user_assigned_identity_id = var.customer_managed_key.user_assigned_identity_resource_id
-
-  lifecycle {
-    precondition {
-      condition     = (var.account_kind == "StorageV2" || var.account_tier == "Premium")
-      error_message = "`var.customer_managed_key` can only be set when the `account_kind` is set to `StorageV2` or `account_tier` set to `Premium`, and the identity type is `UserAssigned`."
-    }
-  }
-}
-
-resource "azurerm_role_assignment" "storage_account" {
-  for_each = var.role_assignments
-
-  principal_id                           = each.value.principal_id
-  scope                                  = azurerm_storage_account.this.id
-  condition                              = each.value.condition
-  condition_version                      = each.value.condition_version
-  delegated_managed_identity_resource_id = each.value.delegated_managed_identity_resource_id
-  role_definition_id                     = strcontains(lower(each.value.role_definition_id_or_name), lower(local.role_definition_resource_substring)) ? each.value.role_definition_id_or_name : null
-  role_definition_name                   = strcontains(lower(each.value.role_definition_id_or_name), lower(local.role_definition_resource_substring)) ? null : each.value.role_definition_id_or_name
-  skip_service_principal_aad_check       = each.value.skip_service_principal_aad_check
 }

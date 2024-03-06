@@ -809,7 +809,7 @@ object({
   })
 ```
 
-Default: `{}`
+Default: `null`
 
 ### <a name="input_nfsv3_enabled"></a> [nfsv3\_enabled](#input\_nfsv3\_enabled)
 
@@ -1353,6 +1353,18 @@ object({
 ```
 
 Default: `null`
+
+### <a name="input_use_nested_nacl"></a> [use\_nested\_nacl](#input\_use\_nested\_nacl)
+
+Description:     Controls whether or not to use nested network ACLs for this resource.  
+    Nested network ACLs are used to apply network ACLs to the subresources of the storage account, such as blob containers and queues.
+
+    - If set to `true`, nested network ACLs will be used and will override any network rules. NACL resource will be created to support scenarios like Azure policy for storage accounts.
+    - If set to `false`, nested network ACLs will not be used and "azurerm\_storage\_account\_network\_rules" resource will be leveraged.
+
+Type: `bool`
+
+Default: `false`
 
 ### <a name="input_wait_for_rbac_before_container_operations"></a> [wait\_for\_rbac\_before\_container\_operations](#input\_wait\_for\_rbac\_before\_container\_operations)
 

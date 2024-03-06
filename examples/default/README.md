@@ -29,7 +29,7 @@ provider "azurerm" {
   storage_use_azuread        = true
 }
 locals {
-  test_regions = ["eastus", "eastus2", "westus", "westus2"]
+  test_regions = ["eastus", "eastus2", "westus2", "westus3"]
 }
 resource "random_integer" "region_index" {
   max = length(local.test_regions) - 1
@@ -117,7 +117,7 @@ module "this" {
 
   source = "../.."
 
-  account_replication_type      = "GRS"
+  account_replication_type      = "ZRS"
   account_tier                  = "Standard"
   account_kind                  = "StorageV2"
   location                      = azurerm_resource_group.this.location
@@ -126,6 +126,8 @@ module "this" {
   min_tls_version               = "TLS1_2"
   shared_access_key_enabled     = true
   public_network_access_enabled = true
+  use_nested_nacl               = false
+  #use_nested_nacl              = true
   managed_identities = {
     system_assigned            = true
     user_assigned_resource_ids = [azurerm_user_assigned_identity.example_identity.id]
@@ -156,7 +158,7 @@ module "this" {
   }
   network_rules = {
     bypass                     = ["AzureServices"]
-    default_action             = "Allow"
+    default_action             = "Deny"
     ip_rules                   = [try(module.public_ip[0].public_ip, var.bypass_ip_cidr)]
     virtual_network_subnet_ids = toset([azurerm_subnet.private.id])
   }

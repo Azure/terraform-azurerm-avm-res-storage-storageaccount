@@ -14,7 +14,7 @@ terraform {
 }
 
 locals {
-  test_regions = ["eastus", "eastus2", "westus", "westus2"]
+  test_regions = ["eastus", "eastus2", "westus2", "westus3"]
 }
 resource "random_integer" "region_index" {
   max = length(local.test_regions) - 1
@@ -160,7 +160,7 @@ module "this" {
 
   source = "../.."
 
-  account_replication_type          = "GRS"
+  account_replication_type          = "ZRS"
   account_tier                      = "Standard"
   account_kind                      = "StorageV2"
   location                          = azurerm_resource_group.this.location
@@ -170,6 +170,8 @@ module "this" {
   shared_access_key_enabled         = true
   infrastructure_encryption_enabled = true
   public_network_access_enabled     = true
+  use_nested_nacl                   = false
+  #use_nested_nacl                  = true
   managed_identities = {
     system_assigned            = true
     user_assigned_resource_ids = [azurerm_user_assigned_identity.example_identity.id]
