@@ -27,7 +27,7 @@ provider "azurerm" {
   storage_use_azuread        = true
 }
 locals {
-  test_regions = ["eastus", "eastus2", "westus", "westus2"]
+  test_regions = ["eastus", "eastus2", "westus2", "westus3"]
 }
 
 # This allows us to randomize the region for the resource group.

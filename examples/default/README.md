@@ -29,7 +29,7 @@ provider "azurerm" {
   storage_use_azuread        = true
 }
 locals {
-  test_regions = ["eastus", "eastus2", "westus", "westus2"]
+  test_regions = ["eastus", "eastus2", "westus2", "westus3"]
 }
 resource "random_integer" "region_index" {
   max = length(local.test_regions) - 1
