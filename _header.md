@@ -17,3 +17,5 @@ This Terraform module is designed to create Azure Storage Accounts and its relat
 * The module does not support Azure File Shares at this time.
 * The storage account name must be globally unique.
 * The module creates resources in the same region as the storage account.
+
+> **IMPORTANT** We recommend using Azure AD authentication over Shared Key for provisioning Storage Containers, Blobs, and other items. To achieve this, add the `storage_use_azuread` flag in the Provider block. However, it’s important to note that not all Azure Storage services support Active Directory authentication.(https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs#storage_use_azuread) In the absence of the `storage_use_azuread` flag, you will need to enable Shared Key Access by setting the `shared_access_key_enabled` flag `True`.
