@@ -85,6 +85,12 @@ The following resources are used by this module:
 
 The following input variables are required:
 
+### <a name="input_location"></a> [location](#input\_location)
+
+Description: Azure region where the resource should be deployed.  If null, the location will be inferred from the resource group location.
+
+Type: `string`
+
 ### <a name="input_name"></a> [name](#input\_name)
 
 Description: The name of the resource.
@@ -714,15 +720,6 @@ map(object({
 ```
 
 Default: `{}`
-
-### <a name="input_location"></a> [location](#input\_location)
-
-Description: Azure region where the resource should be deployed.  
-If null, the location will be inferred from the resource group location.
-
-Type: `string`
-
-Default: `null`
 
 ### <a name="input_lock"></a> [lock](#input\_lock)
 
