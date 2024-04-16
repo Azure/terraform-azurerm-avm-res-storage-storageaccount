@@ -3,7 +3,7 @@ data "azurerm_client_config" "this" {}
 resource "azurerm_storage_account" "this" {
   account_replication_type          = var.account_replication_type
   account_tier                      = var.account_tier
-  location                          = local.location
+  location                          = var.location
   name                              = var.name
   resource_group_name               = var.resource_group_name
   access_tier                       = var.access_tier
