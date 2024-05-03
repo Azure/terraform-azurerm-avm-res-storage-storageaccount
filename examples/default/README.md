@@ -55,6 +55,7 @@ module "test" {
 
   source              = "../.."
   location            = azurerm_resource_group.this.location
+  enable_telemetry    = var.enable_telemetry # see variables.tf
   name                = module.naming.storage_account.name_unique
   resource_group_name = azurerm_resource_group.this.name
 }
@@ -95,13 +96,15 @@ No required inputs.
 
 The following input variables are optional (have default values):
 
-### <a name="input_bypass_ip_cidr"></a> [bypass\_ip\_cidr](#input\_bypass\_ip\_cidr)
+### <a name="input_enable_telemetry"></a> [enable\_telemetry](#input\_enable\_telemetry)
 
-Description: value to bypass the IP CIDR on firewall rules
+Description: This variable controls whether or not telemetry is enabled for the module.  
+For more information see <https://aka.ms/avm/telemetryinfo>.  
+If it is set to false, then no telemetry will be collected.
 
-Type: `string`
+Type: `bool`
 
-Default: `null`
+Default: `true`
 
 ## Outputs
 
