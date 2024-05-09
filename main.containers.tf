@@ -9,8 +9,9 @@ resource "azapi_resource" "containers" {
       publicAccess = each.value.public_access
     }
   })
-  name      = each.value.name
-  parent_id = "${azurerm_storage_account.this.id}/blobServices/default"
+  name                      = each.value.name
+  parent_id                 = "${azurerm_storage_account.this.id}/blobServices/default"
+  schema_validation_enabled = false #https://github.com/Azure/terraform-provider-azapi/issues/497
 
   dynamic "timeouts" {
     for_each = each.value.timeouts == null ? [] : [each.value.timeouts]
