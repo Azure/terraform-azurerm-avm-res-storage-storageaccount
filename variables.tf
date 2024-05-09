@@ -64,7 +64,7 @@ DESCRIPTION
 variable "lock" {
   type = object({
     name = optional(string, null)
-    kind = optional(string, "None")
+    kind = string
   })
   default     = {}
   description = "The lock level to apply. Default is `None`. Possible values are `None`, `CanNotDelete`, and `ReadOnly`."
