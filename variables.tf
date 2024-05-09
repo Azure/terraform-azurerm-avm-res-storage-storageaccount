@@ -66,7 +66,7 @@ variable "lock" {
     name = optional(string, null)
     kind = string
   })
-  default     = {}
+  default     = null
   description = "The lock level to apply. Default is `None`. Possible values are `None`, `CanNotDelete`, and `ReadOnly`."
   nullable    = false
 
