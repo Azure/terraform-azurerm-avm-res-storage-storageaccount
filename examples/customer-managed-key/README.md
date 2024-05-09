@@ -181,9 +181,9 @@ module "this" {
     user_assigned_resource_ids = [azurerm_user_assigned_identity.example_identity.id]
   }
   customer_managed_key = {
-    key_vault_resource_id              = module.avm_res_keyvault_vault.resource.id
-    key_name                           = azurerm_key_vault_key.example.name
-    user_assigned_identity_resource_id = azurerm_user_assigned_identity.example_identity.id
+    key_vault_resource_id  = module.avm_res_keyvault_vault.resource.id
+    key_name               = azurerm_key_vault_key.example.name
+    user_assigned_identity = { resource_id = azurerm_user_assigned_identity.example_identity.id }
 
   }
   tags = {

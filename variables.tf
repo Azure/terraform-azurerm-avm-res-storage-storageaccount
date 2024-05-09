@@ -160,7 +160,6 @@ variable "role_assignments" {
     principal_type                         = optional(string, null)
   }))
   default     = {}
-  nullable    = false
   description = <<DESCRIPTION
 A map of role assignments to create on the resource. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
 
@@ -173,6 +172,7 @@ A map of role assignments to create on the resource. The map key is deliberately
 
 > Note: only set `skip_service_principal_aad_check` to true if you are assigning a role to a service principal.
 DESCRIPTION
+  nullable    = false
 }
 
 variable "tags" {
