@@ -736,7 +736,7 @@ Type:
 ```hcl
 object({
     name = optional(string, null)
-    kind = optional(string, "None")
+    kind = string
   })
 ```
 
