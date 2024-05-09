@@ -126,7 +126,7 @@ Description: (Required) Defines the type of replication to use for this storage 
 
 Type: `string`
 
-Default: `"RAGZRS"`
+Default: `"ZRS"`
 
 ### <a name="input_account_tier"></a> [account\_tier](#input\_account\_tier)
 
