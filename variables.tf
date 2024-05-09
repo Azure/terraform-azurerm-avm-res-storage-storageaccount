@@ -68,7 +68,6 @@ variable "lock" {
   })
   default     = null
   description = "The lock level to apply. Default is `None`. Possible values are `None`, `CanNotDelete`, and `ReadOnly`."
-  nullable    = false
 
   validation {
     condition     = contains(["CanNotDelete", "ReadOnly", "None"], var.lock.kind)
