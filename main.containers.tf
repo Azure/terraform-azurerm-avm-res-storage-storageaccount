@@ -18,7 +18,7 @@ resource "azapi_resource" "containers" {
       create = timeouts.value.create
       delete = timeouts.value.delete
       read   = timeouts.value.read
-      update = timeouts.value.update
+      #update = timeouts.value.update
     }
   }
 }
