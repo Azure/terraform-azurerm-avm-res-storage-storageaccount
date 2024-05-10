@@ -18,7 +18,6 @@ variable "containers" {
       create = optional(string)
       delete = optional(string)
       read   = optional(string)
-      update = optional(string)
     }))
   }))
   default     = {}
@@ -34,7 +33,6 @@ variable "containers" {
  - `create` - (Defaults to 30 minutes) Used when creating the Storage Container.
  - `delete` - (Defaults to 30 minutes) Used when deleting the Storage Container.
  - `read` - (Defaults to 5 minutes) Used when retrieving the Storage Container.
- - `update` - (Defaults to 30 minutes) Used when updating the Storage Container.
 EOT
   nullable    = false
 }
