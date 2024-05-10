@@ -32,9 +32,7 @@ locals {
       }
     ]
   ]) : "${assoc.pe_key}-${assoc.asg_key}" => assoc }
-  private_endpoint_enabled = var.private_endpoints != null
-  private_endpoints        = local.private_endpoint_enabled ? local.endpoints : toset([])
-  queue_endpoint           = length(var.queues) == 0 ? [] : ["queue"]
+  queue_endpoint = length(var.queues) == 0 ? [] : ["queue"]
   # Role assignments for queues
   queues_role_assignments = { for ra in flatten([
     for qk, qv in var.queues : [
