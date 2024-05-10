@@ -7,13 +7,13 @@ resource "azurerm_private_endpoint" "this" {
   resource_group_name           = each.value.resource_group_name != null ? each.value.resource_group_name : var.resource_group_name
   subnet_id                     = each.value.subnet_resource_id
   custom_network_interface_name = each.value.network_interface_name
-  tags                          = each.value.inherit_tags ? merge(each.value.tags, var.tags) : each.value.tags
+  tags                          = each.value.tags
 
   private_service_connection {
     is_manual_connection           = false
     name                           = each.value.private_service_connection_name != null ? each.value.private_service_connection_name : "pse-${var.name}"
     private_connection_resource_id = azurerm_storage_account.this.id
-    subresource_names              = each.value.subresource_name
+    subresource_names              = [each.value.subresource_name]
   }
   dynamic "ip_configuration" {
     for_each = each.value.ip_configurations
