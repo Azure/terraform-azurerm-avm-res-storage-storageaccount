@@ -87,6 +87,13 @@ The following resources are used by this module:
 
 The following input variables are required:
 
+### <a name="input_location"></a> [location](#input\_location)
+
+Description: Azure region where the resource should be deployed.  
+If null, the location will be inferred from the resource group location.
+
+Type: `string`
+
 ### <a name="input_name"></a> [name](#input\_name)
 
 Description: The name of the resource.
@@ -682,15 +689,6 @@ map(object({
 
 Default: `{}`
 
-### <a name="input_location"></a> [location](#input\_location)
-
-Description: Azure region where the resource should be deployed.  
-If null, the location will be inferred from the resource group location.
-
-Type: `string`
-
-Default: `null`
-
 ### <a name="input_lock"></a> [lock](#input\_lock)
 
 Description: The lock level to apply. Default is `None`. Possible values are `None`, `CanNotDelete`, and `ReadOnly`.
@@ -819,6 +817,7 @@ map(object({
       condition                              = optional(string, null)
       condition_version                      = optional(string, null)
       delegated_managed_identity_resource_id = optional(string, null)
+      principal_type                         = optional(string, null)
     })), {})
     lock = optional(object({
       kind = string
@@ -1416,10 +1415,6 @@ Description: Map of storage containers that are created.
 
 Description: Fqdns for storage services.
 
-### <a name="output_id"></a> [id](#output\_id)
-
-Description: The ID of the Storage Account.
-
 ### <a name="output_name"></a> [name](#output\_name)
 
 Description: The name of the storage account
@@ -1435,6 +1430,10 @@ Description: Map of storage queues that are created.
 ### <a name="output_resource"></a> [resource](#output\_resource)
 
 Description: This is the full resource output for the Storage Account resource.
+
+### <a name="output_resource_id"></a> [resource\_id](#output\_resource\_id)
+
+Description: The ID of the Storage Account.
 
 ### <a name="output_tables"></a> [tables](#output\_tables)
 
