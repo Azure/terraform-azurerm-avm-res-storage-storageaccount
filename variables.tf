@@ -1,3 +1,12 @@
+variable "location" {
+  type        = string
+  description = <<DESCRIPTION
+Azure region where the resource should be deployed.
+If null, the location will be inferred from the resource group location.
+DESCRIPTION
+  nullable    = false
+}
+
 variable "name" {
   type        = string
   description = "The name of the resource."
@@ -51,15 +60,6 @@ variable "enable_telemetry" {
 This variable controls whether or not telemetry is enabled for the module.
 For more information see https://aka.ms/avm/telemetryinfo.
 If it is set to false, then no telemetry will be collected.
-DESCRIPTION
-}
-
-variable "location" {
-  type        = string
-  nullable    = false
-  description = <<DESCRIPTION
-Azure region where the resource should be deployed.
-If null, the location will be inferred from the resource group location.
 DESCRIPTION
 }
 
