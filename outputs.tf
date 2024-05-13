@@ -17,7 +17,7 @@ output "fqdn" {
   value       = { for svc in local.endpoints : svc => "${azurerm_storage_account.this.name}.${svc}.core.windows.net" }
 }
 
-output "id" {
+output "resource_id" {
   description = "The ID of the Storage Account."
   value       = azurerm_storage_account.this.id
 }
