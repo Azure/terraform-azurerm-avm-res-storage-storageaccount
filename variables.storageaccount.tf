@@ -184,7 +184,7 @@ variable "network_rules" {
       update = optional(string)
     }))
   })
-  default = null
+  default = {}
 
   description = <<-EOT
  > Note the default value for this variable will block all public access to the storage account. If you want to disable all network rules, set this value to `null`.
