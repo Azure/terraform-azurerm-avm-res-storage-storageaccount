@@ -6,6 +6,6 @@ variable "bypass_ip_cidr" {
 
 variable "msi_id" {
   type        = string
-  description = "If you're running this example by authentication with identity, please set identity object id here."
   default     = null
+  description = "If you're running this example by authentication with identity, please set identity object id here."
 }
