@@ -17,11 +17,6 @@ output "fqdn" {
   value       = { for svc in local.endpoints : svc => "${azurerm_storage_account.this.name}.${svc}.core.windows.net" }
 }
 
-output "id" {
-  description = "The ID of the Storage Account."
-  value       = azurerm_storage_account.this.id
-}
-
 output "name" {
   description = "The name of the storage account"
   value       = azurerm_storage_account.this.name
@@ -48,6 +43,11 @@ output "queues" {
 output "resource" {
   description = "This is the full resource output for the Storage Account resource."
   value       = azurerm_storage_account.this
+}
+
+output "resource_id" {
+  description = "The ID of the Storage Account."
+  value       = azurerm_storage_account.this.id
 }
 
 output "tables" {

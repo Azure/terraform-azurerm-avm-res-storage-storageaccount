@@ -1,12 +1,10 @@
-data "azurerm_client_config" "this" {}
-
-data "azurerm_resource_group" "rg" {
-  name = var.resource_group_name
-}
+# data "azurerm_resource_group" "rg" {
+#   name = var.resource_group_name
+# }
 resource "azurerm_storage_account" "this" {
   account_replication_type          = var.account_replication_type
   account_tier                      = var.account_tier
-  location                          = local.location
+  location                          = var.location
   name                              = var.name
   resource_group_name               = var.resource_group_name
   access_tier                       = var.access_tier
@@ -302,7 +300,7 @@ resource "azurerm_storage_account_customer_managed_key" "this" {
   storage_account_id        = azurerm_storage_account.this.id
   key_vault_id              = var.customer_managed_key.key_vault_resource_id
   key_version               = var.customer_managed_key.key_version
-  user_assigned_identity_id = var.customer_managed_key.user_assigned_identity_resource_id
+  user_assigned_identity_id = var.customer_managed_key.user_assigned_identity.resource_id
 
   lifecycle {
     precondition {

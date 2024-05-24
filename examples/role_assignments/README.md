@@ -147,8 +147,8 @@ module "this" {
   } */
   role_assignments = {
     role_assignment_1 = {
-      role_definition_id_or_name       = data.azurerm_role_definition.example.id
-      principal_id                     = data.azurerm_client_config.current.object_id
+      role_definition_id_or_name       = data.azurerm_role_definition.example.name
+      principal_id                     = coalesce(var.msi_id, data.azurerm_client_config.current.object_id)
       skip_service_principal_aad_check = false
     },
     role_assignment_2 = {
@@ -301,6 +301,14 @@ The following input variables are optional (have default values):
 ### <a name="input_bypass_ip_cidr"></a> [bypass\_ip\_cidr](#input\_bypass\_ip\_cidr)
 
 Description: value to bypass the IP CIDR on firewall rules
+
+Type: `string`
+
+Default: `null`
+
+### <a name="input_msi_id"></a> [msi\_id](#input\_msi\_id)
+
+Description: If you're running this example by authentication with identity, please set identity object id here.
 
 Type: `string`
 

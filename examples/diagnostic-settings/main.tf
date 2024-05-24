@@ -139,8 +139,8 @@ module "this" {
   } */
   role_assignments = {
     role_assignment_1 = {
-      role_definition_id_or_name       = data.azurerm_role_definition.example.id
-      principal_id                     = data.azurerm_client_config.current.object_id
+      role_definition_id_or_name       = data.azurerm_role_definition.example.name
+      principal_id                     = coalesce(var.msi_id, data.azurerm_client_config.current.object_id)
       skip_service_principal_aad_check = false
     },
     role_assignment_2 = {
@@ -195,56 +195,61 @@ module "this" {
       quota = 10
     }
   }
-  # setting up diagnostic settings for storage account
+
+  #setting up diagnostic settings for storage account
   diagnostic_settings_storage_account = {
     storage = {
       name                       = "diag"
       log_analytics_workspace_id = azurerm_log_analytics_workspace.this.id
       log_categories             = ["audit", "alllogs"]
-      metric_categories          = ["AllMetrics"]
+      metric_categories          = ["Capacity", "Transaction"]
     }
 
   }
-  # setting up diagnostic settings for blob
-  diagnostic_settings_blob = {
-    blob11 = {
-      name                       = "diag"
-      log_analytics_workspace_id = azurerm_log_analytics_workspace.this.id
-      log_categories             = ["audit", "alllogs"]
-      metric_categories          = ["AllMetrics"]
-    }
 
-  }
   # setting up diagnostic settings for queue
   diagnostic_settings_queue = {
     queue = {
       name                       = "diag"
       log_analytics_workspace_id = azurerm_log_analytics_workspace.this.id
       log_categories             = ["audit", "alllogs"]
-      metric_categories          = ["AllMetrics"]
+      metric_categories          = ["Capacity", "Transaction"]
 
     }
 
   }
   # setting up diagnostic settings for table
   diagnostic_settings_table = {
-    queue = {
+    table = {
       name                       = "diag"
       log_analytics_workspace_id = azurerm_log_analytics_workspace.this.id
       log_categories             = ["audit", "alllogs"]
-      metric_categories          = ["AllMetrics"]
+      metric_categories          = ["Capacity", "Transaction"]
 
     }
 
   }
+
   # setting up diagnostic settings for file
   diagnostic_settings_file = {
-    queue = {
+    file1 = {
       name                       = "diag"
       log_analytics_workspace_id = azurerm_log_analytics_workspace.this.id
       log_categories             = ["audit", "alllogs"]
-      metric_categories          = ["AllMetrics"]
+      metric_categories          = ["Capacity", "Transaction"]
 
+    }
+
+  }
+
+
+  # setting up diagnostic settings for blob
+  diagnostic_settings_blob = {
+    blob11 = {
+      name                       = "diag"
+      log_analytics_workspace_id = azurerm_log_analytics_workspace.this.id
+      log_categories             = ["audit", "alllogs"]
+      metric_categories          = ["Capacity", "Transaction"]
     }
 
   }

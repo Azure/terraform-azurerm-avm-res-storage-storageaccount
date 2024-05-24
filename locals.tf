@@ -11,7 +11,7 @@ locals {
     ]
   ]) : "${ra.container_key}-${ra.ra_key}" => ra }
   endpoints = toset(concat(local.blob_endpoint, local.queue_endpoint, local.table_endpoint))
-  location  = var.location != null ? var.location : data.azurerm_resource_group.rg.location
+  #location  = var.location != null ? var.location : var.location
   # private endpoint role assignments
   pe_role_assignments = { for ra in flatten([
     for pe_k, pe_v in var.private_endpoints : [
@@ -32,9 +32,7 @@ locals {
       }
     ]
   ]) : "${assoc.pe_key}-${assoc.asg_key}" => assoc }
-  private_endpoint_enabled = var.private_endpoints != null
-  private_endpoints        = local.private_endpoint_enabled ? local.endpoints : toset([])
-  queue_endpoint           = length(var.queues) == 0 ? [] : ["queue"]
+  queue_endpoint = length(var.queues) == 0 ? [] : ["queue"]
   # Role assignments for queues
   queues_role_assignments = { for ra in flatten([
     for qk, qv in var.queues : [

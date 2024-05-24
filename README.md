@@ -19,6 +19,8 @@ This Terraform module is designed to create Azure Storage Accounts and its relat
 * The storage account name must be globally unique.
 * The module creates resources in the same region as the storage account.
 
+> **IMPORTANT** We recommend using Azure AD authentication over Shared Key for provisioning Storage Containers, Blobs, and other items. To achieve this, add the `storage_use_azuread` flag in the Provider block. However, it’s important to note that not all Azure Storage services support Active Directory authentication.(https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs#storage_use_azuread) In the absence of the `storage_use_azuread` flag, you will need to enable Shared Key Access by setting the `shared_access_key_enabled` flag `True`.
+
 <!-- markdownlint-disable MD033 -->
 ## Requirements
 
@@ -78,13 +80,18 @@ The following resources are used by this module:
 - [time_sleep.wait_for_rbac_before_queue_operations](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/sleep) (resource)
 - [time_sleep.wait_for_rbac_before_share_operations](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/sleep) (resource)
 - [time_sleep.wait_for_rbac_before_table_operations](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/sleep) (resource)
-- [azurerm_client_config.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/client_config) (data source)
-- [azurerm_resource_group.rg](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/resource_group) (data source)
 
 <!-- markdownlint-disable MD013 -->
 ## Required Inputs
 
 The following input variables are required:
+
+### <a name="input_location"></a> [location](#input\_location)
+
+Description: Azure region where the resource should be deployed.  
+If null, the location will be inferred from the resource group location.
+
+Type: `string`
 
 ### <a name="input_name"></a> [name](#input\_name)
 
@@ -124,7 +131,7 @@ Description: (Required) Defines the type of replication to use for this storage 
 
 Type: `string`
 
-Default: `"RAGZRS"`
+Default: `"ZRS"`
 
 ### <a name="input_account_tier"></a> [account\_tier](#input\_account\_tier)
 
@@ -356,10 +363,12 @@ Type:
 
 ```hcl
 object({
-    key_vault_resource_id              = string
-    key_name                           = string
-    key_version                        = optional(string, null)
-    user_assigned_identity_resource_id = string
+    key_vault_resource_id = string
+    key_name              = string
+    key_version           = optional(string, null)
+    user_assigned_identity = optional(object({
+      resource_id = string
+    }), null)
   })
 ```
 
@@ -605,43 +614,6 @@ Type: `bool`
 
 Default: `null`
 
-### <a name="input_key_vault_access_policy"></a> [key\_vault\_access\_policy](#input\_key\_vault\_access\_policy)
-
-Description: Since storage account's customer managed key might require key vault permission, you can create the corresponding permission by setting this variable.
-
-- `key_permissions` - (Optional) A map of list of key permissions, key is user assigned identity id, the element in value list must be one or more from the following: `Backup`, `Create`, `Decrypt`, Delete, `Encrypt`, `Get`, `Import`, `List`, `Purge`, `Recover`, `Restore`, `Sign`, `UnwrapKey`, `Update`, `Verify`, `WrapKey`, `Release`, `Rotate`, `GetRotationPolicy` and `SetRotationPolicy`. Defaults to `["Get", "UnwrapKey", "WrapKey"]`
-- `identity_principle_id` - (Required) The principal ID of managed identity. Changing this forces a new resource to be created.
-- `identity_tenant_id` - (Required) The tenant ID of managed identity. Changing this forces a new resource to be created.
-
----
-`timeouts` block supports the following:
-- `create` - (Defaults to 30 minutes) Used when creating the Key Vault Access Policy.
-- `delete` - (Defaults to 30 minutes) Used when deleting the Key Vault Access Policy.
-- `read` - (Defaults to 5 minutes) Used when retrieving the Key Vault Access Policy.
-- `update` - (Defaults to 30 minutes) Used when updating the Key Vault Access Policy.
-
-Type:
-
-```hcl
-map(object({
-    key_permissions = optional(list(string), [
-      "Get",
-      "UnwrapKey",
-      "WrapKey"
-    ])
-    identity_principle_id = string
-    identity_tenant_id    = string
-    timeouts = optional(object({
-      create = optional(string)
-      delete = optional(string)
-      read   = optional(string)
-      update = optional(string)
-    }))
-  }))
-```
-
-Default: `{}`
-
 ### <a name="input_large_file_share_enabled"></a> [large\_file\_share\_enabled](#input\_large\_file\_share\_enabled)
 
 Description: (Optional) Is Large File Share Enabled?
@@ -716,15 +688,6 @@ map(object({
 
 Default: `{}`
 
-### <a name="input_location"></a> [location](#input\_location)
-
-Description: Azure region where the resource should be deployed.  
-If null, the location will be inferred from the resource group location.
-
-Type: `string`
-
-Default: `null`
-
 ### <a name="input_lock"></a> [lock](#input\_lock)
 
 Description: The lock level to apply. Default is `None`. Possible values are `None`, `CanNotDelete`, and `ReadOnly`.
@@ -734,11 +697,11 @@ Type:
 ```hcl
 object({
     name = optional(string, null)
-    kind = optional(string, "None")
+    kind = string
   })
 ```
 
-Default: `{}`
+Default: `null`
 
 ### <a name="input_managed_identities"></a> [managed\_identities](#input\_managed\_identities)
 
@@ -809,7 +772,7 @@ object({
   })
 ```
 
-Default: `null`
+Default: `{}`
 
 ### <a name="input_nfsv3_enabled"></a> [nfsv3\_enabled](#input\_nfsv3\_enabled)
 
@@ -853,21 +816,21 @@ map(object({
       condition                              = optional(string, null)
       condition_version                      = optional(string, null)
       delegated_managed_identity_resource_id = optional(string, null)
+      principal_type                         = optional(string, null)
     })), {})
     lock = optional(object({
+      kind = string
       name = optional(string, null)
-      kind = optional(string, null)
-    }), {})
-    tags                                    = optional(map(any), null)
+    }), null)
+    tags                                    = optional(map(string), null)
     subnet_resource_id                      = string
-    subresource_name                        = list(string)
+    subresource_name                        = string
     private_dns_zone_group_name             = optional(string, "default")
     private_dns_zone_resource_ids           = optional(set(string), [])
     application_security_group_associations = optional(map(string), {})
     private_service_connection_name         = optional(string, null)
     network_interface_name                  = optional(string, null)
     location                                = optional(string, null)
-    inherit_tags                            = optional(bool, false)
     resource_group_name                     = optional(string, null)
     ip_configurations = optional(map(object({
       name               = string
@@ -1051,6 +1014,7 @@ map(object({
     condition                              = optional(string, null)
     condition_version                      = optional(string, null)
     delegated_managed_identity_resource_id = optional(string, null)
+    principal_type                         = optional(string, null)
   }))
 ```
 
@@ -1332,7 +1296,7 @@ Description: Custom tags to apply to the resource.
 
 Type: `map(string)`
 
-Default: `{}`
+Default: `null`
 
 ### <a name="input_timeouts"></a> [timeouts](#input\_timeouts)
 
@@ -1450,10 +1414,6 @@ Description: Map of storage containers that are created.
 
 Description: Fqdns for storage services.
 
-### <a name="output_id"></a> [id](#output\_id)
-
-Description: The ID of the Storage Account.
-
 ### <a name="output_name"></a> [name](#output\_name)
 
 Description: The name of the storage account
@@ -1469,6 +1429,10 @@ Description: Map of storage queues that are created.
 ### <a name="output_resource"></a> [resource](#output\_resource)
 
 Description: This is the full resource output for the Storage Account resource.
+
+### <a name="output_resource_id"></a> [resource\_id](#output\_resource\_id)
+
+Description: The ID of the Storage Account.
 
 ### <a name="output_tables"></a> [tables](#output\_tables)
 
