@@ -232,14 +232,14 @@ module "this" {
       inherit_lock                    = false
       ip_configurations = {
         staticIpConfig = {
-          name               = "staticIpConfig"
-          member_name        = "blob"
+          name = "staticIpConfig"
+          # member_name        = "blob"
           private_ip_address = "192.168.0.7"
           subresource_name   = "blob"
         }
         staticIpConfig1 = {
-          name               = "staticIpConfig1"
-          member_name        = "queue"
+          name = "staticIpConfig1"
+          #member_name        = "queue"
           private_ip_address = "192.168.0.9"
           subresource_name   = "queue"
         }
