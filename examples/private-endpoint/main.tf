@@ -230,20 +230,6 @@ module "this" {
       private_service_connection_name = "psc-${endpoint}-${module.naming.storage_account.name_unique}"
       network_interface_name          = "nic-pe-${endpoint}-${module.naming.storage_account.name_unique}"
       inherit_lock                    = false
-      ip_configurations = {
-        staticIpConfig = {
-          name = "staticIpConfig"
-          # member_name        = "blob"
-          private_ip_address = "192.168.0.7"
-          subresource_name   = "blob"
-        }
-        staticIpConfig1 = {
-          name = "staticIpConfig1"
-          #member_name        = "queue"
-          private_ip_address = "192.168.0.9"
-          subresource_name   = "queue"
-        }
-      }
 
       tags = {
         env   = "Prod"

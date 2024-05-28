@@ -89,7 +89,13 @@ resource "azurerm_network_security_rule" "no_internet" {
 }
 
 locals {
-  endpoints = toset(["blob", "queue", "table", "file"])
+  #  endpoints = toset(["blob", "queue", "table", "file"])
+  endpoints = {
+    blob  = "192.168.0.7"
+    queue = "192.168.0.8"
+    table = "192.168.0.9"
+    file  = "192.168.0.10"
+  }
 }
 
 module "public_ip" {
@@ -219,7 +225,8 @@ module "this" {
   }
   #create a private endpoint for each endpoint type
   private_endpoints = {
-    for endpoint in local.endpoints :
+    #for endpoint in local.endpoints :
+    for endpoint, private_ip in local.endpoints :
     endpoint => {
       # the name must be set to avoid conflicting resources.
       name                          = "pe-${endpoint}-${module.naming.storage_account.name_unique}"
@@ -234,15 +241,9 @@ module "this" {
         staticIpConfig = {
           name = "staticIpConfig"
           # member_name        = "blob"
-          private_ip_address = "192.168.0.7"
-          subresource_name   = "blob"
+          private_ip_address = private_ip
         }
-        staticIpConfig1 = {
-          name = "staticIpConfig1"
-          #member_name        = "queue"
-          private_ip_address = "192.168.0.9"
-          subresource_name   = "queue"
-        }
+
       }
 
       tags = {
