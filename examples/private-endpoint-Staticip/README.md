@@ -232,7 +232,6 @@ module "this" {
   }
   #create a private endpoint for each endpoint type
   private_endpoints = {
-    #for endpoint in local.endpoints :
     for endpoint, private_ip in local.endpoints :
     endpoint => {
       # the name must be set to avoid conflicting resources.
