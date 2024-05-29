@@ -95,7 +95,13 @@ resource "azurerm_network_security_rule" "no_internet" {
 }
 
 locals {
-  endpoints = toset(["blob", "queue", "table", "file"])
+  # Provide static ip address for each endpoint. Make sure to use a unique IP address for each endpoint to avoide conflicts.
+  endpoints = {
+    blob  = "192.168.0.7"
+    queue = "192.168.0.8"
+    table = "192.168.0.9"
+    file  = "192.168.0.10"
+  }
 }
 
 module "public_ip" {
@@ -108,12 +114,13 @@ module "public_ip" {
 resource "azurerm_private_dns_zone" "this" {
   for_each = local.endpoints
 
-  name                = "privatelink.${each.value}.core.windows.net"
+  name                = "privatelink.${each.key}.core.windows.net"
   resource_group_name = azurerm_resource_group.this.name
   tags = {
     env = "Dev"
   }
 }
+
 
 resource "azurerm_private_dns_zone_virtual_network_link" "private_links" {
   for_each = azurerm_private_dns_zone.this
@@ -225,7 +232,8 @@ module "this" {
   }
   #create a private endpoint for each endpoint type
   private_endpoints = {
-    for endpoint in local.endpoints :
+    #for endpoint in local.endpoints :
+    for endpoint, private_ip in local.endpoints :
     endpoint => {
       # the name must be set to avoid conflicting resources.
       name                          = "pe-${endpoint}-${module.naming.storage_account.name_unique}"
@@ -236,6 +244,13 @@ module "this" {
       private_service_connection_name = "psc-${endpoint}-${module.naming.storage_account.name_unique}"
       network_interface_name          = "nic-pe-${endpoint}-${module.naming.storage_account.name_unique}"
       inherit_lock                    = false
+      ip_configurations = {
+        staticIpConfig = {
+          name               = "staticIpConfig"
+          private_ip_address = private_ip
+        }
+
+      }
 
       tags = {
         env   = "Prod"
