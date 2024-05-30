@@ -199,50 +199,50 @@ module "this" {
   #setting up diagnostic settings for storage account
   diagnostic_settings_storage_account = {
     storage = {
-      name                       = "diag"
+      name                  = "diag"
       workspace_resource_id = azurerm_log_analytics_workspace.this.id
-      log_categories             = ["audit", "alllogs"]
-      metric_categories          = ["Capacity", "Transaction"]
+      log_categories        = ["audit", "alllogs"]
+      metric_categories     = ["Capacity", "Transaction"]
     }
   }
 
   # setting up diagnostic settings for queue
   diagnostic_settings_queue = {
     queue = {
-      name                       = "diag"
+      name                  = "diag"
       workspace_resource_id = azurerm_log_analytics_workspace.this.id
-      log_categories             = ["audit", "alllogs"]
-      metric_categories          = ["Capacity", "Transaction"]
+      log_categories        = ["audit", "alllogs"]
+      metric_categories     = ["Capacity", "Transaction"]
     }
   }
 
   # setting up diagnostic settings for table
   diagnostic_settings_table = {
     table = {
-      name                       = "diag"
+      name                  = "diag"
       workspace_resource_id = azurerm_log_analytics_workspace.this.id
-      log_categories             = ["audit", "alllogs"]
-      metric_categories          = ["Capacity", "Transaction"]
+      log_categories        = ["audit", "alllogs"]
+      metric_categories     = ["Capacity", "Transaction"]
     }
   }
 
   # setting up diagnostic settings for file
   diagnostic_settings_file = {
     file1 = {
-      name                       = "diag"
+      name                  = "diag"
       workspace_resource_id = azurerm_log_analytics_workspace.this.id
-      log_categories             = ["audit", "alllogs"]
-      metric_categories          = ["Capacity", "Transaction"]
+      log_categories        = ["audit", "alllogs"]
+      metric_categories     = ["Capacity", "Transaction"]
     }
   }
 
   # setting up diagnostic settings for blob
   diagnostic_settings_blob = {
     blob11 = {
-      name                       = "diag"
+      name                  = "diag"
       workspace_resource_id = azurerm_log_analytics_workspace.this.id
-      log_categories             = ["audit", "alllogs"]
-      metric_categories          = ["Capacity", "Transaction"]
+      log_categories        = ["audit", "alllogs"]
+      metric_categories     = ["Capacity", "Transaction"]
     }
   }
 }
