@@ -2,13 +2,12 @@
 variable "diagnostic_settings_storage_account" {
   type = map(object({
     name                                     = optional(string, null)
-    log_categories                           = optional(set(string))
+    log_categories                           = optional(set(string), [])
     log_groups                               = optional(set(string), ["allLogs"])
-    metric_categories                        = optional(set(string))
+    metric_categories                        = optional(set(string), ["AllMetrics"])
     log_analytics_destination_type           = optional(string, "Dedicated")
     workspace_resource_id                    = optional(string, null)
     storage_account_resource_id              = optional(string, null)
-    log_analytics_workspace_id               = optional(string, null)
     event_hub_authorization_rule_resource_id = optional(string, null)
     event_hub_name                           = optional(string, null)
     marketplace_partner_resource_id          = optional(string, null)
@@ -20,8 +19,17 @@ variable "diagnostic_settings_storage_account" {
     condition     = alltrue([for _, v in var.diagnostic_settings_storage_account : contains(["Dedicated", "AzureDiagnostics"], v.log_analytics_destination_type)])
     error_message = "Log analytics destination type must be one of: 'Dedicated', 'AzureDiagnostics'."
   }
+  validation {
+    condition = alltrue(
+      [
+        for _, v in var.diagnostic_settings_storage_account :
+        v.workspace_resource_id != null || v.storage_account_resource_id != null || v.event_hub_authorization_rule_resource_id != null || v.marketplace_partner_resource_id != null
+      ]
+    )
+    error_message = "At least one of `workspace_resource_id`, `storage_account_resource_id`, `marketplace_partner_resource_id`, or `event_hub_authorization_rule_resource_id`, must be set."
+  }
   description = <<DESCRIPTION
-A map of diagnostic settings to create on the Storage Account. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
+A map of diagnostic settings to create on the Key Vault. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
 
 - `name` - (Optional) The name of the diagnostic setting. One will be generated if not set, however this will not be unique if you want to create multiple diagnostic setting resources.
 - `log_categories` - (Optional) A set of log categories to send to the log analytics workspace. Defaults to `[]`.
@@ -34,18 +42,17 @@ A map of diagnostic settings to create on the Storage Account. The map key is de
 - `event_hub_name` - (Optional) The name of the event hub. If none is specified, the default event hub will be selected.
 - `marketplace_partner_resource_id` - (Optional) The full ARM resource ID of the Marketplace resource to which you would like to send Diagnostic LogsLogs.
 DESCRIPTION
-}
+  }
 
 variable "diagnostic_settings_blob" {
   type = map(object({
     name                                     = optional(string, null)
-    log_categories                           = optional(set(string))
+    log_categories                           = optional(set(string), [])
     log_groups                               = optional(set(string), ["allLogs"])
-    metric_categories                        = optional(set(string))
+    metric_categories                        = optional(set(string), ["AllMetrics"])
     log_analytics_destination_type           = optional(string, "Dedicated")
     workspace_resource_id                    = optional(string, null)
     storage_account_resource_id              = optional(string, null)
-    log_analytics_workspace_id               = optional(string, null)
     event_hub_authorization_rule_resource_id = optional(string, null)
     event_hub_name                           = optional(string, null)
     marketplace_partner_resource_id          = optional(string, null)
@@ -57,8 +64,17 @@ variable "diagnostic_settings_blob" {
     condition     = alltrue([for _, v in var.diagnostic_settings_blob : contains(["Dedicated", "AzureDiagnostics"], v.log_analytics_destination_type)])
     error_message = "Log analytics destination type must be one of: 'Dedicated', 'AzureDiagnostics'."
   }
+  validation {
+    condition = alltrue(
+      [
+        for _, v in var.diagnostic_settings_blob :
+        v.workspace_resource_id != null || v.storage_account_resource_id != null || v.event_hub_authorization_rule_resource_id != null || v.marketplace_partner_resource_id != null
+      ]
+    )
+    error_message = "At least one of `workspace_resource_id`, `storage_account_resource_id`, `marketplace_partner_resource_id`, or `event_hub_authorization_rule_resource_id`, must be set."
+  }
   description = <<DESCRIPTION
-A map of diagnostic settings to create on the Blob Storage within storage account. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
+A map of diagnostic settings to create on the Key Vault. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
 
 - `name` - (Optional) The name of the diagnostic setting. One will be generated if not set, however this will not be unique if you want to create multiple diagnostic setting resources.
 - `log_categories` - (Optional) A set of log categories to send to the log analytics workspace. Defaults to `[]`.
@@ -76,12 +92,12 @@ DESCRIPTION
 variable "diagnostic_settings_queue" {
   type = map(object({
     name                                     = optional(string, null)
-    log_categories                           = optional(set(string))
-    metric_categories                        = optional(set(string))
+    log_categories                           = optional(set(string), [])
+    log_groups                               = optional(set(string), ["allLogs"])
+    metric_categories                        = optional(set(string), ["AllMetrics"])
     log_analytics_destination_type           = optional(string, "Dedicated")
     workspace_resource_id                    = optional(string, null)
     storage_account_resource_id              = optional(string, null)
-    log_analytics_workspace_id               = optional(string, null)
     event_hub_authorization_rule_resource_id = optional(string, null)
     event_hub_name                           = optional(string, null)
     marketplace_partner_resource_id          = optional(string, null)
@@ -93,8 +109,17 @@ variable "diagnostic_settings_queue" {
     condition     = alltrue([for _, v in var.diagnostic_settings_queue : contains(["Dedicated", "AzureDiagnostics"], v.log_analytics_destination_type)])
     error_message = "Log analytics destination type must be one of: 'Dedicated', 'AzureDiagnostics'."
   }
+  validation {
+    condition = alltrue(
+      [
+        for _, v in var.diagnostic_settings_queue :
+        v.workspace_resource_id != null || v.storage_account_resource_id != null || v.event_hub_authorization_rule_resource_id != null || v.marketplace_partner_resource_id != null
+      ]
+    )
+    error_message = "At least one of `workspace_resource_id`, `storage_account_resource_id`, `marketplace_partner_resource_id`, or `event_hub_authorization_rule_resource_id`, must be set."
+  }
   description = <<DESCRIPTION
-A map of diagnostic settings to create on the Queue Storage within storage account. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
+A map of diagnostic settings to create on the Key Vault. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
 
 - `name` - (Optional) The name of the diagnostic setting. One will be generated if not set, however this will not be unique if you want to create multiple diagnostic setting resources.
 - `log_categories` - (Optional) A set of log categories to send to the log analytics workspace. Defaults to `[]`.
@@ -112,12 +137,12 @@ DESCRIPTION
 variable "diagnostic_settings_table" {
   type = map(object({
     name                                     = optional(string, null)
-    log_categories                           = optional(set(string))
-    metric_categories                        = optional(set(string))
+    log_categories                           = optional(set(string), [])
+    log_groups                               = optional(set(string), ["allLogs"])
+    metric_categories                        = optional(set(string), ["AllMetrics"])
     log_analytics_destination_type           = optional(string, "Dedicated")
     workspace_resource_id                    = optional(string, null)
     storage_account_resource_id              = optional(string, null)
-    log_analytics_workspace_id               = optional(string, null)
     event_hub_authorization_rule_resource_id = optional(string, null)
     event_hub_name                           = optional(string, null)
     marketplace_partner_resource_id          = optional(string, null)
@@ -129,8 +154,17 @@ variable "diagnostic_settings_table" {
     condition     = alltrue([for _, v in var.diagnostic_settings_table : contains(["Dedicated", "AzureDiagnostics"], v.log_analytics_destination_type)])
     error_message = "Log analytics destination type must be one of: 'Dedicated', 'AzureDiagnostics'."
   }
+  validation {
+    condition = alltrue(
+      [
+        for _, v in var.diagnostic_settings_table :
+        v.workspace_resource_id != null || v.storage_account_resource_id != null || v.event_hub_authorization_rule_resource_id != null || v.marketplace_partner_resource_id != null
+      ]
+    )
+    error_message = "At least one of `workspace_resource_id`, `storage_account_resource_id`, `marketplace_partner_resource_id`, or `event_hub_authorization_rule_resource_id`, must be set."
+  }
   description = <<DESCRIPTION
-A map of diagnostic settings to create on the Table Storage within storage account. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
+A map of diagnostic settings to create on the Key Vault. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
 
 - `name` - (Optional) The name of the diagnostic setting. One will be generated if not set, however this will not be unique if you want to create multiple diagnostic setting resources.
 - `log_categories` - (Optional) A set of log categories to send to the log analytics workspace. Defaults to `[]`.
@@ -148,12 +182,12 @@ DESCRIPTION
 variable "diagnostic_settings_file" {
   type = map(object({
     name                                     = optional(string, null)
-    log_categories                           = optional(set(string))
-    metric_categories                        = optional(set(string))
+    log_categories                           = optional(set(string), [])
+    log_groups                               = optional(set(string), ["allLogs"])
+    metric_categories                        = optional(set(string), ["AllMetrics"])
     log_analytics_destination_type           = optional(string, "Dedicated")
     workspace_resource_id                    = optional(string, null)
     storage_account_resource_id              = optional(string, null)
-    log_analytics_workspace_id               = optional(string, null)
     event_hub_authorization_rule_resource_id = optional(string, null)
     event_hub_name                           = optional(string, null)
     marketplace_partner_resource_id          = optional(string, null)
@@ -165,8 +199,17 @@ variable "diagnostic_settings_file" {
     condition     = alltrue([for _, v in var.diagnostic_settings_file : contains(["Dedicated", "AzureDiagnostics"], v.log_analytics_destination_type)])
     error_message = "Log analytics destination type must be one of: 'Dedicated', 'AzureDiagnostics'."
   }
+  validation {
+    condition = alltrue(
+      [
+        for _, v in var.diagnostic_settings_file :
+        v.workspace_resource_id != null || v.storage_account_resource_id != null || v.event_hub_authorization_rule_resource_id != null || v.marketplace_partner_resource_id != null
+      ]
+    )
+    error_message = "At least one of `workspace_resource_id`, `storage_account_resource_id`, `marketplace_partner_resource_id`, or `event_hub_authorization_rule_resource_id`, must be set."
+  }
   description = <<DESCRIPTION
-A map of diagnostic settings to create on the Azure Files Storage within storage account. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
+A map of diagnostic settings to create on the Key Vault. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
 
 - `name` - (Optional) The name of the diagnostic setting. One will be generated if not set, however this will not be unique if you want to create multiple diagnostic setting resources.
 - `log_categories` - (Optional) A set of log categories to send to the log analytics workspace. Defaults to `[]`.
