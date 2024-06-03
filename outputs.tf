@@ -60,3 +60,15 @@ output "tables" {
     }
   }
 }
+
+output "shares" {
+  description = "Map of storage storage shares that are created."
+  value = {
+    for name, share in azurerm_storage_share.this : name => {
+      id                   = share.id
+      name                 = share.name
+      storage_account_name = share.storage_account_name
+      metadata             = share.metadata
+    }
+  }
+}
