@@ -50,17 +50,6 @@ output "resource_id" {
   value       = azurerm_storage_account.this.id
 }
 
-output "tables" {
-  description = "Map of storage tables that are created."
-  value = {
-    for name, table in azurerm_storage_table.this : name => {
-      id   = table.id
-      name = table.name
-      name = table.storage_account_name
-    }
-  }
-}
-
 output "shares" {
   description = "Map of storage storage shares that are created."
   value = {
@@ -69,6 +58,17 @@ output "shares" {
       name                 = share.name
       storage_account_name = share.storage_account_name
       metadata             = share.metadata
+    }
+  }
+}
+
+output "tables" {
+  description = "Map of storage tables that are created."
+  value = {
+    for name, table in azurerm_storage_table.this : name => {
+      id   = table.id
+      name = table.name
+      name = table.storage_account_name
     }
   }
 }

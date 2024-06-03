@@ -1432,6 +1432,10 @@ Description: This is the full resource output for the Storage Account resource.
 
 Description: The ID of the Storage Account.
 
+### <a name="output_shares"></a> [shares](#output\_shares)
+
+Description: Map of storage storage shares that are created.
+
 ### <a name="output_tables"></a> [tables](#output\_tables)
 
 Description: Map of storage tables that are created.
