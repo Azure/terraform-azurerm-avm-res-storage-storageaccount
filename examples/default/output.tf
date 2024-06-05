@@ -3,7 +3,7 @@ output "shares" {
   value       = module.this.shares
 }
 
-output "Queue" {
+output "queue" {
   description = "value of queues"
   value       = module.this.queues
 }

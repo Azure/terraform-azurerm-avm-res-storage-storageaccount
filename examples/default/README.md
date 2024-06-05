@@ -268,13 +268,13 @@ Default: `null`
 
 The following outputs are exported:
 
-### <a name="output_Queue"></a> [Queue](#output\_Queue)
-
-Description: value of queues
-
 ### <a name="output_containers"></a> [containers](#output\_containers)
 
 Description: value of containers
+
+### <a name="output_queue"></a> [queue](#output\_queue)
+
+Description: value of queues
 
 ### <a name="output_shares"></a> [shares](#output\_shares)
 
