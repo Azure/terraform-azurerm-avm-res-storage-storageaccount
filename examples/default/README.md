@@ -276,13 +276,13 @@ Description: value of containers
 
 Description: value of queues
 
+### <a name="output_resource"></a> [resource](#output\_resource)
+
+Description: value of storage\_account
+
 ### <a name="output_shares"></a> [shares](#output\_shares)
 
 Description: value of shares
-
-### <a name="output_storage_account"></a> [storage\_account](#output\_storage\_account)
-
-Description: value of storage\_account
 
 ### <a name="output_tables"></a> [tables](#output\_tables)
 
