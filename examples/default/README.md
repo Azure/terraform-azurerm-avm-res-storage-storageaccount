@@ -202,6 +202,31 @@ module "this" {
     }
   }
 }
+
+#Outputs for each sub resource type
+output "shares" {
+  description = "value of shares"
+  value       = module.this.shares
+}
+
+output "Queue" {
+  description = "value of queues"
+  value       = module.this.queues
+}
+output "tables" {
+  description = "value of tables"
+  value       = module.this.tables
+}
+output "containers" {
+  description = "value of containers"
+  value       = module.this.containers
+}
+
+output "storage_account" {
+  description = "value of storage_account"
+  value       = module.this.storage_account
+  sensitive   = true
+}
 ```
 
 <!-- markdownlint-disable MD033 -->
@@ -266,7 +291,27 @@ Default: `null`
 
 ## Outputs
 
-No outputs.
+The following outputs are exported:
+
+### <a name="output_Queue"></a> [Queue](#output\_Queue)
+
+Description: value of queues
+
+### <a name="output_containers"></a> [containers](#output\_containers)
+
+Description: value of containers
+
+### <a name="output_shares"></a> [shares](#output\_shares)
+
+Description: value of shares
+
+### <a name="output_storage_account"></a> [storage\_account](#output\_storage\_account)
+
+Description: value of storage\_account
+
+### <a name="output_tables"></a> [tables](#output\_tables)
+
+Description: value of tables
 
 ## Modules
 
