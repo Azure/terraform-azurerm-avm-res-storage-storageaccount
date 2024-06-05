@@ -40,12 +40,6 @@ output "queues" {
   }
 }
 
-output "storage_account" {
-  description = "This is the full resource output for the Storage Account resource."
-  sensitive   = true
-  value       = azurerm_storage_account.this
-}
-
 output "resource_id" {
   description = "The ID of the Storage Account."
   value       = azurerm_storage_account.this.id
@@ -61,6 +55,12 @@ output "shares" {
       metadata             = share.metadata
     }
   }
+}
+
+output "storage_account" {
+  description = "This is the full resource output for the Storage Account resource."
+  sensitive   = true
+  value       = azurerm_storage_account.this
 }
 
 output "tables" {

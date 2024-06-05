@@ -1424,10 +1424,6 @@ Description: A map of private endpoints. The map key is the supplied input to va
 
 Description: Map of storage queues that are created.
 
-### <a name="output_resource"></a> [resource](#output\_resource)
-
-Description: This is the full resource output for the Storage Account resource.
-
 ### <a name="output_resource_id"></a> [resource\_id](#output\_resource\_id)
 
 Description: The ID of the Storage Account.
@@ -1435,6 +1431,10 @@ Description: The ID of the Storage Account.
 ### <a name="output_shares"></a> [shares](#output\_shares)
 
 Description: Map of storage storage shares that are created.
+
+### <a name="output_storage_account"></a> [storage\_account](#output\_storage\_account)
+
+Description: This is the full resource output for the Storage Account resource.
 
 ### <a name="output_tables"></a> [tables](#output\_tables)
 
