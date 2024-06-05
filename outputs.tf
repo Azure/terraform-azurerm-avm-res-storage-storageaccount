@@ -42,6 +42,7 @@ output "queues" {
 
 output "resource" {
   description = "This is the full resource output for the Storage Account resource."
+  sensitive   = true
   value       = azurerm_storage_account.this
 }
 
