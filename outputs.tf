@@ -30,12 +30,12 @@ output "private_endpoints" {
 output "queues" {
   description = "Map of storage queues that are created."
   value = {
-    for name, queue in azurerm_storage_queue.this :
+    for name, queue in azapi_resource.queue :
     name => {
       id       = queue.id
       name     = queue.name
-      name     = queue.storage_account_name
-      metadata = queue.metadata
+      name     = azurerm_storage_account.this.name
+      metadata = jsondecode(queue.body).properties.metadata
     }
   }
 }

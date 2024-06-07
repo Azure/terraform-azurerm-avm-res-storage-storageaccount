@@ -30,7 +30,7 @@ resource "azurerm_storage_table" "this" {
   }
 
   # We need to create these storage service in serialize otherwise we might meet dns issue
-  depends_on = [azapi_resource.containers, azurerm_storage_queue.this, time_sleep.wait_for_rbac_before_table_operations]
+  depends_on = [azapi_resource.containers, azapi_resource.queue, time_sleep.wait_for_rbac_before_table_operations]
 }
 
 # Enable role assignments for tables

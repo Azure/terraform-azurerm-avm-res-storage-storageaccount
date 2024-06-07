@@ -1,9 +1,35 @@
-resource "azurerm_storage_queue" "this" {
-  for_each = var.queues
+# resource "azurerm_storage_queue" "this" {
+#   for_each = var.queues
 
-  name                 = each.value.name
-  storage_account_name = azurerm_storage_account.this.name
-  metadata             = each.value.metadata
+#   name                 = each.value.name
+#   storage_account_name = azurerm_storage_account.this.name
+#   metadata             = each.value.metadata
+
+#   dynamic "timeouts" {
+#     for_each = each.value.timeouts == null ? [] : [each.value.timeouts]
+#     content {
+#       create = timeouts.value.create
+#       delete = timeouts.value.delete
+#       read   = timeouts.value.read
+#       update = timeouts.value.update
+#     }
+#   }
+
+#   # We need to create these storage service in serialize otherwise we might meet dns issue
+#   depends_on = [azapi_resource.containers, time_sleep.wait_for_rbac_before_queue_operations, azurerm_storage_account.this]
+# }
+
+resource "azapi_resource" "queue" {
+  for_each = var.queues
+  type     = "Microsoft.Storage/storageAccounts/queueServices/queues@2023-01-01"
+  body = jsonencode({
+    properties = {
+      metadata = each.value.metadata
+    }
+  })
+  name                      = each.value.name
+  parent_id                 = "${azurerm_storage_account.this.id}/queueServices/default"
+  schema_validation_enabled = false
 
   dynamic "timeouts" {
     for_each = each.value.timeouts == null ? [] : [each.value.timeouts]
@@ -11,12 +37,9 @@ resource "azurerm_storage_queue" "this" {
       create = timeouts.value.create
       delete = timeouts.value.delete
       read   = timeouts.value.read
-      update = timeouts.value.update
     }
   }
 
-  # We need to create these storage service in serialize otherwise we might meet dns issue
-  depends_on = [azapi_resource.containers, time_sleep.wait_for_rbac_before_queue_operations, azurerm_storage_account.this]
 }
 
 # Enable role assignments for queues
@@ -24,7 +47,7 @@ resource "azurerm_role_assignment" "queues" {
   for_each = local.queues_role_assignments
 
   principal_id                           = each.value.role_assignment.principal_id
-  scope                                  = azurerm_storage_queue.this[each.value.queue_key].resource_manager_id
+  scope                                  = azapi_resource.queue[each.value.queue_key].resource_manager_id
   condition                              = each.value.role_assignment.condition
   condition_version                      = each.value.role_assignment.condition_version
   delegated_managed_identity_resource_id = each.value.role_assignment.delegated_managed_identity_resource_id
