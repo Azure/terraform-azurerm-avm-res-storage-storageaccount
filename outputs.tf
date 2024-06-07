@@ -32,10 +32,9 @@ output "queues" {
   value = {
     for name, queue in azapi_resource.queue :
     name => {
-      id       = queue.id
-      name     = queue.name
-      name     = azurerm_storage_account.this.name
-      metadata = jsondecode(queue.body).properties.metadata
+      id   = queue.id
+      name = queue.name
+      name = azurerm_storage_account.this.name
     }
   }
 }
@@ -54,11 +53,11 @@ output "resource_id" {
 output "shares" {
   description = "Map of storage storage shares that are created."
   value = {
-    for name, share in azurerm_storage_share.this : name => {
+    for name, share in azapi_resource.share : name => {
       id                   = share.id
       name                 = share.name
-      storage_account_name = share.storage_account_name
-      metadata             = share.metadata
+      storage_account_name = azurerm_storage_account.this.name
+      #metadata             = share.metadata
     }
   }
 }
@@ -66,10 +65,10 @@ output "shares" {
 output "tables" {
   description = "Map of storage tables that are created."
   value = {
-    for name, table in azurerm_storage_table.this : name => {
+    for name, table in azapi_resource.table : name => {
       id   = table.id
       name = table.name
-      name = table.storage_account_name
+      name = azurerm_storage_account.this.name
     }
   }
 }
