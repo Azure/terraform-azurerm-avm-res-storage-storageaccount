@@ -1,6 +1,7 @@
 resource "azapi_resource" "share" {
   for_each = var.shares
-  type     = "Microsoft.Storage/storageAccounts/fileServices/shares@2023-01-01"
+
+  type = "Microsoft.Storage/storageAccounts/fileServices/shares@2023-01-01"
   body = jsonencode({
     properties = {
       metadata         = each.value.metadata
@@ -24,7 +25,6 @@ resource "azapi_resource" "share" {
       read   = timeouts.value.read
     }
   }
-
 }
 
 # Enable role assignments for shares

@@ -1,6 +1,7 @@
 resource "azapi_resource" "table" {
   for_each = var.tables
-  type     = "Microsoft.Storage/storageAccounts/tableServices/tables@2021-08-01"
+
+  type = "Microsoft.Storage/storageAccounts/tableServices/tables@2021-08-01"
   body = jsonencode({
     properties = {
       #metadata = each.value.metadata
@@ -18,7 +19,6 @@ resource "azapi_resource" "table" {
       read   = timeouts.value.read
     }
   }
-
 }
 
 # Enable role assignments for tables

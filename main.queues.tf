@@ -1,6 +1,7 @@
 resource "azapi_resource" "queue" {
   for_each = var.queues
-  type     = "Microsoft.Storage/storageAccounts/queueServices/queues@2023-01-01"
+
+  type = "Microsoft.Storage/storageAccounts/queueServices/queues@2023-01-01"
   body = jsonencode({
     properties = {
       # metadata = each.value.metadata
@@ -18,7 +19,6 @@ resource "azapi_resource" "queue" {
       read   = timeouts.value.read
     }
   }
-
 }
 
 # Enable role assignments for queues
