@@ -1,24 +1,3 @@
-# resource "azurerm_storage_queue" "this" {
-#   for_each = var.queues
-
-#   name                 = each.value.name
-#   storage_account_name = azurerm_storage_account.this.name
-#   metadata             = each.value.metadata
-
-#   dynamic "timeouts" {
-#     for_each = each.value.timeouts == null ? [] : [each.value.timeouts]
-#     content {
-#       create = timeouts.value.create
-#       delete = timeouts.value.delete
-#       read   = timeouts.value.read
-#       update = timeouts.value.update
-#     }
-#   }
-
-#   # We need to create these storage service in serialize otherwise we might meet dns issue
-#   depends_on = [azapi_resource.containers, time_sleep.wait_for_rbac_before_queue_operations, azurerm_storage_account.this]
-# }
-
 resource "azapi_resource" "queue" {
   for_each = var.queues
   type     = "Microsoft.Storage/storageAccounts/queueServices/queues@2023-01-01"
