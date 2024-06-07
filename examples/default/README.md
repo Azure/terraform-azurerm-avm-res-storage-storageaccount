@@ -266,7 +266,27 @@ Default: `null`
 
 ## Outputs
 
-No outputs.
+The following outputs are exported:
+
+### <a name="output_containers"></a> [containers](#output\_containers)
+
+Description: value of containers
+
+### <a name="output_queue"></a> [queue](#output\_queue)
+
+Description: value of queues
+
+### <a name="output_resource"></a> [resource](#output\_resource)
+
+Description: value of storage\_account
+
+### <a name="output_shares"></a> [shares](#output\_shares)
+
+Description: value of shares
+
+### <a name="output_tables"></a> [tables](#output\_tables)
+
+Description: value of tables
 
 ## Modules
 
