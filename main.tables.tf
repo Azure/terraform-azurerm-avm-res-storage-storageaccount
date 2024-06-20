@@ -2,11 +2,11 @@ resource "azapi_resource" "table" {
   for_each = var.tables
 
   type = "Microsoft.Storage/storageAccounts/tableServices/tables@2021-08-01"
-  body = jsonencode({
+  body = {
     properties = {
       #metadata = each.value.metadata
     }
-  })
+  }
   name                      = each.value.name
   parent_id                 = "${azurerm_storage_account.this.id}/tableServices/default"
   schema_validation_enabled = false

@@ -2,17 +2,18 @@ resource "azapi_resource" "share" {
   for_each = var.shares
 
   type = "Microsoft.Storage/storageAccounts/fileServices/shares@2023-01-01"
-  body = jsonencode({
+  body = {
     properties = {
       metadata         = each.value.metadata
       access_tier      = each.value.access_tier
       enabledProtocols = each.value.enabled_protocol
       shareQuota       = each.value.quota
+
       #accesspolicy     = each.value.access_policy
 
 
     }
-  })
+  }
   name                      = each.value.name
   parent_id                 = "${azurerm_storage_account.this.id}/fileServices/default"
   schema_validation_enabled = false
