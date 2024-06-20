@@ -51,9 +51,9 @@
 #   ]
 # }
 
-module "container" {
-  source   = "./modules/container"
-  for_each = var.containers
+# module "container" {
+#   source   = "./modules/container"
+#   for_each = var.containers
 
-  name
-}
+#   name
+# }

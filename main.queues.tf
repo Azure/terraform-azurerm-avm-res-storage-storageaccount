@@ -1,5 +1,7 @@
-module "queue" {
-  source   = "./modules/queue"
+module "storage_queue" {
+  source   = "./modules/storage_queue"
   for_each = var.queues
-  name     = each.value.name
+
+
+
 }
