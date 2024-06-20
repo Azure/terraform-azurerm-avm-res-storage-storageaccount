@@ -5,7 +5,7 @@ resource "azurerm_monitor_diagnostic_setting" "storage_account" {
 
   name                       = each.value.name
   target_resource_id         = azurerm_storage_account.this.id
-  log_analytics_workspace_id = each.value.log_analytics_workspace_id
+  log_analytics_workspace_id = each.value.workspace_resource_id
 
   dynamic "metric" {
     for_each = each.value.metric_categories
@@ -20,7 +20,7 @@ resource "azurerm_monitor_diagnostic_setting" "blob" {
 
   name                       = each.value.name
   target_resource_id         = "${azurerm_storage_account.this.id}/blobServices/default/"
-  log_analytics_workspace_id = each.value.log_analytics_workspace_id
+  log_analytics_workspace_id = each.value.workspace_resource_id
 
   dynamic "enabled_log" {
     for_each = each.value.log_categories
@@ -42,7 +42,7 @@ resource "azurerm_monitor_diagnostic_setting" "queue" {
 
   name                       = each.value.name
   target_resource_id         = "${azurerm_storage_account.this.id}/queueServices/default/"
-  log_analytics_workspace_id = each.value.log_analytics_workspace_id
+  log_analytics_workspace_id = each.value.workspace_resource_id
 
   dynamic "enabled_log" {
     for_each = each.value.log_categories
@@ -63,7 +63,7 @@ resource "azurerm_monitor_diagnostic_setting" "table" {
 
   name                       = each.value.name
   target_resource_id         = "${azurerm_storage_account.this.id}/tableServices/default/"
-  log_analytics_workspace_id = each.value.log_analytics_workspace_id
+  log_analytics_workspace_id = each.value.workspace_resource_id
 
   dynamic "enabled_log" {
     for_each = each.value.log_categories
@@ -84,7 +84,7 @@ resource "azurerm_monitor_diagnostic_setting" "azure_file" {
 
   name                       = each.value.name
   target_resource_id         = "${azurerm_storage_account.this.id}/fileServices/default/"
-  log_analytics_workspace_id = each.value.log_analytics_workspace_id
+  log_analytics_workspace_id = each.value.workspace_resource_id
 
   dynamic "enabled_log" {
     for_each = each.value.log_categories

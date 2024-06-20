@@ -24,7 +24,7 @@ variable "account_replication_type" {
   type        = string
   description = "(Required) Defines the type of replication to use for this storage account. Valid options are `LRS`, `GRS`, `RAGRS`, `ZRS`, `GZRS` and `RAGZRS`.  Defaults to `ZRS`"
   nullable    = false
-  default     = "RAGZRS"
+  default     = "ZRS"
 
   validation {
     condition     = contains(["LRS", "GRS", "RAGRS", "ZRS", "GZRS", "RAGZRS"], var.account_replication_type)
@@ -184,7 +184,7 @@ variable "network_rules" {
       update = optional(string)
     }))
   })
-  default = null
+  default = {}
 
   description = <<-EOT
  > Note the default value for this variable will block all public access to the storage account. If you want to disable all network rules, set this value to `null`.
@@ -285,38 +285,4 @@ variable "timeouts" {
  - `read` - (Defaults to 5 minutes) Used when retrieving the Storage Account.
  - `update` - (Defaults to 60 minutes) Used when updating the Storage Account.
 EOT
-}
-
-variable "key_vault_access_policy" {
-  type = map(object({
-    key_permissions = optional(list(string), [
-      "Get",
-      "UnwrapKey",
-      "WrapKey"
-    ])
-    identity_principle_id = string
-    identity_tenant_id    = string
-    timeouts = optional(object({
-      create = optional(string)
-      delete = optional(string)
-      read   = optional(string)
-      update = optional(string)
-    }))
-  }))
-  default     = {}
-  description = <<-EOT
- Since storage account's customer managed key might require key vault permission, you can create the corresponding permission by setting this variable.
-
- - `key_permissions` - (Optional) A map of list of key permissions, key is user assigned identity id, the element in value list must be one or more from the following: `Backup`, `Create`, `Decrypt`, Delete, `Encrypt`, `Get`, `Import`, `List`, `Purge`, `Recover`, `Restore`, `Sign`, `UnwrapKey`, `Update`, `Verify`, `WrapKey`, `Release`, `Rotate`, `GetRotationPolicy` and `SetRotationPolicy`. Defaults to `["Get", "UnwrapKey", "WrapKey"]`
- - `identity_principle_id` - (Required) The principal ID of managed identity. Changing this forces a new resource to be created.
- - `identity_tenant_id` - (Required) The tenant ID of managed identity. Changing this forces a new resource to be created.
-
- ---
- `timeouts` block supports the following:
- - `create` - (Defaults to 30 minutes) Used when creating the Key Vault Access Policy.
- - `delete` - (Defaults to 30 minutes) Used when deleting the Key Vault Access Policy.
- - `read` - (Defaults to 5 minutes) Used when retrieving the Key Vault Access Policy.
- - `update` - (Defaults to 30 minutes) Used when updating the Key Vault Access Policy.
-EOT
-  nullable    = false
 }

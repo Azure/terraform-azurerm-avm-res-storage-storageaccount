@@ -12,7 +12,6 @@ terraform {
     }
   }
 }
-
 provider "azurerm" {
   features {
     resource_group {
@@ -22,10 +21,10 @@ provider "azurerm" {
   skip_provider_registration = true
   storage_use_azuread        = true
 }
+
 locals {
   test_regions = ["eastus", "eastus2", "westus2", "westus3"]
 }
-
 # This allows us to randomize the region for the resource group.
 resource "random_integer" "region_index" {
   max = length(local.test_regions) - 1
@@ -37,7 +36,7 @@ resource "random_string" "this" {
   special = false
   upper   = false
 }
-# This ensures we have unique CAF compliant names for resources.
+# This ensures we have unique CAF compliant names for our resources.
 module "naming" {
   source  = "Azure/naming/azurerm"
   version = "0.4.0"
@@ -89,13 +88,43 @@ resource "azurerm_network_security_rule" "no_internet" {
   source_port_range           = "*"
 }
 
+locals {
+  # Provide static ip address for each endpoint. Make sure to use a unique IP address for each endpoint to avoide conflicts.
+  endpoints = {
+    blob  = "192.168.0.7"
+    queue = "192.168.0.8"
+    table = "192.168.0.9"
+    file  = "192.168.0.10"
+  }
+}
+
 module "public_ip" {
   count = var.bypass_ip_cidr == null ? 1 : 0
 
   source  = "lonegunmanb/public-ip/lonegunmanb"
   version = "0.1.0"
 }
-# We need this to get the object_id of the current user
+
+resource "azurerm_private_dns_zone" "this" {
+  for_each = local.endpoints
+
+  name                = "privatelink.${each.key}.core.windows.net"
+  resource_group_name = azurerm_resource_group.this.name
+  tags = {
+    env = "Dev"
+  }
+}
+
+
+resource "azurerm_private_dns_zone_virtual_network_link" "private_links" {
+  for_each = azurerm_private_dns_zone.this
+
+  name                  = "${each.key}_${azurerm_virtual_network.vnet.name}-link"
+  private_dns_zone_name = azurerm_private_dns_zone.this[each.key].name
+  resource_group_name   = azurerm_resource_group.this.name
+  virtual_network_id    = azurerm_virtual_network.vnet.id
+}
+
 data "azurerm_client_config" "current" {}
 
 resource "azurerm_user_assigned_identity" "example_identity" {
@@ -103,10 +132,12 @@ resource "azurerm_user_assigned_identity" "example_identity" {
   name                = module.naming.user_assigned_identity.name_unique
   resource_group_name = azurerm_resource_group.this.name
 }
-# We use the role definition data source to get the id of the Contributor role
+
 data "azurerm_role_definition" "example" {
   name = "Contributor"
 }
+
+#create azure storage account
 module "this" {
 
   source = "../.."
@@ -131,8 +162,6 @@ module "this" {
     owner = "John Doe"
     dept  = "IT"
   }
-
-  #Locks for storage account (Disabled by default)
   /*lock = {
     name = "lock"
     kind = "None"
@@ -195,62 +224,43 @@ module "this" {
       quota = 10
     }
   }
+  #create a private endpoint for each endpoint type
+  private_endpoints = {
+    for endpoint, private_ip in local.endpoints :
+    endpoint => {
+      # the name must be set to avoid conflicting resources.
+      name                          = "pe-${endpoint}-${module.naming.storage_account.name_unique}"
+      subnet_resource_id            = azurerm_subnet.private.id
+      subresource_name              = endpoint
+      private_dns_zone_resource_ids = [azurerm_private_dns_zone.this[endpoint].id]
+      # these are optional but illustrate making well-aligned service connection & NIC names.
+      private_service_connection_name = "psc-${endpoint}-${module.naming.storage_account.name_unique}"
+      network_interface_name          = "nic-pe-${endpoint}-${module.naming.storage_account.name_unique}"
+      inherit_lock                    = false
+      ip_configurations = {
+        staticIpConfig = {
+          name               = "staticIpConfig"
+          private_ip_address = private_ip
+        }
 
-  #setting up diagnostic settings for storage account
-  diagnostic_settings_storage_account = {
-    storage = {
-      name                  = "diag"
-      workspace_resource_id = azurerm_log_analytics_workspace.this.id
-      log_categories        = ["audit", "alllogs"]
-      metric_categories     = ["Capacity", "Transaction"]
+      }
+
+      tags = {
+        env   = "Prod"
+        owner = "Matt "
+        dept  = "IT"
+      }
+
+      role_assignments = {
+        role_assignment_1 = {
+          role_definition_id_or_name = data.azurerm_role_definition.example.name
+          principal_id               = coalesce(var.msi_id, data.azurerm_client_config.current.object_id)
+        }
+      }
     }
+
+
   }
 
-  # setting up diagnostic settings for queue
-  diagnostic_settings_queue = {
-    queue = {
-      name                  = "diag"
-      workspace_resource_id = azurerm_log_analytics_workspace.this.id
-      log_categories        = ["audit", "alllogs"]
-      metric_categories     = ["Capacity", "Transaction"]
-    }
-  }
-
-  # setting up diagnostic settings for table
-  diagnostic_settings_table = {
-    table = {
-      name                  = "diag"
-      workspace_resource_id = azurerm_log_analytics_workspace.this.id
-      log_categories        = ["audit", "alllogs"]
-      metric_categories     = ["Capacity", "Transaction"]
-    }
-  }
-
-  # setting up diagnostic settings for file
-  diagnostic_settings_file = {
-    file1 = {
-      name                  = "diag"
-      workspace_resource_id = azurerm_log_analytics_workspace.this.id
-      log_categories        = ["audit", "alllogs"]
-      metric_categories     = ["Capacity", "Transaction"]
-    }
-  }
-
-  # setting up diagnostic settings for blob
-  diagnostic_settings_blob = {
-    blob11 = {
-      name                  = "diag"
-      workspace_resource_id = azurerm_log_analytics_workspace.this.id
-      log_categories        = ["audit", "alllogs"]
-      metric_categories     = ["Capacity", "Transaction"]
-    }
-  }
 }
 
-#Log Analytics Workspace for diagnostic settings
-resource "azurerm_log_analytics_workspace" "this" {
-  location            = azurerm_resource_group.this.location
-  name                = module.naming.log_analytics_workspace.name_unique
-  resource_group_name = azurerm_resource_group.this.name
-  sku                 = "PerGB2018"
-}

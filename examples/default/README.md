@@ -145,8 +145,8 @@ module "this" {
   } */
   role_assignments = {
     role_assignment_1 = {
-      role_definition_id_or_name       = data.azurerm_role_definition.example.id
-      principal_id                     = data.azurerm_client_config.current.object_id
+      role_definition_id_or_name       = data.azurerm_role_definition.example.name
+      principal_id                     = coalesce(var.msi_id, data.azurerm_client_config.current.object_id)
       skip_service_principal_aad_check = false
     },
     role_assignment_2 = {
@@ -256,9 +256,37 @@ Type: `string`
 
 Default: `null`
 
+### <a name="input_msi_id"></a> [msi\_id](#input\_msi\_id)
+
+Description: If you're running this example by authentication with identity, please set identity object id here.
+
+Type: `string`
+
+Default: `null`
+
 ## Outputs
 
-No outputs.
+The following outputs are exported:
+
+### <a name="output_containers"></a> [containers](#output\_containers)
+
+Description: value of containers
+
+### <a name="output_queue"></a> [queue](#output\_queue)
+
+Description: value of queues
+
+### <a name="output_resource"></a> [resource](#output\_resource)
+
+Description: value of storage\_account
+
+### <a name="output_shares"></a> [shares](#output\_shares)
+
+Description: value of shares
+
+### <a name="output_tables"></a> [tables](#output\_tables)
+
+Description: value of tables
 
 ## Modules
 

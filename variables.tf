@@ -1,3 +1,12 @@
+variable "location" {
+  type        = string
+  description = <<DESCRIPTION
+Azure region where the resource should be deployed.
+If null, the location will be inferred from the resource group location.
+DESCRIPTION
+  nullable    = false
+}
+
 variable "name" {
   type        = string
   description = "The name of the resource."
@@ -16,10 +25,12 @@ variable "resource_group_name" {
 
 variable "customer_managed_key" {
   type = object({
-    key_vault_resource_id              = string
-    key_name                           = string
-    key_version                        = optional(string, null)
-    user_assigned_identity_resource_id = string
+    key_vault_resource_id = string
+    key_name              = string
+    key_version           = optional(string, null)
+    user_assigned_identity = optional(object({
+      resource_id = string
+    }), null)
   })
   default     = null
   description = <<DESCRIPTION
@@ -52,27 +63,17 @@ If it is set to false, then no telemetry will be collected.
 DESCRIPTION
 }
 
-variable "location" {
-  type        = string
-  default     = null
-  description = <<DESCRIPTION
-Azure region where the resource should be deployed.
-If null, the location will be inferred from the resource group location.
-DESCRIPTION
-}
-
 variable "lock" {
   type = object({
     name = optional(string, null)
-    kind = optional(string, "None")
+    kind = string
   })
-  default     = {}
+  default     = null
   description = "The lock level to apply. Default is `None`. Possible values are `None`, `CanNotDelete`, and `ReadOnly`."
-  nullable    = false
 
   validation {
-    condition     = contains(["CanNotDelete", "ReadOnly", "None"], var.lock.kind)
-    error_message = "The lock level must be one of: 'None', 'CanNotDelete', or 'ReadOnly'."
+    condition     = var.lock != null ? contains(["CanNotDelete", "ReadOnly"], var.lock.kind) : true
+    error_message = "Lock kind must be either `\"CanNotDelete\"` or `\"ReadOnly\"`."
   }
 }
 
@@ -102,21 +103,20 @@ variable "private_endpoints" {
       condition                              = optional(string, null)
       condition_version                      = optional(string, null)
       delegated_managed_identity_resource_id = optional(string, null)
+      principal_type                         = optional(string, null)
     })), {})
     lock = optional(object({
+      kind = string
       name = optional(string, null)
-      kind = optional(string, null)
-    }), {})
-    tags                                    = optional(map(any), null)
+    }), null)
+    tags                                    = optional(map(string), null)
     subnet_resource_id                      = string
-    subresource_names                       = list(string)
     private_dns_zone_group_name             = optional(string, "default")
     private_dns_zone_resource_ids           = optional(set(string), [])
     application_security_group_associations = optional(map(string), {})
     private_service_connection_name         = optional(string, null)
     network_interface_name                  = optional(string, null)
     location                                = optional(string, null)
-    inherit_tags                            = optional(bool, false)
     resource_group_name                     = optional(string, null)
     ip_configurations = optional(map(object({
       name               = string
@@ -146,6 +146,7 @@ A map of private endpoints to create on the resource. The map key is deliberatel
   - `private_ip_address` - The private IP address of the IP configuration.
   - `subresource_name` -  The subresource this IP address applies to.
 DESCRIPTION
+  nullable    = false
 }
 
 variable "role_assignments" {
@@ -157,6 +158,7 @@ variable "role_assignments" {
     condition                              = optional(string, null)
     condition_version                      = optional(string, null)
     delegated_managed_identity_resource_id = optional(string, null)
+    principal_type                         = optional(string, null)
   }))
   default     = {}
   description = <<DESCRIPTION
@@ -171,11 +173,12 @@ A map of role assignments to create on the resource. The map key is deliberately
 
 > Note: only set `skip_service_principal_aad_check` to true if you are assigning a role to a service principal.
 DESCRIPTION
+  nullable    = false
 }
 
 variable "tags" {
   type        = map(string)
-  default     = {}
+  default     = null
   description = "Custom tags to apply to the resource."
 }
 
