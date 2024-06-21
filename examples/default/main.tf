@@ -198,7 +198,7 @@ module "this" {
       signedIdentifiers = [
         {
           id = "1"
-          aaccessPolicy = {
+          accessPolicy = {
             expiryTime = "2025-01-01T00:00:00Z"
             permission = "r"
             startTime  = "2024-01-01T00:00:00Z"
