@@ -3,7 +3,7 @@ variable "tables" {
     name = string
     signedIdentifiers = optional(list(object({
       id = string
-      access_policy = optional(list(object({
+      accesspolicy = optional(list(object({
         expiry     = string
         permission = string
         start      = string
