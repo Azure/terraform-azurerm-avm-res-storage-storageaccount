@@ -4,7 +4,9 @@ resource "azapi_resource" "table" {
   type = "Microsoft.Storage/storageAccounts/tableServices/tables@2021-08-01"
   body = {
     properties = {
-      #metadata = each.value.metadata
+      signedIdentifiers = {
+        access_policy = each.value.signedIdentifiers
+      }
     }
   }
   name                      = each.value.name
@@ -36,16 +38,3 @@ resource "azurerm_role_assignment" "tables" {
   skip_service_principal_aad_check       = each.value.role_assignment.skip_service_principal_aad_check
 }
 
-resource "time_sleep" "wait_for_rbac_before_table_operations" {
-  count = length(var.role_assignments) > 0 && length(var.tables) > 0 ? 1 : 0
-
-  create_duration  = var.wait_for_rbac_before_table_operations.create
-  destroy_duration = var.wait_for_rbac_before_table_operations.destroy
-  triggers = {
-    role_assignments = jsonencode(var.role_assignments)
-  }
-
-  depends_on = [
-    azurerm_role_assignment.storage_account
-  ]
-}

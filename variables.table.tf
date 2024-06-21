@@ -1,7 +1,7 @@
 variable "tables" {
   type = map(object({
     name = string
-    acl = optional(set(object({
+    signedIdentifiers = optional(list(object({
       id = string
       access_policy = optional(list(object({
         expiry      = string
