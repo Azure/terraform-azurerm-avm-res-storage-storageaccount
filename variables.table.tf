@@ -3,11 +3,11 @@ variable "tables" {
     name = string
     signedIdentifiers = optional(list(object({
       id = string
-      accesspolicy = optional(list(object({
+      accessPolicy = optional(object({
         expiry     = string
         permission = string
         start      = string
-      })))
+      }))
     })))
 
     role_assignments = optional(map(object({
