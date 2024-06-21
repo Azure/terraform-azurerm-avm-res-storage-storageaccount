@@ -5,9 +5,9 @@ resource "azapi_resource" "containers" {
   type = "Microsoft.Storage/storageAccounts/blobServices/containers@2023-01-01"
   body = {
     properties = {
-      metadata                       = each.value.metadata
+      metadata                       = each.value.metadata == null ? {} : each.value.metadata
       publicAccess                   = each.value.public_access
-      immutableStorageWithVersioning = each.value.immutableStorageWithVersioning == null ? {} : each.value.immutableStorageWithVersioning
+      immutableStorageWithVersioning = each.value.immutableStorageWithVersioning == "" ? {} : each.value.immutableStorageWithVersioning
     }
   }
   name                      = each.value.name
