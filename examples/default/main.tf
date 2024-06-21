@@ -174,6 +174,11 @@ module "this" {
     }
     queue1 = {
       name = "queue-${random_string.this.result}-1"
+
+      metadata = {
+        key1 = "value1"
+        key2 = "value2"
+      }
     }
   }
   tables = {
