@@ -9,7 +9,7 @@ resource "azapi_resource" "table" {
   }
   name                      = each.value.name
   parent_id                 = "${azurerm_storage_account.this.id}/tableServices/default"
-  schema_validation_enabled = false
+  schema_validation_enabled = true
 
   dynamic "timeouts" {
     for_each = each.value.timeouts == null ? [] : [each.value.timeouts]
