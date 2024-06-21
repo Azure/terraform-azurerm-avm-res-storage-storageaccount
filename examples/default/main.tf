@@ -171,6 +171,7 @@ module "this" {
   queues = {
     queue0 = {
       name = "queue-${random_string.this.result}-0"
+
     }
     queue1 = {
       name = "queue-${random_string.this.result}-1"

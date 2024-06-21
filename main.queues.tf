@@ -4,7 +4,7 @@ resource "azapi_resource" "queue" {
   type = "Microsoft.Storage/storageAccounts/queueServices/queues@2023-01-01"
   body = {
     properties = {
-      metadata = each.value.metadata
+      metadata = each.value.metadata == null ? {} : each.value.metadata
     }
   }
   name                      = each.value.name
