@@ -137,6 +137,9 @@ module "this" {
     owner = "John Doe"
     dept  = "IT"
   }
+  blob_properties = {
+    versioning_enabled = true
+  }
 
   #Locks for storage account (Disabled by default)
   /*lock = {
@@ -171,23 +174,53 @@ module "this" {
     blob_container1 = {
       name                  = "blob-container-${random_string.this.result}-1"
       container_access_type = "private"
+      immutableStorageWithVersioning = {
+        enabled = true
+      }
     }
 
   }
   queues = {
     queue0 = {
       name = "queue-${random_string.this.result}-0"
+
     }
     queue1 = {
       name = "queue-${random_string.this.result}-1"
+
+      metadata = {
+        key1 = "value1"
+        key2 = "value2"
+      }
     }
   }
   tables = {
     table0 = {
       name = "table${random_string.this.result}0"
+      signedIdentifiers = [
+        {
+          id = "1"
+          accessPolicy = {
+            expiryTime = "2025-01-01T00:00:00Z"
+            permission = "r"
+            startTime  = "2024-01-01T00:00:00Z"
+          }
+        }
+      ]
     }
     table1 = {
       name = "table${random_string.this.result}1"
+
+      signedIdentifiers = [
+        {
+          id = "1"
+          accessPolicy = {
+            expiryTime = "2025-01-01T00:00:00Z"
+            permission = "r"
+            startTime  = "2024-01-01T00:00:00Z"
+          }
+        }
+      ]
     }
   }
 
@@ -195,10 +228,25 @@ module "this" {
     share0 = {
       name  = "share-${random_string.this.result}-0"
       quota = 10
+      signedIdentifiers = [
+        {
+          id = "1"
+          accessPolicy = {
+            expiryTime = "2025-01-01T00:00:00Z"
+            permission = "r"
+            startTime  = "2024-01-01T00:00:00Z"
+          }
+        }
+      ]
     }
     share1 = {
-      name  = "share-${random_string.this.result}-1"
-      quota = 10
+      name        = "share-${random_string.this.result}-1"
+      quota       = 10
+      access_tier = "Hot"
+      metadata = {
+        key1 = "value1"
+        key2 = "value2"
+      }
     }
   }
 }
@@ -275,10 +323,6 @@ Description: value of containers
 ### <a name="output_queue"></a> [queue](#output\_queue)
 
 Description: value of queues
-
-### <a name="output_resource"></a> [resource](#output\_resource)
-
-Description: value of storage\_account
 
 ### <a name="output_shares"></a> [shares](#output\_shares)
 

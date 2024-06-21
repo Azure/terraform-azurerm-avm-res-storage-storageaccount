@@ -79,7 +79,6 @@ The following resources are used by this module:
 - [time_sleep.wait_for_rbac_before_container_operations](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/sleep) (resource)
 - [time_sleep.wait_for_rbac_before_queue_operations](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/sleep) (resource)
 - [time_sleep.wait_for_rbac_before_share_operations](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/sleep) (resource)
-- [time_sleep.wait_for_rbac_before_table_operations](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/sleep) (resource)
 
 <!-- markdownlint-disable MD013 -->
 ## Required Inputs
@@ -290,9 +289,16 @@ Type:
 
 ```hcl
 map(object({
-    public_access = optional(string, "None")
-    metadata      = optional(map(string))
-    name          = string
+    public_access               = optional(string, "None")
+    metadata                    = optional(map(string))
+    name                        = string
+    defaultEncryptionScope      = optional(string)
+    denyEncryptionScopeOverride = optional(bool)
+    enableNfsV3AllSquash        = optional(bool)
+    enableNfsV3RootSquash       = optional(bool)
+    immutableStorageWithVersioning = optional(object({
+      enabled = bool
+    }))
 
     role_assignments = optional(map(object({
       role_definition_id_or_name             = string
@@ -1178,14 +1184,23 @@ map(object({
     metadata         = optional(map(string))
     name             = string
     quota            = number
-    acl = optional(set(object({
+    rootSquash       = optional(string)
+    signedIdentifiers = optional(list(object({
       id = string
-      access_policy = optional(list(object({
-        expiry      = optional(string)
-        permissions = string
-        start       = optional(string)
-      })))
+      accessPolicy = optional(object({
+        expiryTime = string
+        permission = string
+        startTime  = string
+      }))
     })))
+    # acl = optional(set(object({
+    #   id = string
+    #   access_policy = optional(list(object({
+    #     expiry      = optional(string)
+    #     permissions = string
+    #     start       = optional(string)
+    #   })))
+    # })))
     role_assignments = optional(map(object({
       role_definition_id_or_name             = string
       principal_id                           = string
@@ -1258,13 +1273,13 @@ Type:
 ```hcl
 map(object({
     name = string
-    acl = optional(set(object({
+    signedIdentifiers = optional(list(object({
       id = string
-      access_policy = optional(list(object({
-        expiry      = string
-        permissions = string
-        start       = string
-      })))
+      accessPolicy = optional(object({
+        expiryTime = string
+        permission = string
+        startTime  = string
+      }))
     })))
 
     role_assignments = optional(map(object({
