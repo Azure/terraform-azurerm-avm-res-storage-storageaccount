@@ -182,7 +182,7 @@ module "this" {
       signedIdentifiers = [
         {
           id = "1"
-          accesspolicy = [
+          accessPolicy = [
             {
               expiry     = "2022-01-01T00:00:00Z"
               permission = "r"
@@ -197,7 +197,7 @@ module "this" {
       signedIdentifiers = [
         {
           id = "2"
-          aaccesspolicy = [
+          aaccessPolicy = [
             {
               expiry     = "2022-01-01T00:00:00Z"
               permission = "r"
