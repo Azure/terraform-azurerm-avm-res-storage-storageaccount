@@ -1397,24 +1397,6 @@ object({
 
 Default: `{}`
 
-### <a name="input_wait_for_rbac_before_table_operations"></a> [wait\_for\_rbac\_before\_table\_operations](#input\_wait\_for\_rbac\_before\_table\_operations)
-
-Description: This variable controls the amount of time to wait before performing table operations.  
-It only applies when `var.role_assignments` and `var.tables` are both set.  
-This is useful when you are creating role assignments on the table and immediately creating tables in it.  
-The default is 30 seconds for create and 0 seconds for destroy.
-
-Type:
-
-```hcl
-object({
-    create  = optional(string, "30s")
-    destroy = optional(string, "0s")
-  })
-```
-
-Default: `{}`
-
 ## Outputs
 
 The following outputs are exported:
