@@ -4,9 +4,7 @@ resource "azapi_resource" "table" {
   type = "Microsoft.Storage/storageAccounts/tableServices/tables@2021-08-01"
   body = {
     properties = {
-      signedIdentifiers = {
-        access_policy = each.value.signedIdentifiers
-      }
+      signedIdentifiers = each.value.signedIdentifiers
     }
   }
   name                      = each.value.name

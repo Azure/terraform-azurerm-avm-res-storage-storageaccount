@@ -194,6 +194,18 @@ module "this" {
     }
     table1 = {
       name = "table${random_string.this.result}1"
+      signedIdentifiers = [
+        {
+          id = "1"
+          access_policy = [
+            {
+              expiry      = "2022-01-01T00:00:00Z"
+              permissions = "r"
+              start       = "2021-01-01T00:00:00Z"
+            }
+          ]
+        }
+      ]
     }
   }
 
