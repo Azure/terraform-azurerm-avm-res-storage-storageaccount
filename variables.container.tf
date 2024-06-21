@@ -1,8 +1,15 @@
 variable "containers" {
   type = map(object({
-    public_access = optional(string, "None")
-    metadata      = optional(map(string))
-    name          = string
+    public_access               = optional(string, "None")
+    metadata                    = optional(map(string))
+    name                        = string
+    defaultEncryptionScope      = optional(string)
+    denyEncryptionScopeOverride = optional(bool)
+    enableNfsV3AllSquash        = optional(bool)
+    enableNfsV3RootSquash       = optional(bool)
+    immutableStorageWithVersioning = optional(object({
+      enabled = bool
+    }))
 
     role_assignments = optional(map(object({
       role_definition_id_or_name             = string

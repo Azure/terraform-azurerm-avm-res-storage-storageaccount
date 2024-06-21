@@ -4,7 +4,7 @@ resource "azapi_resource" "table" {
   type = "Microsoft.Storage/storageAccounts/tableServices/tables@2023-01-01"
   body = {
     properties = {
-      signedIdentifiers = each.value.signedIdentifiers
+      signedIdentifiers = each.value.signedIdentifiers == null ? [] : each.value.signedIdentifiers
     }
   }
   name                      = each.value.name

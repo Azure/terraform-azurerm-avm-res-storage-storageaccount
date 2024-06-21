@@ -3,11 +3,13 @@ output "containers" {
   value = {
     for name, container in azapi_resource.containers :
     name => {
-      id            = container.id
-      name          = container.name
-      name          = azurerm_storage_account.this.name
-      public_access = jsondecode(container.body).properties.publicAccess
-      metadata      = jsondecode(container.body).properties.metadata
+      id   = container.id
+      name = container.name
+      name = azurerm_storage_account.this.name
+      # public_access = jsondecode(container.body).properties.publicAccess
+      public_access = container.body.properties.publicAccess
+      # metadata      = jsondecode(container.body).properties.metadata
+      metadata = container.body.properties.metadata
     }
   }
 }

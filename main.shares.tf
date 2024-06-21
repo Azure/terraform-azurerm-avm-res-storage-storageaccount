@@ -4,12 +4,12 @@ resource "azapi_resource" "share" {
   type = "Microsoft.Storage/storageAccounts/fileServices/shares@2023-01-01"
   body = {
     properties = {
-      metadata         = each.value.metadata
-      access_tier      = each.value.access_tier
-      enabledProtocols = each.value.enabled_protocol
-      shareQuota       = each.value.quota
-
-      #accesspolicy     = each.value.access_policy
+      metadata          = each.value.metadata
+      access_tier       = each.value.access_tier
+      enabledProtocols  = each.value.enabled_protocol
+      shareQuota        = each.value.quota
+      rootSquash        = each.value.rootSquash
+      signedIdentifiers = each.value.signedIdentifiers == null ? [] : each.value.signedIdentifiers
 
 
     }

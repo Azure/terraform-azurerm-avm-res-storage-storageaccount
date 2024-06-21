@@ -2,13 +2,14 @@
 resource "azapi_resource" "containers" {
   for_each = var.containers
 
-  type = "Microsoft.Storage/storageAccounts/blobServices/containers@2022-09-01"
-  body = jsonencode({
+  type = "Microsoft.Storage/storageAccounts/blobServices/containers@2023-01-01"
+  body = {
     properties = {
-      metadata     = each.value.metadata
-      publicAccess = each.value.public_access
+      metadata                       = each.value.metadata
+      publicAccess                   = each.value.public_access
+      immutableStorageWithVersioning = each.value.immutableStorageWithVersioning == null ? {} : each.value.immutableStorageWithVersioning
     }
-  })
+  }
   name                      = each.value.name
   parent_id                 = "${azurerm_storage_account.this.id}/blobServices/default"
   schema_validation_enabled = false #https://github.com/Azure/terraform-provider-azapi/issues/497

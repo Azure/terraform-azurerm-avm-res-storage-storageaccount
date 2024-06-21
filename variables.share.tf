@@ -5,14 +5,23 @@ variable "shares" {
     metadata         = optional(map(string))
     name             = string
     quota            = number
-    acl = optional(set(object({
+    rootSquash       = optional(string)
+    signedIdentifiers = optional(list(object({
       id = string
-      access_policy = optional(list(object({
-        expiry      = optional(string)
-        permissions = string
-        start       = optional(string)
-      })))
+      accessPolicy = optional(object({
+        expiryTime = string
+        permission = string
+        startTime  = string
+      }))
     })))
+    # acl = optional(set(object({
+    #   id = string
+    #   access_policy = optional(list(object({
+    #     expiry      = optional(string)
+    #     permissions = string
+    #     start       = optional(string)
+    #   })))
+    # })))
     role_assignments = optional(map(object({
       role_definition_id_or_name             = string
       principal_id                           = string
