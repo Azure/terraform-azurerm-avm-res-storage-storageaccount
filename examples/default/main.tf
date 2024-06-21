@@ -184,9 +184,9 @@ module "this" {
           id = "1"
           access_policy = [
             {
-              expiry      = "2022-01-01T00:00:00Z"
-              permissions = "r"
-              start       = "2021-01-01T00:00:00Z"
+              expiry     = "2022-01-01T00:00:00Z"
+              permission = "r"
+              start      = "2021-01-01T00:00:00Z"
             }
           ]
         }
@@ -196,12 +196,12 @@ module "this" {
       name = "table${random_string.this.result}1"
       signedIdentifiers = [
         {
-          id = "1"
+          id = "2"
           access_policy = [
             {
-              expiry      = "2022-01-01T00:00:00Z"
-              permissions = "r"
-              start       = "2021-01-01T00:00:00Z"
+              expiry     = "2022-01-01T00:00:00Z"
+              permission = "r"
+              start      = "2021-01-01T00:00:00Z"
             }
           ]
         }
