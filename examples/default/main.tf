@@ -178,8 +178,7 @@ module "this" {
   }
   tables = {
     table0 = {
-      # name = "table${random_string.this.result}0"
-      name = "fsfsfsgdsdsssgs"
+      name = "table${random_string.this.result}0"
       signedIdentifiers = [
         {
           id = "1"
@@ -192,8 +191,7 @@ module "this" {
       ]
     }
     table1 = {
-      # name = "table${random_string.this.result}1"
-      name = "fsfsfsgsgs"
+      name = "table${random_string.this.result}1"
 
       signedIdentifiers = [
         {
