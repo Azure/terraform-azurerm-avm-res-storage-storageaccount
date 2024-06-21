@@ -4,9 +4,9 @@ variable "tables" {
     signedIdentifiers = optional(list(object({
       id = string
       accessPolicy = optional(object({
-        expiry     = string
+        expiryTime = string
         permission = string
-        start      = string
+        startTime  = string
       }))
     })))
 

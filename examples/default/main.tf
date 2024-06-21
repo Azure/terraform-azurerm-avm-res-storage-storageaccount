@@ -178,32 +178,31 @@ module "this" {
   }
   tables = {
     table0 = {
-      name = "table${random_string.this.result}0"
+      # name = "table${random_string.this.result}0"
+      name = "fsfsfsgdsdsssgs"
       signedIdentifiers = [
         {
           id = "1"
-          accessPolicy = [
-            {
-              expiry     = "2025-01-01T00:00:00Z"
-              permission = "r"
-              start      = "2024-01-01T00:00:00Z"
-            }
-          ]
+          accessPolicy = {
+            expiryTime = "2025-01-01T00:00:00Z"
+            permission = "r"
+            startTime  = "2024-01-01T00:00:00Z"
+          }
         }
       ]
     }
     table1 = {
-      name = "table${random_string.this.result}1"
+      # name = "table${random_string.this.result}1"
+      name = "fsfsfsgsgs"
+
       signedIdentifiers = [
         {
-          id = "2"
-          aaccessPolicy = [
-            {
-              expiry     = "2025-01-01T00:00:00Z"
-              permission = "r"
-              start      = "2024-01-01T00:00:00Z"
-            }
-          ]
+          id = "1"
+          aaccessPolicy = {
+            expiryTime = "2025-01-01T00:00:00Z"
+            permission = "r"
+            startTime  = "2024-01-01T00:00:00Z"
+          }
         }
       ]
     }
