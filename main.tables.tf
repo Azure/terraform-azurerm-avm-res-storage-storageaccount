@@ -1,7 +1,7 @@
 resource "azapi_resource" "table" {
   for_each = var.tables
 
-  type = "Microsoft.Storage/storageAccounts/tableServices/tables@2021-08-01"
+  type = "Microsoft.Storage/storageAccounts/tableServices/tables@2023-01-01"
   body = {
     properties = {
       signedIdentifiers = each.value.signedIdentifiers
