@@ -8,8 +8,8 @@ resource "azapi_resource" "share" {
       access_tier       = each.value.access_tier
       enabledProtocols  = each.value.enabled_protocol
       shareQuota        = each.value.quota
-      rootSquash        = each.value.rootSquash
-      signedIdentifiers = each.value.signedIdentifiers == null ? [] : each.value.signedIdentifiers
+      rootSquash        = each.value.root_squash
+      signedIdentifiers = each.value.signed_identifiers == null ? [] : each.value.signed_identifiers
 
 
     }

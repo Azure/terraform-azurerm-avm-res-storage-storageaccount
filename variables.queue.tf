@@ -131,16 +131,4 @@ EOT
   nullable    = false
 }
 
-variable "wait_for_rbac_before_queue_operations" {
-  type = object({
-    create  = optional(string, "30s")
-    destroy = optional(string, "0s")
-  })
-  default     = {}
-  description = <<DESCRIPTION
-This variable controls the amount of time to wait before performing queue operations.
-It only applies when `var.role_assignments` and `var.queues` are both set.
-This is useful when you are creating role assignments on the queue and immediately creating queues in it.
-The default is 30 seconds for create and 0 seconds for destroy.
-DESCRIPTION
-}
+

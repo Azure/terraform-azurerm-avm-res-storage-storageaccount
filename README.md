@@ -76,8 +76,6 @@ The following resources are used by this module:
 - [azurerm_storage_account_local_user.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account_local_user) (resource)
 - [azurerm_storage_account_network_rules.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account_network_rules) (resource)
 - [random_id.telemetry](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/id) (resource)
-- [time_sleep.wait_for_rbac_before_container_operations](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/sleep) (resource)
-- [time_sleep.wait_for_rbac_before_queue_operations](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/sleep) (resource)
 - [time_sleep.wait_for_rbac_before_share_operations](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/sleep) (resource)
 
 <!-- markdownlint-disable MD013 -->
@@ -289,14 +287,14 @@ Type:
 
 ```hcl
 map(object({
-    public_access               = optional(string, "None")
-    metadata                    = optional(map(string))
-    name                        = string
-    defaultEncryptionScope      = optional(string)
-    denyEncryptionScopeOverride = optional(bool)
-    enableNfsV3AllSquash        = optional(bool)
-    enableNfsV3RootSquash       = optional(bool)
-    immutableStorageWithVersioning = optional(object({
+    public_access                  = optional(string, "None")
+    metadata                       = optional(map(string))
+    name                           = string
+    default_encryption_scope       = optional(string)
+    deny_encryption_scope_override = optional(bool)
+    enable_NfsV3_allSquash         = optional(bool)
+    enable_nfsV3_rootSquash        = optional(bool)
+    immutable_storage_with_Versioning = optional(object({
       enabled = bool
     }))
 
@@ -1184,13 +1182,13 @@ map(object({
     metadata         = optional(map(string))
     name             = string
     quota            = number
-    rootSquash       = optional(string)
-    signedIdentifiers = optional(list(object({
+    root_squash      = optional(string)
+    signed_identifiers = optional(list(object({
       id = string
-      accessPolicy = optional(object({
-        expiryTime = string
-        permission = string
-        startTime  = string
+      access_policy = optional(object({
+        expiry_time = string
+        permission  = string
+        start_time  = string
       }))
     })))
     # acl = optional(set(object({
@@ -1273,12 +1271,12 @@ Type:
 ```hcl
 map(object({
     name = string
-    signedIdentifiers = optional(list(object({
+    signed_identifiers = optional(list(object({
       id = string
-      accessPolicy = optional(object({
-        expiryTime = string
-        permission = string
-        startTime  = string
+      access_policy = optional(object({
+        expiry_time = string
+        permission  = string
+        start_time  = string
       }))
     })))
 
@@ -1348,24 +1346,6 @@ Default: `false`
 Description: This variable controls the amount of time to wait before performing container operations.  
 It only applies when `var.role_assignments` and `var.containers` are both set.  
 This is useful when you are creating role assignments on the container and immediately creating containers in it.  
-The default is 30 seconds for create and 0 seconds for destroy.
-
-Type:
-
-```hcl
-object({
-    create  = optional(string, "30s")
-    destroy = optional(string, "0s")
-  })
-```
-
-Default: `{}`
-
-### <a name="input_wait_for_rbac_before_queue_operations"></a> [wait\_for\_rbac\_before\_queue\_operations](#input\_wait\_for\_rbac\_before\_queue\_operations)
-
-Description: This variable controls the amount of time to wait before performing queue operations.  
-It only applies when `var.role_assignments` and `var.queues` are both set.  
-This is useful when you are creating role assignments on the queue and immediately creating queues in it.  
 The default is 30 seconds for create and 0 seconds for destroy.
 
 Type:

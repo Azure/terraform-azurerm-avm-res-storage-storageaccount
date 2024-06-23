@@ -19,6 +19,7 @@ resource "azapi_resource" "queue" {
       read   = timeouts.value.read
     }
   }
+
   depends_on = [azurerm_storage_account.this, azurerm_storage_account_network_rules.this]
 }
 
@@ -36,16 +37,16 @@ resource "azurerm_role_assignment" "queues" {
   skip_service_principal_aad_check       = each.value.role_assignment.skip_service_principal_aad_check
 }
 
-resource "time_sleep" "wait_for_rbac_before_queue_operations" {
-  count = length(var.role_assignments) > 0 && length(var.queues) > 0 ? 1 : 0
+# resource "time_sleep" "wait_for_rbac_before_queue_operations" {
+#   count = length(var.role_assignments) > 0 && length(var.queues) > 0 ? 1 : 0
 
-  create_duration  = var.wait_for_rbac_before_queue_operations.create
-  destroy_duration = var.wait_for_rbac_before_queue_operations.destroy
-  triggers = {
-    role_assignments = jsonencode(var.role_assignments)
-  }
+#   create_duration  = var.wait_for_rbac_before_queue_operations.create
+#   destroy_duration = var.wait_for_rbac_before_queue_operations.destroy
+#   triggers = {
+#     role_assignments = jsonencode(var.role_assignments)
+#   }
 
-  depends_on = [
-    azurerm_role_assignment.storage_account
-  ]
-}
+#   depends_on = [
+#     azurerm_role_assignment.storage_account
+#   ]
+# }

@@ -1,12 +1,12 @@
 variable "tables" {
   type = map(object({
     name = string
-    signedIdentifiers = optional(list(object({
+    signed_identifiers = optional(list(object({
       id = string
-      accessPolicy = optional(object({
-        expiryTime = string
-        permission = string
-        startTime  = string
+      access_policy = optional(object({
+        expiry_time = string
+        permission  = string
+        start_time  = string
       }))
     })))
 
