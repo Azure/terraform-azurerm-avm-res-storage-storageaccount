@@ -191,13 +191,13 @@ module "this" {
   tables = {
     table0 = {
       name = "table${random_string.this.result}0"
-      signedIdentifiers = [
+      signed_identifiers = [
         {
           id = "1"
-          accessPolicy = {
-            expiryTime = "2025-01-01T00:00:00Z"
-            permission = "r"
-            startTime  = "2024-01-01T00:00:00Z"
+          access_policy = {
+            expiry_time = "2025-01-01T00:00:00Z"
+            permission  = "r"
+            start_time  = "2024-01-01T00:00:00Z"
           }
         }
       ]
@@ -205,13 +205,13 @@ module "this" {
     table1 = {
       name = "table${random_string.this.result}1"
 
-      signedIdentifiers = [
+      signed_identifiers = [
         {
           id = "1"
-          accessPolicy = {
-            expiryTime = "2025-01-01T00:00:00Z"
-            permission = "r"
-            startTime  = "2024-01-01T00:00:00Z"
+          access_policy = {
+            expiry_time = "2025-01-01T00:00:00Z"
+            permission  = "r"
+            start_time  = "2024-01-01T00:00:00Z"
           }
         }
       ]
