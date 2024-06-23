@@ -1341,24 +1341,6 @@ Type: `bool`
 
 Default: `false`
 
-### <a name="input_wait_for_rbac_before_container_operations"></a> [wait\_for\_rbac\_before\_container\_operations](#input\_wait\_for\_rbac\_before\_container\_operations)
-
-Description: This variable controls the amount of time to wait before performing container operations.  
-It only applies when `var.role_assignments` and `var.containers` are both set.  
-This is useful when you are creating role assignments on the container and immediately creating containers in it.  
-The default is 30 seconds for create and 0 seconds for destroy.
-
-Type:
-
-```hcl
-object({
-    create  = optional(string, "30s")
-    destroy = optional(string, "0s")
-  })
-```
-
-Default: `{}`
-
 ### <a name="input_wait_for_rbac_before_share_operations"></a> [wait\_for\_rbac\_before\_share\_operations](#input\_wait\_for\_rbac\_before\_share\_operations)
 
 Description: This variable controls the amount of time to wait before performing share operations.  
