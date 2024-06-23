@@ -16,8 +16,8 @@ output "containers" {
   value       = module.this.containers
 }
 
-# output "resource" {
-#   description = "value of storage_account"
-#   value       = module.this.resource
-#   sensitive   = true
-# }
+output "resource" {
+  description = "value of storage_account"
+  value       = module.this.resource
+  sensitive   = true
+}
