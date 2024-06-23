@@ -19,6 +19,7 @@ resource "azapi_resource" "queue" {
       read   = timeouts.value.read
     }
   }
+  depends_on = [azurerm_storage_account.this, azurerm_storage_account_network_rules.this]
 }
 
 # Enable role assignments for queues
