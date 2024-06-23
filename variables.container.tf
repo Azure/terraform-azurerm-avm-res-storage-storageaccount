@@ -1,13 +1,13 @@
 variable "containers" {
   type = map(object({
-    public_access               = optional(string, "None")
-    metadata                    = optional(map(string))
-    name                        = string
-    defaultEncryptionScope      = optional(string)
-    denyEncryptionScopeOverride = optional(bool)
-    enableNfsV3AllSquash        = optional(bool)
-    enableNfsV3RootSquash       = optional(bool)
-    immutableStorageWithVersioning = optional(object({
+    public_access                  = optional(string, "None")
+    metadata                       = optional(map(string))
+    name                           = string
+    default_encryption_scope       = optional(string)
+    deny_encryption_scope_override = optional(bool)
+    enable_NfsV3_allSquash         = optional(bool)
+    enable_nfsV3_rootSquash        = optional(bool)
+    immutable_storage_with_Versioning = optional(object({
       enabled = bool
     }))
 
