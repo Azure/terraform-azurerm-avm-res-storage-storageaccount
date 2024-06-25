@@ -36,17 +36,3 @@ resource "azurerm_role_assignment" "queues" {
   role_definition_name                   = strcontains(lower(each.value.role_assignment.role_definition_id_or_name), lower(local.role_definition_resource_substring)) ? null : each.value.role_assignment.role_definition_id_or_name
   skip_service_principal_aad_check       = each.value.role_assignment.skip_service_principal_aad_check
 }
-
-# resource "time_sleep" "wait_for_rbac_before_queue_operations" {
-#   count = length(var.role_assignments) > 0 && length(var.queues) > 0 ? 1 : 0
-
-#   create_duration  = var.wait_for_rbac_before_queue_operations.create
-#   destroy_duration = var.wait_for_rbac_before_queue_operations.destroy
-#   triggers = {
-#     role_assignments = jsonencode(var.role_assignments)
-#   }
-
-#   depends_on = [
-#     azurerm_role_assignment.storage_account
-#   ]
-# }
