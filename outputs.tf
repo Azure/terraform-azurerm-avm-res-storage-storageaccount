@@ -3,13 +3,10 @@ output "containers" {
   value = {
     for name, container in azapi_resource.containers :
     name => {
-      id   = container.id
-      name = container.name
-      name = azurerm_storage_account.this.name
-      # public_access = jsondecode(container.body).properties.publicAccess
+      id            = container.id
+      name          = container.name
+      name          = azurerm_storage_account.this.name
       public_access = container.body.properties.publicAccess
-      # metadata      = jsondecode(container.body).properties.metadata
-      metadata = container.body.properties.metadata
     }
   }
 }
@@ -59,7 +56,6 @@ output "shares" {
       id                   = share.id
       name                 = share.name
       storage_account_name = azurerm_storage_account.this.name
-      #metadata             = share.metadata
     }
   }
 }

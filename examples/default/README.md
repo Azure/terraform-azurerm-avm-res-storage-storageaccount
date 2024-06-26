@@ -170,10 +170,18 @@ module "this" {
     blob_container0 = {
       name                  = "blob-container-${random_string.this.result}-0"
       container_access_type = "private"
+      # metadata = {
+      #   key1 = "value1"
+      #   key2 = "value2"
+      # }
     }
     blob_container1 = {
       name                  = "blob-container-${random_string.this.result}-1"
       container_access_type = "private"
+      metadata = {
+        key1 = "value1"
+        key2 = "value2"
+      }
       immutableStorageWithVersioning = {
         enabled = true
       }
