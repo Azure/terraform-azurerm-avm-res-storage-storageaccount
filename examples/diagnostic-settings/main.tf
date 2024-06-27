@@ -265,6 +265,17 @@ resource "azurerm_log_analytics_workspace" "this" {
   sku                 = "PerGB2018"
 }
 
+resource "azurerm_eventhub_namespace" "this" {
+  location            = azurerm_resource_group.this.location
+  name                = module.naming.eventhub_namespace.name_unique
+  resource_group_name = azurerm_resource_group.this.name
+  sku                 = "Standard"
+  capacity            = 2
+  tags = {
+    environment = "Production"
+  }
+}
+
 resource "azurerm_eventhub" "this" {
   message_retention   = 7
   name                = module.naming.eventhub_namespace.name_unique
