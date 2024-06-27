@@ -22,15 +22,8 @@ provider "azurerm" {
   skip_provider_registration = true
   storage_use_azuread        = true
 }
-locals {
-  test_regions = ["eastus", "eastus2", "westus2", "westus3"]
-}
 
-# This allows us to randomize the region for the resource group.
-resource "random_integer" "region_index" {
-  max = length(local.test_regions) - 1
-  min = 0
-}
+
 # This allow use to randomize the name of resources
 resource "random_string" "this" {
   length  = 6
@@ -38,17 +31,23 @@ resource "random_string" "this" {
   upper   = false
 }
 # This ensures we have unique CAF compliant names for resources.
+module "regions" {
+  source  = "Azure/regions/azurerm"
+  version = ">= 0.3.0"
+}
+resource "random_integer" "region_index" {
+  max = length(module.regions.regions) - 1
+  min = 0
+}
 module "naming" {
   source  = "Azure/naming/azurerm"
   version = "0.4.0"
 }
-
-
+# This is required for resource modules
 resource "azurerm_resource_group" "this" {
-  location = local.test_regions[random_integer.region_index.result]
+  location = module.regions.regions[random_integer.region_index.result].name
   name     = module.naming.resource_group.name_unique
 }
-
 resource "azurerm_virtual_network" "vnet" {
   address_space       = ["192.168.0.0/16"]
   location            = azurerm_resource_group.this.location

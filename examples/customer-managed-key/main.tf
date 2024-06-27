@@ -12,12 +12,12 @@ terraform {
     }
   }
 }
-
-locals {
-  test_regions = ["eastus", "eastus2", "westus2", "westus3"]
+module "regions" {
+  source  = "Azure/regions/azurerm"
+  version = ">= 0.3.0"
 }
 resource "random_integer" "region_index" {
-  max = length(local.test_regions) - 1
+  max = length(module.regions.regions) - 1
   min = 0
 }
 provider "azurerm" {
@@ -43,7 +43,7 @@ module "naming" {
 
 # This is required for resource modules
 resource "azurerm_resource_group" "this" {
-  location = local.test_regions[random_integer.region_index.result]
+  location = module.regions.regions[random_integer.region_index.result].name
   name     = module.naming.resource_group.name_unique
 }
 
