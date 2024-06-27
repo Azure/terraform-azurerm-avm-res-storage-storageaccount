@@ -1,12 +1,10 @@
 variable "location" {
   type        = string
-
   description = <<DESCRIPTION
 Azure region where the resource should be deployed.
 If null, the location will be inferred from the resource group location.
 DESCRIPTION
   nullable    = false
-
 }
 
 variable "name" {
@@ -117,11 +115,11 @@ variable "private_endpoints" {
       kind = string
       name = optional(string, null)
     }), null)
-    tags                                    = optional(map(string), null)
-    subnet_resource_id                      = string
+    tags               = optional(map(string), null)
+    subnet_resource_id = string
 
 
-    subresource_name                        = string
+    subresource_name = string
 
     private_dns_zone_group_name             = optional(string, "default")
     private_dns_zone_resource_ids           = optional(set(string), [])

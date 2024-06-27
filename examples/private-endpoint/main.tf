@@ -25,7 +25,6 @@ provider "azurerm" {
 
 locals {
   test_regions = ["eastus", "eastus2", "westus2", "westus3"]
-
 }
 resource "random_integer" "region_index" {
   max = length(module.regions.regions) - 1
