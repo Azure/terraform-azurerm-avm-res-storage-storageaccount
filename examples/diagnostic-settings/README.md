@@ -269,6 +269,17 @@ resource "azurerm_log_analytics_workspace" "this" {
   sku                 = "PerGB2018"
 }
 
+resource "azurerm_eventhub_namespace" "this" {
+  location            = azurerm_resource_group.this.location
+  name                = module.naming.eventhub_namespace.name_unique
+  resource_group_name = azurerm_resource_group.this.name
+  sku                 = "Standard"
+  capacity            = 2
+  tags = {
+    environment = "Production"
+  }
+}
+
 resource "azurerm_eventhub" "this" {
   message_retention   = 7
   name                = module.naming.eventhub_namespace.name_unique
@@ -315,6 +326,7 @@ The following resources are used by this module:
 
 - [azurerm_eventhub.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/eventhub) (resource)
 - [azurerm_eventhub_authorization_rule.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/eventhub_authorization_rule) (resource)
+- [azurerm_eventhub_namespace.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/eventhub_namespace) (resource)
 - [azurerm_log_analytics_workspace.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/log_analytics_workspace) (resource)
 - [azurerm_network_security_group.nsg](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/network_security_group) (resource)
 - [azurerm_network_security_rule.no_internet](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/network_security_rule) (resource)
