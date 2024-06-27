@@ -168,7 +168,7 @@ module "this" {
     blob_container1 = {
       name                  = "blob-container-${random_string.this.result}-1"
       container_access_type = "private"
-      immutableStorageWithVersioning = {
+      immutable_storage_with_versioning = {
         enabled = true
       }
     }
