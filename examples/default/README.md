@@ -228,13 +228,13 @@ module "this" {
     share0 = {
       name  = "share-${random_string.this.result}-0"
       quota = 10
-      signedIdentifiers = [
+      signed_identifiers = [
         {
           id = "1"
-          accessPolicy = {
-            expiryTime = "2025-01-01T00:00:00Z"
-            permission = "r"
-            startTime  = "2024-01-01T00:00:00Z"
+          access_policy = {
+            expiry_time = "2025-01-01T00:00:00Z"
+            permission  = "r"
+            start_time  = "2024-01-01T00:00:00Z"
           }
         }
       ]

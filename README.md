@@ -292,9 +292,9 @@ map(object({
     name                           = string
     default_encryption_scope       = optional(string)
     deny_encryption_scope_override = optional(bool)
-    enable_NfsV3_allSquash         = optional(bool)
+    enable_nfs_v3_all_squash       = optional(bool)
     enable_nfsV3_rootSquash        = optional(bool)
-    immutable_storage_with_Versioning = optional(object({
+    immutable_storage_with_versioning = optional(object({
       enabled = bool
     }))
 
