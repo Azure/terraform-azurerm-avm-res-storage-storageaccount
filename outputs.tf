@@ -5,9 +5,7 @@ output "containers" {
     name => {
       id            = container.id
       name          = container.name
-      name          = azurerm_storage_account.this.name
-      public_access = jsondecode(container.body).properties.publicAccess
-      metadata      = jsondecode(container.body).properties.metadata
+      public_access = container.body.properties.publicAccess
     }
   }
 }
@@ -30,12 +28,10 @@ output "private_endpoints" {
 output "queues" {
   description = "Map of storage queues that are created."
   value = {
-    for name, queue in azurerm_storage_queue.this :
+    for name, queue in azapi_resource.queue :
     name => {
-      id       = queue.id
-      name     = queue.name
-      name     = queue.storage_account_name
-      metadata = queue.metadata
+      id   = queue.id
+      name = queue.name
     }
   }
 }
@@ -54,11 +50,9 @@ output "resource_id" {
 output "shares" {
   description = "Map of storage storage shares that are created."
   value = {
-    for name, share in azurerm_storage_share.this : name => {
-      id                   = share.id
-      name                 = share.name
-      storage_account_name = share.storage_account_name
-      metadata             = share.metadata
+    for name, share in azapi_resource.share : name => {
+      id   = share.id
+      name = share.name
     }
   }
 }
@@ -66,10 +60,10 @@ output "shares" {
 output "tables" {
   description = "Map of storage tables that are created."
   value = {
-    for name, table in azurerm_storage_table.this : name => {
-      id   = table.id
-      name = table.name
-      name = table.storage_account_name
+    for name, table in azapi_resource.table : name => {
+      id                   = table.id
+      name                 = table.name
+      storage_account_name = azurerm_storage_account.this.name
     }
   }
 }

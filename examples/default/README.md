@@ -124,6 +124,9 @@ module "this" {
     owner = "John Doe"
     dept  = "IT"
   }
+  blob_properties = {
+    versioning_enabled = true
+  }
 
   #Locks for storage account (Disabled by default)
   /*lock = {
@@ -158,23 +161,53 @@ module "this" {
     blob_container1 = {
       name                  = "blob-container-${random_string.this.result}-1"
       container_access_type = "private"
+      immutable_storage_with_versioning = {
+        enabled = true
+      }
     }
 
   }
   queues = {
     queue0 = {
       name = "queue-${random_string.this.result}-0"
+
     }
     queue1 = {
       name = "queue-${random_string.this.result}-1"
+
+      metadata = {
+        key1 = "value1"
+        key2 = "value2"
+      }
     }
   }
   tables = {
     table0 = {
       name = "table${random_string.this.result}0"
+      signed_identifiers = [
+        {
+          id = "1"
+          access_policy = {
+            expiry_time = "2025-01-01T00:00:00Z"
+            permission  = "r"
+            start_time  = "2024-01-01T00:00:00Z"
+          }
+        }
+      ]
     }
     table1 = {
       name = "table${random_string.this.result}1"
+
+      signed_identifiers = [
+        {
+          id = "1"
+          access_policy = {
+            expiry_time = "2025-01-01T00:00:00Z"
+            permission  = "r"
+            start_time  = "2024-01-01T00:00:00Z"
+          }
+        }
+      ]
     }
   }
 
@@ -182,10 +215,25 @@ module "this" {
     share0 = {
       name  = "share-${random_string.this.result}-0"
       quota = 10
+      signed_identifiers = [
+        {
+          id = "1"
+          access_policy = {
+            expiry_time = "2025-01-01T00:00:00Z"
+            permission  = "r"
+            start_time  = "2024-01-01T00:00:00Z"
+          }
+        }
+      ]
     }
     share1 = {
-      name  = "share-${random_string.this.result}-1"
-      quota = 10
+      name        = "share-${random_string.this.result}-1"
+      quota       = 10
+      access_tier = "Hot"
+      metadata = {
+        key1 = "value1"
+        key2 = "value2"
+      }
     }
   }
 }

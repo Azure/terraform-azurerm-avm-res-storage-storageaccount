@@ -53,7 +53,6 @@ The following providers are used by this module:
 The following resources are used by this module:
 
 - [azapi_resource.containers](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
-- [azurerm_management_lock.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/management_lock) (resource)
 - [azurerm_monitor_diagnostic_setting.azure_file](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_diagnostic_setting) (resource)
 - [azurerm_monitor_diagnostic_setting.blob](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_diagnostic_setting) (resource)
 - [azurerm_monitor_diagnostic_setting.queue](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_diagnostic_setting) (resource)
@@ -72,14 +71,8 @@ The following resources are used by this module:
 - [azurerm_storage_account_customer_managed_key.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account_customer_managed_key) (resource)
 - [azurerm_storage_account_local_user.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account_local_user) (resource)
 - [azurerm_storage_account_network_rules.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account_network_rules) (resource)
-- [azurerm_storage_queue.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_queue) (resource)
-- [azurerm_storage_share.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_share) (resource)
-- [azurerm_storage_table.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_table) (resource)
 - [random_id.telemetry](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/id) (resource)
-- [time_sleep.wait_for_rbac_before_container_operations](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/sleep) (resource)
-- [time_sleep.wait_for_rbac_before_queue_operations](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/sleep) (resource)
 - [time_sleep.wait_for_rbac_before_share_operations](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/sleep) (resource)
-- [time_sleep.wait_for_rbac_before_table_operations](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/sleep) (resource)
 
 - [azurerm_client_config.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/client_config) (data source)
 
@@ -295,9 +288,16 @@ Type:
 
 ```hcl
 map(object({
-    public_access = optional(string, "None")
-    metadata      = optional(map(string))
-    name          = string
+    public_access                  = optional(string, "None")
+    metadata                       = optional(map(string))
+    name                           = string
+    default_encryption_scope       = optional(string)
+    deny_encryption_scope_override = optional(bool)
+    enable_nfs_v3_all_squash       = optional(bool)
+    enable_nfs_v3_root_squash      = optional(bool)
+    immutable_storage_with_versioning = optional(object({
+      enabled = bool
+    }))
 
     role_assignments = optional(map(object({
       role_definition_id_or_name             = string
@@ -1190,13 +1190,14 @@ map(object({
     metadata         = optional(map(string))
     name             = string
     quota            = number
-    acl = optional(set(object({
+    root_squash      = optional(string)
+    signed_identifiers = optional(list(object({
       id = string
-      access_policy = optional(list(object({
-        expiry      = optional(string)
-        permissions = string
-        start       = optional(string)
-      })))
+      access_policy = optional(object({
+        expiry_time = string
+        permission  = string
+        start_time  = string
+      }))
     })))
     role_assignments = optional(map(object({
       role_definition_id_or_name             = string
@@ -1270,13 +1271,13 @@ Type:
 ```hcl
 map(object({
     name = string
-    acl = optional(set(object({
+    signed_identifiers = optional(list(object({
       id = string
-      access_policy = optional(list(object({
-        expiry      = string
-        permissions = string
-        start       = string
-      })))
+      access_policy = optional(object({
+        expiry_time = string
+        permission  = string
+        start_time  = string
+      }))
     })))
 
     role_assignments = optional(map(object({
@@ -1340,65 +1341,11 @@ Type: `bool`
 
 Default: `false`
 
-### <a name="input_wait_for_rbac_before_container_operations"></a> [wait\_for\_rbac\_before\_container\_operations](#input\_wait\_for\_rbac\_before\_container\_operations)
-
-Description: This variable controls the amount of time to wait before performing container operations.  
-It only applies when `var.role_assignments` and `var.containers` are both set.  
-This is useful when you are creating role assignments on the container and immediately creating containers in it.  
-The default is 30 seconds for create and 0 seconds for destroy.
-
-Type:
-
-```hcl
-object({
-    create  = optional(string, "30s")
-    destroy = optional(string, "0s")
-  })
-```
-
-Default: `{}`
-
-### <a name="input_wait_for_rbac_before_queue_operations"></a> [wait\_for\_rbac\_before\_queue\_operations](#input\_wait\_for\_rbac\_before\_queue\_operations)
-
-Description: This variable controls the amount of time to wait before performing queue operations.  
-It only applies when `var.role_assignments` and `var.queues` are both set.  
-This is useful when you are creating role assignments on the queue and immediately creating queues in it.  
-The default is 30 seconds for create and 0 seconds for destroy.
-
-Type:
-
-```hcl
-object({
-    create  = optional(string, "30s")
-    destroy = optional(string, "0s")
-  })
-```
-
-Default: `{}`
-
 ### <a name="input_wait_for_rbac_before_share_operations"></a> [wait\_for\_rbac\_before\_share\_operations](#input\_wait\_for\_rbac\_before\_share\_operations)
 
 Description: This variable controls the amount of time to wait before performing share operations.  
 It only applies when `var.role_assignments` and `var.shares` are both set.  
 This is useful when you are creating role assignments on the share and immediately creating shares in it.  
-The default is 30 seconds for create and 0 seconds for destroy.
-
-Type:
-
-```hcl
-object({
-    create  = optional(string, "30s")
-    destroy = optional(string, "0s")
-  })
-```
-
-Default: `{}`
-
-### <a name="input_wait_for_rbac_before_table_operations"></a> [wait\_for\_rbac\_before\_table\_operations](#input\_wait\_for\_rbac\_before\_table\_operations)
-
-Description: This variable controls the amount of time to wait before performing table operations.  
-It only applies when `var.role_assignments` and `var.tables` are both set.  
-This is useful when you are creating role assignments on the table and immediately creating tables in it.  
 The default is 30 seconds for create and 0 seconds for destroy.
 
 Type:

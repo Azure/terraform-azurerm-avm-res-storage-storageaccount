@@ -1,13 +1,13 @@
 variable "tables" {
   type = map(object({
     name = string
-    acl = optional(set(object({
+    signed_identifiers = optional(list(object({
       id = string
-      access_policy = optional(list(object({
-        expiry      = string
-        permissions = string
-        start       = string
-      })))
+      access_policy = optional(object({
+        expiry_time = string
+        permission  = string
+        start_time  = string
+      }))
     })))
 
     role_assignments = optional(map(object({
@@ -58,18 +58,4 @@ variable "table_encryption_key_type" {
   type        = string
   default     = null
   description = "(Optional) The encryption type of the table service. Possible values are `Service` and `Account`. Changing this forces a new resource to be created. Default value is `Service`."
-}
-
-variable "wait_for_rbac_before_table_operations" {
-  type = object({
-    create  = optional(string, "30s")
-    destroy = optional(string, "0s")
-  })
-  default     = {}
-  description = <<DESCRIPTION
-This variable controls the amount of time to wait before performing table operations.
-It only applies when `var.role_assignments` and `var.tables` are both set.
-This is useful when you are creating role assignments on the table and immediately creating tables in it.
-The default is 30 seconds for create and 0 seconds for destroy.
-DESCRIPTION
 }

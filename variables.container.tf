@@ -1,8 +1,15 @@
 variable "containers" {
   type = map(object({
-    public_access = optional(string, "None")
-    metadata      = optional(map(string))
-    name          = string
+    public_access                  = optional(string, "None")
+    metadata                       = optional(map(string))
+    name                           = string
+    default_encryption_scope       = optional(string)
+    deny_encryption_scope_override = optional(bool)
+    enable_nfs_v3_all_squash       = optional(bool)
+    enable_nfs_v3_root_squash      = optional(bool)
+    immutable_storage_with_versioning = optional(object({
+      enabled = bool
+    }))
 
     role_assignments = optional(map(object({
       role_definition_id_or_name             = string
@@ -136,18 +143,4 @@ variable "blob_properties" {
  `restore_policy` block supports the following:
  - `days` - (Required) Specifies the number of days that the blob can be restored, between `1` and `365` days. This must be less than the `days` specified for `delete_retention_policy`.
 EOT
-}
-
-variable "wait_for_rbac_before_container_operations" {
-  type = object({
-    create  = optional(string, "30s")
-    destroy = optional(string, "0s")
-  })
-  default     = {}
-  description = <<DESCRIPTION
-This variable controls the amount of time to wait before performing container operations.
-It only applies when `var.role_assignments` and `var.containers` are both set.
-This is useful when you are creating role assignments on the container and immediately creating containers in it.
-The default is 30 seconds for create and 0 seconds for destroy.
-DESCRIPTION
 }
