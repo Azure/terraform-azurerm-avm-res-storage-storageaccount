@@ -14,14 +14,6 @@ variable "shares" {
         start_time  = string
       }))
     })))
-    # acl = optional(set(object({
-    #   id = string
-    #   access_policy = optional(list(object({
-    #     expiry      = optional(string)
-    #     permissions = string
-    #     start       = optional(string)
-    #   })))
-    # })))
     role_assignments = optional(map(object({
       role_definition_id_or_name             = string
       principal_id                           = string
