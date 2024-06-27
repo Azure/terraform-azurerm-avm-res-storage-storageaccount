@@ -203,50 +203,60 @@ module "this" {
   #setting up diagnostic settings for storage account
   diagnostic_settings_storage_account = {
     storage = {
-      name                  = "diag"
-      workspace_resource_id = azurerm_log_analytics_workspace.this.id
-      log_categories        = ["audit", "alllogs"]
-      metric_categories     = ["Capacity", "Transaction"]
+      name                                     = "diag"
+      workspace_resource_id                    = azurerm_log_analytics_workspace.this.id
+      log_categories                           = ["audit", "alllogs"]
+      metric_categories                        = ["Capacity", "Transaction"]
+      eventhub_name                            = azurerm_eventhub.this.name
+      event_hub_authorization_rule_resource_id = "${azurerm_eventhub_namespace.this.id}/authorizationRules/RootManageSharedAccessKey"
     }
   }
 
   # setting up diagnostic settings for queue
   diagnostic_settings_queue = {
     queue = {
-      name                  = "diag"
-      workspace_resource_id = azurerm_log_analytics_workspace.this.id
-      log_categories        = ["audit", "alllogs"]
-      metric_categories     = ["Capacity", "Transaction"]
+      name                                     = "diag"
+      workspace_resource_id                    = azurerm_log_analytics_workspace.this.id
+      log_categories                           = ["audit", "alllogs"]
+      eventhub_name                            = azurerm_eventhub.this.name
+      event_hub_authorization_rule_resource_id = "${azurerm_eventhub_namespace.this.id}/authorizationRules/RootManageSharedAccessKey"
+      metric_categories                        = ["Capacity", "Transaction"]
     }
   }
 
   # setting up diagnostic settings for table
   diagnostic_settings_table = {
     table = {
-      name                  = "diag"
-      workspace_resource_id = azurerm_log_analytics_workspace.this.id
-      log_categories        = ["audit", "alllogs"]
-      metric_categories     = ["Capacity", "Transaction"]
+      name                                     = "diag"
+      workspace_resource_id                    = azurerm_log_analytics_workspace.this.id
+      eventhub_name                            = azurerm_eventhub.this.name
+      event_hub_authorization_rule_resource_id = "${azurerm_eventhub_namespace.this.id}/authorizationRules/RootManageSharedAccessKey"
+      log_categories                           = ["audit", "alllogs"]
+      metric_categories                        = ["Capacity", "Transaction"]
     }
   }
 
   # setting up diagnostic settings for file
   diagnostic_settings_file = {
     file1 = {
-      name                  = "diag"
-      workspace_resource_id = azurerm_log_analytics_workspace.this.id
-      log_categories        = ["audit", "alllogs"]
-      metric_categories     = ["Capacity", "Transaction"]
+      name                                     = "diag"
+      workspace_resource_id                    = azurerm_log_analytics_workspace.this.id
+      eventhub_name                            = azurerm_eventhub.this.name
+      event_hub_authorization_rule_resource_id = "${azurerm_eventhub_namespace.this.id}/authorizationRules/RootManageSharedAccessKey"
+      log_categories                           = ["audit", "alllogs"]
+      metric_categories                        = ["Capacity", "Transaction"]
     }
   }
 
   # setting up diagnostic settings for blob
   diagnostic_settings_blob = {
     blob11 = {
-      name                  = "diag"
-      workspace_resource_id = azurerm_log_analytics_workspace.this.id
-      log_categories        = ["audit", "alllogs"]
-      metric_categories     = ["Capacity", "Transaction"]
+      name                                     = "diag"
+      workspace_resource_id                    = azurerm_log_analytics_workspace.this.id
+      eventhub_name                            = azurerm_eventhub.this.name
+      event_hub_authorization_rule_resource_id = "${azurerm_eventhub_namespace.this.id}/authorizationRules/RootManageSharedAccessKey"
+      log_categories                           = ["audit", "alllogs"]
+      metric_categories                        = ["Capacity", "Transaction"]
     }
   }
 }
@@ -258,6 +268,26 @@ resource "azurerm_log_analytics_workspace" "this" {
   resource_group_name = azurerm_resource_group.this.name
   sku                 = "PerGB2018"
 }
+
+resource "azurerm_eventhub" "this" {
+  message_retention   = 7
+  name                = module.naming.eventhub_namespace.name_unique
+  namespace_name      = azurerm_eventhub_namespace.this.name
+  partition_count     = 2
+  resource_group_name = azurerm_resource_group.this.name
+}
+
+resource "azurerm_eventhub_authorization_rule" "this" {
+  eventhub_name       = azurerm_eventhub.this.name
+  name                = module.naming.eventhub_authorization_rule.name_unique
+  namespace_name      = azurerm_eventhub_namespace.this.name
+  resource_group_name = azurerm_resource_group.this.name
+  listen              = true
+  manage              = false
+  send                = false
+}
+
+
 ```
 
 <!-- markdownlint-disable MD033 -->
@@ -283,6 +313,8 @@ The following providers are used by this module:
 
 The following resources are used by this module:
 
+- [azurerm_eventhub.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/eventhub) (resource)
+- [azurerm_eventhub_authorization_rule.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/eventhub_authorization_rule) (resource)
 - [azurerm_log_analytics_workspace.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/log_analytics_workspace) (resource)
 - [azurerm_network_security_group.nsg](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/network_security_group) (resource)
 - [azurerm_network_security_rule.no_internet](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/network_security_rule) (resource)
@@ -323,7 +355,31 @@ Default: `null`
 
 ## Outputs
 
-No outputs.
+The following outputs are exported:
+
+### <a name="output_containers"></a> [containers](#output\_containers)
+
+Description: value of containers
+
+### <a name="output_eventhub_authorization_rule"></a> [eventhub\_authorization\_rule](#output\_eventhub\_authorization\_rule)
+
+Description: n/a
+
+### <a name="output_queue"></a> [queue](#output\_queue)
+
+Description: value of queues
+
+### <a name="output_resource"></a> [resource](#output\_resource)
+
+Description: value of storage\_account
+
+### <a name="output_shares"></a> [shares](#output\_shares)
+
+Description: value of shares
+
+### <a name="output_tables"></a> [tables](#output\_tables)
+
+Description: value of tables
 
 ## Modules
 
