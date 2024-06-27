@@ -7,7 +7,7 @@ resource "azapi_resource" "containers" {
     properties = {
       metadata                       = each.value.metadata == null ? {} : each.value.metadata
       publicAccess                   = each.value.public_access
-      immutableStorageWithVersioning = each.value.immutable_storage_with_Versioning == "" ? {} : each.value.immutable_storage_with_Versioning
+      immutableStorageWithVersioning = each.value.immutable_storage_with_versioning == "" ? {} : each.value.immutable_storage_with_versioning
     }
   }
   name                      = each.value.name

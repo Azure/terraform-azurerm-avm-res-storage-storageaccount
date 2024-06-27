@@ -3,10 +3,10 @@ output "containers" {
   value = {
     for name, container in azapi_resource.containers :
     name => {
-      id            = container.id
-      name          = container.name
-      name          = azurerm_storage_account.this.name
-      public_access = container.body.properties.publicAccess
+      id                   = container.id
+      name                 = container.name
+      storage_account_name = azurerm_storage_account.this.name
+      public_access        = container.body.properties.publicAccess
     }
   }
 }
@@ -31,9 +31,9 @@ output "queues" {
   value = {
     for name, queue in azapi_resource.queue :
     name => {
-      id   = queue.id
-      name = queue.name
-      name = azurerm_storage_account.this.name
+      id                   = queue.id
+      name                 = queue.name
+      storage_account_name = azurerm_storage_account.this.name
     }
   }
 }
@@ -64,9 +64,9 @@ output "tables" {
   description = "Map of storage tables that are created."
   value = {
     for name, table in azapi_resource.table : name => {
-      id   = table.id
-      name = table.name
-      name = azurerm_storage_account.this.name
+      id                   = table.id
+      name                 = table.name
+      storage_account_name = azurerm_storage_account.this.name
     }
   }
 }
