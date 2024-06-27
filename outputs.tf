@@ -17,11 +17,6 @@ output "fqdn" {
   value       = { for svc in local.endpoints : svc => "${azurerm_storage_account.this.name}.${svc}.core.windows.net" }
 }
 
-output "id" {
-  description = "The ID of the Storage Account."
-  value       = azurerm_storage_account.this.id
-}
-
 output "name" {
   description = "The name of the storage account"
   value       = azurerm_storage_account.this.name
@@ -47,7 +42,25 @@ output "queues" {
 
 output "resource" {
   description = "This is the full resource output for the Storage Account resource."
+  sensitive   = true
   value       = azurerm_storage_account.this
+}
+
+output "resource_id" {
+  description = "The ID of the Storage Account."
+  value       = azurerm_storage_account.this.id
+}
+
+output "shares" {
+  description = "Map of storage storage shares that are created."
+  value = {
+    for name, share in azurerm_storage_share.this : name => {
+      id                   = share.id
+      name                 = share.name
+      storage_account_name = share.storage_account_name
+      metadata             = share.metadata
+    }
+  }
 }
 
 output "tables" {

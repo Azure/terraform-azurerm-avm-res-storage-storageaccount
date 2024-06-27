@@ -22,9 +22,10 @@ provider "azurerm" {
   storage_use_azuread        = true
 }
 
-module "regions" {
-  source  = "Azure/regions/azurerm"
-  version = ">= 0.3.0"
+
+locals {
+  test_regions = ["eastus", "eastus2", "westus2", "westus3"]
+
 }
 resource "random_integer" "region_index" {
   max = length(module.regions.regions) - 1
@@ -162,8 +163,8 @@ module "this" {
   } */
   role_assignments = {
     role_assignment_1 = {
-      role_definition_id_or_name       = data.azurerm_role_definition.example.id
-      principal_id                     = data.azurerm_client_config.current.object_id
+      role_definition_id_or_name       = data.azurerm_role_definition.example.name
+      principal_id                     = coalesce(var.msi_id, data.azurerm_client_config.current.object_id)
       skip_service_principal_aad_check = false
     },
     role_assignment_2 = {
@@ -225,12 +226,11 @@ module "this" {
       # the name must be set to avoid conflicting resources.
       name                          = "pe-${endpoint}-${module.naming.storage_account.name_unique}"
       subnet_resource_id            = azurerm_subnet.private.id
-      subresource_name              = [endpoint]
+      subresource_name              = endpoint
       private_dns_zone_resource_ids = [azurerm_private_dns_zone.this[endpoint].id]
       # these are optional but illustrate making well-aligned service connection & NIC names.
       private_service_connection_name = "psc-${endpoint}-${module.naming.storage_account.name_unique}"
       network_interface_name          = "nic-pe-${endpoint}-${module.naming.storage_account.name_unique}"
-      inherit_tags                    = false
       inherit_lock                    = false
 
       tags = {
@@ -241,8 +241,8 @@ module "this" {
 
       role_assignments = {
         role_assignment_1 = {
-          role_definition_id_or_name = data.azurerm_role_definition.example.id
-          principal_id               = data.azurerm_client_config.current.object_id
+          role_definition_id_or_name = data.azurerm_role_definition.example.name
+          principal_id               = coalesce(var.msi_id, data.azurerm_client_config.current.object_id)
         }
       }
     }

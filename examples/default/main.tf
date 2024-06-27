@@ -51,5 +51,4 @@ module "test" {
   location            = azurerm_resource_group.this.location
   enable_telemetry    = var.enable_telemetry # see variables.tf
   name                = module.naming.storage_account.name_unique
-  resource_group_name = azurerm_resource_group.this.name
-}
+  resource_group_name = azurerm_resource_group.this.n

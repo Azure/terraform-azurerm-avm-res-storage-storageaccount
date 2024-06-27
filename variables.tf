@@ -1,6 +1,12 @@
 variable "location" {
   type        = string
-  description = "Azure region where the resource should be deployed.  If null, the location will be inferred from the resource group location."
+
+  description = <<DESCRIPTION
+Azure region where the resource should be deployed.
+If null, the location will be inferred from the resource group location.
+DESCRIPTION
+  nullable    = false
+
 }
 
 variable "name" {
@@ -63,6 +69,7 @@ variable "lock" {
   type = object({
     kind = string
     name = optional(string, null)
+
   })
   default     = null
   description = <<DESCRIPTION
@@ -70,7 +77,7 @@ variable "lock" {
 
   - `kind` - (Required) The type of lock. Possible values are `\"CanNotDelete\"` and `\"ReadOnly\"`.
   - `name` - (Optional) The name of the lock. If not specified, a name will be generated based on the `kind` value. Changing this forces the creation of a new resource.
-  DESCRIPTION
+
 
   validation {
     condition     = var.lock != null ? contains(["CanNotDelete", "ReadOnly"], var.lock.kind) : true
@@ -104,6 +111,7 @@ variable "private_endpoints" {
       condition                              = optional(string, null)
       condition_version                      = optional(string, null)
       delegated_managed_identity_resource_id = optional(string, null)
+      principal_type                         = optional(string, null)
     })), {})
     lock = optional(object({
       kind = string
@@ -111,6 +119,10 @@ variable "private_endpoints" {
     }), null)
     tags                                    = optional(map(string), null)
     subnet_resource_id                      = string
+
+
+    subresource_name                        = string
+
     private_dns_zone_group_name             = optional(string, "default")
     private_dns_zone_resource_ids           = optional(set(string), [])
     application_security_group_associations = optional(map(string), {})
@@ -155,6 +167,7 @@ variable "role_assignments" {
     condition                              = optional(string, null)
     condition_version                      = optional(string, null)
     delegated_managed_identity_resource_id = optional(string, null)
+    principal_type                         = optional(string, null)
   }))
   default     = {}
   description = <<DESCRIPTION

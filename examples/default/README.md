@@ -59,6 +59,137 @@ module "test" {
   name                = module.naming.storage_account.name_unique
   resource_group_name = azurerm_resource_group.this.name
 }
+
+
+
+resource "azurerm_subnet_network_security_group_association" "private" {
+  network_security_group_id = azurerm_network_security_group.nsg.id
+  subnet_id                 = azurerm_subnet.private.id
+}
+
+resource "azurerm_network_security_rule" "no_internet" {
+  access                      = "Deny"
+  direction                   = "Outbound"
+  name                        = module.naming.network_security_rule.name_unique
+  network_security_group_name = azurerm_network_security_group.nsg.name
+  priority                    = 100
+  protocol                    = "*"
+  resource_group_name         = azurerm_resource_group.this.name
+  destination_address_prefix  = "Internet"
+  destination_port_range      = "*"
+  source_address_prefix       = azurerm_subnet.private.address_prefixes[0]
+  source_port_range           = "*"
+}
+
+module "public_ip" {
+  count = var.bypass_ip_cidr == null ? 1 : 0
+
+  source  = "lonegunmanb/public-ip/lonegunmanb"
+  version = "0.1.0"
+}
+# We need this to get the object_id of the current user
+data "azurerm_client_config" "current" {}
+
+resource "azurerm_user_assigned_identity" "example_identity" {
+  location            = azurerm_resource_group.this.location
+  name                = module.naming.user_assigned_identity.name_unique
+  resource_group_name = azurerm_resource_group.this.name
+}
+# We use the role definition data source to get the id of the Contributor role
+data "azurerm_role_definition" "example" {
+  name = "Contributor"
+}
+
+module "this" {
+
+  source = "../.."
+
+  account_replication_type      = "ZRS"
+  account_tier                  = "Standard"
+  account_kind                  = "StorageV2"
+  location                      = azurerm_resource_group.this.location
+  name                          = module.naming.storage_account.name_unique
+  resource_group_name           = azurerm_resource_group.this.name
+  min_tls_version               = "TLS1_2"
+  shared_access_key_enabled     = true
+  public_network_access_enabled = true
+  use_nested_nacl               = false
+  #use_nested_nacl              = true
+  managed_identities = {
+    system_assigned            = true
+    user_assigned_resource_ids = [azurerm_user_assigned_identity.example_identity.id]
+  }
+  tags = {
+    env   = "Dev"
+    owner = "John Doe"
+    dept  = "IT"
+  }
+
+  #Locks for storage account (Disabled by default)
+  /*lock = {
+    name = "lock"
+    kind = "None"
+  } */
+  role_assignments = {
+    role_assignment_1 = {
+      role_definition_id_or_name       = data.azurerm_role_definition.example.name
+      principal_id                     = coalesce(var.msi_id, data.azurerm_client_config.current.object_id)
+      skip_service_principal_aad_check = false
+    },
+    role_assignment_2 = {
+      role_definition_id_or_name       = "Owner"
+      principal_id                     = data.azurerm_client_config.current.object_id
+      skip_service_principal_aad_check = false
+    },
+
+  }
+  network_rules = {
+    bypass                     = ["AzureServices"]
+    default_action             = "Deny"
+    ip_rules                   = [try(module.public_ip[0].public_ip, var.bypass_ip_cidr)]
+    virtual_network_subnet_ids = toset([azurerm_subnet.private.id])
+  }
+
+  containers = {
+    blob_container0 = {
+      name                  = "blob-container-${random_string.this.result}-0"
+      container_access_type = "private"
+    }
+    blob_container1 = {
+      name                  = "blob-container-${random_string.this.result}-1"
+      container_access_type = "private"
+    }
+
+  }
+  queues = {
+    queue0 = {
+      name = "queue-${random_string.this.result}-0"
+    }
+    queue1 = {
+      name = "queue-${random_string.this.result}-1"
+    }
+  }
+  tables = {
+    table0 = {
+      name = "table${random_string.this.result}0"
+    }
+    table1 = {
+      name = "table${random_string.this.result}1"
+    }
+  }
+
+  shares = {
+    share0 = {
+      name  = "share-${random_string.this.result}-0"
+      quota = 10
+    }
+    share1 = {
+      name  = "share-${random_string.this.result}-1"
+      quota = 10
+    }
+  }
+}
+
 ```
 
 <!-- markdownlint-disable MD033 -->
@@ -106,9 +237,37 @@ Type: `bool`
 
 Default: `true`
 
+### <a name="input_msi_id"></a> [msi\_id](#input\_msi\_id)
+
+Description: If you're running this example by authentication with identity, please set identity object id here.
+
+Type: `string`
+
+Default: `null`
+
 ## Outputs
 
-No outputs.
+The following outputs are exported:
+
+### <a name="output_containers"></a> [containers](#output\_containers)
+
+Description: value of containers
+
+### <a name="output_queue"></a> [queue](#output\_queue)
+
+Description: value of queues
+
+### <a name="output_resource"></a> [resource](#output\_resource)
+
+Description: value of storage\_account
+
+### <a name="output_shares"></a> [shares](#output\_shares)
+
+Description: value of shares
+
+### <a name="output_tables"></a> [tables](#output\_tables)
+
+Description: value of tables
 
 ## Modules
 

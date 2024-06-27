@@ -1,4 +1,3 @@
-data "azurerm_client_config" "this" {}
 
 resource "azurerm_storage_account" "this" {
   account_replication_type          = var.account_replication_type
@@ -6,7 +5,7 @@ resource "azurerm_storage_account" "this" {
   location                          = var.location
   name                              = var.name
   resource_group_name               = var.resource_group_name
-  access_tier                       = var.access_tier
+  access_tier                       = var.account_kind == "BlockBlobStorage" && var.account_tier == "Premium" ? null : var.access_tier
   account_kind                      = var.account_kind
   allow_nested_items_to_be_public   = var.allow_nested_items_to_be_public
   allowed_copy_scope                = var.allowed_copy_scope

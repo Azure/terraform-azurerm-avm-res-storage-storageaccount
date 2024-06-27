@@ -7,13 +7,13 @@ resource "azurerm_private_endpoint" "this" {
   resource_group_name           = each.value.resource_group_name != null ? each.value.resource_group_name : var.resource_group_name
   subnet_id                     = each.value.subnet_resource_id
   custom_network_interface_name = each.value.network_interface_name
-  tags                          = each.value.inherit_tags ? merge(each.value.tags, var.tags) : each.value.tags
+  tags                          = each.value.tags
 
   private_service_connection {
     is_manual_connection           = false
     name                           = each.value.private_service_connection_name != null ? each.value.private_service_connection_name : "pse-${var.name}"
     private_connection_resource_id = azurerm_storage_account.this.id
-    subresource_names              = each.value.subresource_name
+    subresource_names              = [each.value.subresource_name]
   }
   dynamic "ip_configuration" {
     for_each = each.value.ip_configurations
@@ -50,6 +50,7 @@ resource "azurerm_role_assignment" "private_endpoint" {
   condition                              = each.value.role_assignment.condition
   condition_version                      = each.value.role_assignment.condition_version
   delegated_managed_identity_resource_id = each.value.role_assignment.delegated_managed_identity_resource_id
+  principal_type                         = each.value.role_assignment.principal_type
   role_definition_id                     = strcontains(lower(each.value.role_assignment.role_definition_id_or_name), lower(local.role_definition_resource_substring)) ? each.value.role_assignment.role_definition_id_or_name : null
   role_definition_name                   = strcontains(lower(each.value.role_assignment.role_definition_id_or_name), lower(local.role_definition_resource_substring)) ? null : each.value.role_assignment.role_definition_id_or_name
   skip_service_principal_aad_check       = each.value.role_assignment.skip_service_principal_aad_check
