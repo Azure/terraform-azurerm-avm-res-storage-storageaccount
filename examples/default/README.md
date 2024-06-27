@@ -28,20 +28,17 @@ provider "azurerm" {
   skip_provider_registration = true
   storage_use_azuread        = true
 }
-locals {
-  test_regions = ["eastus", "eastus2", "westus2", "westus3"]
+## Section to provide a random Azure region for the resource group
+# This allows us to randomize the region for the resource group.
+module "regions" {
+  source  = "Azure/regions/azurerm"
+  version = ">= 0.3.0"
 }
 resource "random_integer" "region_index" {
-  max = length(local.test_regions) - 1
+  max = length(module.regions.regions) - 1
   min = 0
 }
 
-# This allow use to randomize the name of resources
-resource "random_string" "this" {
-  length  = 6
-  special = false
-  upper   = false
-}
 # This ensures we have unique CAF compliant names for resources.
 module "naming" {
   source  = "Azure/naming/azurerm"
@@ -50,30 +47,20 @@ module "naming" {
 
 # This is required for resource modules
 resource "azurerm_resource_group" "this" {
-  location = local.test_regions[random_integer.region_index.result]
+  location = module.regions.regions[random_integer.region_index.result].name
   name     = module.naming.resource_group.name_unique
 }
 
-resource "azurerm_virtual_network" "vnet" {
-  address_space       = ["192.168.0.0/16"]
+module "test" {
+
+  source              = "../.."
   location            = azurerm_resource_group.this.location
-  name                = module.naming.virtual_network.name_unique
+  enable_telemetry    = var.enable_telemetry # see variables.tf
+  name                = module.naming.storage_account.name_unique
   resource_group_name = azurerm_resource_group.this.name
 }
 
-resource "azurerm_subnet" "private" {
-  address_prefixes     = ["192.168.0.0/24"]
-  name                 = module.naming.subnet.name_unique
-  resource_group_name  = azurerm_resource_group.this.name
-  virtual_network_name = azurerm_virtual_network.vnet.name
-  service_endpoints    = ["Microsoft.Storage"]
-}
 
-resource "azurerm_network_security_group" "nsg" {
-  location            = azurerm_resource_group.this.location
-  name                = module.naming.network_security_group.name_unique
-  resource_group_name = azurerm_resource_group.this.name
-}
 
 resource "azurerm_subnet_network_security_group_association" "private" {
   network_security_group_id = azurerm_network_security_group.nsg.id
@@ -202,6 +189,7 @@ module "this" {
     }
   }
 }
+
 ```
 
 <!-- markdownlint-disable MD033 -->
@@ -227,17 +215,8 @@ The following providers are used by this module:
 
 The following resources are used by this module:
 
-- [azurerm_network_security_group.nsg](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/network_security_group) (resource)
-- [azurerm_network_security_rule.no_internet](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/network_security_rule) (resource)
 - [azurerm_resource_group.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) (resource)
-- [azurerm_subnet.private](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet) (resource)
-- [azurerm_subnet_network_security_group_association.private](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet_network_security_group_association) (resource)
-- [azurerm_user_assigned_identity.example_identity](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/user_assigned_identity) (resource)
-- [azurerm_virtual_network.vnet](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_network) (resource)
 - [random_integer.region_index](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/integer) (resource)
-- [random_string.this](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/string) (resource)
-- [azurerm_client_config.current](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/client_config) (data source)
-- [azurerm_role_definition.example](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/role_definition) (data source)
 
 <!-- markdownlint-disable MD013 -->
 ## Required Inputs
@@ -248,13 +227,15 @@ No required inputs.
 
 The following input variables are optional (have default values):
 
-### <a name="input_bypass_ip_cidr"></a> [bypass\_ip\_cidr](#input\_bypass\_ip\_cidr)
+### <a name="input_enable_telemetry"></a> [enable\_telemetry](#input\_enable\_telemetry)
 
-Description: value to bypass the IP CIDR on firewall rules
+Description: This variable controls whether or not telemetry is enabled for the module.  
+For more information see <https://aka.ms/avm/telemetryinfo>.  
+If it is set to false, then no telemetry will be collected.
 
-Type: `string`
+Type: `bool`
 
-Default: `null`
+Default: `true`
 
 ### <a name="input_msi_id"></a> [msi\_id](#input\_msi\_id)
 
@@ -298,13 +279,13 @@ Source: Azure/naming/azurerm
 
 Version: 0.4.0
 
-### <a name="module_public_ip"></a> [public\_ip](#module\_public\_ip)
+### <a name="module_regions"></a> [regions](#module\_regions)
 
-Source: lonegunmanb/public-ip/lonegunmanb
+Source: Azure/regions/azurerm
 
-Version: 0.1.0
+Version: >= 0.3.0
 
-### <a name="module_this"></a> [this](#module\_this)
+### <a name="module_test"></a> [test](#module\_test)
 
 Source: ../..
 
