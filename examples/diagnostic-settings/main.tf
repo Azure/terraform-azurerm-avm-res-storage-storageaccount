@@ -199,50 +199,60 @@ module "this" {
   #setting up diagnostic settings for storage account
   diagnostic_settings_storage_account = {
     storage = {
-      name                  = "diag"
-      workspace_resource_id = azurerm_log_analytics_workspace.this.id
-      log_categories        = ["audit", "alllogs"]
-      metric_categories     = ["Capacity", "Transaction"]
+      name                                     = "diag"
+      workspace_resource_id                    = azurerm_log_analytics_workspace.this.id
+      log_categories                           = ["audit", "alllogs"]
+      metric_categories                        = ["Capacity", "Transaction"]
+      eventhub_name                            = azurerm_eventhub.this.name
+      event_hub_authorization_rule_resource_id = "${azurerm_eventhub_namespace.this.id}/authorizationRules/RootManageSharedAccessKey"
     }
   }
 
   # setting up diagnostic settings for queue
   diagnostic_settings_queue = {
     queue = {
-      name                  = "diag"
-      workspace_resource_id = azurerm_log_analytics_workspace.this.id
-      log_categories        = ["audit", "alllogs"]
-      metric_categories     = ["Capacity", "Transaction"]
+      name                                     = "diag"
+      workspace_resource_id                    = azurerm_log_analytics_workspace.this.id
+      log_categories                           = ["audit", "alllogs"]
+      eventhub_name                            = azurerm_eventhub.this.name
+      event_hub_authorization_rule_resource_id = "${azurerm_eventhub_namespace.this.id}/authorizationRules/RootManageSharedAccessKey"
+      metric_categories                        = ["Capacity", "Transaction"]
     }
   }
 
   # setting up diagnostic settings for table
   diagnostic_settings_table = {
     table = {
-      name                  = "diag"
-      workspace_resource_id = azurerm_log_analytics_workspace.this.id
-      log_categories        = ["audit", "alllogs"]
-      metric_categories     = ["Capacity", "Transaction"]
+      name                                     = "diag"
+      workspace_resource_id                    = azurerm_log_analytics_workspace.this.id
+      eventhub_name                            = azurerm_eventhub.this.name
+      event_hub_authorization_rule_resource_id = "${azurerm_eventhub_namespace.this.id}/authorizationRules/RootManageSharedAccessKey"
+      log_categories                           = ["audit", "alllogs"]
+      metric_categories                        = ["Capacity", "Transaction"]
     }
   }
 
   # setting up diagnostic settings for file
   diagnostic_settings_file = {
     file1 = {
-      name                  = "diag"
-      workspace_resource_id = azurerm_log_analytics_workspace.this.id
-      log_categories        = ["audit", "alllogs"]
-      metric_categories     = ["Capacity", "Transaction"]
+      name                                     = "diag"
+      workspace_resource_id                    = azurerm_log_analytics_workspace.this.id
+      eventhub_name                            = azurerm_eventhub.this.name
+      event_hub_authorization_rule_resource_id = "${azurerm_eventhub_namespace.this.id}/authorizationRules/RootManageSharedAccessKey"
+      log_categories                           = ["audit", "alllogs"]
+      metric_categories                        = ["Capacity", "Transaction"]
     }
   }
 
   # setting up diagnostic settings for blob
   diagnostic_settings_blob = {
     blob11 = {
-      name                  = "diag"
-      workspace_resource_id = azurerm_log_analytics_workspace.this.id
-      log_categories        = ["audit", "alllogs"]
-      metric_categories     = ["Capacity", "Transaction"]
+      name                                     = "diag"
+      workspace_resource_id                    = azurerm_log_analytics_workspace.this.id
+      eventhub_name                            = azurerm_eventhub.this.name
+      event_hub_authorization_rule_resource_id = "${azurerm_eventhub_namespace.this.id}/authorizationRules/RootManageSharedAccessKey"
+      log_categories                           = ["audit", "alllogs"]
+      metric_categories                        = ["Capacity", "Transaction"]
     }
   }
 }
@@ -254,3 +264,34 @@ resource "azurerm_log_analytics_workspace" "this" {
   resource_group_name = azurerm_resource_group.this.name
   sku                 = "PerGB2018"
 }
+
+resource "azurerm_eventhub_namespace" "this" {
+  location            = azurerm_resource_group.this.location
+  name                = module.naming.eventhub_namespace.name_unique
+  resource_group_name = azurerm_resource_group.this.name
+  sku                 = "Standard"
+  capacity            = 2
+  tags = {
+    environment = "Production"
+  }
+}
+
+resource "azurerm_eventhub" "this" {
+  message_retention   = 7
+  name                = module.naming.eventhub_namespace.name_unique
+  namespace_name      = azurerm_eventhub_namespace.this.name
+  partition_count     = 2
+  resource_group_name = azurerm_resource_group.this.name
+}
+
+resource "azurerm_eventhub_authorization_rule" "this" {
+  eventhub_name       = azurerm_eventhub.this.name
+  name                = module.naming.eventhub_authorization_rule.name_unique
+  namespace_name      = azurerm_eventhub_namespace.this.name
+  resource_group_name = azurerm_resource_group.this.name
+  listen              = true
+  manage              = false
+  send                = false
+}
+
+
