@@ -1,5 +1,6 @@
 resource "azurerm_storage_account" "this" {
-  count                             = var.use_nested_nacl ? 1 : 0
+  count = var.use_nested_nacl ? 1 : 0
+
   account_replication_type          = var.account_replication_type
   account_tier                      = var.account_tier
   location                          = var.location
@@ -292,7 +293,8 @@ resource "azurerm_storage_account_local_user" "this" {
 
 resource "azurerm_storage_account_customer_managed_key" "this" {
   # count = var.customer_managed_key != null ? 1 : 0
-  count                     = var.use_nested_nacl ? var.customer_managed_key != null ? 1 : 0 : 0
+  count = var.use_nested_nacl ? var.customer_managed_key != null ? 1 : 0 : 0
+
   key_name                  = var.customer_managed_key.key_name
   storage_account_id        = local.azurerm_storage_account_this.id
   key_vault_id              = var.customer_managed_key.key_vault_resource_id
@@ -309,7 +311,8 @@ resource "azurerm_storage_account_customer_managed_key" "this" {
 
 resource "azurerm_role_assignment" "storage_account" {
   # for_each = var.role_assignments
-  for_each                               = var.use_nested_nacl ? var.role_assignments : {}
+  for_each = var.use_nested_nacl ? var.role_assignments : {}
+
   principal_id                           = each.value.principal_id
   scope                                  = local.azurerm_storage_account_this.id
   condition                              = each.value.condition

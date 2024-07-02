@@ -1,5 +1,6 @@
 resource "azurerm_storage_account" "no_nacl" {
-  count                             = var.use_nested_nacl ? 0 : 1
+  count = var.use_nested_nacl ? 0 : 1
+
   account_replication_type          = var.account_replication_type
   account_tier                      = var.account_tier
   location                          = var.location
@@ -113,24 +114,6 @@ resource "azurerm_storage_account" "no_nacl" {
       state                         = immutability_policy.value.state
     }
   }
-  # dynamic "network_rules" {
-  #   # for_each = var.network_rules == null ? [] : [var.network_rules]
-  #   for_each = var.use_nested_nacl ? (var.network_rules != null ? [var.network_rules] : []) : []
-  #   content {
-  #     default_action             = network_rules.value.default_action
-  #     bypass                     = network_rules.value.bypass
-  #     ip_rules                   = network_rules.value.ip_rules
-  #     virtual_network_subnet_ids = network_rules.value.virtual_network_subnet_ids
-
-  #     dynamic "private_link_access" {
-  #       for_each = var.network_rules.private_link_access == null ? [] : var.network_rules.private_link_access
-  #       content {
-  #         endpoint_resource_id = private_link_access.value.endpoint_resource_id
-  #         endpoint_tenant_id   = private_link_access.value.endpoint_tenant_id
-  #       }
-  #     }
-  #   }
-
   # }
   dynamic "queue_properties" {
     for_each = var.queue_properties == null ? [] : [var.queue_properties]
@@ -293,7 +276,8 @@ resource "azurerm_storage_account_local_user" "no_nacl" {
 
 resource "azurerm_storage_account_customer_managed_key" "no_nacl" {
   # count = var.customer_managed_key != null ? 1 : 0
-  count                     = var.use_nested_nacl ? 0 : var.customer_managed_key != null ? 1 : 0
+  count = var.use_nested_nacl ? 0 : var.customer_managed_key != null ? 1 : 0
+
   key_name                  = var.customer_managed_key.key_name
   storage_account_id        = local.azurerm_storage_account_this.id
   key_vault_id              = var.customer_managed_key.key_vault_resource_id
@@ -310,6 +294,7 @@ resource "azurerm_storage_account_customer_managed_key" "no_nacl" {
 
 resource "azurerm_role_assignment" "storage_account_no_nacl" {
   for_each = var.use_nested_nacl ? {} : var.role_assignments
+
   # count                                  = var.use_nested_nacl ? 0 : 1
   principal_id                           = each.value.principal_id
   scope                                  = local.azurerm_storage_account_this.id
