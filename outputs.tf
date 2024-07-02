@@ -12,12 +12,12 @@ output "containers" {
 
 output "fqdn" {
   description = "Fqdns for storage services."
-  value       = { for svc in local.endpoints : svc => "${azurerm_storage_account.this.name}.${svc}.core.windows.net" }
+  value       = { for svc in local.endpoints : svc => "${local.azurerm_storage_account_this.name}.${svc}.core.windows.net" }
 }
 
 output "name" {
   description = "The name of the storage account"
-  value       = azurerm_storage_account.this.name
+  value       = local.azurerm_storage_account_this.name
 }
 
 output "private_endpoints" {
@@ -44,7 +44,7 @@ output "resource" {
 
 output "resource_id" {
   description = "The ID of the Storage Account."
-  value       = azurerm_storage_account.this.id
+  value       = local.azurerm_storage_account_this.id
 }
 
 output "shares" {
@@ -63,7 +63,7 @@ output "tables" {
     for name, table in azapi_resource.table : name => {
       id                   = table.id
       name                 = table.name
-      storage_account_name = azurerm_storage_account.this.name
+      storage_account_name = local.azurerm_storage_account_this.name
     }
   }
 }

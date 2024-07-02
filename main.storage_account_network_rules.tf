@@ -1,7 +1,5 @@
-# data "azurerm_resource_group" "rg" {
-#   name = var.resource_group_name
-# }
-resource "azurerm_storage_account" "this" {
+resource "azurerm_storage_account" "no_nacl" {
+  count                             = var.use_nested_nacl ? 0 : 1
   account_replication_type          = var.account_replication_type
   account_tier                      = var.account_tier
   location                          = var.location
@@ -115,25 +113,25 @@ resource "azurerm_storage_account" "this" {
       state                         = immutability_policy.value.state
     }
   }
-  dynamic "network_rules" {
-    # for_each = var.network_rules == null ? [] : [var.network_rules]
-    for_each = var.use_nested_nacl ? (var.network_rules != null ? [var.network_rules] : []) : []
-    content {
-      default_action             = network_rules.value.default_action
-      bypass                     = network_rules.value.bypass
-      ip_rules                   = network_rules.value.ip_rules
-      virtual_network_subnet_ids = network_rules.value.virtual_network_subnet_ids
+  # dynamic "network_rules" {
+  #   # for_each = var.network_rules == null ? [] : [var.network_rules]
+  #   for_each = var.use_nested_nacl ? (var.network_rules != null ? [var.network_rules] : []) : []
+  #   content {
+  #     default_action             = network_rules.value.default_action
+  #     bypass                     = network_rules.value.bypass
+  #     ip_rules                   = network_rules.value.ip_rules
+  #     virtual_network_subnet_ids = network_rules.value.virtual_network_subnet_ids
 
-      dynamic "private_link_access" {
-        for_each = var.network_rules.private_link_access == null ? [] : var.network_rules.private_link_access
-        content {
-          endpoint_resource_id = private_link_access.value.endpoint_resource_id
-          endpoint_tenant_id   = private_link_access.value.endpoint_tenant_id
-        }
-      }
-    }
+  #     dynamic "private_link_access" {
+  #       for_each = var.network_rules.private_link_access == null ? [] : var.network_rules.private_link_access
+  #       content {
+  #         endpoint_resource_id = private_link_access.value.endpoint_resource_id
+  #         endpoint_tenant_id   = private_link_access.value.endpoint_tenant_id
+  #       }
+  #     }
+  #   }
 
-  }
+  # }
   dynamic "queue_properties" {
     for_each = var.queue_properties == null ? [] : [var.queue_properties]
     content {
@@ -247,11 +245,11 @@ resource "azurerm_storage_account" "this" {
   }
 }
 
-resource "azurerm_storage_account_local_user" "this" {
+resource "azurerm_storage_account_local_user" "no_nacl" {
   for_each = var.local_user
 
   name                 = each.value.name
-  storage_account_id   = azurerm_storage_account.this.id
+  storage_account_id   = local.azurerm_storage_account_this.id
   home_directory       = each.value.home_directory
   ssh_key_enabled      = each.value.ssh_key_enabled
   ssh_password_enabled = each.value.ssh_password_enabled
@@ -293,11 +291,11 @@ resource "azurerm_storage_account_local_user" "this" {
 }
 
 
-resource "azurerm_storage_account_customer_managed_key" "this" {
-  count = var.customer_managed_key != null ? 1 : 0
-
+resource "azurerm_storage_account_customer_managed_key" "no_nacl" {
+  # count = var.customer_managed_key != null ? 1 : 0
+  count                     = var.use_nested_nacl ? 0 : var.customer_managed_key != null ? 1 : 0
   key_name                  = var.customer_managed_key.key_name
-  storage_account_id        = azurerm_storage_account.this.id
+  storage_account_id        = local.azurerm_storage_account_this.id
   key_vault_id              = var.customer_managed_key.key_vault_resource_id
   key_version               = var.customer_managed_key.key_version
   user_assigned_identity_id = var.customer_managed_key.user_assigned_identity.resource_id
@@ -310,11 +308,11 @@ resource "azurerm_storage_account_customer_managed_key" "this" {
   }
 }
 
-resource "azurerm_role_assignment" "storage_account" {
-  for_each = var.role_assignments
-
+resource "azurerm_role_assignment" "storage_account_no_nacl" {
+  for_each = var.use_nested_nacl ? {} : var.role_assignments
+  # count                                  = var.use_nested_nacl ? 0 : 1
   principal_id                           = each.value.principal_id
-  scope                                  = azurerm_storage_account.this.id
+  scope                                  = local.azurerm_storage_account_this.id
   condition                              = each.value.condition
   condition_version                      = each.value.condition_version
   delegated_managed_identity_resource_id = each.value.delegated_managed_identity_resource_id
@@ -322,11 +320,11 @@ resource "azurerm_role_assignment" "storage_account" {
   role_definition_name                   = strcontains(lower(each.value.role_definition_id_or_name), lower(local.role_definition_resource_substring)) ? null : each.value.role_definition_id_or_name
   skip_service_principal_aad_check       = each.value.skip_service_principal_aad_check
 }
-resource "azurerm_storage_account_network_rules" "this" {
+resource "azurerm_storage_account_network_rules" "no_nacl" {
   count = var.use_nested_nacl ? 0 : var.network_rules == null ? 0 : 1
 
   default_action             = var.network_rules.default_action
-  storage_account_id         = azurerm_storage_account.this.id
+  storage_account_id         = local.azurerm_storage_account_this.id
   bypass                     = var.network_rules.bypass
   ip_rules                   = var.network_rules.ip_rules
   virtual_network_subnet_ids = var.network_rules.virtual_network_subnet_ids

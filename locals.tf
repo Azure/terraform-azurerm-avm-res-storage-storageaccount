@@ -67,3 +67,6 @@ locals {
   ]) : "${ra.table_key}-${ra.ra_key}" => ra }
 }
 
+locals {
+  azurerm_storage_account_this = var.use_nested_nacl ? azurerm_storage_account.this[0] : azurerm_storage_account.no_nacl[0]
+}

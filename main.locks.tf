@@ -4,7 +4,7 @@ resource "azurerm_management_lock" "this_storage_account" {
 
   lock_level = var.lock.kind
   name       = coalesce(var.lock.name, "lock-${var.name}")
-  scope      = azurerm_storage_account.this.id
+  scope      = local.azurerm_storage_account_this.id
   notes      = var.lock.kind == "CanNotDelete" ? "Cannot delete the resource or its child resources." : "Cannot delete or modify the resource or its child resources."
 
   depends_on = [

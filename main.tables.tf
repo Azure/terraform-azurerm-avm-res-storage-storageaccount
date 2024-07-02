@@ -8,7 +8,7 @@ resource "azapi_resource" "table" {
     }
   }
   name                      = each.value.name
-  parent_id                 = "${azurerm_storage_account.this.id}/tableServices/default"
+  parent_id                 = "${local.azurerm_storage_account_this.id}/tableServices/default"
   schema_validation_enabled = false
 
   dynamic "timeouts" {
@@ -27,7 +27,7 @@ resource "azurerm_role_assignment" "tables" {
 
   principal_id = each.value.role_assignment.principal_id
   # the resource manager id is not exposed directly by the AzureRM provider - https://github.com/hashicorp/terraform-provider-azurerm/issues/21525
-  scope                                  = "${azurerm_storage_account.this.id}/tableServices/default/tables/${azapi_resource.table[each.value.table_key].name}"
+  scope                                  = "${local.azurerm_storage_account_this.id}/tableServices/default/tables/${azapi_resource.table[each.value.table_key].name}"
   condition                              = each.value.role_assignment.condition
   condition_version                      = each.value.role_assignment.condition_version
   delegated_managed_identity_resource_id = each.value.role_assignment.delegated_managed_identity_resource_id

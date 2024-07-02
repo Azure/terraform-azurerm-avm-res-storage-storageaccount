@@ -15,7 +15,7 @@ resource "azapi_resource" "share" {
     }
   }
   name                      = each.value.name
-  parent_id                 = "${azurerm_storage_account.this.id}/fileServices/default"
+  parent_id                 = "${local.azurerm_storage_account_this.id}/fileServices/default"
   schema_validation_enabled = false
 
   dynamic "timeouts" {
@@ -33,7 +33,7 @@ resource "azurerm_role_assignment" "shares" {
   for_each = local.shares_role_assignments
 
   principal_id                           = each.value.role_assignment.principal_id
-  scope                                  = "${azurerm_storage_account.this.id}/fileServices/default/shares/${azapi_resource.share[each.value.share_key].name}"
+  scope                                  = "${local.azurerm_storage_account_this.id}/fileServices/default/shares/${azapi_resource.share[each.value.share_key].name}"
   condition                              = each.value.role_assignment.condition
   condition_version                      = each.value.role_assignment.condition_version
   delegated_managed_identity_resource_id = each.value.role_assignment.delegated_managed_identity_resource_id

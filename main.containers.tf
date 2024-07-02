@@ -11,7 +11,7 @@ resource "azapi_resource" "containers" {
     }
   }
   name                      = each.value.name
-  parent_id                 = "${azurerm_storage_account.this.id}/blobServices/default"
+  parent_id                 = "${local.azurerm_storage_account_this.id}/blobServices/default"
   schema_validation_enabled = false #https://github.com/Azure/terraform-provider-azapi/issues/497
 
   dynamic "timeouts" {
