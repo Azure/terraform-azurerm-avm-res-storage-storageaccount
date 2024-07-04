@@ -74,7 +74,6 @@ The following resources are used by this module:
 - [azurerm_storage_account.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account) (resource)
 - [azurerm_storage_account_customer_managed_key.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account_customer_managed_key) (resource)
 - [azurerm_storage_account_local_user.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account_local_user) (resource)
-- [azurerm_storage_account_network_rules.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account_network_rules) (resource)
 - [random_id.telemetry](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/id) (resource)
 - [time_sleep.wait_for_rbac_before_share_operations](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/sleep) (resource)
 
@@ -1320,18 +1319,6 @@ object({
 ```
 
 Default: `null`
-
-### <a name="input_use_nested_nacl"></a> [use\_nested\_nacl](#input\_use\_nested\_nacl)
-
-Description:     Controls whether or not to use nested network ACLs for this resource.  
-    Nested network ACLs are used to apply network ACLs to the subresources of the storage account, such as blob containers and queues.
-
-    - If set to `true`, nested network ACLs will be used and will override any network rules. NACL resource will be created to support scenarios like Azure policy for storage accounts.
-    - If set to `false`, nested network ACLs will not be used and "azurerm\_storage\_account\_network\_rules" resource will be leveraged.
-
-Type: `bool`
-
-Default: `false`
 
 ### <a name="input_wait_for_rbac_before_share_operations"></a> [wait\_for\_rbac\_before\_share\_operations](#input\_wait\_for\_rbac\_before\_share\_operations)
 
