@@ -163,17 +163,3 @@ variable "azure_files_authentication" {
  - `storage_sid` - (Required) Specifies the security identifier (SID) for Azure Storage.
 EOT
 }
-
-variable "wait_for_rbac_before_share_operations" {
-  type = object({
-    create  = optional(string, "30s")
-    destroy = optional(string, "0s")
-  })
-  default     = {}
-  description = <<DESCRIPTION
-This variable controls the amount of time to wait before performing share operations.
-It only applies when `var.role_assignments` and `var.shares` are both set.
-This is useful when you are creating role assignments on the share and immediately creating shares in it.
-The default is 30 seconds for create and 0 seconds for destroy.
-DESCRIPTION
-}
