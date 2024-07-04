@@ -34,8 +34,6 @@ The following requirements are needed by this module:
 
 - <a name="requirement_random"></a> [random](#requirement\_random) (>= 3.5.0, < 4.0.0)
 
-- <a name="requirement_time"></a> [time](#requirement\_time) (>= 0.9.1, < 2.0.0)
-
 ## Providers
 
 The following providers are used by this module:
@@ -45,8 +43,6 @@ The following providers are used by this module:
 - <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) (>= 3.71.0, < 4.0.0)
 
 - <a name="provider_random"></a> [random](#provider\_random) (>= 3.5.0, < 4.0.0)
-
-- <a name="provider_time"></a> [time](#provider\_time) (>= 0.9.1, < 2.0.0)
 
 ## Resources
 
@@ -74,9 +70,7 @@ The following resources are used by this module:
 - [azurerm_storage_account.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account) (resource)
 - [azurerm_storage_account_customer_managed_key.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account_customer_managed_key) (resource)
 - [azurerm_storage_account_local_user.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account_local_user) (resource)
-- [azurerm_storage_account_network_rules.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account_network_rules) (resource)
 - [random_id.telemetry](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/id) (resource)
-- [time_sleep.wait_for_rbac_before_share_operations](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/sleep) (resource)
 
 <!-- markdownlint-disable MD013 -->
 ## Required Inputs
@@ -1320,36 +1314,6 @@ object({
 ```
 
 Default: `null`
-
-### <a name="input_use_nested_nacl"></a> [use\_nested\_nacl](#input\_use\_nested\_nacl)
-
-Description:     Controls whether or not to use nested network ACLs for this resource.  
-    Nested network ACLs are used to apply network ACLs to the subresources of the storage account, such as blob containers and queues.
-
-    - If set to `true`, nested network ACLs will be used and will override any network rules. NACL resource will be created to support scenarios like Azure policy for storage accounts.
-    - If set to `false`, nested network ACLs will not be used and "azurerm\_storage\_account\_network\_rules" resource will be leveraged.
-
-Type: `bool`
-
-Default: `false`
-
-### <a name="input_wait_for_rbac_before_share_operations"></a> [wait\_for\_rbac\_before\_share\_operations](#input\_wait\_for\_rbac\_before\_share\_operations)
-
-Description: This variable controls the amount of time to wait before performing share operations.  
-It only applies when `var.role_assignments` and `var.shares` are both set.  
-This is useful when you are creating role assignments on the share and immediately creating shares in it.  
-The default is 30 seconds for create and 0 seconds for destroy.
-
-Type:
-
-```hcl
-object({
-    create  = optional(string, "30s")
-    destroy = optional(string, "0s")
-  })
-```
-
-Default: `{}`
 
 ## Outputs
 

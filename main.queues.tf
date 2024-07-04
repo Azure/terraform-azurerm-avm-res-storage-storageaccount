@@ -20,7 +20,7 @@ resource "azapi_resource" "queue" {
     }
   }
 
-  depends_on = [azurerm_storage_account.this, azurerm_storage_account_network_rules.this]
+  depends_on = [azurerm_storage_account.this]
 }
 
 # Enable role assignments for queues
