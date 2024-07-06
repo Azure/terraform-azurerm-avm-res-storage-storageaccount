@@ -26,14 +26,8 @@ output "private_endpoints" {
 }
 
 output "queues" {
-  description = "Map of storage queues that are created."
-  value = {
-    for name, queue in azapi_resource.queue :
-    name => {
-      id   = queue.id
-      name = queue.name
-    }
-  }
+  description = "The queues output objects as created by the queues submodule."
+  value       = module.queues
 }
 
 output "resource" {

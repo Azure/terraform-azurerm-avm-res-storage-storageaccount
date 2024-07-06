@@ -24,6 +24,12 @@ resource "azapi_resource" "containers" {
   }
 }
 
+# module "storage_containers" {
+#   source   = "./modules/containers"
+#   for_each = var.containers
+
+# }
+
 # Enable role assignments for containers
 resource "azurerm_role_assignment" "containers" {
   for_each = local.containers_role_assignments
