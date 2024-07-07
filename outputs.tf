@@ -1,15 +1,17 @@
+# output "containers" {
+#   description = "Map of storage containers that are created."
+#   value = {
+#     for name, container in azapi_resource.containers :
+#     name => {
+#       id            = container.id
+#       name          = container.name
+#       public_access = container.body.properties.publicAccess
+#     }
+#   }
+# }
 output "containers" {
-  description = "Map of storage containers that are created."
-  value = {
-    for name, container in azapi_resource.containers :
-    name => {
-      id            = container.id
-      name          = container.name
-      public_access = container.body.properties.publicAccess
-    }
-  }
+  value = module.containers
 }
-
 output "fqdn" {
   description = "Fqdns for storage services."
   value       = { for svc in local.endpoints : svc => "${azurerm_storage_account.this.name}.${svc}.core.windows.net" }
