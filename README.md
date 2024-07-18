@@ -234,10 +234,12 @@ object({
     change_feed_retention_in_days = optional(number)
     default_service_version       = optional(string)
     last_access_time_enabled      = optional(bool)
-    versioning_enabled            = optional(bool)
+    versioning_enabled            = optional(bool, true)
     container_delete_retention_policy = optional(object({
-      days = optional(number)
-    }))
+      days = optional(number, 7)
+
+    }), { days = 7 })
+
     cors_rule = optional(list(object({
       allowed_headers    = list(string)
       allowed_methods    = list(string)
@@ -246,8 +248,8 @@ object({
       max_age_in_seconds = number
     })))
     delete_retention_policy = optional(object({
-      days = optional(number)
-    }))
+      days = optional(number, 7)
+    }), { days = 7 })
     diagnostic_settings = optional(map(object({
       name                                     = optional(string, null)
       log_categories                           = optional(set(string), [])

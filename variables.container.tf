@@ -72,7 +72,7 @@ variable "blob_properties" {
     change_feed_retention_in_days = optional(number)
     default_service_version       = optional(string)
     last_access_time_enabled      = optional(bool)
-    versioning_enabled            = optional(bool,true)
+    versioning_enabled            = optional(bool, true)
     container_delete_retention_policy = optional(object({
       days = optional(number, 7)
 
