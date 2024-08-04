@@ -122,6 +122,7 @@ module "this" {
   account_kind                  = "StorageV2"
   location                      = azurerm_resource_group.this.location
   name                          = module.naming.storage_account.name_unique
+  https_traffic_only_enabled    = true
   resource_group_name           = azurerm_resource_group.this.name
   min_tls_version               = "TLS1_2"
   shared_access_key_enabled     = true
