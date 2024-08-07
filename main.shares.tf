@@ -41,3 +41,9 @@ resource "azurerm_role_assignment" "shares" {
   role_definition_name                   = strcontains(lower(each.value.role_assignment.role_definition_id_or_name), lower(local.role_definition_resource_substring)) ? null : each.value.role_assignment.role_definition_id_or_name
   skip_service_principal_aad_check       = each.value.role_assignment.skip_service_principal_aad_check
 }
+
+resource "azurerm_storage_share_directory" "directory" {
+  count = var.share_directory != null ? var.share_directory : 0
+  name             = var.share_directory.name
+  storage_share_id = azapi_resource.share[each.value.share_key].id
+}

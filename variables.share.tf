@@ -163,3 +163,15 @@ variable "azure_files_authentication" {
  - `storage_sid` - (Required) Specifies the security identifier (SID) for Azure Storage.
 EOT
 }
+
+variable "share_directory" {
+  type = string
+  default     = null
+  description = "(Optional) The directory to be created within the file share."
+}
+
+variable "share_name" {
+  type        = string
+  default = null
+  description = "(Required) The name of the share."
+}
