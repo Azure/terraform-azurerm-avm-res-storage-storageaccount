@@ -91,12 +91,6 @@ variable "managed_identities" {
   DESCRIPTION
   nullable    = false
 }
-variable "private_endpoints_manage_dns_zone_group" {
-  type        = bool
-  default     = true
-  nullable    = false
-  description = "Whether to manage private DNS zone groups with this module. If set to false, you must manage private DNS zone groups externally, e.g. using Azure Policy."
-}
 
 variable "private_endpoints" {
   type = map(object({
@@ -154,7 +148,12 @@ DESCRIPTION
   nullable    = false
 }
 
-
+variable "private_endpoints_manage_dns_zone_group" {
+  type        = bool
+  default     = true
+  description = "Whether to manage private DNS zone groups with this module. If set to false, you must manage private DNS zone groups externally, e.g. using Azure Policy."
+  nullable    = false
+}
 
 variable "role_assignments" {
   type = map(object({
