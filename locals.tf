@@ -12,7 +12,7 @@ locals {
   ]) : "${ra.container_key}-${ra.ra_key}" => ra }
   endpoints = toset(concat(local.blob_endpoint, local.queue_endpoint, local.table_endpoint))
   # private endpoint role assignments
-  pe_role_assignments = var.private_endpoints_manage_dns_zone_group ? { for ra in flatten([
+  pe_role_assignments = { for ra in flatten([
     for pe_k, pe_v in var.private_endpoints : [
       for rk, rv in pe_v.role_assignments : {
         private_endpoint_key = pe_k
@@ -20,8 +20,8 @@ locals {
         role_assignment      = rv
       }
     ]
-  ]) : "${ra.private_endpoint_key}-${ra.ra_key}" => ra } : {}
-  # Private endpoint application security group associations
+  ]) : "${ra.private_endpoint_key}-${ra.ra_key}" => ra }
+  # Private endpsoint application security group associations
   private_endpoint_application_security_group_associations = { for assoc in flatten([
     for pe_k, pe_v in var.private_endpoints : [
       for asg_k, asg_v in pe_v.application_security_group_associations : {
