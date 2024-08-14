@@ -76,7 +76,8 @@ resource "azurerm_private_endpoint_application_security_group_association" "this
 }
 
 resource "azurerm_role_assignment" "private_endpoint" {
-  for_each                               = local.pe_role_assignments
+  for_each = local.pe_role_assignments
+
   principal_id                           = each.value.role_assignment.principal_id
   scope                                  = try(azurerm_private_endpoint.this[each.value.private_endpoint_key].id, azurerm_private_endpoint.this_unmanaged_dns_zone_groups[each.value.private_endpoint_key].id)
   condition                              = each.value.role_assignment.condition
