@@ -21,7 +21,7 @@ locals {
       }
     ]
   ]) : "${ra.private_endpoint_key}-${ra.ra_key}" => ra }
-  # Private endpoint application security group associations
+  # Private endpsoint application security group associations
   private_endpoint_application_security_group_associations = { for assoc in flatten([
     for pe_k, pe_v in var.private_endpoints : [
       for asg_k, asg_v in pe_v.application_security_group_associations : {

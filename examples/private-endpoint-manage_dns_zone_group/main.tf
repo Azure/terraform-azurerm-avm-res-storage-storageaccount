@@ -98,7 +98,6 @@ module "public_ip" {
   source  = "lonegunmanb/public-ip/lonegunmanb"
   version = "0.1.0"
 }
-
 resource "azurerm_private_dns_zone" "this" {
   for_each = local.endpoints
 
@@ -215,6 +214,8 @@ module "this" {
       quota = 10
     }
   }
+  #Whether to manage private DNS zone groups with this module. If set to false, you must manage private DNS zone groups externally, e.g. using Azure Policy.
+  private_endpoints_manage_dns_zone_group = true
   #create a private endpoint for each endpoint type
   private_endpoints = {
     for endpoint in local.endpoints :
@@ -228,7 +229,6 @@ module "this" {
       private_service_connection_name = "psc-${endpoint}-${module.naming.storage_account.name_unique}"
       network_interface_name          = "nic-pe-${endpoint}-${module.naming.storage_account.name_unique}"
       inherit_lock                    = false
-
       tags = {
         env   = "Prod"
         owner = "Matt "
