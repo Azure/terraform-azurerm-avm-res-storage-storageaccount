@@ -117,7 +117,7 @@ module "this" {
 
   source = "../.."
 
-  account_replication_type      = "LRS"
+  account_replication_type      = "GRS"
   account_tier                  = "Standard"
   account_kind                  = "StorageV2"
   location                      = azurerm_resource_group.this.location
