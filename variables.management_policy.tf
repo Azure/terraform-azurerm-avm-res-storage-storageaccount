@@ -1,45 +1,8 @@
-# variable "management_policy" {
-#   type = map(object({
-#     rule = object({
-#       name = string
-#       enabled = bool
-#       filters = optional(object({
-#         prefix_match = optional(list(string))
-#         blob_types = optional(list(string))
-#       }))
-#       match_blob_index_tags = optional(object({
-#         name = optional(string)
-#         value = optional(string)
-#         operation = optional(string)
-#       }))
-
-#       actions = optional(object({
-#         base_blob = optional(object({
-#           tier_to_cool_after_days_since_modification_greater_than = optional(number)
-#           tier_to_archive_after_days_since_modification_greater_than = optional(number)
-#           delete_after_days_since_modification_greater_than   = optional(number)
-#         }))
-#         snapshot = optional(object({
-#           delete_after_days_since_creation_greater_than = optional(number)
-#         }))
-#         version = optional(object({
-#           change_tier_to_archive_after_days_since_creation = optional(number)
-#           change_tier_to_cool_after_days_since_creation = optional(number)
-#           delete_after_days_since_creation = optional(number)
-#         }))
-#       }))
-#     })
-
-#   }))
+# variable "storage_management_policy_storage_account_id" {
+#   type        = string
+#   description = "(Required) Specifies the id of the storage account to apply the management policy to. Changing this forces a new resource to be created."
+#   nullable    = false
 # }
-
-
-
-variable "storage_management_policy_storage_account_id" {
-  type        = string
-  description = "(Required) Specifies the id of the storage account to apply the management policy to. Changing this forces a new resource to be created."
-  nullable    = false
-}
 
 variable "storage_management_policy_rule" {
   type = list(object({

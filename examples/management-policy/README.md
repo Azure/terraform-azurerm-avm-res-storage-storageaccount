@@ -117,7 +117,7 @@ module "this" {
 
   source = "../.."
 
-  account_replication_type      = "ZRS"
+  account_replication_type      = "LRS"
   account_tier                  = "Standard"
   account_kind                  = "StorageV2"
   location                      = azurerm_resource_group.this.location
@@ -127,6 +127,8 @@ module "this" {
   min_tls_version               = "TLS1_2"
   shared_access_key_enabled     = true
   public_network_access_enabled = true
+
+
   managed_identities = {
     system_assigned            = true
     user_assigned_resource_ids = [azurerm_user_assigned_identity.example_identity.id]
@@ -137,8 +139,46 @@ module "this" {
     dept  = "IT"
   }
   blob_properties = {
-    versioning_enabled = true
+    versioning_enabled       = true
+    last_access_time_enabled = true
+
   }
+  storage_management_policy_rule = [
+    {
+      enabled = true
+      name    = "rule1"
+      actions = {
+        base_blob = {
+          auto_tier_to_hot_from_cool_enabled = true
+          #         delete_after_days_since_creation_greater_than = 30
+          delete_after_days_since_last_access_time_greater_than = 30
+          #         delete_after_days_since_modification_greater_than = 30
+          tier_to_archive_after_days_since_creation_greater_than = 30
+          #         tier_to_archive_after_days_since_last_access_time_greater_than = 30
+          tier_to_archive_after_days_since_last_tier_change_greater_than = 30
+          #         tier_to_archive_after_days_since_modification_greater_than = 30
+          tier_to_cold_after_days_since_creation_greater_than = 30
+          #         tier_to_cold_after_days_since_last_access_time_greater_than = 30
+          #         tier_to_cold_after_days_since_modification_greater_than = 30
+          #         tier_to_cool_after_days_since_creation_greater_than = 30
+          tier_to_cool_after_days_since_last_access_time_greater_than = 30
+          #       tier_to_cool_after_days_since_modification_greater_than = 30
+        }
+      }
+      filters = {
+        blob_types   = ["blockBlob"]
+        prefix_match = ["test"]
+        match_blob_index_tag = [
+          {
+            name      = "tag1"
+            operation = "=="
+            value     = "value1"
+          }
+        ]
+      }
+    }
+
+  ]
 
   #Locks for storage account (Disabled by default)
   /*lock = {
