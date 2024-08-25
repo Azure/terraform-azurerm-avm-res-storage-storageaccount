@@ -15,7 +15,6 @@ This Terraform module is designed to create Azure Storage Accounts and its relat
 
 ## Limitations
 
-* The module does not support Azure File Shares at this time.
 * The storage account name must be globally unique.
 * The module creates resources in the same region as the storage account.
 
