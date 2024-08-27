@@ -1,5 +1,4 @@
 resource "azurerm_storage_management_policy" "this" {
-  #   count = var.storage_management_policy_rule == null ? 0 : 1
   for_each = var.storage_management_policy_rule
 
   storage_account_id = azurerm_storage_account.this.id
