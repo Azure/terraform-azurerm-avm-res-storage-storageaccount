@@ -15,7 +15,6 @@ This Terraform module is designed to create Azure Storage Accounts and its relat
 
 ## Limitations
 
-* The module does not support Azure File Shares at this time.
 * The storage account name must be globally unique.
 * The module creates resources in the same region as the storage account.
 
@@ -62,6 +61,7 @@ The following resources are used by this module:
 - [azurerm_storage_account.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account) (resource)
 - [azurerm_storage_account_customer_managed_key.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account_customer_managed_key) (resource)
 - [azurerm_storage_account_local_user.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account_local_user) (resource)
+- [azurerm_storage_management_policy.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_management_policy) (resource)
 - [modtm_telemetry.telemetry](https://registry.terraform.io/providers/Azure/modtm/latest/docs/resources/telemetry) (resource)
 - [random_uuid.telemetry](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/uuid) (resource)
 - [azurerm_client_config.telemetry](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/client_config) (data source)
@@ -748,7 +748,7 @@ Type:
 
 ```hcl
 object({
-    bypass                     = optional(set(string), [])
+    bypass                     = optional(set(string), ["AzureServices"])
     default_action             = optional(string, "Deny")
     ip_rules                   = optional(set(string), [])
     virtual_network_subnet_ids = optional(set(string), [])
@@ -1221,6 +1221,130 @@ Type:
 object({
     error_404_document = optional(string)
     index_document     = optional(string)
+  })
+```
+
+Default: `null`
+
+### <a name="input_storage_management_policy_rule"></a> [storage\_management\_policy\_rule](#input\_storage\_management\_policy\_rule)
+
+Description: - `enabled` - (Required) Boolean to specify whether the rule is enabled.
+- `name` - (Required) The name of the rule. Rule name is case-sensitive. It must be unique within a policy.
+
+---
+`actions` block supports the following:
+
+---
+`base_blob` block supports the following:
+- `auto_tier_to_hot_from_cool_enabled` - (Optional) Whether a blob should automatically be tiered from cool back to hot if it's accessed again after being tiered to cool. Defaults to `false`.
+- `delete_after_days_since_creation_greater_than` - (Optional) The age in days after creation to delete the blob. Must be between `0` and `99999`. Defaults to `-1`.
+- `delete_after_days_since_last_access_time_greater_than` - (Optional) The age in days after last access time to delete the blob. Must be between `0` and `99999`. Defaults to `-1`.
+- `delete_after_days_since_modification_greater_than` - (Optional) The age in days after last modification to delete the blob. Must be between 0 and 99999. Defaults to `-1`.
+- `tier_to_archive_after_days_since_creation_greater_than` - (Optional) The age in days after creation to archive storage. Supports blob currently at Hot or Cool tier. Must be between `0` and`99999`. Defaults to `-1`.
+- `tier_to_archive_after_days_since_last_access_time_greater_than` - (Optional) The age in days after last access time to tier blobs to archive storage. Supports blob currently at Hot or Cool tier. Must be between `0` and`99999`. Defaults to `-1`.
+- `tier_to_archive_after_days_since_last_tier_change_greater_than` - (Optional) The age in days after last tier change to the blobs to skip to be archved. Must be between 0 and 99999. Defaults to `-1`.
+- `tier_to_archive_after_days_since_modification_greater_than` - (Optional) The age in days after last modification to tier blobs to archive storage. Supports blob currently at Hot or Cool tier. Must be between 0 and 99999. Defaults to `-1`.
+- `tier_to_cold_after_days_since_creation_greater_than` - (Optional) The age in days after creation to cold storage. Supports blob currently at Hot tier. Must be between `0` and `99999`. Defaults to `-1`.
+- `tier_to_cold_after_days_since_last_access_time_greater_than` - (Optional) The age in days after last access time to tier blobs to cold storage. Supports blob currently at Hot tier. Must be between `0` and `99999`. Defaults to `-1`.
+- `tier_to_cold_after_days_since_modification_greater_than` - (Optional) The age in days after last modification to tier blobs to cold storage. Supports blob currently at Hot tier. Must be between 0 and 99999. Defaults to `-1`.
+- `tier_to_cool_after_days_since_creation_greater_than` - (Optional) The age in days after creation to cool storage. Supports blob currently at Hot tier. Must be between `0` and `99999`. Defaults to `-1`.
+- `tier_to_cool_after_days_since_last_access_time_greater_than` - (Optional) The age in days after last access time to tier blobs to cool storage. Supports blob currently at Hot tier. Must be between `0` and `99999`. Defaults to `-1`.
+- `tier_to_cool_after_days_since_modification_greater_than` - (Optional) The age in days after last modification to tier blobs to cool storage. Supports blob currently at Hot tier. Must be between 0 and 99999. Defaults to `-1`.
+
+---
+`snapshot` block supports the following:
+- `change_tier_to_archive_after_days_since_creation` - (Optional) The age in days after creation to tier blob snapshot to archive storage. Must be between 0 and 99999. Defaults to `-1`.
+- `change_tier_to_cool_after_days_since_creation` - (Optional) The age in days after creation to tier blob snapshot to cool storage. Must be between 0 and 99999. Defaults to `-1`.
+- `delete_after_days_since_creation_greater_than` - (Optional) The age in days after creation to delete the blob snapshot. Must be between 0 and 99999. Defaults to `-1`.
+- `tier_to_archive_after_days_since_last_tier_change_greater_than` - (Optional) The age in days after last tier change to the blobs to skip to be archved. Must be between 0 and 99999. Defaults to `-1`.
+- `tier_to_cold_after_days_since_creation_greater_than` - (Optional) The age in days after creation to cold storage. Supports blob currently at Hot tier. Must be between `0` and `99999`. Defaults to `-1`.
+
+---
+`version` block supports the following:
+- `change_tier_to_archive_after_days_since_creation` - (Optional) The age in days after creation to tier blob version to archive storage. Must be between 0 and 99999. Defaults to `-1`.
+- `change_tier_to_cool_after_days_since_creation` - (Optional) The age in days creation create to tier blob version to cool storage. Must be between 0 and 99999. Defaults to `-1`.
+- `delete_after_days_since_creation` - (Optional) The age in days after creation to delete the blob version. Must be between 0 and 99999. Defaults to `-1`.
+- `tier_to_archive_after_days_since_last_tier_change_greater_than` - (Optional) The age in days after last tier change to the blobs to skip to be archved. Must be between 0 and 99999. Defaults to `-1`.
+- `tier_to_cold_after_days_since_creation_greater_than` - (Optional) The age in days after creation to cold storage. Supports blob currently at Hot tier. Must be between `0` and `99999`. Defaults to `-1`.
+
+---
+`filters` block supports the following:
+- `blob_types` - (Required) An array of predefined values. Valid options are `blockBlob` and `appendBlob`.
+- `prefix_match` - (Optional) An array of strings for prefixes to be matched.
+
+---
+`match_blob_index_tag` block supports the following:
+- `name` - (Required) The filter tag name used for tag based filtering for blob objects.
+- `operation` - (Optional) The comparison operator which is used for object comparison and filtering. Possible value is `==`. Defaults to `==`.
+- `value` - (Required) The filter tag value used for tag based filtering for blob objects.
+
+Type:
+
+```hcl
+map(object({
+    enabled = bool
+    name    = string
+    actions = object({
+      base_blob = optional(object({
+        auto_tier_to_hot_from_cool_enabled                             = optional(bool)
+        delete_after_days_since_creation_greater_than                  = optional(number)
+        delete_after_days_since_last_access_time_greater_than          = optional(number)
+        delete_after_days_since_modification_greater_than              = optional(number)
+        tier_to_archive_after_days_since_creation_greater_than         = optional(number)
+        tier_to_archive_after_days_since_last_access_time_greater_than = optional(number)
+        tier_to_archive_after_days_since_last_tier_change_greater_than = optional(number)
+        tier_to_archive_after_days_since_modification_greater_than     = optional(number)
+        tier_to_cold_after_days_since_creation_greater_than            = optional(number)
+        tier_to_cold_after_days_since_last_access_time_greater_than    = optional(number)
+        tier_to_cold_after_days_since_modification_greater_than        = optional(number)
+        tier_to_cool_after_days_since_creation_greater_than            = optional(number)
+        tier_to_cool_after_days_since_last_access_time_greater_than    = optional(number)
+        tier_to_cool_after_days_since_modification_greater_than        = optional(number)
+      }))
+      snapshot = optional(object({
+        change_tier_to_archive_after_days_since_creation               = optional(number)
+        change_tier_to_cool_after_days_since_creation                  = optional(number)
+        delete_after_days_since_creation_greater_than                  = optional(number)
+        tier_to_archive_after_days_since_last_tier_change_greater_than = optional(number)
+        tier_to_cold_after_days_since_creation_greater_than            = optional(number)
+      }))
+      version = optional(object({
+        change_tier_to_archive_after_days_since_creation               = optional(number)
+        change_tier_to_cool_after_days_since_creation                  = optional(number)
+        delete_after_days_since_creation                               = optional(number)
+        tier_to_archive_after_days_since_last_tier_change_greater_than = optional(number)
+        tier_to_cold_after_days_since_creation_greater_than            = optional(number)
+      }))
+    })
+    filters = object({
+      blob_types   = set(string)
+      prefix_match = optional(set(string))
+      match_blob_index_tag = optional(set(object({
+        name      = string
+        operation = optional(string)
+        value     = string
+      })))
+    })
+  }))
+```
+
+Default: `{}`
+
+### <a name="input_storage_management_policy_timeouts"></a> [storage\_management\_policy\_timeouts](#input\_storage\_management\_policy\_timeouts)
+
+Description: - `create` - (Defaults to 30 minutes) Used when creating the Storage Account Management Policy.
+- `delete` - (Defaults to 30 minutes) Used when deleting the Storage Account Management Policy.
+- `read` - (Defaults to 5 minutes) Used when retrieving the Storage Account Management Policy.
+- `update` - (Defaults to 30 minutes) Used when updating the Storage Account Management Policy.
+
+Type:
+
+```hcl
+object({
+    create = optional(string)
+    delete = optional(string)
+    read   = optional(string)
+    update = optional(string)
   })
 ```
 
