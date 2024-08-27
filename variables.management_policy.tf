@@ -5,7 +5,7 @@
 # }
 
 variable "storage_management_policy_rule" {
-  type = list(object({
+  type = map(object({
     enabled = bool
     name    = string
     actions = object({
@@ -50,7 +50,8 @@ variable "storage_management_policy_rule" {
       })))
     })
   }))
-  default     = null
+  default     = {}
+  nullable    = false
   description = <<-EOT
  - `enabled` - (Required) Boolean to specify whether the rule is enabled.
  - `name` - (Required) The name of the rule. Rule name is case-sensitive. It must be unique within a policy.

@@ -748,7 +748,7 @@ Type:
 
 ```hcl
 object({
-    bypass                     = optional(set(string), [])
+    bypass                     = optional(set(string), ["AzureServices"])
     default_action             = optional(string, "Deny")
     ip_rules                   = optional(set(string), [])
     virtual_network_subnet_ids = optional(set(string), [])
@@ -1281,7 +1281,7 @@ Description: - `enabled` - (Required) Boolean to specify whether the rule is ena
 Type:
 
 ```hcl
-list(object({
+map(object({
     enabled = bool
     name    = string
     actions = object({
@@ -1328,7 +1328,7 @@ list(object({
   }))
 ```
 
-Default: `null`
+Default: `{}`
 
 ### <a name="input_storage_management_policy_timeouts"></a> [storage\_management\_policy\_timeouts](#input\_storage\_management\_policy\_timeouts)
 

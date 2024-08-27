@@ -130,8 +130,10 @@ module "this" {
 
 
   managed_identities = {
-    system_assigned            = true
-    user_assigned_resource_ids = [azurerm_user_assigned_identity.example_identity.id]
+    system_assigned = true
+    user_assigned_resource_ids = [
+      azurerm_user_assigned_identity.example_identity.id
+    ]
   }
   tags = {
     env   = "Dev"
@@ -143,8 +145,8 @@ module "this" {
     last_access_time_enabled = true
 
   }
-  storage_management_policy_rule = [
-    {
+  storage_management_policy_rule = {
+    rule = {
       enabled = true
       name    = "rule1"
       actions = {
@@ -163,7 +165,35 @@ module "this" {
           #         tier_to_cool_after_days_since_creation_greater_than = 30
           tier_to_cool_after_days_since_last_access_time_greater_than = 30
           #       tier_to_cool_after_days_since_modification_greater_than = 30
+          auto_tier_to_hot_from_cool_enabled = true
+          #         delete_after_days_since_creation_greater_than = 30
+          delete_after_days_since_last_access_time_greater_than = 30
+          #         delete_after_days_since_modification_greater_than = 30
+          tier_to_archive_after_days_since_creation_greater_than = 30
+          #         tier_to_archive_after_days_since_last_access_time_greater_than = 30
+          tier_to_archive_after_days_since_last_tier_change_greater_than = 30
+          #         tier_to_archive_after_days_since_modification_greater_than = 30
+          tier_to_cold_after_days_since_creation_greater_than = 30
+          #         tier_to_cold_after_days_since_last_access_time_greater_than = 30
+          #         tier_to_cold_after_days_since_modification_greater_than = 30
+          #         tier_to_cool_after_days_since_creation_greater_than = 30
+          tier_to_cool_after_days_since_last_access_time_greater_than = 30
+          #       tier_to_cool_after_days_since_modification_greater_than = 30
         }
+        #         snapshot = {
+        #           change_tier_to_archive_after_days_since_creation               = 30
+        #           change_tier_to_cool_after_days_since_creation                  = 30
+        #           delete_after_days_since_creation_greater_than                  = 30
+        #           tier_to_archive_after_days_since_last_tier_change_greater_than = 30
+        #           tier_to_cold_after_days_since_creation_greater_than            = 30
+        #         }
+        #         version = {
+        #           change_tier_to_archive_after_days_since_creation               = 30
+        #           change_tier_to_cool_after_days_since_creation                  = 30
+        #           delete_after_days_since_creation                               = 30
+        #           tier_to_archive_after_days_since_last_tier_change_greater_than = 30
+        #           tier_to_cold_after_days_since_creation_greater_than            = 30
+        #         }
       }
       filters = {
         blob_types   = ["blockBlob"]
@@ -176,9 +206,9 @@ module "this" {
           }
         ]
       }
-    }
 
-  ]
+    }
+  }
 
   #Locks for storage account (Disabled by default)
   /*lock = {
@@ -286,6 +316,7 @@ module "this" {
       }
     }
   }
+
 }
 ```
 
