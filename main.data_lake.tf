@@ -1,7 +1,7 @@
 resource "azurerm_storage_data_lake_gen2_filesystem" "this" {
   count = var.storage_data_lake_gen2_filesystem != null ? 1 : 0
   name                     = var.storage_data_lake_gen2_filesystem.name
-  storage_account_id       = var.storage_data_lake_gen2_filesystem.storage_account_id
+  storage_account_id       = azurerm_storage_account.this.id
   default_encryption_scope = var.storage_data_lake_gen2_filesystem.default_encryption_scope
   group                    = var.storage_data_lake_gen2_filesystem.group
   owner                    = var.storage_data_lake_gen2_filesystem.owner

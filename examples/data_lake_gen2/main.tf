@@ -164,9 +164,6 @@ module "this" {
   }
 
 storage_data_lake_gen2_filesystem = {
-  lake = {
-    name = "sdfsd"
-    storage_account_id = module.this.storage_account_id
-  }
+  name = "dfgsdgf"
 }
 }
