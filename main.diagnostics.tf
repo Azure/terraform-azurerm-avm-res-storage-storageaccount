@@ -11,6 +11,7 @@ resource "azurerm_monitor_diagnostic_setting" "storage_account" {
 
   dynamic "metric" {
     for_each = each.value.metric_categories
+
     content {
       category = metric.value
     }
@@ -28,12 +29,14 @@ resource "azurerm_monitor_diagnostic_setting" "blob" {
 
   dynamic "enabled_log" {
     for_each = each.value.log_categories
+
     content {
       category_group = enabled_log.value
     }
   }
   dynamic "metric" {
     for_each = each.value.metric_categories
+
     content {
       category = metric.value
     }
@@ -52,12 +55,14 @@ resource "azurerm_monitor_diagnostic_setting" "queue" {
 
   dynamic "enabled_log" {
     for_each = each.value.log_categories
+
     content {
       category_group = enabled_log.value
     }
   }
   dynamic "metric" {
     for_each = each.value.metric_categories
+
     content {
       category = metric.value
     }
@@ -75,12 +80,14 @@ resource "azurerm_monitor_diagnostic_setting" "table" {
 
   dynamic "enabled_log" {
     for_each = each.value.log_categories
+
     content {
       category_group = enabled_log.value
     }
   }
   dynamic "metric" {
     for_each = each.value.metric_categories
+
     content {
       category = metric.value
     }
@@ -98,12 +105,14 @@ resource "azurerm_monitor_diagnostic_setting" "azure_file" {
 
   dynamic "enabled_log" {
     for_each = each.value.log_categories
+
     content {
       category_group = enabled_log.value
     }
   }
   dynamic "metric" {
     for_each = each.value.metric_categories
+
     content {
       category = metric.value
     }

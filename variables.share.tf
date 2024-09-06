@@ -139,7 +139,7 @@ variable "large_file_share_enabled" {
 
 variable "azure_files_authentication" {
   type = object({
-    directory_type = optional(string, "AADDS")
+    directory_type                 = optional(string, "AADDS")
     default_share_level_permission = optional(string)
 
     active_directory = optional(object({
