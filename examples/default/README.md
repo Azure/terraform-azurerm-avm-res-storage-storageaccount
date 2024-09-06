@@ -131,6 +131,9 @@ module "this" {
     system_assigned            = true
     user_assigned_resource_ids = [azurerm_user_assigned_identity.example_identity.id]
   }
+  azure_files_authentication = {
+    default_share_level_permission = "StorageFileDataSmbShareContributor"
+  }
   tags = {
     env   = "Dev"
     owner = "John Doe"
