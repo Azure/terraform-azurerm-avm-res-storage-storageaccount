@@ -120,7 +120,7 @@ module "this" {
   resource_group_name           = azurerm_resource_group.this.name
   min_tls_version               = "TLS1_2"
   shared_access_key_enabled     = true
-is_hns_enabled = true
+  is_hns_enabled                = true
   public_network_access_enabled = true
   managed_identities = {
     system_assigned            = true
@@ -135,11 +135,6 @@ is_hns_enabled = true
     owner = "John Doe"
     dept  = "IT"
   }
-  blob_properties = {
-    versioning_enabled = true
-
-  }
-
   #Locks for storage account (Disabled by default)
   /*lock = {
     name = "lock"
@@ -165,7 +160,7 @@ is_hns_enabled = true
     virtual_network_subnet_ids = toset([azurerm_subnet.private.id])
   }
 
-storage_data_lake_gen2_filesystem = {
-  name = "dfgsdgf"
-}
+  storage_data_lake_gen2_filesystem = {
+    name = "testdatelakegen2filesystem"
+  }
 }

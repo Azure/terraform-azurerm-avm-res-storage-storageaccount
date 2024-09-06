@@ -126,6 +126,7 @@ module "this" {
   resource_group_name           = azurerm_resource_group.this.name
   min_tls_version               = "TLS1_2"
   shared_access_key_enabled     = true
+  is_hns_enabled                = true
   public_network_access_enabled = true
   managed_identities = {
     system_assigned            = true
@@ -140,10 +141,6 @@ module "this" {
     owner = "John Doe"
     dept  = "IT"
   }
-  blob_properties = {
-    versioning_enabled = true
-  }
-
   #Locks for storage account (Disabled by default)
   /*lock = {
     name = "lock"
@@ -169,86 +166,8 @@ module "this" {
     virtual_network_subnet_ids = toset([azurerm_subnet.private.id])
   }
 
-  containers = {
-    blob_container0 = {
-      name                  = "blob-container-${random_string.this.result}-0"
-      container_access_type = "private"
-    }
-    blob_container1 = {
-      name                  = "blob-container-${random_string.this.result}-1"
-      container_access_type = "private"
-
-    }
-
-  }
-  queues = {
-    queue0 = {
-      name = "queue-${random_string.this.result}-0"
-
-    }
-    queue1 = {
-      name = "queue-${random_string.this.result}-1"
-
-      metadata = {
-        key1 = "value1"
-        key2 = "value2"
-      }
-    }
-  }
-  tables = {
-    table0 = {
-      name = "table${random_string.this.result}0"
-      signed_identifiers = [
-        {
-          id = "1"
-          access_policy = {
-            expiry_time = "2025-01-01T00:00:00Z"
-            permission  = "r"
-            start_time  = "2024-01-01T00:00:00Z"
-          }
-        }
-      ]
-    }
-    table1 = {
-      name = "table${random_string.this.result}1"
-
-      signed_identifiers = [
-        {
-          id = "1"
-          access_policy = {
-            expiry_time = "2025-01-01T00:00:00Z"
-            permission  = "r"
-            start_time  = "2024-01-01T00:00:00Z"
-          }
-        }
-      ]
-    }
-  }
-
-  shares = {
-    share0 = {
-      name  = "share-${random_string.this.result}-0"
-      quota = 10
-      signed_identifiers = [
-        {
-          id = "1"
-          access_policy = {
-            expiry_time = "2025-01-01T00:00:00Z"
-            permission  = "r"
-            start_time  = "2024-01-01T00:00:00Z"
-          }
-        }
-      ]
-    }
-    share1 = {
-      name        = "share-${random_string.this.result}-1"
-      quota       = 10
-      access_tier = "Hot"
-      metadata = {
-        key1 = "value1"
-        key2 = "value2"
-      }
-    }
+  storage_data_lake_gen2_filesystem = {
+    name = "testdatelakegen2filesystem"
   }
 }
 ```
@@ -309,25 +228,9 @@ Default: `null`
 
 The following outputs are exported:
 
-### <a name="output_containers"></a> [containers](#output\_containers)
-
-Description: value of containers
-
-### <a name="output_queue"></a> [queue](#output\_queue)
-
-Description: value of queues
-
 ### <a name="output_resource"></a> [resource](#output\_resource)
 
 Description: value of storage\_account
-
-### <a name="output_shares"></a> [shares](#output\_shares)
-
-Description: value of shares
-
-### <a name="output_tables"></a> [tables](#output\_tables)
-
-Description: value of tables
 
 ## Modules
 

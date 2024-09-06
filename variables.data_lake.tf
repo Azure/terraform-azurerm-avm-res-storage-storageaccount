@@ -5,7 +5,7 @@ variable "storage_data_lake_gen2_filesystem" {
     name                     = string
     owner                    = optional(string)
     properties               = optional(map(string))
-#     storage_account_id       = string
+    #     storage_account_id       = string
     ace = optional(set(object({
       id          = optional(string)
       permissions = string
@@ -41,5 +41,5 @@ variable "storage_data_lake_gen2_filesystem" {
  - `read` - (Defaults to 5 minutes) Used when retrieving the Data Lake Gen2 File System.
  - `update` - (Defaults to 30 minutes) Used when updating the Data Lake Gen2 File System.
 EOT
-  default = null
+  default     = null
 }
