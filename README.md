@@ -161,7 +161,7 @@ Type:
 
 ```hcl
 object({
-    directory_type                 = optional(string, "AADDS")
+    directory_type                 = optional(string, "AADKERB")
     default_share_level_permission = optional(string)
 
     active_directory = optional(object({

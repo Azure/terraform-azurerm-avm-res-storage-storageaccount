@@ -132,7 +132,8 @@ module "this" {
     user_assigned_resource_ids = [azurerm_user_assigned_identity.example_identity.id]
   }
   azure_files_authentication = {
-    default_share_level_permission = "StorageFileDataSmbShareContributor"
+    default_share_level_permission = "StorageFileDataSmbShareReader"
+    directory_type                 = "AADKERB"
   }
   tags = {
     env   = "Dev"
