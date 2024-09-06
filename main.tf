@@ -30,6 +30,7 @@ resource "azurerm_storage_account" "this" {
     ]
     content {
       directory_type = azure_files_authentication.value.directory_type
+      default_share_level_permission = azure_files_authentication.value.default_share_level_permission
 
       dynamic "active_directory" {
         for_each = azure_files_authentication.value.active_directory == null ? [] : [
