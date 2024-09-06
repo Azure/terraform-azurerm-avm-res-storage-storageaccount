@@ -41,5 +41,5 @@ variable "storage_data_lake_gen2_filesystem" {
  - `read` - (Defaults to 5 minutes) Used when retrieving the Data Lake Gen2 File System.
  - `update` - (Defaults to 30 minutes) Used when updating the Data Lake Gen2 File System.
 EOT
-  nullable    = false
+  default = null
 }
