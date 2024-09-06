@@ -146,6 +146,7 @@ Default: `null`
 ### <a name="input_azure_files_authentication"></a> [azure\_files\_authentication](#input\_azure\_files\_authentication)
 
 Description: - `directory_type` - (Required) Specifies the directory service used. Possible values are `AADDS`, `AD` and `AADKERB`.
+- `default_share_level_permission` - (Optional) Specifies the default share level permissions applied to all users. Possible values are StorageFileDataSmbShareReader, StorageFileDataSmbShareContributor, StorageFileDataSmbShareElevatedContributor, or None.
 
 ---
 `active_directory` block supports the following:
@@ -160,7 +161,9 @@ Type:
 
 ```hcl
 object({
-    directory_type = string
+    directory_type                 = optional(string, "AADKERB")
+    default_share_level_permission = optional(string)
+
     active_directory = optional(object({
       domain_guid         = string
       domain_name         = string
