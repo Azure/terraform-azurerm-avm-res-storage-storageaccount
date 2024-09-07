@@ -28,5 +28,7 @@ resource "azurerm_storage_data_lake_gen2_filesystem" "this" {
       update = timeouts.value.update
     }
   }
+
+  depends_on = [azurerm_storage_account.this]
 }
 
