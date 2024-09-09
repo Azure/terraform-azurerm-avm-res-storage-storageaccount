@@ -5,7 +5,6 @@ variable "storage_data_lake_gen2_filesystem" {
     name                     = string
     owner                    = optional(string)
     properties               = optional(map(string))
-    #     storage_account_id       = string
     ace = optional(set(object({
       id          = optional(string)
       permissions = string
@@ -25,8 +24,6 @@ variable "storage_data_lake_gen2_filesystem" {
  - `name` - (Required) The name of the Data Lake Gen2 File System which should be created within the Storage Account. Must be unique within the storage account the queue is located. Changing this forces a new resource to be created.
  - `owner` - (Optional) Specifies the Object ID of the Azure Active Directory User to make the owning user of the root path (i.e. `/`). Possible values also include `$superuser`.
  - `properties` - (Optional) A mapping of Key to Base64-Encoded Values which should be assigned to this Data Lake Gen2 File System.
- - `storage_account_id` - (Required) Specifies the ID of the Storage Account in which the Data Lake Gen2 File System should exist. Changing this forces a new resource to be created.
-
  ---
  `ace` block supports the following:
  - `id` - (Optional) Specifies the Object ID of the Azure Active Directory User or Group that the entry relates to. Only valid for `user` or `group` entries.
