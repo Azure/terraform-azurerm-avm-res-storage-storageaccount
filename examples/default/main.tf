@@ -120,6 +120,7 @@ module "this" {
   resource_group_name           = azurerm_resource_group.this.name
   min_tls_version               = "TLS1_2"
   shared_access_key_enabled     = true
+  # allow_nested_items_to_be_public = false
   public_network_access_enabled = true
   managed_identities = {
     system_assigned            = true
