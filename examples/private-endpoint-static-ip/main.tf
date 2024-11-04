@@ -186,10 +186,10 @@ module "this" {
 
   containers = {
     blob_container0 = {
-      name                  = "blob-container-${random_string.this.result}-0"
+      name = "blob-container-${random_string.this.result}-0"
     }
     blob_container1 = {
-      name                  = "blob-container-${random_string.this.result}-1"
+      name = "blob-container-${random_string.this.result}-1"
     }
 
   }
