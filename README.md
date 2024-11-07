@@ -27,7 +27,7 @@ The following requirements are needed by this module:
 
 - <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.7.0)
 
-- <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) (>= 1.14.0, < 2.0.0)
+- <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) (>= 1.14.0, < 3.0.0)
 
 - <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (>= 3.114.0, < 4.0.0)
 
@@ -118,7 +118,7 @@ Description: (Required) Defines the type of replication to use for this storage 
 
 Type: `string`
 
-Default: `"ZRS"`
+Default: `"GRS"`
 
 ### <a name="input_account_tier"></a> [account\_tier](#input\_account\_tier)
 
