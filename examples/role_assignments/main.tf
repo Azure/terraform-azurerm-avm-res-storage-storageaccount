@@ -159,8 +159,7 @@ module "this" {
 
   containers = {
     blob_container0 = {
-      name                  = "blob-container-${random_string.this.result}-0"
-      container_access_type = "private"
+      name = "blob-container-${random_string.this.result}-0"
       role_assignments = {
         rbac_storage_blob_data_contributor = {
           role_definition_id_or_name = "Storage Blob Data Contributor"
@@ -169,8 +168,7 @@ module "this" {
       }
     }
     blob_container1 = {
-      name                  = "blob-container-${random_string.this.result}-1"
-      container_access_type = "private"
+      name = "blob-container-${random_string.this.result}-1"
       role_assignments = {
         rbac_storage_blob_data_reader = {
           role_definition_id_or_name = "Storage Blob Data Reader"

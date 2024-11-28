@@ -111,15 +111,16 @@ module "this" {
 
   source = "../.."
 
-  account_replication_type      = "ZRS"
-  account_tier                  = "Standard"
-  account_kind                  = "StorageV2"
-  location                      = azurerm_resource_group.this.location
-  name                          = module.naming.storage_account.name_unique
-  https_traffic_only_enabled    = true
-  resource_group_name           = azurerm_resource_group.this.name
-  min_tls_version               = "TLS1_2"
-  shared_access_key_enabled     = true
+  account_replication_type   = "ZRS"
+  account_tier               = "Standard"
+  account_kind               = "StorageV2"
+  location                   = azurerm_resource_group.this.location
+  name                       = module.naming.storage_account.name_unique
+  https_traffic_only_enabled = true
+  resource_group_name        = azurerm_resource_group.this.name
+  min_tls_version            = "TLS1_2"
+  shared_access_key_enabled  = true
+  # allow_nested_items_to_be_public = false
   public_network_access_enabled = true
   managed_identities = {
     system_assigned            = true
@@ -165,12 +166,12 @@ module "this" {
 
   containers = {
     blob_container0 = {
-      name                  = "blob-container-${random_string.this.result}-0"
-      container_access_type = "private"
+      name = "blob-container-${random_string.this.result}-0"
+      # public_access = "container"
     }
     blob_container1 = {
-      name                  = "blob-container-${random_string.this.result}-1"
-      container_access_type = "private"
+      name = "blob-container-${random_string.this.result}-1"
+      # public_access = "container"
 
     }
 
