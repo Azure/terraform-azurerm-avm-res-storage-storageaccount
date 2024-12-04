@@ -5,7 +5,7 @@ output "containers" {
     name => {
       id            = container.id
       name          = container.name
-      public_access = container.body.properties.publicAccess
+      public_access = jsondecode(container.body).properties.publicAccess
     }
   }
 }
