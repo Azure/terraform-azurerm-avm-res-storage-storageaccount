@@ -324,7 +324,7 @@ resource "azurerm_storage_account_customer_managed_key" "this" {
   storage_account_id        = azurerm_storage_account.this.id
   key_vault_id              = var.customer_managed_key.key_vault_resource_id
   key_version               = var.customer_managed_key.key_version
-  user_assigned_identity_id = var.customer_managed_key.user_assigned_identity_resource_id
+  user_assigned_identity_id = var.customer_managed_key.user_assigned_identity != null ? var.customer_managed_key.user_assigned_identity.resource_id : null
   lifecycle {
     precondition {
       condition     = (var.account_kind == "StorageV2" || var.account_tier == "Premium")
