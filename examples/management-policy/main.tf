@@ -146,7 +146,6 @@ module "this" {
       actions = {
         base_blob = {
           #         delete_after_days_since_creation_greater_than = 30
-          delete_after_days_since_last_access_time_greater_than = 30
           #         delete_after_days_since_modification_greater_than = 30
           #         tier_to_archive_after_days_since_last_access_time_greater_than = 30
           #         tier_to_archive_after_days_since_modification_greater_than = 30
