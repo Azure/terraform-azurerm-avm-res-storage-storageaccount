@@ -4,7 +4,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = ">= 3.7.0, < 5.0.0"
+      version = ">= 3.7.0, < 4.0.0"
     }
     random = {
       source  = "hashicorp/random"
@@ -12,37 +12,37 @@ terraform {
     }
   }
 }
+
 provider "azurerm" {
   features {
     resource_group {
       prevent_deletion_if_contains_resources = false
     }
   }
-  resource_provider_registrations = "none"
-  storage_use_azuread             = true
+  skip_provider_registration = true
+  storage_use_azuread        = true
 }
-
 locals {
   test_regions = ["eastus", "eastus2", "westus2", "westus3"]
 }
-# This allows us to randomize the region for the resource group.
 resource "random_integer" "region_index" {
   max = length(local.test_regions) - 1
   min = 0
 }
+
 # This allow use to randomize the name of resources
 resource "random_string" "this" {
   length  = 6
   special = false
   upper   = false
 }
-# This ensures we have unique CAF compliant names for our resources.
+# This ensures we have unique CAF compliant names for resources.
 module "naming" {
   source  = "Azure/naming/azurerm"
   version = "0.4.0"
 }
 
-
+# This is required for resource modules
 resource "azurerm_resource_group" "this" {
   location = local.test_regions[random_integer.region_index.result]
   name     = module.naming.resource_group.name_unique
@@ -88,35 +88,13 @@ resource "azurerm_network_security_rule" "no_internet" {
   source_port_range           = "*"
 }
 
-locals {
-  endpoints = toset(["blob", "queue", "table", "file"])
-}
-
 module "public_ip" {
   count = var.bypass_ip_cidr == null ? 1 : 0
 
   source  = "lonegunmanb/public-ip/lonegunmanb"
   version = "0.1.0"
 }
-resource "azurerm_private_dns_zone" "this" {
-  for_each = local.endpoints
-
-  name                = "privatelink.${each.value}.core.windows.net"
-  resource_group_name = azurerm_resource_group.this.name
-  tags = {
-    env = "Dev"
-  }
-}
-
-resource "azurerm_private_dns_zone_virtual_network_link" "private_links" {
-  for_each = azurerm_private_dns_zone.this
-
-  name                  = "${each.key}_${azurerm_virtual_network.vnet.name}-link"
-  private_dns_zone_name = azurerm_private_dns_zone.this[each.key].name
-  resource_group_name   = azurerm_resource_group.this.name
-  virtual_network_id    = azurerm_virtual_network.vnet.id
-}
-
+# We need this to get the object_id of the current user
 data "azurerm_client_config" "current" {}
 
 resource "azurerm_user_assigned_identity" "example_identity" {
@@ -124,34 +102,103 @@ resource "azurerm_user_assigned_identity" "example_identity" {
   name                = module.naming.user_assigned_identity.name_unique
   resource_group_name = azurerm_resource_group.this.name
 }
-
+# We use the role definition data source to get the id of the Contributor role
 data "azurerm_role_definition" "example" {
   name = "Contributor"
 }
 
-#create azure storage account
 module "this" {
 
   source = "../.."
 
-  account_replication_type      = "ZRS"
+  account_replication_type      = "GRS"
   account_tier                  = "Standard"
   account_kind                  = "StorageV2"
   location                      = azurerm_resource_group.this.location
   name                          = module.naming.storage_account.name_unique
+  https_traffic_only_enabled    = true
   resource_group_name           = azurerm_resource_group.this.name
   min_tls_version               = "TLS1_2"
   shared_access_key_enabled     = true
   public_network_access_enabled = true
+
+
   managed_identities = {
-    system_assigned            = true
-    user_assigned_resource_ids = [azurerm_user_assigned_identity.example_identity.id]
+    system_assigned = true
+    user_assigned_resource_ids = [
+      azurerm_user_assigned_identity.example_identity.id
+    ]
   }
   tags = {
     env   = "Dev"
     owner = "John Doe"
     dept  = "IT"
   }
+  blob_properties = {
+    versioning_enabled       = true
+    last_access_time_enabled = true
+
+  }
+  storage_management_policy_rule = {
+    rule = {
+      enabled = true
+      name    = "rule1"
+      actions = {
+        base_blob = {
+          #         delete_after_days_since_creation_greater_than = 30
+          #         delete_after_days_since_modification_greater_than = 30
+          #         tier_to_archive_after_days_since_last_access_time_greater_than = 30
+          #         tier_to_archive_after_days_since_modification_greater_than = 30
+          #         tier_to_cold_after_days_since_last_access_time_greater_than = 30
+          #         tier_to_cold_after_days_since_modification_greater_than = 30
+          #         tier_to_cool_after_days_since_creation_greater_than = 30
+          #       tier_to_cool_after_days_since_modification_greater_than = 30
+          auto_tier_to_hot_from_cool_enabled = true
+          #         delete_after_days_since_creation_greater_than = 30
+          delete_after_days_since_last_access_time_greater_than = 30
+          #         delete_after_days_since_modification_greater_than = 30
+          tier_to_archive_after_days_since_creation_greater_than = 30
+          #         tier_to_archive_after_days_since_last_access_time_greater_than = 30
+          tier_to_archive_after_days_since_last_tier_change_greater_than = 30
+          #         tier_to_archive_after_days_since_modification_greater_than = 30
+          tier_to_cold_after_days_since_creation_greater_than = 30
+          #         tier_to_cold_after_days_since_last_access_time_greater_than = 30
+          #         tier_to_cold_after_days_since_modification_greater_than = 30
+          #         tier_to_cool_after_days_since_creation_greater_than = 30
+          tier_to_cool_after_days_since_last_access_time_greater_than = 30
+          #       tier_to_cool_after_days_since_modification_greater_than = 30
+        }
+        #         snapshot = {
+        #           change_tier_to_archive_after_days_since_creation               = 30
+        #           change_tier_to_cool_after_days_since_creation                  = 30
+        #           delete_after_days_since_creation_greater_than                  = 30
+        #           tier_to_archive_after_days_since_last_tier_change_greater_than = 30
+        #           tier_to_cold_after_days_since_creation_greater_than            = 30
+        #         }
+        #         version = {
+        #           change_tier_to_archive_after_days_since_creation               = 30
+        #           change_tier_to_cool_after_days_since_creation                  = 30
+        #           delete_after_days_since_creation                               = 30
+        #           tier_to_archive_after_days_since_last_tier_change_greater_than = 30
+        #           tier_to_cold_after_days_since_creation_greater_than            = 30
+        #         }
+      }
+      filters = {
+        blob_types   = ["blockBlob"]
+        prefix_match = ["test"]
+        match_blob_index_tag = [
+          {
+            name      = "tag1"
+            operation = "=="
+            value     = "value1"
+          }
+        ]
+      }
+
+    }
+  }
+
+  #Locks for storage account (Disabled by default)
   /*lock = {
     name = "lock"
     kind = "None"
@@ -182,23 +229,51 @@ module "this" {
     }
     blob_container1 = {
       name = "blob-container-${random_string.this.result}-1"
+
     }
 
   }
   queues = {
     queue0 = {
       name = "queue-${random_string.this.result}-0"
+
     }
     queue1 = {
       name = "queue-${random_string.this.result}-1"
+
+      metadata = {
+        key1 = "value1"
+        key2 = "value2"
+      }
     }
   }
   tables = {
     table0 = {
       name = "table${random_string.this.result}0"
+      signed_identifiers = [
+        {
+          id = "1"
+          access_policy = {
+            expiry_time = "2025-01-01T00:00:00Z"
+            permission  = "r"
+            start_time  = "2024-01-01T00:00:00Z"
+          }
+        }
+      ]
     }
     table1 = {
       name = "table${random_string.this.result}1"
+
+      signed_identifiers = [
+        {
+          id = "1"
+          access_policy = {
+            expiry_time = "2025-01-01T00:00:00Z"
+            permission  = "r"
+            start_time  = "2024-01-01T00:00:00Z"
+          }
+        }
+      ]
     }
   }
 
@@ -206,43 +281,26 @@ module "this" {
     share0 = {
       name  = "share-${random_string.this.result}-0"
       quota = 10
+      signed_identifiers = [
+        {
+          id = "1"
+          access_policy = {
+            expiry_time = "2025-01-01T00:00:00Z"
+            permission  = "r"
+            start_time  = "2024-01-01T00:00:00Z"
+          }
+        }
+      ]
     }
     share1 = {
-      name  = "share-${random_string.this.result}-1"
-      quota = 10
-    }
-  }
-  #Whether to manage private DNS zone groups with this module. If set to false, you must manage private DNS zone groups externally, e.g. using Azure Policy.
-  private_endpoints_manage_dns_zone_group = true
-  #create a private endpoint for each endpoint type
-  private_endpoints = {
-    for endpoint in local.endpoints :
-    endpoint => {
-      # the name must be set to avoid conflicting resources.
-      name                          = "pe-${endpoint}-${module.naming.storage_account.name_unique}"
-      subnet_resource_id            = azurerm_subnet.private.id
-      subresource_name              = endpoint
-      private_dns_zone_resource_ids = [azurerm_private_dns_zone.this[endpoint].id]
-      # these are optional but illustrate making well-aligned service connection & NIC names.
-      private_service_connection_name = "psc-${endpoint}-${module.naming.storage_account.name_unique}"
-      network_interface_name          = "nic-pe-${endpoint}-${module.naming.storage_account.name_unique}"
-      inherit_lock                    = false
-      tags = {
-        env   = "Prod"
-        owner = "Matt "
-        dept  = "IT"
-      }
-
-      role_assignments = {
-        role_assignment_1 = {
-          role_definition_id_or_name = data.azurerm_role_definition.example.name
-          principal_id               = coalesce(var.msi_id, data.azurerm_client_config.current.object_id)
-        }
+      name        = "share-${random_string.this.result}-1"
+      quota       = 10
+      access_tier = "Hot"
+      metadata = {
+        key1 = "value1"
+        key2 = "value2"
       }
     }
-
-
   }
 
 }
-

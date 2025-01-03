@@ -4,7 +4,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = ">= 3.7.0, < 4.0.0"
+      version = ">= 3.7.0, < 5.0.0"
     }
     random = {
       source  = "hashicorp/random"
@@ -19,8 +19,8 @@ provider "azurerm" {
       prevent_deletion_if_contains_resources = false
     }
   }
-  skip_provider_registration = true
-  storage_use_azuread        = true
+  resource_provider_registrations = "none"
+  storage_use_azuread             = true
 }
 locals {
   test_regions = ["eastus", "eastus2", "westus2", "westus3"]
@@ -273,11 +273,10 @@ resource "azurerm_eventhub_namespace" "this" {
 }
 
 resource "azurerm_eventhub" "this" {
-  message_retention   = 7
-  name                = module.naming.eventhub_namespace.name_unique
-  namespace_name      = azurerm_eventhub_namespace.this.name
-  partition_count     = 2
-  resource_group_name = azurerm_resource_group.this.name
+  message_retention = 7
+  name              = module.naming.eventhub_namespace.name_unique
+  partition_count   = 2
+  namespace_id      = azurerm_eventhub_namespace.this.id
 }
 
 resource "azurerm_eventhub_authorization_rule" "this" {

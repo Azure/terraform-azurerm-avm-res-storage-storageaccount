@@ -8,7 +8,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = ">= 3.7.0, < 4.0.0"
+      version = ">= 3.7.0, < 5.0.0"
     }
     random = {
       source  = "hashicorp/random"
@@ -23,8 +23,8 @@ provider "azurerm" {
       prevent_deletion_if_contains_resources = false
     }
   }
-  skip_provider_registration = true
-  storage_use_azuread        = true
+  resource_provider_registrations = "none"
+  storage_use_azuread             = true
 }
 locals {
   test_regions = ["eastus", "eastus2", "westus2", "westus3"]
@@ -277,11 +277,10 @@ resource "azurerm_eventhub_namespace" "this" {
 }
 
 resource "azurerm_eventhub" "this" {
-  message_retention   = 7
-  name                = module.naming.eventhub_namespace.name_unique
-  namespace_name      = azurerm_eventhub_namespace.this.name
-  partition_count     = 2
-  resource_group_name = azurerm_resource_group.this.name
+  message_retention = 7
+  name              = module.naming.eventhub_namespace.name_unique
+  partition_count   = 2
+  namespace_id      = azurerm_eventhub_namespace.this.id
 }
 
 resource "azurerm_eventhub_authorization_rule" "this" {
@@ -304,7 +303,7 @@ The following requirements are needed by this module:
 
 - <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.7.0)
 
-- <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (>= 3.7.0, < 4.0.0)
+- <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (>= 3.7.0, < 5.0.0)
 
 - <a name="requirement_random"></a> [random](#requirement\_random) (>= 3.5.0, < 4.0.0)
 
@@ -361,9 +360,9 @@ The following outputs are exported:
 
 Description: value of containers
 
-### <a name="output_eventhub_authorization_rule"></a> [eventhub\_authorization\_rule](#output\_eventhub\_authorization\_rule)
+### <a name="output_eventhub_authorization_rule_primary_key"></a> [eventhub\_authorization\_rule\_primary\_key](#output\_eventhub\_authorization\_rule\_primary\_key)
 
-Description: n/a
+Description: Primary key for the event hub authorisation rule
 
 ### <a name="output_queue"></a> [queue](#output\_queue)
 
