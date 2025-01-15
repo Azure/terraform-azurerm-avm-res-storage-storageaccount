@@ -10,10 +10,11 @@ resource "azurerm_monitor_diagnostic_setting" "storage_account" {
   log_analytics_workspace_id     = each.value.workspace_resource_id
 
   dynamic "metric" {
-    for_each = each.value.metric_categories
+    for_each = tomap(each.value.metric_categories)
 
     content {
-      category = metric.value
+      category = metric.key
+      enabled  = metric.value
     }
   }
 }
@@ -35,10 +36,11 @@ resource "azurerm_monitor_diagnostic_setting" "blob" {
     }
   }
   dynamic "metric" {
-    for_each = each.value.metric_categories
+    for_each = tomap(each.value.metric_categories)
 
     content {
-      category = metric.value
+      category = metric.key
+      enabled  = metric.value
     }
   }
 }
@@ -61,10 +63,11 @@ resource "azurerm_monitor_diagnostic_setting" "queue" {
     }
   }
   dynamic "metric" {
-    for_each = each.value.metric_categories
+    for_each = tomap(each.value.metric_categories)
 
     content {
-      category = metric.value
+      category = metric.key
+      enabled  = metric.value
     }
   }
 }
@@ -86,10 +89,11 @@ resource "azurerm_monitor_diagnostic_setting" "table" {
     }
   }
   dynamic "metric" {
-    for_each = each.value.metric_categories
+    for_each = tomap(each.value.metric_categories)
 
     content {
-      category = metric.value
+      category = metric.key
+      enabled  = metric.value
     }
   }
 }
@@ -111,10 +115,11 @@ resource "azurerm_monitor_diagnostic_setting" "azure_file" {
     }
   }
   dynamic "metric" {
-    for_each = each.value.metric_categories
+    for_each = tomap(each.value.metric_categories)
 
     content {
-      category = metric.value
+      category = metric.key
+      enabled  = metric.value
     }
   }
 }

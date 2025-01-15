@@ -207,7 +207,7 @@ Description: - `change_feed_enabled` - (Optional) Is the blob service properties
 - `name` - (Optional) The name of the diagnostic setting. Defaults to `null`.
 - `log_categories` - (Optional) A set of log categories to enable. Defaults to an empty set.
 - `log_groups` - (Optional) A set of log groups to enable. Defaults to `["allLogs"]`.
-- `metric_categories` - (Optional) A set of metric categories to enable. Defaults to `["AllMetrics"]`.
+- `metric_categories` - (Optional) A map of metric categories to enable or disable. The keys are the category names, and the values are booleans (`true` to enable, `false` to disable). Defaults to `{ AllMetrics = true }`..
 - `log_analytics_destination_type` - (Optional) The destination type for log analytics. Defaults to `"Dedicated"`.
 - `workspace_resource_id` - (Optional) The resource ID of the Log Analytics workspace. Defaults to `null`.
 - `resource_id` - (Optional) The resource ID of the target resource for diagnostics. Defaults to `null`.
@@ -403,7 +403,7 @@ map(object({
     name                                     = optional(string, null)
     log_categories                           = optional(set(string), [])
     log_groups                               = optional(set(string), ["allLogs"])
-    metric_categories                        = optional(set(string), ["AllMetrics"])
+    metric_categories                        = optional(map(bool), { AllMetrics = true })
     log_analytics_destination_type           = optional(string, "Dedicated")
     workspace_resource_id                    = optional(string, null)
     storage_account_resource_id              = optional(string, null)
@@ -437,7 +437,7 @@ map(object({
     name                                     = optional(string, null)
     log_categories                           = optional(set(string), [])
     log_groups                               = optional(set(string), ["allLogs"])
-    metric_categories                        = optional(set(string), ["AllMetrics"])
+    metric_categories                        = optional(map(bool), { AllMetrics = true })
     log_analytics_destination_type           = optional(string, "Dedicated")
     workspace_resource_id                    = optional(string, null)
     storage_account_resource_id              = optional(string, null)
@@ -471,7 +471,7 @@ map(object({
     name                                     = optional(string, null)
     log_categories                           = optional(set(string), [])
     log_groups                               = optional(set(string), ["allLogs"])
-    metric_categories                        = optional(set(string), ["AllMetrics"])
+    metric_categories                        = optional(map(bool), { AllMetrics = true })
     log_analytics_destination_type           = optional(string, "Dedicated")
     workspace_resource_id                    = optional(string, null)
     storage_account_resource_id              = optional(string, null)
@@ -505,7 +505,7 @@ map(object({
     name                                     = optional(string, null)
     log_categories                           = optional(set(string), [])
     log_groups                               = optional(set(string), ["allLogs"])
-    metric_categories                        = optional(set(string), ["AllMetrics"])
+    metric_categories                        = optional(map(bool), { AllMetrics = true })
     log_analytics_destination_type           = optional(string, "Dedicated")
     workspace_resource_id                    = optional(string, null)
     storage_account_resource_id              = optional(string, null)
@@ -539,7 +539,7 @@ map(object({
     name                                     = optional(string, null)
     log_categories                           = optional(set(string), [])
     log_groups                               = optional(set(string), ["allLogs"])
-    metric_categories                        = optional(set(string), ["AllMetrics"])
+    metric_categories                        = optional(map(bool), { AllMetrics = true })
     log_analytics_destination_type           = optional(string, "Dedicated")
     workspace_resource_id                    = optional(string, null)
     storage_account_resource_id              = optional(string, null)
@@ -878,7 +878,7 @@ Description:
 - `name` - (Optional) The name of the diagnostic setting. Defaults to `null`.
 - `log_categories` - (Optional) A set of log categories to enable. Defaults to an empty set.
 - `log_groups` - (Optional) A set of log groups to enable. Defaults to `["allLogs"]`.
-- `metric_categories` - (Optional) A set of metric categories to enable. Defaults to `["AllMetrics"]`.
+- `metric_categories` - (Optional) A map of metric categories to enable or disable. The keys are the category names, and the values are booleans (`true` to enable, `false` to disable). Defaults to `{ AllMetrics = true }`..
 - `log_analytics_destination_type` - (Optional) The destination type for log analytics. Defaults to `"Dedicated"`.
 - `workspace_resource_id` - (Optional) The resource ID of the Log Analytics workspace. Defaults to `null`.
 - `resource_id` - (Optional) The resource ID of the target resource for diagnostics. Defaults to `null`.
@@ -923,7 +923,7 @@ object({
       name                                     = optional(string, null)
       log_categories                           = optional(set(string), [])
       log_groups                               = optional(set(string), ["allLogs"])
-      metric_categories                        = optional(set(string), ["AllMetrics"])
+      metric_categories                        = optional(map(bool), { AllMetrics = true })
       log_analytics_destination_type           = optional(string, "Dedicated")
       workspace_resource_id                    = optional(string, null)
       resource_id                              = optional(string, null)
@@ -1083,7 +1083,7 @@ Description:
 - `name` - (Optional) The name of the diagnostic setting. Defaults to `null`.
 - `log_categories` - (Optional) A set of log categories to enable. Defaults to an empty set.
 - `log_groups` - (Optional) A set of log groups to enable. Defaults to `["allLogs"]`.
-- `metric_categories` - (Optional) A set of metric categories to enable. Defaults to `["AllMetrics"]`.
+- `metric_categories` - (Optional) A map of metric categories to enable or disable. The keys are the category names, and the values are booleans (`true` to enable, `false` to disable). Defaults to `{ AllMetrics = true }`..
 - `log_analytics_destination_type` - (Optional) The destination type for log analytics. Defaults to `"Dedicated"`.
 - `workspace_resource_id` - (Optional) The resource ID of the Log Analytics workspace. Defaults to `null`.
 - `resource_id` - (Optional) The resource ID of the target resource for diagnostics. Defaults to `null`.
@@ -1118,7 +1118,7 @@ object({
       name                                     = optional(string, null)
       log_categories                           = optional(set(string), [])
       log_groups                               = optional(set(string), ["allLogs"])
-      metric_categories                        = optional(set(string), ["AllMetrics"])
+      metric_categories                        = optional(map(bool), { AllMetrics = true })
       log_analytics_destination_type           = optional(string, "Dedicated")
       workspace_resource_id                    = optional(string, null)
       resource_id                              = optional(string, null)

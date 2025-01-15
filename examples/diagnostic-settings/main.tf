@@ -198,7 +198,7 @@ module "this" {
       name                                     = "diag"
       workspace_resource_id                    = azurerm_log_analytics_workspace.this.id
       log_categories                           = ["audit", "alllogs"]
-      metric_categories                        = ["Capacity", "Transaction"]
+      metric_categories                        = { "Capacity" = true, "Transaction" = true }
       eventhub_name                            = azurerm_eventhub.this.name
       event_hub_authorization_rule_resource_id = "${azurerm_eventhub_namespace.this.id}/authorizationRules/RootManageSharedAccessKey"
     }
@@ -212,7 +212,7 @@ module "this" {
       log_categories                           = ["audit", "alllogs"]
       eventhub_name                            = azurerm_eventhub.this.name
       event_hub_authorization_rule_resource_id = "${azurerm_eventhub_namespace.this.id}/authorizationRules/RootManageSharedAccessKey"
-      metric_categories                        = ["Capacity", "Transaction"]
+      metric_categories                        = { "Capacity" = true, "Transaction" = true }
     }
   }
 
@@ -224,7 +224,7 @@ module "this" {
       eventhub_name                            = azurerm_eventhub.this.name
       event_hub_authorization_rule_resource_id = "${azurerm_eventhub_namespace.this.id}/authorizationRules/RootManageSharedAccessKey"
       log_categories                           = ["audit", "alllogs"]
-      metric_categories                        = ["Capacity", "Transaction"]
+      metric_categories                        = { "Capacity" = true, "Transaction" = true }
     }
   }
 
@@ -236,7 +236,7 @@ module "this" {
       eventhub_name                            = azurerm_eventhub.this.name
       event_hub_authorization_rule_resource_id = "${azurerm_eventhub_namespace.this.id}/authorizationRules/RootManageSharedAccessKey"
       log_categories                           = ["audit", "alllogs"]
-      metric_categories                        = ["Capacity", "Transaction"]
+      metric_categories                        = { "Capacity" = true, "Transaction" = true }
     }
   }
 
@@ -248,7 +248,7 @@ module "this" {
       eventhub_name                            = azurerm_eventhub.this.name
       event_hub_authorization_rule_resource_id = "${azurerm_eventhub_namespace.this.id}/authorizationRules/RootManageSharedAccessKey"
       log_categories                           = ["audit", "alllogs"]
-      metric_categories                        = ["Capacity", "Transaction"]
+      metric_categories                        = { "Capacity" = true, "Transaction" = true }
     }
   }
 }
