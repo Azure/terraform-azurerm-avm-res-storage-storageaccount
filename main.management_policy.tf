@@ -1,4 +1,6 @@
 resource "azurerm_storage_management_policy" "this" {
+  count = local.has_management_policy ? 1 : 0
+
   storage_account_id = azurerm_storage_account.this.id
 
   dynamic "rule" {
