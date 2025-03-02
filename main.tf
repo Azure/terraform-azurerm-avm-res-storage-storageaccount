@@ -141,54 +141,7 @@ resource "azurerm_storage_account" "this" {
       }
     }
   }
-  dynamic "queue_properties" {
-    for_each = var.queue_properties == null ? [] : [var.queue_properties]
 
-    content {
-      dynamic "cors_rule" {
-        for_each = queue_properties.value.cors_rule == null ? [] : queue_properties.value.cors_rule
-
-        content {
-          allowed_headers    = cors_rule.value.allowed_headers
-          allowed_methods    = cors_rule.value.allowed_methods
-          allowed_origins    = cors_rule.value.allowed_origins
-          exposed_headers    = cors_rule.value.exposed_headers
-          max_age_in_seconds = cors_rule.value.max_age_in_seconds
-        }
-      }
-      dynamic "hour_metrics" {
-        for_each = queue_properties.value.hour_metrics == null ? [] : [queue_properties.value.hour_metrics]
-
-        content {
-          enabled               = hour_metrics.value.enabled
-          version               = hour_metrics.value.version
-          include_apis          = hour_metrics.value.include_apis
-          retention_policy_days = hour_metrics.value.retention_policy_days
-        }
-      }
-      dynamic "logging" {
-        for_each = queue_properties.value.logging == null ? [] : [queue_properties.value.logging]
-
-        content {
-          delete                = logging.value.delete
-          read                  = logging.value.read
-          version               = logging.value.version
-          write                 = logging.value.write
-          retention_policy_days = logging.value.retention_policy_days
-        }
-      }
-      dynamic "minute_metrics" {
-        for_each = queue_properties.value.minute_metrics == null ? [] : [queue_properties.value.minute_metrics]
-
-        content {
-          enabled               = minute_metrics.value.enabled
-          version               = minute_metrics.value.version
-          include_apis          = minute_metrics.value.include_apis
-          retention_policy_days = minute_metrics.value.retention_policy_days
-        }
-      }
-    }
-  }
   dynamic "routing" {
     for_each = var.routing == null ? [] : [var.routing]
 
@@ -239,14 +192,6 @@ resource "azurerm_storage_account" "this" {
           versions                        = smb.value.versions
         }
       }
-    }
-  }
-  dynamic "static_website" {
-    for_each = var.static_website == null ? [] : [var.static_website]
-
-    content {
-      error_404_document = static_website.value.error_404_document
-      index_document     = static_website.value.index_document
     }
   }
   dynamic "timeouts" {
@@ -345,4 +290,57 @@ resource "azurerm_role_assignment" "storage_account" {
   role_definition_id                     = strcontains(lower(each.value.role_definition_id_or_name), lower(local.role_definition_resource_substring)) ? each.value.role_definition_id_or_name : null
   role_definition_name                   = strcontains(lower(each.value.role_definition_id_or_name), lower(local.role_definition_resource_substring)) ? null : each.value.role_definition_id_or_name
   skip_service_principal_aad_check       = each.value.skip_service_principal_aad_check
+}
+
+resource "azurerm_storage_account_static_website" "this" {
+  for_each = var.static_website == null ? {} : var.static_website
+  storage_account_id = azurerm_storage_account.this.id
+  index_document       = each.value.index_document
+  error_404_document   = each.value.error_404_document
+}
+
+resource "azurerm_storage_account_queue_properties" "this" {
+  for_each = var.queue_properties
+  storage_account_id = azurerm_storage_account.this.id
+
+  dynamic "cors_rule" {
+    for_each = each.value.cors_rule
+    content {
+      allowed_headers    = cors_rule.value.allowed_headers
+      allowed_methods    = cors_rule.value.allowed_methods
+      allowed_origins    = cors_rule.value.allowed_origins
+      exposed_headers    = cors_rule.value.exposed_headers
+      max_age_in_seconds = cors_rule.value.max_age_in_seconds
+    }
+}
+
+  dynamic "hour_metrics" {
+    for_each = each.value.hour_metrics == null ? [] : ["1"]
+    content {
+      version               = each.value.hour_metrics.version
+      include_apis          = each.value.hour_metrics.include_apis
+      retention_policy_days = each.value.hour_metrics.retention_policy_days
+    }
+  }
+
+  dynamic "logging" {
+    for_each = each.value.logging == null ? [] : ["1"]
+    content {
+      delete                = each.value.logging.delete
+      read                  = each.value.logging.read
+      version               = each.value.logging.version
+      write                 = each.value.logging.write
+      retention_policy_days = each.value.logging.retention_policy_days
+    }
+  }
+
+  dynamic "minute_metrics" {
+    for_each = each.value.minute_metrics == null ? [] : ["1"]
+    content {
+      version               = each.value.minute_metrics.version
+      include_apis          = each.value.minute_metrics.include_apis
+      retention_policy_days = each.value.minute_metrics.retention_policy_days
+    }
+  }
+
 }

@@ -5,28 +5,27 @@ variable "queue_encryption_key_type" {
 }
 
 variable "queue_properties" {
-  type = object({
-    cors_rule = optional(list(object({
+  type = map(object({
+    cors_rule = optional(map(object({
       allowed_headers    = list(string)
       allowed_methods    = list(string)
       allowed_origins    = list(string)
       exposed_headers    = list(string)
       max_age_in_seconds = number
-    })))
-    diagnostic_settings = optional(map(object({
-      name                                     = optional(string, null)
-      log_categories                           = optional(set(string), [])
-      log_groups                               = optional(set(string), ["allLogs"])
-      metric_categories                        = optional(set(string), ["AllMetrics"])
-      log_analytics_destination_type           = optional(string, "Dedicated")
-      workspace_resource_id                    = optional(string, null)
-      resource_id                              = optional(string, null)
-      event_hub_authorization_rule_resource_id = optional(string, null)
-      event_hub_name                           = optional(string, null)
-      marketplace_partner_resource_id          = optional(string, null)
-    })), {})
+    })),{})
+    # diagnostic_settings = optional(map(object({
+    #   name                                     = optional(string, null)
+    #   log_categories                           = optional(set(string), [])
+    #   log_groups                               = optional(set(string), ["allLogs"])
+    #   metric_categories                        = optional(set(string), ["AllMetrics"])
+    #   log_analytics_destination_type           = optional(string, "Dedicated")
+    #   workspace_resource_id                    = optional(string, null)
+    #   resource_id                              = optional(string, null)
+    #   event_hub_authorization_rule_resource_id = optional(string, null)
+    #   event_hub_name                           = optional(string, null)
+    #   marketplace_partner_resource_id          = optional(string, null)
+    # })), {})
     hour_metrics = optional(object({
-      enabled               = bool
       include_apis          = optional(bool)
       retention_policy_days = optional(number)
       version               = string
@@ -39,13 +38,12 @@ variable "queue_properties" {
       write                 = bool
     }))
     minute_metrics = optional(object({
-      enabled               = bool
       include_apis          = optional(bool)
       retention_policy_days = optional(number)
       version               = string
     }))
-  })
-  default     = null
+  }))
+  default     = {}
   description = <<-EOT
 
  ---
