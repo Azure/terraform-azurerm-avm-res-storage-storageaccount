@@ -260,10 +260,10 @@ variable "shared_access_key_enabled" {
 }
 
 variable "static_website" {
-  type = object({
+  type = map(object({
     error_404_document = optional(string)
     index_document     = optional(string)
-  })
+  }))
   default     = null
   description = <<-EOT
  - `error_404_document` - (Optional) The absolute path to a custom webpage that should be used when a request is made which does not correspond to an existing file.
