@@ -61,6 +61,8 @@ The following resources are used by this module:
 - [azurerm_storage_account.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account) (resource)
 - [azurerm_storage_account_customer_managed_key.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account_customer_managed_key) (resource)
 - [azurerm_storage_account_local_user.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account_local_user) (resource)
+- [azurerm_storage_account_queue_properties.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account_queue_properties) (resource)
+- [azurerm_storage_account_static_website.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account_static_website) (resource)
 - [azurerm_storage_data_lake_gen2_filesystem.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_data_lake_gen2_filesystem) (resource)
 - [azurerm_storage_management_policy.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_management_policy) (resource)
 - [modtm_telemetry.telemetry](https://registry.terraform.io/providers/Azure/modtm/latest/docs/resources/telemetry) (resource)
@@ -911,28 +913,27 @@ Description:
 Type:
 
 ```hcl
-object({
-    cors_rule = optional(list(object({
+map(object({
+    cors_rule = optional(map(object({
       allowed_headers    = list(string)
       allowed_methods    = list(string)
       allowed_origins    = list(string)
       exposed_headers    = list(string)
       max_age_in_seconds = number
-    })))
-    diagnostic_settings = optional(map(object({
-      name                                     = optional(string, null)
-      log_categories                           = optional(set(string), [])
-      log_groups                               = optional(set(string), ["allLogs"])
-      metric_categories                        = optional(set(string), ["AllMetrics"])
-      log_analytics_destination_type           = optional(string, "Dedicated")
-      workspace_resource_id                    = optional(string, null)
-      resource_id                              = optional(string, null)
-      event_hub_authorization_rule_resource_id = optional(string, null)
-      event_hub_name                           = optional(string, null)
-      marketplace_partner_resource_id          = optional(string, null)
     })), {})
+    # diagnostic_settings = optional(map(object({
+    #   name                                     = optional(string, null)
+    #   log_categories                           = optional(set(string), [])
+    #   log_groups                               = optional(set(string), ["allLogs"])
+    #   metric_categories                        = optional(set(string), ["AllMetrics"])
+    #   log_analytics_destination_type           = optional(string, "Dedicated")
+    #   workspace_resource_id                    = optional(string, null)
+    #   resource_id                              = optional(string, null)
+    #   event_hub_authorization_rule_resource_id = optional(string, null)
+    #   event_hub_name                           = optional(string, null)
+    #   marketplace_partner_resource_id          = optional(string, null)
+    # })), {})
     hour_metrics = optional(object({
-      enabled               = bool
       include_apis          = optional(bool)
       retention_policy_days = optional(number)
       version               = string
@@ -945,15 +946,14 @@ object({
       write                 = bool
     }))
     minute_metrics = optional(object({
-      enabled               = bool
       include_apis          = optional(bool)
       retention_policy_days = optional(number)
       version               = string
     }))
-  })
+  }))
 ```
 
-Default: `null`
+Default: `{}`
 
 ### <a name="input_queues"></a> [queues](#input\_queues)
 
@@ -1222,10 +1222,10 @@ Description: - `error_404_document` - (Optional) The absolute path to a custom w
 Type:
 
 ```hcl
-object({
+map(object({
     error_404_document = optional(string)
     index_document     = optional(string)
-  })
+  }))
 ```
 
 Default: `null`

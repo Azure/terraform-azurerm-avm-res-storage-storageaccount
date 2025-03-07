@@ -141,7 +141,6 @@ resource "azurerm_storage_account" "this" {
       }
     }
   }
-
   dynamic "routing" {
     for_each = var.routing == null ? [] : [var.routing]
 
@@ -294,17 +293,20 @@ resource "azurerm_role_assignment" "storage_account" {
 
 resource "azurerm_storage_account_static_website" "this" {
   for_each = var.static_website == null ? {} : var.static_website
+
   storage_account_id = azurerm_storage_account.this.id
-  index_document       = each.value.index_document
-  error_404_document   = each.value.error_404_document
+  error_404_document = each.value.error_404_document
+  index_document     = each.value.index_document
 }
 
 resource "azurerm_storage_account_queue_properties" "this" {
   for_each = var.queue_properties
+
   storage_account_id = azurerm_storage_account.this.id
 
   dynamic "cors_rule" {
     for_each = each.value.cors_rule
+
     content {
       allowed_headers    = cors_rule.value.allowed_headers
       allowed_methods    = cors_rule.value.allowed_methods
@@ -312,19 +314,19 @@ resource "azurerm_storage_account_queue_properties" "this" {
       exposed_headers    = cors_rule.value.exposed_headers
       max_age_in_seconds = cors_rule.value.max_age_in_seconds
     }
-}
-
+  }
   dynamic "hour_metrics" {
     for_each = each.value.hour_metrics == null ? [] : ["1"]
+
     content {
       version               = each.value.hour_metrics.version
       include_apis          = each.value.hour_metrics.include_apis
       retention_policy_days = each.value.hour_metrics.retention_policy_days
     }
   }
-
   dynamic "logging" {
     for_each = each.value.logging == null ? [] : ["1"]
+
     content {
       delete                = each.value.logging.delete
       read                  = each.value.logging.read
@@ -333,14 +335,13 @@ resource "azurerm_storage_account_queue_properties" "this" {
       retention_policy_days = each.value.logging.retention_policy_days
     }
   }
-
   dynamic "minute_metrics" {
     for_each = each.value.minute_metrics == null ? [] : ["1"]
+
     content {
       version               = each.value.minute_metrics.version
       include_apis          = each.value.minute_metrics.include_apis
       retention_policy_days = each.value.minute_metrics.retention_policy_days
     }
   }
-
 }

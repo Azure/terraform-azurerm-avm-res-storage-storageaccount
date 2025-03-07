@@ -12,7 +12,7 @@ variable "queue_properties" {
       allowed_origins    = list(string)
       exposed_headers    = list(string)
       max_age_in_seconds = number
-    })),{})
+    })), {})
     # diagnostic_settings = optional(map(object({
     #   name                                     = optional(string, null)
     #   log_categories                           = optional(set(string), [])
