@@ -76,3 +76,4 @@ avm.tflint_module.merged.hcl
 
 #IntelliJ IDEA
 .idea/
+examples/*/policy
