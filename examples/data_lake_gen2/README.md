@@ -167,7 +167,13 @@ module "this" {
   }
 
   storage_data_lake_gen2_filesystem = {
-    name = "testdatelakegen2filesystem"
+    data_lake_1 = {
+      name = "datalake1"
+    }
+    data_lake_2 = {
+      name = "datalake2"
+
+    }
   }
 }
 ```

@@ -1254,7 +1254,7 @@ Description: - `default_encryption_scope` - (Optional) The default encryption sc
 Type:
 
 ```hcl
-object({
+map(object({
     default_encryption_scope = optional(string)
     group                    = optional(string)
     name                     = string
@@ -1272,10 +1272,10 @@ object({
       read   = optional(string)
       update = optional(string)
     }))
-  })
+  }))
 ```
 
-Default: `null`
+Default: `{}`
 
 ### <a name="input_storage_management_policy_rule"></a> [storage\_management\_policy\_rule](#input\_storage\_management\_policy\_rule)
 
