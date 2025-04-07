@@ -1,5 +1,5 @@
 variable "storage_data_lake_gen2_filesystem" {
-  type = object({
+  type = map(object({
     default_encryption_scope = optional(string)
     group                    = optional(string)
     name                     = string
@@ -17,7 +17,7 @@ variable "storage_data_lake_gen2_filesystem" {
       read   = optional(string)
       update = optional(string)
     }))
-  })
+  }))
   description = <<-EOT
  - `default_encryption_scope` - (Optional) The default encryption scope to use for this filesystem. Changing this forces a new resource to be created.
  - `group` - (Optional) Specifies the Object ID of the Azure Active Directory Group to make the owning group of the root path (i.e. `/`). Possible values also include `$superuser`.
@@ -38,5 +38,5 @@ variable "storage_data_lake_gen2_filesystem" {
  - `read` - (Defaults to 5 minutes) Used when retrieving the Data Lake Gen2 File System.
  - `update` - (Defaults to 30 minutes) Used when updating the Data Lake Gen2 File System.
 EOT
-  default     = null
+  default     = {}
 }
