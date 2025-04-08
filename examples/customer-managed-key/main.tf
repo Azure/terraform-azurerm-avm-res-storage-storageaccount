@@ -197,11 +197,11 @@ module "this" {
       principal_id                     = coalesce(var.msi_id, data.azurerm_client_config.current.object_id)
       skip_service_principal_aad_check = false
     },
-    role_assignment_2 = {
-      role_definition_id_or_name       = "Owner"
-      principal_id                     = data.azurerm_client_config.current.object_id
-      skip_service_principal_aad_check = false
-    },
+    # role_assignment_2 = {
+    #   role_definition_id_or_name       = "Owner"
+    #   principal_id                     = data.azurerm_client_config.current.object_id
+    #   skip_service_principal_aad_check = false
+    # },
 
   }
   network_rules = {
