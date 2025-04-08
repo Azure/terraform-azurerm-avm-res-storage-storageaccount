@@ -131,9 +131,9 @@ module "avm_res_keyvault_vault" {
   name                = module.naming.key_vault.name_unique
   resource_group_name = azurerm_resource_group.this.name
   location            = azurerm_resource_group.this.location
-  network_acls = {
-    default_action = "Allow"
-  }
+  # network_acls = {
+  #   default_action = "Allow"
+  # }
 
   role_assignments = {
     deployment_user_secrets = {
