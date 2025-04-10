@@ -1,5 +1,17 @@
+moved {
+  from = azurerm_storage_data_lake_gen2_filesystem.this[0]
+  to   = azurerm_storage_data_lake_gen2_filesystem.this["legacy"]
+}
+
+locals {
+  storage_data_lake_gen2_filesystems = merge(
+    var.storage_data_lake_gen2_filesystem == null ? {} : { legacy = var.storage_data_lake_gen2_filesystem },
+    var.storage_data_lake_gen2_filesystems
+  )
+}
+
 resource "azurerm_storage_data_lake_gen2_filesystem" "this" {
-  for_each = var.storage_data_lake_gen2_filesystem
+  for_each = local.storage_data_lake_gen2_filesystems
 
   name                     = each.value.name
   storage_account_id       = azurerm_storage_account.this.id
