@@ -267,8 +267,8 @@ resource "azurerm_storage_account_customer_managed_key" "this" {
   key_name                  = var.customer_managed_key.key_name
   storage_account_id        = azurerm_storage_account.this.id
   key_vault_id              = var.customer_managed_key.key_vault_resource_id
-  managed_hsm_key_id        = var.customer_managed_key.managed_hsm_key_id
   key_version               = var.customer_managed_key.key_version
+  managed_hsm_key_id        = var.customer_managed_key.managed_hsm_key_id
   user_assigned_identity_id = try(var.customer_managed_key.user_assigned_identity.resource_id, null)
 
   lifecycle {
