@@ -25,8 +25,9 @@ variable "resource_group_name" {
 
 variable "customer_managed_key" {
   type = object({
-    key_vault_resource_id = string
+    key_vault_resource_id = optional(string, null)
     key_name              = string
+    managed_hsm_key_id    = optional(string, null)
     key_version           = optional(string, null)
     user_assigned_identity = optional(object({
       resource_id = string
@@ -39,6 +40,7 @@ variable "customer_managed_key" {
     object({
       key_vault_resource_id              = (Required) - The full Azure Resource ID of the key_vault where the customer managed key will be referenced from.
       key_name                           = (Required) - The key name for the customer managed key in the key vault.
+      managed_hsm_key_id                 = (Optional) - The full Azure Resource ID of the managed HSM where the customer managed key will be referenced from.
       key_version                        = (Optional) - The version of the key to use
       user_assigned_identity_resource_id = (Optional) - The user assigned identity to use when access the key vault
     })
