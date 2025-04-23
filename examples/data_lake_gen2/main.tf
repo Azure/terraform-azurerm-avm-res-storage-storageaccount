@@ -160,7 +160,13 @@ module "this" {
     virtual_network_subnet_ids = toset([azurerm_subnet.private.id])
   }
 
-  storage_data_lake_gen2_filesystem = {
-    name = "testdatelakegen2filesystem"
+  storage_data_lake_gen2_filesystems = {
+    data_lake_1 = {
+      name = "datalake1"
+    }
+    data_lake_2 = {
+      name = "datalake2"
+
+    }
   }
 }

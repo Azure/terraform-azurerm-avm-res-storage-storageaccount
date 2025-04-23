@@ -1,5 +1,5 @@
-variable "storage_data_lake_gen2_filesystems" {
-  type = map(object({
+variable "storage_data_lake_gen2_filesystem" {
+  type = object({
     default_encryption_scope = optional(string)
     group                    = optional(string)
     name                     = string
@@ -17,8 +17,10 @@ variable "storage_data_lake_gen2_filesystems" {
       read   = optional(string)
       update = optional(string)
     }))
-  }))
+  })
+  default     = null
   description = <<-EOT
+ DEPRECATED, please use `var.storage_data_lake_gen2_filesystems` instead.
  - `default_encryption_scope` - (Optional) The default encryption scope to use for this filesystem. Changing this forces a new resource to be created.
  - `group` - (Optional) Specifies the Object ID of the Azure Active Directory Group to make the owning group of the root path (i.e. `/`). Possible values also include `$superuser`.
  - `name` - (Required) The name of the Data Lake Gen2 File System which should be created within the Storage Account. Must be unique within the storage account the queue is located. Changing this forces a new resource to be created.
@@ -38,9 +40,4 @@ variable "storage_data_lake_gen2_filesystems" {
  - `read` - (Defaults to 5 minutes) Used when retrieving the Data Lake Gen2 File System.
  - `update` - (Defaults to 30 minutes) Used when updating the Data Lake Gen2 File System.
 EOT
-  default     = {}
-  validation {
-    condition     = !contains(keys(var.storage_data_lake_gen2_filesystems), "legacy")
-    error_message = "Key `legacy` is preserved for backward compatibility."
-  }
 }
