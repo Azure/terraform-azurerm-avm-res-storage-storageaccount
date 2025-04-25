@@ -130,11 +130,11 @@ module "this" {
     default_share_level_permission = "StorageFileDataSmbShareReader"
     directory_type                 = "AADKERB"
   }
-  tags = {
-    env   = "Dev"
-    owner = "John Doe"
-    dept  = "IT"
-  }
+  # tags = {
+  #   env   = "Dev"
+  #   owner = "John Doe"
+  #   dept  = "IT"
+  # }
   blob_properties = {
     versioning_enabled = true
   }
