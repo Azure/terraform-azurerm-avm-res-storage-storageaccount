@@ -1,7 +1,7 @@
 variable "location" {
   description = "The Azure location to deploy resources into."
   type        = string
-  default = "swedencentral"
+  default     = "swedencentral"
 }
 
 terraform {
@@ -26,9 +26,9 @@ provider "azurerm" {
 
 resource "random_string" "this" {
   length  = 3
+  numeric = false
   special = false
   upper   = false
-  numeric = false
 }
 
 locals {
@@ -39,7 +39,7 @@ module "resource_group" {
   source  = "Azure/avm-res-resources-resourcegroup/azurerm"
   version = "0.2.1"
 
-  name    = "rg-avm-dev-swedencentral-001"
+  name     = "rg-avm-dev-swedencentral-001"
   location = var.location
 }
 
@@ -53,7 +53,7 @@ module "virtual_network" {
   location            = var.location
   subnets = {
     private_endpoints = {
-      name = "subnet-private-endpoints"
+      name             = "subnet-private-endpoints"
       address_prefixes = ["10.0.0.0/24"]
     }
   }
@@ -81,9 +81,9 @@ module "storage_account" {
   #version = "0.5.0"
   source = "../.."
 
-  location                          = var.location
-  name                              = local.storage_account_name
-  resource_group_name               = module.resource_group.name
+  location            = var.location
+  name                = local.storage_account_name
+  resource_group_name = module.resource_group.name
 
   containers = {
     demo = {
