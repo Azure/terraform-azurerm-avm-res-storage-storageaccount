@@ -27,6 +27,9 @@ resource "azapi_resource" "share" {
       read   = timeouts.value.read
     }
   }
+  lifecycle {
+    ignore_changes = [body.properties.metadata]
+  }
 }
 
 # Enable role assignments for shares
