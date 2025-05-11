@@ -1,8 +1,3 @@
-variable "location" {
-  description = "The Azure location to deploy resources into."
-  type        = string
-  default     = "swedencentral"
-}
 
 terraform {
   required_providers {
@@ -39,35 +34,33 @@ module "resource_group" {
   source  = "Azure/avm-res-resources-resourcegroup/azurerm"
   version = "0.2.1"
 
-  name     = "rg-avm-dev-swedencentral-001"
   location = var.location
+  name     = "rg-avm-dev-swedencentral-001"
 }
 
 module "virtual_network" {
   source  = "Azure/avm-res-network-virtualnetwork/azurerm"
   version = "0.8.1"
 
-  name                = "vnet-avm-dev-swedencentral-001"
-  enable_telemetry    = true
-  resource_group_name = module.resource_group.name
+  address_space       = ["10.0.0.0/16"]
   location            = var.location
+  resource_group_name = module.resource_group.name
+  enable_telemetry    = true
+  name                = "vnet-avm-dev-swedencentral-001"
   subnets = {
     private_endpoints = {
       name             = "subnet-private-endpoints"
       address_prefixes = ["10.0.0.0/24"]
     }
   }
-
-  address_space = ["10.0.0.0/16"]
 }
 
 module "private_dns_zone" {
   source  = "Azure/avm-res-network-privatednszone/azurerm"
   version = "0.3.2"
 
-  resource_group_name = module.resource_group.name
   domain_name         = "privatelink.blob.core.windows.net"
-
+  resource_group_name = module.resource_group.name
   virtual_network_links = {
     vnetlink1 = {
       vnetlinkname = "storage-account"
@@ -84,13 +77,11 @@ module "storage_account" {
   location            = var.location
   name                = local.storage_account_name
   resource_group_name = module.resource_group.name
-
   containers = {
     demo = {
       name = "demo"
     }
   }
-
   private_endpoints = {
     primary = {
       private_dns_zone_resource_ids = [module.private_dns_zone.resource_id]
