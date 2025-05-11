@@ -89,10 +89,9 @@ resource "azurerm_network_security_rule" "no_internet" {
 }
 
 module "public_ip" {
-  count = var.bypass_ip_cidr == null ? 1 : 0
-
   source  = "lonegunmanb/public-ip/lonegunmanb"
   version = "0.1.0"
+  count   = var.bypass_ip_cidr == null ? 1 : 0
 }
 # We need this to get the object_id of the current user
 data "azurerm_client_config" "current" {}
@@ -108,38 +107,32 @@ data "azurerm_role_definition" "example" {
 }
 
 module "this" {
-
   source = "../.."
 
-  account_replication_type      = "ZRS"
-  account_tier                  = "Standard"
-  account_kind                  = "StorageV2"
-  location                      = azurerm_resource_group.this.location
-  name                          = module.naming.storage_account.name_unique
-  https_traffic_only_enabled    = true
-  resource_group_name           = azurerm_resource_group.this.name
-  min_tls_version               = "TLS1_2"
-  shared_access_key_enabled     = true
-  is_hns_enabled                = true
-  public_network_access_enabled = true
-  managed_identities = {
-    system_assigned            = true
-    user_assigned_resource_ids = [azurerm_user_assigned_identity.example_identity.id]
-  }
+  location                 = azurerm_resource_group.this.location
+  name                     = module.naming.storage_account.name_unique
+  resource_group_name      = azurerm_resource_group.this.name
+  account_kind             = "StorageV2"
+  account_replication_type = "ZRS"
+  account_tier             = "Standard"
   azure_files_authentication = {
     default_share_level_permission = "StorageFileDataSmbShareReader"
     directory_type                 = "AADKERB"
   }
-  tags = {
-    env   = "Dev"
-    owner = "John Doe"
-    dept  = "IT"
+  https_traffic_only_enabled = true
+  is_hns_enabled             = true
+  managed_identities = {
+    system_assigned            = true
+    user_assigned_resource_ids = [azurerm_user_assigned_identity.example_identity.id]
   }
-  #Locks for storage account (Disabled by default)
-  /*lock = {
-    name = "lock"
-    kind = "None"
-  } */
+  min_tls_version = "TLS1_2"
+  network_rules = {
+    bypass                     = ["AzureServices"]
+    default_action             = "Deny"
+    ip_rules                   = [try(module.public_ip[0].public_ip, var.bypass_ip_cidr)]
+    virtual_network_subnet_ids = toset([azurerm_subnet.private.id])
+  }
+  public_network_access_enabled = true
   role_assignments = {
     role_assignment_1 = {
       role_definition_id_or_name       = data.azurerm_role_definition.example.name
@@ -153,13 +146,7 @@ module "this" {
     },
 
   }
-  network_rules = {
-    bypass                     = ["AzureServices"]
-    default_action             = "Deny"
-    ip_rules                   = [try(module.public_ip[0].public_ip, var.bypass_ip_cidr)]
-    virtual_network_subnet_ids = toset([azurerm_subnet.private.id])
-  }
-
+  shared_access_key_enabled = true
   storage_data_lake_gen2_filesystems = {
     data_lake_1 = {
       name = "datalake1"
@@ -168,5 +155,10 @@ module "this" {
       name = "datalake2"
 
     }
+  }
+  tags = {
+    env   = "Dev"
+    owner = "John Doe"
+    dept  = "IT"
   }
 }

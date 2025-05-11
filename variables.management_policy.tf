@@ -51,7 +51,6 @@ variable "storage_management_policy_rule" {
     })
   }))
   default     = {}
-  nullable    = false
   description = <<-EOT
  - `enabled` - (Required) Boolean to specify whether the rule is enabled.
  - `name` - (Required) The name of the rule. Rule name is case-sensitive. It must be unique within a policy.
@@ -103,6 +102,7 @@ variable "storage_management_policy_rule" {
  - `operation` - (Optional) The comparison operator which is used for object comparison and filtering. Possible value is `==`. Defaults to `==`.
  - `value` - (Required) The filter tag value used for tag based filtering for blob objects.
 EOT
+  nullable    = false
 }
 
 variable "storage_management_policy_timeouts" {
