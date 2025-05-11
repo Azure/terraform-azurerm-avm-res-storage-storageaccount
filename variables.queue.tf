@@ -128,5 +128,3 @@ Supply role assignments in the same way as for `var.role_assignments`.
 EOT
   nullable    = false
 }
-
-

@@ -18,6 +18,7 @@ variable "storage_data_lake_gen2_filesystems" {
       update = optional(string)
     }))
   }))
+  default     = {}
   description = <<-EOT
  - `default_encryption_scope` - (Optional) The default encryption scope to use for this filesystem. Changing this forces a new resource to be created.
  - `group` - (Optional) Specifies the Object ID of the Azure Active Directory Group to make the owning group of the root path (i.e. `/`). Possible values also include `$superuser`.
@@ -38,7 +39,7 @@ variable "storage_data_lake_gen2_filesystems" {
  - `read` - (Defaults to 5 minutes) Used when retrieving the Data Lake Gen2 File System.
  - `update` - (Defaults to 30 minutes) Used when updating the Data Lake Gen2 File System.
 EOT
-  default     = {}
+
   validation {
     condition     = !contains(keys(var.storage_data_lake_gen2_filesystems), "legacy")
     error_message = "Key `legacy` is preserved for backward compatibility."
