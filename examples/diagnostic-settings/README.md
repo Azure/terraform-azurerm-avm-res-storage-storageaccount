@@ -256,7 +256,7 @@ resource "azurerm_eventhub_namespace" "this" {
   resource_group_name  = azurerm_resource_group.this.name
   sku                  = "Standard"
   auto_inflate_enabled = true
-  capacity             = 2
+  capacity             = 3
   tags = {
     environment = "Production"
   }
