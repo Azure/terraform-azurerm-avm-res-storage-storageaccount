@@ -1,11 +1,11 @@
 variable "access_tier" {
   type        = string
   default     = "Hot"
-  description = "(Optional) Defines the access tier for `BlobStorage`, `FileStorage` and `StorageV2` accounts. Valid options are `Hot`, `Cool`, and `Cold`. Defaults to `Hot`."
+  description = "(Optional) Defines the access tier for BlobStorage, FileStorage and StorageV2 accounts. Valid options are Hot, Cool, Cold and Premium. Defaults to Hot."
 
   validation {
     condition     = contains(["Hot", "Cool", "Cold"], var.access_tier)
-    error_message = "Invalid value for access tier. Valid options are 'Hot', 'Cool', or 'Cold'."
+    error_message = "Invalid value for access tier. Valid options are 'Hot', 'Cool','Premium' or 'Cold'."
   }
 }
 
