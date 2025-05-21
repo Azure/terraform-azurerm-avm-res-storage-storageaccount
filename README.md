@@ -61,6 +61,8 @@ The following resources are used by this module:
 - [azurerm_storage_account.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account) (resource)
 - [azurerm_storage_account_customer_managed_key.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account_customer_managed_key) (resource)
 - [azurerm_storage_account_local_user.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account_local_user) (resource)
+- [azurerm_storage_account_queue_properties.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account_queue_properties) (resource)
+- [azurerm_storage_account_static_website.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account_static_website) (resource)
 - [azurerm_storage_data_lake_gen2_filesystem.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_data_lake_gen2_filesystem) (resource)
 - [azurerm_storage_management_policy.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_management_policy) (resource)
 - [modtm_telemetry.telemetry](https://registry.terraform.io/providers/Azure/modtm/latest/docs/resources/telemetry) (resource)
@@ -911,28 +913,27 @@ Description:
 Type:
 
 ```hcl
-object({
-    cors_rule = optional(list(object({
+map(object({
+    cors_rule = optional(map(object({
       allowed_headers    = list(string)
       allowed_methods    = list(string)
       allowed_origins    = list(string)
       exposed_headers    = list(string)
       max_age_in_seconds = number
-    })))
-    diagnostic_settings = optional(map(object({
-      name                                     = optional(string, null)
-      log_categories                           = optional(set(string), [])
-      log_groups                               = optional(set(string), ["allLogs"])
-      metric_categories                        = optional(set(string), ["AllMetrics"])
-      log_analytics_destination_type           = optional(string, "Dedicated")
-      workspace_resource_id                    = optional(string, null)
-      resource_id                              = optional(string, null)
-      event_hub_authorization_rule_resource_id = optional(string, null)
-      event_hub_name                           = optional(string, null)
-      marketplace_partner_resource_id          = optional(string, null)
     })), {})
+    # diagnostic_settings = optional(map(object({
+    #   name                                     = optional(string, null)
+    #   log_categories                           = optional(set(string), [])
+    #   log_groups                               = optional(set(string), ["allLogs"])
+    #   metric_categories                        = optional(set(string), ["AllMetrics"])
+    #   log_analytics_destination_type           = optional(string, "Dedicated")
+    #   workspace_resource_id                    = optional(string, null)
+    #   resource_id                              = optional(string, null)
+    #   event_hub_authorization_rule_resource_id = optional(string, null)
+    #   event_hub_name                           = optional(string, null)
+    #   marketplace_partner_resource_id          = optional(string, null)
+    # })), {})
     hour_metrics = optional(object({
-      enabled               = bool
       include_apis          = optional(bool)
       retention_policy_days = optional(number)
       version               = string
@@ -945,15 +946,14 @@ object({
       write                 = bool
     }))
     minute_metrics = optional(object({
-      enabled               = bool
       include_apis          = optional(bool)
       retention_policy_days = optional(number)
       version               = string
     }))
-  })
+  }))
 ```
 
-Default: `null`
+Default: `{}`
 
 ### <a name="input_queues"></a> [queues](#input\_queues)
 
@@ -1222,17 +1222,18 @@ Description: - `error_404_document` - (Optional) The absolute path to a custom w
 Type:
 
 ```hcl
-object({
+map(object({
     error_404_document = optional(string)
     index_document     = optional(string)
-  })
+  }))
 ```
 
 Default: `null`
 
 ### <a name="input_storage_data_lake_gen2_filesystem"></a> [storage\_data\_lake\_gen2\_filesystem](#input\_storage\_data\_lake\_gen2\_filesystem)
 
-Description: - `default_encryption_scope` - (Optional) The default encryption scope to use for this filesystem. Changing this forces a new resource to be created.
+Description: DEPRECATED, please use `var.storage_data_lake_gen2_filesystems` instead.
+- `default_encryption_scope` - (Optional) The default encryption scope to use for this filesystem. Changing this forces a new resource to be created.
 - `group` - (Optional) Specifies the Object ID of the Azure Active Directory Group to make the owning group of the root path (i.e. `/`). Possible values also include `$superuser`.
 - `name` - (Required) The name of the Data Lake Gen2 File System which should be created within the Storage Account. Must be unique within the storage account the queue is located. Changing this forces a new resource to be created.
 - `owner` - (Optional) Specifies the Object ID of the Azure Active Directory User to make the owning user of the root path (i.e. `/`). Possible values also include `$superuser`.
@@ -1276,6 +1277,53 @@ object({
 ```
 
 Default: `null`
+
+### <a name="input_storage_data_lake_gen2_filesystems"></a> [storage\_data\_lake\_gen2\_filesystems](#input\_storage\_data\_lake\_gen2\_filesystems)
+
+Description: - `default_encryption_scope` - (Optional) The default encryption scope to use for this filesystem. Changing this forces a new resource to be created.
+- `group` - (Optional) Specifies the Object ID of the Azure Active Directory Group to make the owning group of the root path (i.e. `/`). Possible values also include `$superuser`.
+- `name` - (Required) The name of the Data Lake Gen2 File System which should be created within the Storage Account. Must be unique within the storage account the queue is located. Changing this forces a new resource to be created.
+- `owner` - (Optional) Specifies the Object ID of the Azure Active Directory User to make the owning user of the root path (i.e. `/`). Possible values also include `$superuser`.
+- `properties` - (Optional) A mapping of Key to Base64-Encoded Values which should be assigned to this Data Lake Gen2 File System.
+---
+`ace` block supports the following:
+- `id` - (Optional) Specifies the Object ID of the Azure Active Directory User or Group that the entry relates to. Only valid for `user` or `group` entries.
+- `permissions` - (Required) Specifies the permissions for the entry in `rwx` form. For example, `rwx` gives full permissions but `r--` only gives read permissions.
+- `scope` - (Optional) Specifies whether the ACE represents an `access` entry or a `default` entry. Default value is `access`.
+- `type` - (Required) Specifies the type of entry. Can be `user`, `group`, `mask` or `other`.
+
+---
+`timeouts` block supports the following:
+- `create` - (Defaults to 30 minutes) Used when creating the Data Lake Gen2 File System.
+- `delete` - (Defaults to 30 minutes) Used when deleting the Data Lake Gen2 File System.
+- `read` - (Defaults to 5 minutes) Used when retrieving the Data Lake Gen2 File System.
+- `update` - (Defaults to 30 minutes) Used when updating the Data Lake Gen2 File System.
+
+Type:
+
+```hcl
+map(object({
+    default_encryption_scope = optional(string)
+    group                    = optional(string)
+    name                     = string
+    owner                    = optional(string)
+    properties               = optional(map(string))
+    ace = optional(set(object({
+      id          = optional(string)
+      permissions = string
+      scope       = optional(string)
+      type        = string
+    })))
+    timeouts = optional(object({
+      create = optional(string)
+      delete = optional(string)
+      read   = optional(string)
+      update = optional(string)
+    }))
+  }))
+```
+
+Default: `{}`
 
 ### <a name="input_storage_management_policy_rule"></a> [storage\_management\_policy\_rule](#input\_storage\_management\_policy\_rule)
 

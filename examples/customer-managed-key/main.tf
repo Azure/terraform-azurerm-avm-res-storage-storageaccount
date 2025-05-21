@@ -88,10 +88,9 @@ resource "azurerm_network_security_rule" "no_internet" {
 }
 
 module "public_ip" {
-  count = var.bypass_ip_cidr == null ? 1 : 0
-
   source  = "lonegunmanb/public-ip/lonegunmanb"
   version = "0.1.0"
+  count   = var.bypass_ip_cidr == null ? 1 : 0
 }
 
 data "azurerm_client_config" "current" {}
@@ -125,16 +124,16 @@ resource "azurerm_key_vault_key" "example" {
 
 #create a keyvault for storing the credential with RBAC for the deployment user
 module "avm_res_keyvault_vault" {
-  source              = "Azure/avm-res-keyvault-vault/azurerm"
-  version             = "0.5.1"
-  tenant_id           = data.azurerm_client_config.current.tenant_id
+  source  = "Azure/avm-res-keyvault-vault/azurerm"
+  version = "0.5.1"
+
+  location            = azurerm_resource_group.this.location
   name                = module.naming.key_vault.name_unique
   resource_group_name = azurerm_resource_group.this.name
-  location            = azurerm_resource_group.this.location
+  tenant_id           = data.azurerm_client_config.current.tenant_id
   network_acls = {
     default_action = "Allow"
   }
-
   role_assignments = {
     deployment_user_secrets = {
       role_definition_id_or_name = "Key Vault Administrator"
@@ -146,33 +145,31 @@ module "avm_res_keyvault_vault" {
       principal_id               = azurerm_user_assigned_identity.example_identity.principal_id
     }
   }
-
-
-  wait_for_rbac_before_secret_operations = {
-    create = "60s"
-  }
   tags = {
     Dep = "IT"
+  }
+  wait_for_rbac_before_secret_operations = {
+    create = "60s"
   }
 }
 
 module "this" {
-
   source = "../.."
 
-  account_replication_type          = "ZRS"
-  account_tier                      = "Standard"
-  account_kind                      = "StorageV2"
-  location                          = azurerm_resource_group.this.location
-  name                              = module.naming.storage_account.name_unique
-  resource_group_name               = azurerm_resource_group.this.name
-  min_tls_version                   = "TLS1_2"
-  shared_access_key_enabled         = true
-  infrastructure_encryption_enabled = true
-  public_network_access_enabled     = true
-  managed_identities = {
-    system_assigned            = true
-    user_assigned_resource_ids = [azurerm_user_assigned_identity.example_identity.id]
+  location                 = azurerm_resource_group.this.location
+  name                     = module.naming.storage_account.name_unique
+  resource_group_name      = azurerm_resource_group.this.name
+  account_kind             = "StorageV2"
+  account_replication_type = "ZRS"
+  account_tier             = "Standard"
+  containers = {
+    blob_container0 = {
+      name = "blob-container-${random_string.this.result}-0"
+    }
+    blob_container1 = {
+      name = "blob-container-${random_string.this.result}-1"
+    }
+
   }
   customer_managed_key = {
     key_vault_resource_id  = module.avm_res_keyvault_vault.resource.id
@@ -180,17 +177,27 @@ module "this" {
     user_assigned_identity = { resource_id = azurerm_user_assigned_identity.example_identity.id }
 
   }
-  tags = {
-    env   = "Dev"
-    owner = "John Doe"
-    dept  = "IT"
+  infrastructure_encryption_enabled = true
+  managed_identities = {
+    system_assigned            = true
+    user_assigned_resource_ids = [azurerm_user_assigned_identity.example_identity.id]
   }
-
-  #Locks for storage account (Disabled by default)
-  /*lock = {
-    name = "lock"
-    kind = "None"
-  } */
+  min_tls_version = "TLS1_2"
+  network_rules = {
+    bypass                     = ["AzureServices"]
+    default_action             = "Deny"
+    ip_rules                   = [try(module.public_ip[0].public_ip, var.bypass_ip_cidr)]
+    virtual_network_subnet_ids = toset([azurerm_subnet.private.id])
+  }
+  public_network_access_enabled = true
+  queues = {
+    queue0 = {
+      name = "queue-${random_string.this.result}-0"
+    }
+    queue1 = {
+      name = "queue-${random_string.this.result}-1"
+    }
+  }
   role_assignments = {
     role_assignment_1 = {
       role_definition_id_or_name       = data.azurerm_role_definition.example.name
@@ -204,28 +211,15 @@ module "this" {
     },
 
   }
-  network_rules = {
-    bypass                     = ["AzureServices"]
-    default_action             = "Deny"
-    ip_rules                   = [try(module.public_ip[0].public_ip, var.bypass_ip_cidr)]
-    virtual_network_subnet_ids = toset([azurerm_subnet.private.id])
-  }
-
-  containers = {
-    blob_container0 = {
-      name = "blob-container-${random_string.this.result}-0"
+  shared_access_key_enabled = true
+  shares = {
+    share0 = {
+      name  = "share-${random_string.this.result}-0"
+      quota = 10
     }
-    blob_container1 = {
-      name = "blob-container-${random_string.this.result}-1"
-    }
-
-  }
-  queues = {
-    queue0 = {
-      name = "queue-${random_string.this.result}-0"
-    }
-    queue1 = {
-      name = "queue-${random_string.this.result}-1"
+    share1 = {
+      name  = "share-${random_string.this.result}-1"
+      quota = 10
     }
   }
   tables = {
@@ -236,15 +230,9 @@ module "this" {
       name = "table${random_string.this.result}1"
     }
   }
-
-  shares = {
-    share0 = {
-      name  = "share-${random_string.this.result}-0"
-      quota = 10
-    }
-    share1 = {
-      name  = "share-${random_string.this.result}-1"
-      quota = 10
-    }
+  tags = {
+    env   = "Dev"
+    owner = "John Doe"
+    dept  = "IT"
   }
 }

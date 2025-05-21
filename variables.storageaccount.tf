@@ -22,9 +22,9 @@ variable "account_kind" {
 
 variable "account_replication_type" {
   type        = string
+  default     = "ZRS"
   description = "(Required) Defines the type of replication to use for this storage account. Valid options are `LRS`, `GRS`, `RAGRS`, `ZRS`, `GZRS` and `RAGZRS`.  Defaults to `ZRS`"
   nullable    = false
-  default     = "ZRS"
 
   validation {
     condition     = contains(["LRS", "GRS", "RAGRS", "ZRS", "GZRS", "RAGZRS"], var.account_replication_type)
@@ -34,8 +34,8 @@ variable "account_replication_type" {
 
 variable "account_tier" {
   type        = string
-  description = "(Required) Defines the Tier to use for this storage account. Valid options are `Standard` and `Premium`. For `BlockBlobStorage` and `FileStorage` accounts only `Premium` is valid. Changing this forces a new resource to be created."
   default     = "Standard"
+  description = "(Required) Defines the Tier to use for this storage account. Valid options are `Standard` and `Premium`. For `BlockBlobStorage` and `FileStorage` accounts only `Premium` is valid. Changing this forces a new resource to be created."
   nullable    = false
 
   validation {
@@ -184,8 +184,7 @@ variable "network_rules" {
       update = optional(string)
     }))
   })
-  default = {}
-
+  default     = {}
   description = <<-EOT
  > Note the default value for this variable will block all public access to the storage account. If you want to disable all network rules, set this value to `null`.
 
@@ -260,10 +259,10 @@ variable "shared_access_key_enabled" {
 }
 
 variable "static_website" {
-  type = object({
+  type = map(object({
     error_404_document = optional(string)
     index_document     = optional(string)
-  })
+  }))
   default     = null
   description = <<-EOT
  - `error_404_document` - (Optional) The absolute path to a custom webpage that should be used when a request is made which does not correspond to an existing file.
