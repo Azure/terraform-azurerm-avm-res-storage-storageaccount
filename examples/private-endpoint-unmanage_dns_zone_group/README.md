@@ -99,10 +99,9 @@ locals {
 }
 
 module "public_ip" {
-  count = var.bypass_ip_cidr == null ? 1 : 0
-
   source  = "lonegunmanb/public-ip/lonegunmanb"
   version = "0.1.0"
+  count   = var.bypass_ip_cidr == null ? 1 : 0
 }
 resource "azurerm_private_dns_zone" "this" {
   for_each = local.endpoints
@@ -137,51 +136,14 @@ data "azurerm_role_definition" "example" {
 
 #create azure storage account
 module "this" {
-
   source = "../.."
 
-  account_replication_type      = "ZRS"
-  account_tier                  = "Standard"
-  account_kind                  = "StorageV2"
-  location                      = azurerm_resource_group.this.location
-  name                          = module.naming.storage_account.name_unique
-  resource_group_name           = azurerm_resource_group.this.name
-  min_tls_version               = "TLS1_2"
-  shared_access_key_enabled     = true
-  public_network_access_enabled = true
-  managed_identities = {
-    system_assigned            = true
-    user_assigned_resource_ids = [azurerm_user_assigned_identity.example_identity.id]
-  }
-  tags = {
-    env   = "Dev"
-    owner = "John Doe"
-    dept  = "IT"
-  }
-  /*lock = {
-    name = "lock"
-    kind = "None"
-  } */
-  role_assignments = {
-    role_assignment_1 = {
-      role_definition_id_or_name       = data.azurerm_role_definition.example.name
-      principal_id                     = coalesce(var.msi_id, data.azurerm_client_config.current.object_id)
-      skip_service_principal_aad_check = false
-    },
-    role_assignment_2 = {
-      role_definition_id_or_name       = "Owner"
-      principal_id                     = data.azurerm_client_config.current.object_id
-      skip_service_principal_aad_check = false
-    },
-
-  }
-  network_rules = {
-    bypass                     = ["AzureServices"]
-    default_action             = "Deny"
-    ip_rules                   = [try(module.public_ip[0].public_ip, var.bypass_ip_cidr)]
-    virtual_network_subnet_ids = toset([azurerm_subnet.private.id])
-  }
-
+  location                 = azurerm_resource_group.this.location
+  name                     = module.naming.storage_account.name_unique
+  resource_group_name      = azurerm_resource_group.this.name
+  account_kind             = "StorageV2"
+  account_replication_type = "ZRS"
+  account_tier             = "Standard"
   containers = {
     blob_container0 = {
       name = "blob-container-${random_string.this.result}-0"
@@ -191,35 +153,17 @@ module "this" {
     }
 
   }
-  queues = {
-    queue0 = {
-      name = "queue-${random_string.this.result}-0"
-    }
-    queue1 = {
-      name = "queue-${random_string.this.result}-1"
-    }
+  managed_identities = {
+    system_assigned            = true
+    user_assigned_resource_ids = [azurerm_user_assigned_identity.example_identity.id]
   }
-  tables = {
-    table0 = {
-      name = "table${random_string.this.result}0"
-    }
-    table1 = {
-      name = "table${random_string.this.result}1"
-    }
+  min_tls_version = "TLS1_2"
+  network_rules = {
+    bypass                     = ["AzureServices"]
+    default_action             = "Deny"
+    ip_rules                   = [try(module.public_ip[0].public_ip, var.bypass_ip_cidr)]
+    virtual_network_subnet_ids = toset([azurerm_subnet.private.id])
   }
-
-  shares = {
-    share0 = {
-      name  = "share-${random_string.this.result}-0"
-      quota = 10
-    }
-    share1 = {
-      name  = "share-${random_string.this.result}-1"
-      quota = 10
-    }
-  }
-  #Whether to manage private DNS zone groups with this module. If set to false, you must manage private DNS zone groups externally, e.g. using Azure Policy.
-  private_endpoints_manage_dns_zone_group = false
   #create a private endpoint for each endpoint type
   private_endpoints = {
     for endpoint in local.endpoints :
@@ -249,7 +193,54 @@ module "this" {
 
 
   }
+  #Whether to manage private DNS zone groups with this module. If set to false, you must manage private DNS zone groups externally, e.g. using Azure Policy.
+  private_endpoints_manage_dns_zone_group = false
+  public_network_access_enabled           = true
+  queues = {
+    queue0 = {
+      name = "queue-${random_string.this.result}-0"
+    }
+    queue1 = {
+      name = "queue-${random_string.this.result}-1"
+    }
+  }
+  role_assignments = {
+    role_assignment_1 = {
+      role_definition_id_or_name       = data.azurerm_role_definition.example.name
+      principal_id                     = coalesce(var.msi_id, data.azurerm_client_config.current.object_id)
+      skip_service_principal_aad_check = false
+    },
+    role_assignment_2 = {
+      role_definition_id_or_name       = "Owner"
+      principal_id                     = data.azurerm_client_config.current.object_id
+      skip_service_principal_aad_check = false
+    },
 
+  }
+  shared_access_key_enabled = true
+  shares = {
+    share0 = {
+      name  = "share-${random_string.this.result}-0"
+      quota = 10
+    }
+    share1 = {
+      name  = "share-${random_string.this.result}-1"
+      quota = 10
+    }
+  }
+  tables = {
+    table0 = {
+      name = "table${random_string.this.result}0"
+    }
+    table1 = {
+      name = "table${random_string.this.result}1"
+    }
+  }
+  tags = {
+    env   = "Dev"
+    owner = "John Doe"
+    dept  = "IT"
+  }
 }
 
 ```

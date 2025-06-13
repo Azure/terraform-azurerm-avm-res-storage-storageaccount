@@ -1,64 +1,37 @@
-variable "shares" {
-  type = map(object({
-    access_tier      = optional(string)
-    enabled_protocol = optional(string)
-    metadata         = optional(map(string))
-    name             = string
-    quota            = number
-    root_squash      = optional(string)
-    signed_identifiers = optional(list(object({
-      id = string
-      access_policy = optional(object({
-        expiry_time = string
-        permission  = string
-        start_time  = string
-      }))
-    })))
-    role_assignments = optional(map(object({
-      role_definition_id_or_name             = string
-      principal_id                           = string
-      description                            = optional(string, null)
-      skip_service_principal_aad_check       = optional(bool, false)
-      condition                              = optional(string, null)
-      condition_version                      = optional(string, null)
-      delegated_managed_identity_resource_id = optional(string, null)
-    })), {})
-    timeouts = optional(object({
-      create = optional(string)
-      delete = optional(string)
-      read   = optional(string)
-      update = optional(string)
+variable "azure_files_authentication" {
+  type = object({
+    directory_type                 = optional(string, "AADKERB")
+    default_share_level_permission = optional(string)
+
+    active_directory = optional(object({
+      domain_guid         = string
+      domain_name         = string
+      domain_sid          = string
+      forest_name         = string
+      netbios_domain_name = string
+      storage_sid         = string
     }))
-  }))
-  default     = {}
+  })
+  default     = null
   description = <<-EOT
- - `access_tier` - (Optional) The access tier of the File Share. Possible values are `Hot`, `Cool` and `TransactionOptimized`, `Premium`.
- - `enabled_protocol` - (Optional) The protocol used for the share. Possible values are `SMB` and `NFS`. The `SMB` indicates the share can be accessed by SMBv3.0, SMBv2.1 and REST. The `NFS` indicates the share can be accessed by NFSv4.1. Defaults to `SMB`. Changing this forces a new resource to be created.
- - `metadata` - (Optional) A mapping of MetaData for this File Share.
- - `name` - (Required) The name of the share. Must be unique within the storage account where the share is located. Changing this forces a new resource to be created.
- - `quota` - (Required) The maximum size of the share, in gigabytes. For Standard storage accounts, this must be `1`GB (or higher) and at most `5120` GB (`5` TB). For Premium FileStorage storage accounts, this must be greater than 100 GB and at most `102400` GB (`100` TB).
+ - `directory_type` - (Required) Specifies the directory service used. Possible values are `AADDS`, `AD` and `AADKERB`.
+ - `default_share_level_permission` - (Optional) Specifies the default share level permissions applied to all users. Possible values are StorageFileDataSmbShareReader, StorageFileDataSmbShareContributor, StorageFileDataSmbShareElevatedContributor, or None.
 
  ---
- `acl` block supports the following:
- - `id` - (Required) The ID which should be used for this Shared Identifier.
-
- ---
- `access_policy` block supports the following:
- - `expiry` - (Optional) The time at which this Access Policy should be valid until, in [ISO8601](https://en.wikipedia.org/wiki/ISO_8601) format.
- - `permissions` - (Required) The permissions which should be associated with this Shared Identifier. Possible value is combination of `r` (read), `w` (write), `d` (delete), and `l` (list).
- - `start` - (Optional) The time at which this Access Policy should be valid from, in [ISO8601](https://en.wikipedia.org/wiki/ISO_8601) format.
-
- ---
- `timeouts` block supports the following:
- - `create` - (Defaults to 30 minutes) Used when creating the Storage Share.
- - `delete` - (Defaults to 30 minutes) Used when deleting the Storage Share.
- - `read` - (Defaults to 5 minutes) Used when retrieving the Storage Share.
- - `update` - (Defaults to 30 minutes) Used when updating the Storage Share.
-
-Supply role assignments in the same way as for `var.role_assignments`.
-
+ `active_directory` block supports the following:
+ - `domain_guid` - (Required) Specifies the domain GUID.
+ - `domain_name` - (Required) Specifies the primary domain that the AD DNS server is authoritative for.
+ - `domain_sid` - (Required) Specifies the security identifier (SID).
+ - `forest_name` - (Required) Specifies the Active Directory forest.
+ - `netbios_domain_name` - (Required) Specifies the NetBIOS domain name.
+ - `storage_sid` - (Required) Specifies the security identifier (SID) for Azure Storage.
 EOT
-  nullable    = false
+}
+
+variable "large_file_share_enabled" {
+  type        = bool
+  default     = null
+  description = "(Optional) Is Large File Share Enabled?"
 }
 
 variable "share_properties" {
@@ -131,38 +104,65 @@ variable "share_properties" {
 EOT
 }
 
-variable "large_file_share_enabled" {
-  type        = bool
-  default     = null
-  description = "(Optional) Is Large File Share Enabled?"
-}
-
-variable "azure_files_authentication" {
-  type = object({
-    directory_type                 = optional(string, "AADKERB")
-    default_share_level_permission = optional(string)
-
-    active_directory = optional(object({
-      domain_guid         = string
-      domain_name         = string
-      domain_sid          = string
-      forest_name         = string
-      netbios_domain_name = string
-      storage_sid         = string
+variable "shares" {
+  type = map(object({
+    access_tier      = optional(string)
+    enabled_protocol = optional(string)
+    metadata         = optional(map(string))
+    name             = string
+    quota            = number
+    root_squash      = optional(string)
+    signed_identifiers = optional(list(object({
+      id = string
+      access_policy = optional(object({
+        expiry_time = string
+        permission  = string
+        start_time  = string
+      }))
+    })))
+    role_assignments = optional(map(object({
+      role_definition_id_or_name             = string
+      principal_id                           = string
+      description                            = optional(string, null)
+      skip_service_principal_aad_check       = optional(bool, false)
+      condition                              = optional(string, null)
+      condition_version                      = optional(string, null)
+      delegated_managed_identity_resource_id = optional(string, null)
+    })), {})
+    timeouts = optional(object({
+      create = optional(string)
+      delete = optional(string)
+      read   = optional(string)
+      update = optional(string)
     }))
-  })
-  default     = null
+  }))
+  default     = {}
   description = <<-EOT
- - `directory_type` - (Required) Specifies the directory service used. Possible values are `AADDS`, `AD` and `AADKERB`.
- - `default_share_level_permission` - (Optional) Specifies the default share level permissions applied to all users. Possible values are StorageFileDataSmbShareReader, StorageFileDataSmbShareContributor, StorageFileDataSmbShareElevatedContributor, or None.
+ - `access_tier` - (Optional) The access tier of the File Share. Possible values are `Hot`, `Cool` and `TransactionOptimized`, `Premium`.
+ - `enabled_protocol` - (Optional) The protocol used for the share. Possible values are `SMB` and `NFS`. The `SMB` indicates the share can be accessed by SMBv3.0, SMBv2.1 and REST. The `NFS` indicates the share can be accessed by NFSv4.1. Defaults to `SMB`. Changing this forces a new resource to be created.
+ - `metadata` - (Optional) A mapping of MetaData for this File Share.
+ - `name` - (Required) The name of the share. Must be unique within the storage account where the share is located. Changing this forces a new resource to be created.
+ - `quota` - (Required) The maximum size of the share, in gigabytes. For Standard storage accounts, this must be `1`GB (or higher) and at most `5120` GB (`5` TB). For Premium FileStorage storage accounts, this must be greater than 100 GB and at most `102400` GB (`100` TB).
 
  ---
- `active_directory` block supports the following:
- - `domain_guid` - (Required) Specifies the domain GUID.
- - `domain_name` - (Required) Specifies the primary domain that the AD DNS server is authoritative for.
- - `domain_sid` - (Required) Specifies the security identifier (SID).
- - `forest_name` - (Required) Specifies the Active Directory forest.
- - `netbios_domain_name` - (Required) Specifies the NetBIOS domain name.
- - `storage_sid` - (Required) Specifies the security identifier (SID) for Azure Storage.
+ `acl` block supports the following:
+ - `id` - (Required) The ID which should be used for this Shared Identifier.
+
+ ---
+ `access_policy` block supports the following:
+ - `expiry` - (Optional) The time at which this Access Policy should be valid until, in [ISO8601](https://en.wikipedia.org/wiki/ISO_8601) format.
+ - `permissions` - (Required) The permissions which should be associated with this Shared Identifier. Possible value is combination of `r` (read), `w` (write), `d` (delete), and `l` (list).
+ - `start` - (Optional) The time at which this Access Policy should be valid from, in [ISO8601](https://en.wikipedia.org/wiki/ISO_8601) format.
+
+ ---
+ `timeouts` block supports the following:
+ - `create` - (Defaults to 30 minutes) Used when creating the Storage Share.
+ - `delete` - (Defaults to 30 minutes) Used when deleting the Storage Share.
+ - `read` - (Defaults to 5 minutes) Used when retrieving the Storage Share.
+ - `update` - (Defaults to 30 minutes) Used when updating the Storage Share.
+
+Supply role assignments in the same way as for `var.role_assignments`.
+
 EOT
+  nullable    = false
 }

@@ -1,3 +1,9 @@
+variable "table_encryption_key_type" {
+  type        = string
+  default     = null
+  description = "(Optional) The encryption type of the table service. Possible values are `Service` and `Account`. Changing this forces a new resource to be created. Default value is `Service`."
+}
+
 variable "tables" {
   type = map(object({
     name = string
@@ -52,10 +58,4 @@ Supply role assignments in the same way as for `var.role_assignments`.
 
 EOT
   nullable    = false
-}
-
-variable "table_encryption_key_type" {
-  type        = string
-  default     = null
-  description = "(Optional) The encryption type of the table service. Possible values are `Service` and `Account`. Changing this forces a new resource to be created. Default value is `Service`."
 }

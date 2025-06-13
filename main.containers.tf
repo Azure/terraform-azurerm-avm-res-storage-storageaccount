@@ -10,9 +10,8 @@ resource "azapi_resource" "containers" {
       immutableStorageWithVersioning = each.value.immutable_storage_with_versioning == "" ? {} : each.value.immutable_storage_with_versioning
     }
   }
-  name                      = each.value.name
-  parent_id                 = "${azurerm_storage_account.this.id}/blobServices/default"
-  schema_validation_enabled = false #https://github.com/Azure/terraform-provider-azapi/issues/497
+  name      = each.value.name
+  parent_id = "${azurerm_storage_account.this.id}/blobServices/default"
 
   dynamic "timeouts" {
     for_each = each.value.timeouts == null ? [] : [each.value.timeouts]
