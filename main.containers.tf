@@ -2,7 +2,9 @@
 resource "azapi_resource" "containers" {
   for_each = var.containers
 
-  type = "Microsoft.Storage/storageAccounts/blobServices/containers@2023-01-01"
+  name      = each.value.name
+  parent_id = "${azurerm_storage_account.this.id}/blobServices/default"
+  type      = "Microsoft.Storage/storageAccounts/blobServices/containers@2023-01-01"
   body = {
     properties = {
       metadata                       = each.value.metadata == null ? {} : each.value.metadata
@@ -10,8 +12,6 @@ resource "azapi_resource" "containers" {
       immutableStorageWithVersioning = each.value.immutable_storage_with_versioning == "" ? {} : each.value.immutable_storage_with_versioning
     }
   }
-  name      = each.value.name
-  parent_id = "${azurerm_storage_account.this.id}/blobServices/default"
 
   dynamic "timeouts" {
     for_each = each.value.timeouts == null ? [] : [each.value.timeouts]
