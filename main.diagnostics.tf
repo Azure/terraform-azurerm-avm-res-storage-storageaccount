@@ -9,11 +9,11 @@ resource "azurerm_monitor_diagnostic_setting" "storage_account" {
   eventhub_name                  = each.value.event_hub_name
   log_analytics_workspace_id     = each.value.workspace_resource_id
 
-  dynamic "metric" {
+  dynamic "enabled_metric" {
     for_each = each.value.metric_categories
 
     content {
-      category = metric.value
+      category = enabled_metric.value
     }
   }
 }
@@ -34,11 +34,11 @@ resource "azurerm_monitor_diagnostic_setting" "blob" {
       category_group = enabled_log.value
     }
   }
-  dynamic "metric" {
+  dynamic "enabled_metric" {
     for_each = each.value.metric_categories
 
     content {
-      category = metric.value
+      category = enabled_metric.value
     }
   }
 }
@@ -60,11 +60,11 @@ resource "azurerm_monitor_diagnostic_setting" "queue" {
       category_group = enabled_log.value
     }
   }
-  dynamic "metric" {
+  dynamic "enabled_metric" {
     for_each = each.value.metric_categories
 
     content {
-      category = metric.value
+      category = enabled_metric.value
     }
   }
 }
@@ -85,11 +85,11 @@ resource "azurerm_monitor_diagnostic_setting" "table" {
       category_group = enabled_log.value
     }
   }
-  dynamic "metric" {
+  dynamic "enabled_metric" {
     for_each = each.value.metric_categories
 
     content {
-      category = metric.value
+      category = enabled_metric.value
     }
   }
 }
@@ -110,11 +110,11 @@ resource "azurerm_monitor_diagnostic_setting" "azure_file" {
       category_group = enabled_log.value
     }
   }
-  dynamic "metric" {
+  dynamic "enabled_metric" {
     for_each = each.value.metric_categories
 
     content {
-      category = metric.value
+      category = enabled_metric.value
     }
   }
 }
