@@ -62,3 +62,13 @@ output "tables" {
     }
   }
 }
+
+output "data_lake_gen2_filesystems" {
+  description = "Map of Data Lake Gen2 filesystems that are created."
+  value = {
+    for name, filesystem in azurerm_storage_data_lake_gen2_filesystem.this :
+    name => {
+      id = filesystem.id
+    }
+  }
+}
