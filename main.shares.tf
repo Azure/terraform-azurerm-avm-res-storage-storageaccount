@@ -1,7 +1,9 @@
 resource "azapi_resource" "share" {
   for_each = var.shares
 
-  type = "Microsoft.Storage/storageAccounts/fileServices/shares@2023-01-01"
+  name      = each.value.name
+  parent_id = "${azurerm_storage_account.this.id}/fileServices/default"
+  type      = "Microsoft.Storage/storageAccounts/fileServices/shares@2023-01-01"
   body = {
     properties = {
       metadata          = each.value.metadata
@@ -14,8 +16,6 @@ resource "azapi_resource" "share" {
 
     }
   }
-  name                      = each.value.name
-  parent_id                 = "${azurerm_storage_account.this.id}/fileServices/default"
   schema_validation_enabled = false
 
   dynamic "timeouts" {

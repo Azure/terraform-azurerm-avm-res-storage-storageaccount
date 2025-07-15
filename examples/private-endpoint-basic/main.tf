@@ -1,5 +1,7 @@
 
 terraform {
+  required_version = ">= 1.11"
+
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
@@ -10,8 +12,6 @@ terraform {
       version = "~> 3.5"
     }
   }
-
-  required_version = ">= 1.11"
 }
 
 provider "azurerm" {
@@ -40,7 +40,7 @@ module "resource_group" {
 
 module "virtual_network" {
   source  = "Azure/avm-res-network-virtualnetwork/azurerm"
-  version = "0.8.1"
+  version = "0.9.2"
 
   address_space       = ["10.0.0.0/16"]
   location            = var.location
@@ -57,21 +57,21 @@ module "virtual_network" {
 
 module "private_dns_zone" {
   source  = "Azure/avm-res-network-privatednszone/azurerm"
-  version = "0.3.2"
+  version = "0.4.0"
 
-  domain_name         = "privatelink.blob.core.windows.net"
-  resource_group_name = module.resource_group.name
+  domain_name = "privatelink.blob.core.windows.net"
+  parent_id   = module.resource_group.resource_id
   virtual_network_links = {
     vnetlink1 = {
-      vnetlinkname = "storage-account"
-      vnetid       = module.virtual_network.resource_id
+      name   = "storage-account"
+      vnetid = module.virtual_network.resource_id
     }
   }
 }
 
 module "storage_account" {
   #source  = "Azure/avm-res-storage-storageaccount/azurerm"
-  #version = "0.5.0"
+  #version = "0.6.3"
   source = "../.."
 
   location            = var.location
