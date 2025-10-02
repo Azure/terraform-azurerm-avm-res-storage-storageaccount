@@ -30,7 +30,8 @@ resource "azapi_resource" "table" {
 resource "azurerm_role_assignment" "tables" {
   for_each = local.tables_role_assignments
 
-  principal_id = each.value.role_assignment.principal_id
+  principal_id   = each.value.role_assignment.principal_id
+  principal_type = each.value.role_assignment.principal_type
   # the resource manager id is not exposed directly by the AzureRM provider - https://github.com/hashicorp/terraform-provider-azurerm/issues/21525
   scope                                  = "${azurerm_storage_account.this.id}/tableServices/default/tables/${azapi_resource.table[each.value.table_key].name}"
   condition                              = each.value.role_assignment.condition

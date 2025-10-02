@@ -33,6 +33,7 @@ resource "azurerm_role_assignment" "containers" {
   for_each = local.containers_role_assignments
 
   principal_id                           = each.value.role_assignment.principal_id
+  principal_type                         = each.value.role_assignment.principal_type
   scope                                  = azapi_resource.containers[each.value.container_key].id
   condition                              = each.value.role_assignment.condition
   condition_version                      = each.value.role_assignment.condition_version
