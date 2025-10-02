@@ -161,6 +161,12 @@ EOT
   nullable    = false
 }
 
+variable "local_user_enabled" {
+  type        = bool
+  default     = false
+  description = "(Optional) Should Storage Account Local Users be enabled? Defaults to `false`."
+}
+
 variable "min_tls_version" {
   type        = string
   default     = "TLS1_2"
@@ -284,11 +290,4 @@ variable "timeouts" {
  - `read` - (Defaults to 5 minutes) Used when retrieving the Storage Account.
  - `update` - (Defaults to 60 minutes) Used when updating the Storage Account.
 EOT
-}
-
-variable "local_user_enabled" {
-  type        = bool
-  default     = false
-  description = "(Optional) Should Storage Account Local Users be enabled? Defaults to `false`."
-
 }

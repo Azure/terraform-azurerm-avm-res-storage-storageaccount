@@ -113,7 +113,6 @@ module "this" {
   name                     = module.naming.storage_account.name_unique
   resource_group_name      = azurerm_resource_group.this.name
   account_kind             = "StorageV2"
-  local_user_enabled       = false
   account_replication_type = "ZRS"
   account_tier             = "Standard"
   azure_files_authentication = {
@@ -136,6 +135,7 @@ module "this" {
 
   }
   https_traffic_only_enabled = true
+  local_user_enabled         = false
   managed_identities = {
     system_assigned            = true
     user_assigned_resource_ids = [azurerm_user_assigned_identity.example_identity.id]

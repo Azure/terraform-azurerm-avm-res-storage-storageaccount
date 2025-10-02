@@ -15,6 +15,7 @@ resource "azurerm_storage_account" "this" {
   infrastructure_encryption_enabled = var.infrastructure_encryption_enabled
   is_hns_enabled                    = var.is_hns_enabled
   large_file_share_enabled          = var.large_file_share_enabled
+  local_user_enabled                = var.local_user_enabled
   min_tls_version                   = var.min_tls_version
   nfsv3_enabled                     = var.nfsv3_enabled
   public_network_access_enabled     = var.public_network_access_enabled
@@ -22,7 +23,6 @@ resource "azurerm_storage_account" "this" {
   sftp_enabled                      = var.sftp_enabled
   shared_access_key_enabled         = var.shared_access_key_enabled
   table_encryption_key_type         = var.table_encryption_key_type
-  local_user_enabled                = var.local_user_enabled
   tags                              = var.tags
 
   dynamic "azure_files_authentication" {
