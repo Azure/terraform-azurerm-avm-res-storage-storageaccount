@@ -285,3 +285,10 @@ variable "timeouts" {
  - `update` - (Defaults to 60 minutes) Used when updating the Storage Account.
 EOT
 }
+
+variable "local_user_enabled" {
+  type        = bool
+  default     = false
+  description = "(Optional) Should Storage Account Local Users be enabled? Defaults to `false`."
+
+}

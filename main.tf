@@ -22,6 +22,7 @@ resource "azurerm_storage_account" "this" {
   sftp_enabled                      = var.sftp_enabled
   shared_access_key_enabled         = var.shared_access_key_enabled
   table_encryption_key_type         = var.table_encryption_key_type
+  local_user_enabled                = var.local_user_enabled
   tags                              = var.tags
 
   dynamic "azure_files_authentication" {
