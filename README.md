@@ -688,6 +688,14 @@ map(object({
 
 Default: `{}`
 
+### <a name="input_local_user_enabled"></a> [local\_user\_enabled](#input\_local\_user\_enabled)
+
+Description: (Optional) Should Storage Account Local Users be enabled? Defaults to `false`.
+
+Type: `bool`
+
+Default: `false`
+
 ### <a name="input_lock"></a> [lock](#input\_lock)
 
 Description: The lock level to apply. Default is `None`. Possible values are `None`, `CanNotDelete`, and `ReadOnly`.
