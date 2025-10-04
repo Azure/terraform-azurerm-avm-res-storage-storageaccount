@@ -85,7 +85,8 @@ resource "azurerm_storage_account" "this" {
         ]
 
         content {
-          days = delete_retention_policy.value.days
+          days                     = delete_retention_policy.value.days
+          permanent_delete_enabled = delete_retention_policy.value.permanent_delete_enabled
         }
       }
       dynamic "restore_policy" {
