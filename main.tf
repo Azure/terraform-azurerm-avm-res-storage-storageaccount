@@ -283,6 +283,7 @@ resource "azurerm_role_assignment" "storage_account" {
   for_each = var.role_assignments
 
   principal_id                           = each.value.principal_id
+  principal_type                         = each.value.principal_type
   scope                                  = azurerm_storage_account.this.id
   condition                              = each.value.condition
   condition_version                      = each.value.condition_version
