@@ -33,6 +33,7 @@ resource "azurerm_role_assignment" "queues" {
   for_each = local.queues_role_assignments
 
   principal_id                           = each.value.role_assignment.principal_id
+  principal_type                         = each.value.role_assignment.principal_type
   scope                                  = "${azurerm_storage_account.this.id}/queueServices/default/queues/${azapi_resource.queue[each.value.queue_key].name}"
   condition                              = each.value.role_assignment.condition
   condition_version                      = each.value.role_assignment.condition_version
