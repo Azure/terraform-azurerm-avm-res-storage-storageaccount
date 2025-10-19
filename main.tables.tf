@@ -34,9 +34,9 @@ resource "azurerm_role_assignment" "tables" {
   # the resource manager id is not exposed directly by the AzureRM provider - https://github.com/hashicorp/terraform-provider-azurerm/issues/21525
   scope                                  = "${azurerm_storage_account.this.id}/tableServices/default/tables/${azapi_resource.table[each.value.table_key].name}"
   condition                              = each.value.role_assignment.condition
-  principal_type                         = each.value.role_assignment.principal_type
   condition_version                      = each.value.role_assignment.condition_version
   delegated_managed_identity_resource_id = each.value.role_assignment.delegated_managed_identity_resource_id
+  principal_type                         = each.value.role_assignment.principal_type
   role_definition_id                     = strcontains(lower(each.value.role_assignment.role_definition_id_or_name), lower(local.role_definition_resource_substring)) ? each.value.role_assignment.role_definition_id_or_name : null
   role_definition_name                   = strcontains(lower(each.value.role_assignment.role_definition_id_or_name), lower(local.role_definition_resource_substring)) ? null : each.value.role_assignment.role_definition_id_or_name
   skip_service_principal_aad_check       = each.value.role_assignment.skip_service_principal_aad_check

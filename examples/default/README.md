@@ -174,11 +174,13 @@ module "this" {
     role_assignment_1 = {
       role_definition_id_or_name       = data.azurerm_role_definition.example.name
       principal_id                     = coalesce(var.msi_id, data.azurerm_client_config.current.object_id)
+      principal_type                   = "User"
       skip_service_principal_aad_check = false
     },
     role_assignment_2 = {
       role_definition_id_or_name       = "Owner"
       principal_id                     = data.azurerm_client_config.current.object_id
+      principal_type                   = "User"
       skip_service_principal_aad_check = false
     },
 
@@ -200,9 +202,9 @@ module "this" {
       ]
     }
     share1 = {
-      name        = "share-${random_string.this.result}-1"
-      quota       = 10
-      access_tier = "Hot"
+      name       = "share-${random_string.this.result}-1"
+      quota      = 10
+      accesstier = "Hot"
       metadata = {
         key1 = "value1"
         key2 = "value2"
