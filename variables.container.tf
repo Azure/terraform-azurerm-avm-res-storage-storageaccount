@@ -112,6 +112,7 @@ variable "containers" {
   }))
   default     = {}
   description = <<-EOT
+ - `public_access` - (Optional) Specifies whether data in the container may be accessed publicly and the level of access. Possible values are `Container`, `Blob`, and `None`. Defaults to `None`. Changing this forces a new resource to be created.
  - `metadata` - (Optional) A mapping of MetaData for this Container. All metadata keys should be lowercase.
  - `name` - (Required) The name of the Container which should be created within the Storage Account. Changing this forces a new resource to be created.
 
