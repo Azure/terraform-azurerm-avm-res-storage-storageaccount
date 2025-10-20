@@ -1,7 +1,9 @@
 resource "azapi_resource" "share" {
   for_each = var.shares
 
-  type = "Microsoft.Storage/storageAccounts/fileServices/shares@2023-01-01"
+  name      = each.value.name
+  parent_id = "${azurerm_storage_account.this.id}/fileServices/default"
+  type      = "Microsoft.Storage/storageAccounts/fileServices/shares@2023-01-01"
   body = {
     properties = {
       metadata          = each.value.metadata
@@ -14,9 +16,11 @@ resource "azapi_resource" "share" {
 
     }
   }
-  name                      = each.value.name
-  parent_id                 = "${azurerm_storage_account.this.id}/fileServices/default"
+  create_headers            = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
+  delete_headers            = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
+  read_headers              = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
   schema_validation_enabled = false
+  update_headers            = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
 
   dynamic "timeouts" {
     for_each = each.value.timeouts == null ? [] : [each.value.timeouts]

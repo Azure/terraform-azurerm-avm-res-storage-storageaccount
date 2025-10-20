@@ -161,6 +161,12 @@ EOT
   nullable    = false
 }
 
+variable "local_user_enabled" {
+  type        = bool
+  default     = false
+  description = "(Optional) Should Storage Account Local Users be enabled? Defaults to `false`."
+}
+
 variable "min_tls_version" {
   type        = string
   default     = "TLS1_2"

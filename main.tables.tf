@@ -1,15 +1,19 @@
 resource "azapi_resource" "table" {
   for_each = var.tables
 
-  type = "Microsoft.Storage/storageAccounts/tableServices/tables@2023-01-01"
+  name      = each.value.name
+  parent_id = "${azurerm_storage_account.this.id}/tableServices/default"
+  type      = "Microsoft.Storage/storageAccounts/tableServices/tables@2023-01-01"
   body = {
     properties = {
       signed_identifiers = each.value.signed_identifiers == null ? [] : each.value.signed_identifiers
     }
   }
-  name                      = each.value.name
-  parent_id                 = "${azurerm_storage_account.this.id}/tableServices/default"
+  create_headers            = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
+  delete_headers            = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
+  read_headers              = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
   schema_validation_enabled = false
+  update_headers            = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
 
   dynamic "timeouts" {
     for_each = each.value.timeouts == null ? [] : [each.value.timeouts]
