@@ -123,6 +123,7 @@ variable "shares" {
     role_assignments = optional(map(object({
       role_definition_id_or_name             = string
       principal_id                           = string
+      principal_type                         = optional(string, null)
       description                            = optional(string, null)
       skip_service_principal_aad_check       = optional(bool, false)
       condition                              = optional(string, null)

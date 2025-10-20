@@ -42,7 +42,7 @@ variable "blob_properties" {
  - `change_feed_retention_in_days` - (Optional) The duration of change feed events retention in days. The possible values are between 1 and 146000 days (400 years). Setting this to null (or omit this in the configuration file) indicates an infinite retention of the change feed.
  - `default_service_version` - (Optional) The API Version which should be used by default for requests to the Data Plane API if an incoming request doesn't specify an API Version.
  - `last_access_time_enabled` - (Optional) Is the last access time based tracking enabled? Default to `false`.
- - `versioning_enabled` - (Optional) Is versioning enabled? Default to `false`.
+ - `versioning_enabled` - (Optional) Is versioning enabled? Default to `true`.
 
  ---
  `container_delete_retention_policy` block supports the following:
@@ -95,6 +95,7 @@ variable "containers" {
     role_assignments = optional(map(object({
       role_definition_id_or_name             = string
       principal_id                           = string
+      principal_type                         = optional(string, null)
       description                            = optional(string, null)
       skip_service_principal_aad_check       = optional(bool, false)
       condition                              = optional(string, null)
@@ -111,7 +112,7 @@ variable "containers" {
   }))
   default     = {}
   description = <<-EOT
- - `container_access_type` - (Optional) The Access Level configured for this Container. Possible values are `Blob`, `Container` or `None`. Defaults to `None`.
+ - `public_access` - (Optional) Specifies whether data in the container may be accessed publicly and the level of access. Possible values are `Container`, `Blob`, and `None`. Defaults to `None`. Changing this forces a new resource to be created.
  - `metadata` - (Optional) A mapping of MetaData for this Container. All metadata keys should be lowercase.
  - `name` - (Required) The name of the Container which should be created within the Storage Account. Changing this forces a new resource to be created.
 
