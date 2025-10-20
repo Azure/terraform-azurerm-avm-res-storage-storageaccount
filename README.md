@@ -1191,7 +1191,7 @@ Type:
 
 ```hcl
 map(object({
-    accesstier       = optional(string)
+    access_tier      = optional(string)
     enabled_protocol = optional(string)
     metadata         = optional(map(string))
     name             = string
