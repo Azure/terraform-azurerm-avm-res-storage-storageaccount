@@ -7,7 +7,7 @@ resource "azapi_resource" "share" {
   body = {
     properties = {
       metadata          = each.value.metadata
-      accesstier        = each.value.accesstier
+      accessTier        = each.value.access_tier
       enabledProtocols  = each.value.enabled_protocol
       shareQuota        = each.value.quota
       rootSquash        = each.value.root_squash
