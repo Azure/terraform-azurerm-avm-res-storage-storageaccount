@@ -109,12 +109,14 @@ data "azurerm_role_definition" "example" {
 module "this" {
   source = "../.."
 
-  location                 = azurerm_resource_group.this.location
-  name                     = module.naming.storage_account.name_unique
-  resource_group_name      = azurerm_resource_group.this.name
-  account_kind             = "FileStorage"
-  account_replication_type = "ZRS"
-  account_tier             = "Premium"
+  location                  = azurerm_resource_group.this.location
+  name                      = module.naming.storage_account.name_unique
+  resource_group_name       = azurerm_resource_group.this.name
+  account_kind              = "FileStorage"
+  account_replication_type  = "ZRS"
+  account_tier              = "Premium"
+  shared_access_key_enabled = true
+
   azure_files_authentication = {
     default_share_level_permission = "StorageFileDataSmbShareReader"
     directory_type                 = "AADKERB"
@@ -147,11 +149,11 @@ module "this" {
     },
 
   }
-  shared_access_key_enabled = true
   shares = {
     premium_share = {
-      name  = "premium-share"
-      quota = 100
+      name             = "premium-share"
+      quota            = 100
+      enabled_protocol = "SMB"
     }
   }
 }
