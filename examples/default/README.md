@@ -200,9 +200,9 @@ module "this" {
       ]
     }
     share1 = {
-      name       = "share-${random_string.this.result}-1"
-      quota      = 10
-      accesstier = "Hot"
+      name        = "share-${random_string.this.result}-1"
+      quota       = 10
+      access_tier = "Hot"
       metadata = {
         key1 = "value1"
         key2 = "value2"
