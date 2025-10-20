@@ -8,6 +8,16 @@ output "containers" {
   }
 }
 
+output "data_lake_gen2_filesystems" {
+  description = "Map of Data Lake Gen2 filesystems that are created."
+  value = {
+    for name, filesystem in azurerm_storage_data_lake_gen2_filesystem.this :
+    name => {
+      id = filesystem.id
+    }
+  }
+}
+
 output "fqdn" {
   description = "Fqdns for storage services."
   value       = { for svc in local.endpoints : svc => "${azurerm_storage_account.this.name}.${svc}.core.windows.net" }

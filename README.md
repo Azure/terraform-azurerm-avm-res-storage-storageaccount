@@ -1564,6 +1564,10 @@ The following outputs are exported:
 
 Description: Map of storage containers that are created.
 
+### <a name="output_data_lake_gen2_filesystems"></a> [data\_lake\_gen2\_filesystems](#output\_data\_lake\_gen2\_filesystems)
+
+Description: Map of Data Lake Gen2 filesystems that are created.
+
 ### <a name="output_fqdn"></a> [fqdn](#output\_fqdn)
 
 Description: Fqdns for storage services.
