@@ -157,8 +157,9 @@ module "this" {
   shared_access_key_enabled = true
   shares = {
     premium_share = {
-      name  = "premium-share"
-      quota = 100
+      name             = "premium-share"
+      quota            = 100
+      enabled_protocol = "SMB"
     }
   }
 }
