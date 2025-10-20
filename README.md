@@ -858,6 +858,14 @@ Type: `bool`
 
 Default: `true`
 
+### <a name="input_provisioned_billing_model_version"></a> [provisioned\_billing\_model\_version](#input\_provisioned\_billing\_model\_version)
+
+Description: (Optional) Specifies the version of the provisioned billing model (e.g. when account\_kind = "FileStorage" for Storage File). Possible value is V2. Changing this forces a new resource to be created.
+
+Type: `string`
+
+Default: `null`
+
 ### <a name="input_public_network_access_enabled"></a> [public\_network\_access\_enabled](#input\_public\_network\_access\_enabled)
 
 Description: (Optional) Whether the public network access is enabled? Defaults to `false`.

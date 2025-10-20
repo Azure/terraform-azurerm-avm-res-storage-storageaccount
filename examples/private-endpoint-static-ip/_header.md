@@ -1,3 +1,3 @@
 # Private Endpoint example
 
-This illustrates the use of private endpoints
+This illustrates the use of provisioned_billing_model_version
