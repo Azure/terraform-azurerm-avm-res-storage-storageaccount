@@ -18,6 +18,7 @@ resource "azurerm_storage_account" "this" {
   local_user_enabled                = var.local_user_enabled
   min_tls_version                   = var.min_tls_version
   nfsv3_enabled                     = var.nfsv3_enabled
+  provisioned_billing_model_version = var.provisioned_billing_model_version
   public_network_access_enabled     = var.public_network_access_enabled
   queue_encryption_key_type         = var.queue_encryption_key_type
   sftp_enabled                      = var.sftp_enabled
