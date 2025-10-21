@@ -155,4 +155,9 @@ module "this" {
       enabled_protocol = "SMB"
     }
   }
+  tags = {
+    env   = "Dev"
+    owner = "John Doe"
+    dept  = "IT"
+  }
 }
