@@ -1170,7 +1170,7 @@ Default: `false`
 
 ### <a name="input_shares"></a> [shares](#input\_shares)
 
-Description:  - `access_tier` - (Optional) The access tier of the File Share. Possible values are `Hot`, `Cool` and `TransactionOptimized`, `Premium`.
+Description:  - `access_tier` - (Optional) The access tier of the File Share. Possible values are `Hot`, `Cool` and `TransactionOptimized`, `Premium`. Defaults to `TransactionOptimized`.
  - `enabled_protocol` - (Optional) The protocol used for the share. Possible values are `SMB` and `NFS`. The `SMB` indicates the share can be accessed by SMBv3.0, SMBv2.1 and REST. The `NFS` indicates the share can be accessed by NFSv4.1. Defaults to `SMB`. Changing this forces a new resource to be created.
  - `metadata` - (Optional) A mapping of MetaData for this File Share.
  - `name` - (Required) The name of the share. Must be unique within the storage account where the share is located. Changing this forces a new resource to be created.
@@ -1199,7 +1199,7 @@ Type:
 
 ```hcl
 map(object({
-    access_tier      = optional(string)
+    access_tier      = optional(string, "TransactionOptimized")
     enabled_protocol = optional(string)
     metadata         = optional(map(string))
     name             = string
@@ -1212,7 +1212,7 @@ map(object({
         permission  = string
         start_time  = string
       }))
-    })))
+    })), [])
     role_assignments = optional(map(object({
       role_definition_id_or_name             = string
       principal_id                           = string
@@ -1512,7 +1512,7 @@ map(object({
         permission  = string
         start_time  = string
       }))
-    })))
+    })), [])
 
     role_assignments = optional(map(object({
       role_definition_id_or_name             = string
