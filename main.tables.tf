@@ -6,13 +6,21 @@ resource "azapi_resource" "table" {
   type      = "Microsoft.Storage/storageAccounts/tableServices/tables@2023-01-01"
   body = {
     properties = {
-      signed_identifiers = each.value.signed_identifiers == null ? [] : each.value.signed_identifiers
+      signedIdentifiers = [
+        for signed_identifier in each.value.signed_identifiers : {
+          id = signed_identifier.id
+          accessPolicy = signed_identifier.access_policy == null ? null : {
+            expiryTime = signed_identifier.access_policy.expiry_time
+            permission = signed_identifier.access_policy.permission
+            startTime  = signed_identifier.access_policy.start_time
+          }
+      }]
     }
   }
   create_headers            = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
   delete_headers            = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
   read_headers              = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
-  schema_validation_enabled = false
+  schema_validation_enabled = true
   update_headers            = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
 
   dynamic "timeouts" {
