@@ -142,8 +142,10 @@ module "this" {
       workspace_resource_id                    = azurerm_log_analytics_workspace.this.id
       eventhub_name                            = azurerm_eventhub.this.name
       event_hub_authorization_rule_resource_id = "${azurerm_eventhub_namespace.this.id}/authorizationRules/RootManageSharedAccessKey"
-      log_categories                           = ["audit", "alllogs"]
-      metric_categories                        = ["Capacity", "Transaction"]
+      category                                 = ["StorageWrite", "StorageDelete"]
+      metric_categories                        = ["Capacity"]
+      # log_categories  `                         = ["audit", "alllogs"]
+
     }
   }
   # setting up diagnostic settings for queue
@@ -175,8 +177,9 @@ module "this" {
       workspace_resource_id                    = azurerm_log_analytics_workspace.this.id
       eventhub_name                            = azurerm_eventhub.this.name
       event_hub_authorization_rule_resource_id = "${azurerm_eventhub_namespace.this.id}/authorizationRules/RootManageSharedAccessKey"
-      log_categories                           = ["audit", "alllogs"]
-      metric_categories                        = ["Capacity", "Transaction"]
+      # log_categories                           = ["audit", "alllogs"]
+      metric_categories = ["Capacity", "Transaction"]
+      category          = ["StorageWrite"]
     }
   }
   managed_identities = {
