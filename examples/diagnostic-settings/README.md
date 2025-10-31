@@ -9,7 +9,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = ">= 3.7.0, < 5.0.0"
+      version = ">= 4.37.0, < 5.0.0"
     }
     random = {
       source  = "hashicorp/random"
@@ -136,8 +136,10 @@ module "this" {
       workspace_resource_id                    = azurerm_log_analytics_workspace.this.id
       eventhub_name                            = azurerm_eventhub.this.name
       event_hub_authorization_rule_resource_id = "${azurerm_eventhub_namespace.this.id}/authorizationRules/RootManageSharedAccessKey"
-      log_categories                           = ["audit", "alllogs"]
-      metric_categories                        = ["Capacity", "Transaction"]
+      log_categories                           = ["StorageWrite", "StorageDelete"]
+      metric_categories                        = ["Transaction"]
+      log_groups                               = []
+
     }
   }
   # setting up diagnostic settings for file
@@ -147,8 +149,10 @@ module "this" {
       workspace_resource_id                    = azurerm_log_analytics_workspace.this.id
       eventhub_name                            = azurerm_eventhub.this.name
       event_hub_authorization_rule_resource_id = "${azurerm_eventhub_namespace.this.id}/authorizationRules/RootManageSharedAccessKey"
-      log_categories                           = ["audit", "alllogs"]
-      metric_categories                        = ["Capacity", "Transaction"]
+      metric_categories                        = ["Transaction"]
+      log_groups                               = ["Audit"]
+      # log_categories                           = ["StorageWrite", "StorageDelete"]
+
     }
   }
   # setting up diagnostic settings for queue
@@ -156,10 +160,11 @@ module "this" {
     queue = {
       name                                     = "diag"
       workspace_resource_id                    = azurerm_log_analytics_workspace.this.id
-      log_categories                           = ["audit", "alllogs"]
       eventhub_name                            = azurerm_eventhub.this.name
       event_hub_authorization_rule_resource_id = "${azurerm_eventhub_namespace.this.id}/authorizationRules/RootManageSharedAccessKey"
-      metric_categories                        = ["Capacity", "Transaction"]
+      metric_categories                        = ["Transaction"]
+      log_groups                               = []
+      log_categories                           = ["StorageWrite", "StorageDelete"]
     }
   }
   #setting up diagnostic settings for storage account
@@ -167,8 +172,7 @@ module "this" {
     storage = {
       name                                     = "diag"
       workspace_resource_id                    = azurerm_log_analytics_workspace.this.id
-      log_categories                           = ["audit", "alllogs"]
-      metric_categories                        = ["Capacity", "Transaction"]
+      metric_categories                        = ["Transaction"]
       eventhub_name                            = azurerm_eventhub.this.name
       event_hub_authorization_rule_resource_id = "${azurerm_eventhub_namespace.this.id}/authorizationRules/RootManageSharedAccessKey"
     }
@@ -180,8 +184,10 @@ module "this" {
       workspace_resource_id                    = azurerm_log_analytics_workspace.this.id
       eventhub_name                            = azurerm_eventhub.this.name
       event_hub_authorization_rule_resource_id = "${azurerm_eventhub_namespace.this.id}/authorizationRules/RootManageSharedAccessKey"
-      log_categories                           = ["audit", "alllogs"]
-      metric_categories                        = ["Capacity", "Transaction"]
+      metric_categories                        = ["Transaction"]
+      log_categories                           = ["StorageWrite"]
+      log_groups                               = []
+
     }
   }
   managed_identities = {
@@ -291,7 +297,7 @@ The following requirements are needed by this module:
 
 - <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.7.0)
 
-- <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (>= 3.7.0, < 5.0.0)
+- <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (>= 4.37.0, < 5.0.0)
 
 - <a name="requirement_random"></a> [random](#requirement\_random) (>= 3.5.0, < 4.0.0)
 
