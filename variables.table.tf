@@ -14,7 +14,7 @@ variable "tables" {
         permission  = string
         start_time  = string
       }))
-    })))
+    })), [])
 
     role_assignments = optional(map(object({
       role_definition_id_or_name             = string
