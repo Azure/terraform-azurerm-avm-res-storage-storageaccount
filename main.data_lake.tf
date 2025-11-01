@@ -24,20 +24,20 @@ resource "azurerm_storage_data_lake_gen2_filesystem" "this" {
     for_each = each.value.ace == null ? [] : each.value.ace
 
     content {
-      permissions = each.value.permissions
-      type        = each.value.type
-      id          = each.value.id
-      scope       = each.value.scope
+      permissions = ace.value.permissions
+      type        = ace.value.type
+      id          = ace.value.id
+      scope       = ace.value.scope
     }
   }
   dynamic "timeouts" {
     for_each = each.value.timeouts == null ? [] : [each.value.timeouts]
 
     content {
-      create = each.value.create
-      delete = each.value.delete
-      read   = each.value.read
-      update = each.value.update
+      create = timeouts.value.create
+      delete = timeouts.value.delete
+      read   = timeouts.value.read
+      update = timeouts.value.update
     }
   }
 
