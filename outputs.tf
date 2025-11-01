@@ -3,7 +3,8 @@ output "containers" {
   value = {
     for name, container in azapi_resource.containers :
     name => {
-      id = container.id
+      id   = container.id
+      name = container.name
     }
   }
 }
@@ -13,7 +14,8 @@ output "data_lake_gen2_filesystems" {
   value = {
     for name, filesystem in azurerm_storage_data_lake_gen2_filesystem.this :
     name => {
-      id = filesystem.id
+      id   = filesystem.id
+      name = filesystem.name
     }
   }
 }
@@ -38,7 +40,8 @@ output "queues" {
   value = {
     for name, queue in azapi_resource.queue :
     name => {
-      id = queue.id
+      id   = queue.id
+      name = queue.name
     }
   }
 }
@@ -58,7 +61,8 @@ output "shares" {
   description = "Map of storage storage shares that are created."
   value = {
     for name, share in azapi_resource.share : name => {
-      id = share.id
+      id   = share.id
+      name = share.name
     }
   }
 }
@@ -68,6 +72,7 @@ output "tables" {
   value = {
     for name, table in azapi_resource.table : name => {
       id                   = table.id
+      name                 = table.name
       storage_account_name = azurerm_storage_account.this.name
     }
   }
