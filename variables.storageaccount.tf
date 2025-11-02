@@ -226,7 +226,7 @@ variable "provisioned_billing_model_version" {
   description = "(Optional) Specifies the version of the provisioned billing model (e.g. when account_kind = \"FileStorage\" for Storage File). Possible value is V2. Changing this forces a new resource to be created."
 
   validation {
-    condition     = var.provisioned_billing_model_version == null || contains(["V2"], var.provisioned_billing_model_version)
+    condition     = var.provisioned_billing_model_version == null || var.provisioned_billing_model_version == "V2"
     error_message = "Invalid value for provisioned_billing_model_version. Valid options are `V2`."
   }
 }
