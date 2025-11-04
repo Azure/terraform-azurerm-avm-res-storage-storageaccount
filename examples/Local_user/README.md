@@ -230,7 +230,7 @@ module "this" {
 # Store password in Key Vault
 resource "azurerm_key_vault_secret" "sftp_password" {
   key_vault_id = module.avm_res_keyvault_vault.resource.id
-  name         = "${module.this.local_users["user1"].name}"
+  name         = module.this.local_users["user1"].name
   value        = module.this.local_users["user1"].password
 
   depends_on = [module.avm_res_keyvault_vault]
