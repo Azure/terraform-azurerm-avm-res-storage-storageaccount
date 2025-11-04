@@ -1581,6 +1581,10 @@ Description: Map of Data Lake Gen2 filesystems that are created.
 
 Description: Fqdns for storage services.
 
+### <a name="output_local_users"></a> [local\_users](#output\_local\_users)
+
+Description: A map of Storage Account Local Users. The map key is the supplied input to var.local\_user. Contains sensitive information including passwords when ssh\_password\_enabled is true.
+
 ### <a name="output_name"></a> [name](#output\_name)
 
 Description: The name of the storage account
