@@ -34,7 +34,7 @@ output "local_users" {
       id                   = user.id
       name                 = user.name
       home_directory       = user.home_directory
-      password             = user.password # Available when ssh_password_enabled = true
+      password             = user.password
       sid                  = user.sid
       ssh_key_enabled      = user.ssh_key_enabled
       ssh_password_enabled = user.ssh_password_enabled

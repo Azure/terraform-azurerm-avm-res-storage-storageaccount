@@ -292,7 +292,11 @@ Default: `null`
 
 ## Outputs
 
-No outputs.
+The following outputs are exported:
+
+### <a name="output_local_users"></a> [local\_users](#output\_local\_users)
+
+Description: A map of Storage Account Local Users created by the module.
 
 ## Modules
 
