@@ -25,6 +25,34 @@ output "fqdn" {
   value       = { for svc in local.endpoints : svc => "${azurerm_storage_account.this.name}.${svc}.core.windows.net" }
 }
 
+output "local_users" {
+  description = <<DESCRIPTION
+A map of Storage Account Local Users. The map key is the supplied input to var.local_user. Contains sensitive information including passwords when ssh_password_enabled is true.
+
+The map value contains the following attributes:
+- `id` - The ID of the Storage Account Local User.
+- `name` - The name of the Storage Account Local User.
+- `home_directory` - The home directory of the Storage Account Local User.
+- `password` - The password of the Storage Account Local User (sensitive).
+- `sid` - The unique Security Identifier (SID) of the Storage Account Local User.
+- `ssh_key_enabled` - Specifies whether SSH Key authentication is enabled.
+- `ssh_password_enabled` - Specifies whether SSH password authentication is enabled.
+DESCRIPTION
+  sensitive   = true
+  value = {
+    for key, user in azurerm_storage_account_local_user.this :
+    key => {
+      id                   = user.id
+      name                 = user.name
+      home_directory       = user.home_directory
+      password             = user.password
+      sid                  = user.sid
+      ssh_key_enabled      = user.ssh_key_enabled
+      ssh_password_enabled = user.ssh_password_enabled
+    }
+  }
+}
+
 output "name" {
   description = "The name of the storage account"
   value       = azurerm_storage_account.this.name
