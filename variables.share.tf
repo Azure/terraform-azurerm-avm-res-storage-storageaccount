@@ -6,10 +6,10 @@ variable "azure_files_authentication" {
     active_directory = optional(object({
       domain_guid         = string
       domain_name         = string
-      domain_sid          = string
-      forest_name         = string
-      netbios_domain_name = string
-      storage_sid         = string
+      domain_sid          = optional(string)
+      forest_name         = optional(string)
+      netbios_domain_name = optional(string)
+      storage_sid         = optional(string)
     }))
   })
   default     = null
@@ -21,10 +21,10 @@ variable "azure_files_authentication" {
  `active_directory` block supports the following:
  - `domain_guid` - (Required) Specifies the domain GUID.
  - `domain_name` - (Required) Specifies the primary domain that the AD DNS server is authoritative for.
- - `domain_sid` - (Required) Specifies the security identifier (SID).
- - `forest_name` - (Required) Specifies the Active Directory forest.
- - `netbios_domain_name` - (Required) Specifies the NetBIOS domain name.
- - `storage_sid` - (Required) Specifies the security identifier (SID) for Azure Storage.
+ - `domain_sid` - (Optional) Specifies the security identifier (SID).
+ - `forest_name` - (Optional) Specifies the Active Directory forest.
+ - `netbios_domain_name` - (Optional) Specifies the NetBIOS domain name.
+ - `storage_sid` - (Optional) Specifies the security identifier (SID) for Azure Storage.
 EOT
 }
 
