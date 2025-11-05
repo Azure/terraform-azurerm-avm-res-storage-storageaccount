@@ -26,7 +26,18 @@ output "fqdn" {
 }
 
 output "local_users" {
-  description = "A map of Storage Account Local Users. The map key is the supplied input to var.local_user. Contains sensitive information including passwords when ssh_password_enabled is true."
+  description = <<DESCRIPTION
+A map of Storage Account Local Users. The map key is the supplied input to var.local_user. Contains sensitive information including passwords when ssh_password_enabled is true.
+
+The map value contains the following attributes:
+- `id` - The ID of the Storage Account Local User.
+- `name` - The name of the Storage Account Local User.
+- `home_directory` - The home directory of the Storage Account Local User.
+- `password` - The password of the Storage Account Local User (sensitive).
+- `sid` - The unique Security Identifier (SID) of the Storage Account Local User.
+- `ssh_key_enabled` - Specifies whether SSH Key authentication is enabled.
+- `ssh_password_enabled` - Specifies whether SSH password authentication is enabled.
+DESCRIPTION
   sensitive   = true
   value = {
     for key, user in azurerm_storage_account_local_user.this :
