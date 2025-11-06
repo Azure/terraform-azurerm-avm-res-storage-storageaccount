@@ -52,7 +52,7 @@ resource "time_sleep" "wait_for_rbac" {
 }
 
 resource "azurerm_storage_data_lake_gen2_path" "this" {
-  for_each = var.storage_data_lake_gen2_paths == null ? {} : var.storage_data_lake_gen2_paths
+  for_each = var.storage_data_lake_gen2_paths
 
   filesystem_name    = each.value.filesystem_name
   path               = each.value.path
@@ -84,7 +84,6 @@ resource "azurerm_storage_data_lake_gen2_path" "this" {
 
   depends_on = [
     azurerm_storage_data_lake_gen2_filesystem.this,
-    azurerm_role_assignment.storage_account,
     time_sleep.wait_for_rbac
   ]
 }
