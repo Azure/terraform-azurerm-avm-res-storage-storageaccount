@@ -145,13 +145,17 @@ module "this" {
       role_definition_id_or_name       = data.azurerm_role_definition.example.name
       principal_id                     = coalesce(var.msi_id, data.azurerm_client_config.current.object_id)
       skip_service_principal_aad_check = false
-    },
+    }
     role_assignment_2 = {
       role_definition_id_or_name       = "Owner"
       principal_id                     = data.azurerm_client_config.current.object_id
       skip_service_principal_aad_check = false
-    },
-
+    }
+    role_assignment_3 = {
+      role_definition_id_or_name       = "Storage Blob Data Owner"
+      principal_id                     = data.azurerm_client_config.current.object_id
+      skip_service_principal_aad_check = false
+    }
   }
   shared_access_key_enabled = true
   storage_data_lake_gen2_filesystems = {
@@ -161,6 +165,41 @@ module "this" {
     data_lake_2 = {
       name = "datalake2"
 
+    }
+  }
+  storage_data_lake_gen2_paths = {
+    path_1 = {
+      path            = "example-directory"
+      filesystem_name = "datalake1"
+      resource        = "directory"
+      owner           = data.azurerm_client_config.current.object_id
+      group           = "$superuser"
+      ace = [
+        {
+          type        = "user"
+          id          = data.azurerm_client_config.current.object_id
+          permissions = "rwx"
+        },
+        {
+          type        = "group"
+          permissions = "r-x"
+        },
+        {
+          type        = "other"
+          permissions = "---"
+        }
+      ]
+    }
+    path_2 = {
+      path            = "data"
+      filesystem_name = "datalake2"
+      resource        = "directory"
+      owner           = "$superuser"
+    }
+    path_3 = {
+      path            = "logs"
+      filesystem_name = "datalake2"
+      resource        = "directory"
     }
   }
   tags = {
