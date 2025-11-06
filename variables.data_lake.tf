@@ -67,7 +67,6 @@ variable "storage_data_lake_gen2_paths" {
     }))
   }))
   default     = {}
-  nullable = false
   description = <<-EOT
  - `path` - (Required) The path which should be created within the Data Lake Gen2 File System in the Storage Account. Changing this forces a new resource to be created.
  - `filesystem_name` - (Required) The name of the Data Lake Gen2 File System which should be created within the Storage Account. Changing this forces a new resource to be created.
@@ -90,4 +89,5 @@ variable "storage_data_lake_gen2_paths" {
  - `read` - (Defaults to 5 minutes) Used when retrieving the Data Lake Gen2 Path.
  - `update` - (Defaults to 30 minutes) Used when updating the Data Lake Gen2 Path.
 EOT
+  nullable    = false
 }
