@@ -162,11 +162,11 @@ module "this" {
   }
   storage_data_lake_gen2_paths = {
     path_1 = {
-      path               = "example-directory"
-      filesystem_name    = "datalake1"
-      resource           = "directory"
-      owner              = data.azurerm_client_config.current.object_id
-      group              = "$superuser"
+      path            = "example-directory"
+      filesystem_name = "datalake1"
+      resource        = "directory"
+      owner           = data.azurerm_client_config.current.object_id
+      group           = "$superuser"
       ace = [
         {
           type        = "user"
@@ -184,15 +184,15 @@ module "this" {
       ]
     }
     path_2 = {
-      path               = "data"
-      filesystem_name    = "datalake2"
-      resource           = "directory"
-      owner              = "$superuser"
+      path            = "data"
+      filesystem_name = "datalake2"
+      resource        = "directory"
+      owner           = "$superuser"
     }
     path_3 = {
-      path               = "logs"
-      filesystem_name    = "datalake2"
-      resource           = "directory"
+      path            = "logs"
+      filesystem_name = "datalake2"
+      resource        = "directory"
     }
   }
   tags = {

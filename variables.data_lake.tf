@@ -48,11 +48,11 @@ EOT
 
 variable "storage_data_lake_gen2_paths" {
   type = map(object({
-    path               = string
-    filesystem_name    = string
-    resource           = string
-    owner              = optional(string)
-    group              = optional(string)
+    path            = string
+    filesystem_name = string
+    resource        = string
+    owner           = optional(string)
+    group           = optional(string)
     ace = optional(set(object({
       id          = optional(string)
       permissions = string
@@ -90,5 +90,3 @@ variable "storage_data_lake_gen2_paths" {
  - `update` - (Defaults to 30 minutes) Used when updating the Data Lake Gen2 Path.
 EOT
 }
-
-
