@@ -12,7 +12,7 @@ resource "azurerm_monitor_diagnostic_setting" "storage_account" {
   dynamic "enabled_metric" {
     for_each = {
       for k, v in each.value.metric_categories : k => v
-      if length(each.value.metric_categories > 0)
+      if length(each.value.metric_categories) > 0
     }
 
     content {
@@ -47,7 +47,7 @@ resource "azurerm_monitor_diagnostic_setting" "blob" {
   dynamic "enabled_metric" {
     for_each = {
       for k, v in each.value.metric_categories : k => v
-      if length(each.value.metric_categories > 0)
+      if length(each.value.metric_categories) > 0
     }
 
     content {
@@ -83,7 +83,7 @@ resource "azurerm_monitor_diagnostic_setting" "queue" {
   dynamic "enabled_metric" {
     for_each = {
       for k, v in each.value.metric_categories : k => v
-      if length(each.value.metric_categories > 0)
+      if length(each.value.metric_categories) > 0
     }
 
     content {
@@ -118,7 +118,7 @@ resource "azurerm_monitor_diagnostic_setting" "table" {
   dynamic "enabled_metric" {
     for_each = {
       for k, v in each.value.metric_categories : k => v
-      if length(each.value.metric_categories > 0)
+      if length(each.value.metric_categories) > 0
     }
 
     content {
@@ -153,7 +153,7 @@ resource "azurerm_monitor_diagnostic_setting" "azure_file" {
   dynamic "enabled_metric" {
     for_each = {
       for k, v in each.value.metric_categories : k => v
-      if length(each.value.metric_categories > 0)
+      if length(each.value.metric_categories) > 0
     }
 
     content {
