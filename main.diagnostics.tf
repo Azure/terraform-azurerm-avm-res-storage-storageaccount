@@ -10,10 +10,7 @@ resource "azurerm_monitor_diagnostic_setting" "storage_account" {
   log_analytics_workspace_id     = each.value.workspace_resource_id
 
   dynamic "enabled_metric" {
-    for_each = {
-      for k, v in each.value.metric_categories : k => v
-      if length(each.value.metric_categories) > 0
-    }
+    for_each = try(each.value.metric_categories != [] ? each.value.metric_categories : [], [])
 
     content {
       category = enabled_metric.value
@@ -45,10 +42,7 @@ resource "azurerm_monitor_diagnostic_setting" "blob" {
     }
   }
   dynamic "enabled_metric" {
-    for_each = {
-      for k, v in each.value.metric_categories : k => v
-      if length(each.value.metric_categories) > 0
-    }
+    for_each = try(each.value.metric_categories != [] ? each.value.metric_categories : [], [])
 
     content {
       category = enabled_metric.value
@@ -81,10 +75,7 @@ resource "azurerm_monitor_diagnostic_setting" "queue" {
     }
   }
   dynamic "enabled_metric" {
-    for_each = {
-      for k, v in each.value.metric_categories : k => v
-      if length(each.value.metric_categories) > 0
-    }
+    for_each = try(each.value.metric_categories != [] ? each.value.metric_categories : [], [])
 
     content {
       category = enabled_metric.value
@@ -116,10 +107,7 @@ resource "azurerm_monitor_diagnostic_setting" "table" {
     }
   }
   dynamic "enabled_metric" {
-    for_each = {
-      for k, v in each.value.metric_categories : k => v
-      if length(each.value.metric_categories) > 0
-    }
+    for_each = try(each.value.metric_categories != [] ? each.value.metric_categories : [], [])
 
     content {
       category = enabled_metric.value
@@ -151,10 +139,7 @@ resource "azurerm_monitor_diagnostic_setting" "azure_file" {
     }
   }
   dynamic "enabled_metric" {
-    for_each = {
-      for k, v in each.value.metric_categories : k => v
-      if length(each.value.metric_categories) > 0
-    }
+    for_each = try(each.value.metric_categories != [] ? each.value.metric_categories : [], [])
 
     content {
       category = enabled_metric.value
