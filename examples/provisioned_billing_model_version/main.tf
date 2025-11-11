@@ -112,15 +112,15 @@ module "this" {
   location                 = azurerm_resource_group.this.location
   name                     = module.naming.storage_account.name_unique
   resource_group_name      = azurerm_resource_group.this.name
-  account_kind             = "StorageV2"
+  account_kind             = "FileStorage"
   account_replication_type = "ZRS"
-  account_tier             = "Standard"
+  account_tier             = "Premium"
   azure_files_authentication = {
     default_share_level_permission = "StorageFileDataSmbShareReader"
     directory_type                 = "AADKERB"
   }
   https_traffic_only_enabled = true
-  is_hns_enabled             = true
+  local_user_enabled         = false
   managed_identities = {
     system_assigned            = true
     user_assigned_resource_ids = [azurerm_user_assigned_identity.example_identity.id]
@@ -132,67 +132,27 @@ module "this" {
     ip_rules                   = [try(module.public_ip[0].public_ip, var.bypass_ip_cidr)]
     virtual_network_subnet_ids = toset([azurerm_subnet.private.id])
   }
-  public_network_access_enabled = true
+  provisioned_billing_model_version = "V2"
+  public_network_access_enabled     = true
   role_assignments = {
     role_assignment_1 = {
       role_definition_id_or_name       = data.azurerm_role_definition.example.name
       principal_id                     = coalesce(var.msi_id, data.azurerm_client_config.current.object_id)
       skip_service_principal_aad_check = false
-    }
+    },
     role_assignment_2 = {
       role_definition_id_or_name       = "Owner"
       principal_id                     = data.azurerm_client_config.current.object_id
       skip_service_principal_aad_check = false
-    }
-    role_assignment_3 = {
-      role_definition_id_or_name       = "Storage Blob Data Owner"
-      principal_id                     = data.azurerm_client_config.current.object_id
-      skip_service_principal_aad_check = false
-    }
+    },
+
   }
   shared_access_key_enabled = true
-  storage_data_lake_gen2_filesystems = {
-    data_lake_1 = {
-      name = "datalake1"
-    }
-    data_lake_2 = {
-      name = "datalake2"
-
-    }
-  }
-  storage_data_lake_gen2_paths = {
-    path_1 = {
-      path            = "example-directory"
-      filesystem_name = "datalake1"
-      resource        = "directory"
-      owner           = data.azurerm_client_config.current.object_id
-      group           = "$superuser"
-      ace = [
-        {
-          type        = "user"
-          id          = data.azurerm_client_config.current.object_id
-          permissions = "rwx"
-        },
-        {
-          type        = "group"
-          permissions = "r-x"
-        },
-        {
-          type        = "other"
-          permissions = "---"
-        }
-      ]
-    }
-    path_2 = {
-      path            = "data"
-      filesystem_name = "datalake2"
-      resource        = "directory"
-      owner           = "$superuser"
-    }
-    path_3 = {
-      path            = "logs"
-      filesystem_name = "datalake2"
-      resource        = "directory"
+  shares = {
+    premium_share = {
+      name             = "premium-share"
+      quota            = 100
+      enabled_protocol = "SMB"
     }
   }
   tags = {

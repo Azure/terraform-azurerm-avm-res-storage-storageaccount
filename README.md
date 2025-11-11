@@ -28,13 +28,15 @@ The following requirements are needed by this module:
 
 - <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.7.0)
 
-- <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) (>= 1.14.0, < 3.0.0)
+- <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) (~> 2.4)
 
-- <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (>= 3.116.0, < 5.0.0)
+- <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (>= 4.37.0, < 5.0.0)
 
 - <a name="requirement_modtm"></a> [modtm](#requirement\_modtm) (~> 0.3)
 
 - <a name="requirement_random"></a> [random](#requirement\_random) (>= 3.5.0, < 4.0.0)
+
+- <a name="requirement_time"></a> [time](#requirement\_time) (>= 0.9.0, < 1.0.0)
 
 ## Resources
 
@@ -65,10 +67,12 @@ The following resources are used by this module:
 - [azurerm_storage_account_queue_properties.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account_queue_properties) (resource)
 - [azurerm_storage_account_static_website.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account_static_website) (resource)
 - [azurerm_storage_data_lake_gen2_filesystem.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_data_lake_gen2_filesystem) (resource)
+- [azurerm_storage_data_lake_gen2_path.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_data_lake_gen2_path) (resource)
 - [azurerm_storage_management_policy.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_management_policy) (resource)
 - [modtm_telemetry.telemetry](https://registry.terraform.io/providers/Azure/modtm/latest/docs/resources/telemetry) (resource)
 - [random_uuid.telemetry](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/uuid) (resource)
-- [azurerm_client_config.telemetry](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/client_config) (data source)
+- [time_sleep.wait_for_rbac](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/sleep) (resource)
+- [azapi_client_config.telemetry](https://registry.terraform.io/providers/Azure/azapi/latest/docs/data-sources/client_config) (data source)
 - [modtm_module_source.telemetry](https://registry.terraform.io/providers/Azure/modtm/latest/docs/data-sources/module_source) (data source)
 
 <!-- markdownlint-disable MD013 -->
@@ -156,10 +160,10 @@ Description: - `directory_type` - (Required) Specifies the directory service use
 `active_directory` block supports the following:
 - `domain_guid` - (Required) Specifies the domain GUID.
 - `domain_name` - (Required) Specifies the primary domain that the AD DNS server is authoritative for.
-- `domain_sid` - (Required) Specifies the security identifier (SID).
-- `forest_name` - (Required) Specifies the Active Directory forest.
-- `netbios_domain_name` - (Required) Specifies the NetBIOS domain name.
-- `storage_sid` - (Required) Specifies the security identifier (SID) for Azure Storage.
+- `domain_sid` - (Optional) Specifies the security identifier (SID).
+- `forest_name` - (Optional) Specifies the Active Directory forest.
+- `netbios_domain_name` - (Optional) Specifies the NetBIOS domain name.
+- `storage_sid` - (Optional) Specifies the security identifier (SID) for Azure Storage.
 
 Type:
 
@@ -171,10 +175,10 @@ object({
     active_directory = optional(object({
       domain_guid         = string
       domain_name         = string
-      domain_sid          = string
-      forest_name         = string
-      netbios_domain_name = string
-      storage_sid         = string
+      domain_sid          = optional(string)
+      forest_name         = optional(string)
+      netbios_domain_name = optional(string)
+      storage_sid         = optional(string)
     }))
   })
 ```
@@ -187,7 +191,7 @@ Description: - `change_feed_enabled` - (Optional) Is the blob service properties
 - `change_feed_retention_in_days` - (Optional) The duration of change feed events retention in days. The possible values are between 1 and 146000 days (400 years). Setting this to null (or omit this in the configuration file) indicates an infinite retention of the change feed.
 - `default_service_version` - (Optional) The API Version which should be used by default for requests to the Data Plane API if an incoming request doesn't specify an API Version.
 - `last_access_time_enabled` - (Optional) Is the last access time based tracking enabled? Default to `false`.
-- `versioning_enabled` - (Optional) Is versioning enabled? Default to `false`.
+- `versioning_enabled` - (Optional) Is versioning enabled? Default to `true`.
 
 ---
 `container_delete_retention_policy` block supports the following:
@@ -268,7 +272,7 @@ Default: `null`
 
 ### <a name="input_containers"></a> [containers](#input\_containers)
 
-Description: - `container_access_type` - (Optional) The Access Level configured for this Container. Possible values are `Blob`, `Container` or `None`. Defaults to `None`.
+Description: - `public_access` - (Optional) Specifies whether data in the container may be accessed publicly and the level of access. Possible values are `Container`, `Blob`, and `None`. Defaults to `None`. Changing this forces a new resource to be created.
 - `metadata` - (Optional) A mapping of MetaData for this Container. All metadata keys should be lowercase.
 - `name` - (Required) The name of the Container which should be created within the Storage Account. Changing this forces a new resource to be created.
 
@@ -299,6 +303,7 @@ map(object({
     role_assignments = optional(map(object({
       role_definition_id_or_name             = string
       principal_id                           = string
+      principal_type                         = optional(string, null)
       description                            = optional(string, null)
       skip_service_principal_aad_check       = optional(bool, false)
       condition                              = optional(string, null)
@@ -447,6 +452,7 @@ map(object({
     event_hub_authorization_rule_resource_id = optional(string, null)
     event_hub_name                           = optional(string, null)
     marketplace_partner_resource_id          = optional(string, null)
+    category                                 = optional(set(string), [])
   }))
 ```
 
@@ -565,7 +571,7 @@ Default: `null`
 ### <a name="input_enable_telemetry"></a> [enable\_telemetry](#input\_enable\_telemetry)
 
 Description: This variable controls whether or not telemetry is enabled for the module.  
-For more information see https://aka.ms/avm/telemetryinfo.  
+For more information see <https://aka.ms/avm/telemetryinfo>.  
 If it is set to false, then no telemetry will be collected.
 
 Type: `bool`
@@ -687,6 +693,14 @@ map(object({
 ```
 
 Default: `{}`
+
+### <a name="input_local_user_enabled"></a> [local\_user\_enabled](#input\_local\_user\_enabled)
+
+Description: (Optional) Should Storage Account Local Users be enabled? Defaults to `false`.
+
+Type: `bool`
+
+Default: `false`
 
 ### <a name="input_lock"></a> [lock](#input\_lock)
 
@@ -849,6 +863,14 @@ Type: `bool`
 
 Default: `true`
 
+### <a name="input_provisioned_billing_model_version"></a> [provisioned\_billing\_model\_version](#input\_provisioned\_billing\_model\_version)
+
+Description: (Optional) Specifies the version of the provisioned billing model (e.g. when account\_kind = "FileStorage" for Storage File). Possible value is V2. Changing this forces a new resource to be created.
+
+Type: `string`
+
+Default: `null`
+
 ### <a name="input_public_network_access_enabled"></a> [public\_network\_access\_enabled](#input\_public\_network\_access\_enabled)
 
 Description: (Optional) Whether the public network access is enabled? Defaults to `false`.
@@ -979,6 +1001,7 @@ map(object({
     role_assignments = optional(map(object({
       role_definition_id_or_name             = string
       principal_id                           = string
+      principal_type                         = optional(string, null)
       description                            = optional(string, null)
       skip_service_principal_aad_check       = optional(bool, false)
       condition                              = optional(string, null)
@@ -1198,6 +1221,7 @@ map(object({
     role_assignments = optional(map(object({
       role_definition_id_or_name             = string
       principal_id                           = string
+      principal_type                         = optional(string, null)
       description                            = optional(string, null)
       skip_service_principal_aad_check       = optional(bool, false)
       condition                              = optional(string, null)
@@ -1309,6 +1333,55 @@ map(object({
     name                     = string
     owner                    = optional(string)
     properties               = optional(map(string))
+    ace = optional(set(object({
+      id          = optional(string)
+      permissions = string
+      scope       = optional(string)
+      type        = string
+    })))
+    timeouts = optional(object({
+      create = optional(string)
+      delete = optional(string)
+      read   = optional(string)
+      update = optional(string)
+    }))
+  }))
+```
+
+Default: `{}`
+
+### <a name="input_storage_data_lake_gen2_paths"></a> [storage\_data\_lake\_gen2\_paths](#input\_storage\_data\_lake\_gen2\_paths)
+
+Description: - `path` - (Required) The path which should be created within the Data Lake Gen2 File System in the Storage Account. Changing this forces a new resource to be created.
+- `filesystem_name` - (Required) The name of the Data Lake Gen2 File System which should be created within the Storage Account. Changing this forces a new resource to be created.
+- `storage_account_id` - (Required) The ID of the Storage Account where the Data Lake Gen2 File System exists. Changing this forces a new resource to be created.
+- `resource` - (Required) The type of resource. Possible values are `directory` or `file`. Changing this forces a new resource to be created.
+- `owner` - (Optional) Specifies the Object ID of the Azure Active Directory User to make the owning user. Possible values also include `$superuser`.
+- `group` - (Optional) Specifies the Object ID of the Azure Active Directory Group to make the owning group. Possible values also include `$superuser`.
+
+---
+`ace` block supports the following:
+- `id` - (Optional) Specifies the Object ID of the Azure Active Directory User or Group that the entry relates to. Only valid for `user` or `group` entries.
+- `permissions` - (Required) Specifies the permissions for the entry in `rwx` form. For example, `rwx` gives full permissions but `r--` only gives read permissions.
+- `scope` - (Optional) Specifies whether the ACE represents an `access` entry or a `default` entry. Default value is `access`.
+- `type` - (Required) Specifies the type of entry. Can be `user`, `group`, `mask` or `other`.
+
+---
+`timeouts` block supports the following:
+- `create` - (Defaults to 30 minutes) Used when creating the Data Lake Gen2 Path.
+- `delete` - (Defaults to 30 minutes) Used when deleting the Data Lake Gen2 Path.
+- `read` - (Defaults to 5 minutes) Used when retrieving the Data Lake Gen2 Path.
+- `update` - (Defaults to 30 minutes) Used when updating the Data Lake Gen2 Path.
+
+Type:
+
+```hcl
+map(object({
+    path            = string
+    filesystem_name = string
+    resource        = string
+    owner           = optional(string)
+    group           = optional(string)
     ace = optional(set(object({
       id          = optional(string)
       permissions = string
@@ -1498,6 +1571,7 @@ map(object({
     role_assignments = optional(map(object({
       role_definition_id_or_name             = string
       principal_id                           = string
+      principal_type                         = optional(string, null)
       description                            = optional(string, null)
       skip_service_principal_aad_check       = optional(bool, false)
       condition                              = optional(string, null)
@@ -1552,9 +1626,26 @@ The following outputs are exported:
 
 Description: Map of storage containers that are created.
 
+### <a name="output_data_lake_gen2_filesystems"></a> [data\_lake\_gen2\_filesystems](#output\_data\_lake\_gen2\_filesystems)
+
+Description: Map of Data Lake Gen2 filesystems that are created.
+
 ### <a name="output_fqdn"></a> [fqdn](#output\_fqdn)
 
 Description: Fqdns for storage services.
+
+### <a name="output_local_users"></a> [local\_users](#output\_local\_users)
+
+Description: A map of Storage Account Local Users. The map key is the supplied input to var.local\_user. Contains sensitive information including passwords when ssh\_password\_enabled is true.
+
+The map value contains the following attributes:
+- `id` - The ID of the Storage Account Local User.
+- `name` - The name of the Storage Account Local User.
+- `home_directory` - The home directory of the Storage Account Local User.
+- `password` - The password of the Storage Account Local User (sensitive).
+- `sid` - The unique Security Identifier (SID) of the Storage Account Local User.
+- `ssh_key_enabled` - Specifies whether SSH Key authentication is enabled.
+- `ssh_password_enabled` - Specifies whether SSH password authentication is enabled.
 
 ### <a name="output_name"></a> [name](#output\_name)
 

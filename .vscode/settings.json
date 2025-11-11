@@ -1,24 +1,6 @@
 {
-  "editor.bracketPairColorization.enabled": true,
-  "editor.formatOnSave": true,
-  "[terraform]": {
-    "editor.defaultFormatter": "hashicorp.terraform",
-    "editor.formatOnSave": false,
-    "editor.codeActionsOnSave": {
-      "source.formatAll.terraform": "explicit"
-    },
-  },
-  "[terraform-vars]": {
-    "editor.defaultFormatter": "hashicorp.terraform",
-    "editor.formatOnSave": false,
-    "editor.codeActionsOnSave": {
-      "source.formatAll.terraform": "explicit"
-    },
-  },
-  "git.enableCommitSigning": false,
-  "[terraform][terraform-vars]": {
-    "editor.codeActionsOnSave": {
-      "source.formatAll.terraform": "explicit"
-    }
-  }
+  "chat.agent.maxRequests": 500,
+  "chat.math.enabled": true,
+  "chat.todoListTool.enabled": true,
+  "github.copilot.chat.agent.thinkingTool": true
 }

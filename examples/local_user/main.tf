@@ -13,6 +13,13 @@ terraform {
   }
 }
 
+locals {
+  test_regions = ["eastus", "eastus2", "westus2", "westus3"]
+}
+resource "random_integer" "region_index" {
+  max = length(local.test_regions) - 1
+  min = 0
+}
 provider "azurerm" {
   features {
     resource_group {
@@ -22,21 +29,13 @@ provider "azurerm" {
   resource_provider_registrations = "none"
   storage_use_azuread             = true
 }
-locals {
-  test_regions = ["eastus", "eastus2", "westus2", "westus3"]
-}
-resource "random_integer" "region_index" {
-  max = length(local.test_regions) - 1
-  min = 0
-}
 
-# This allow use to randomize the name of resources
 resource "random_string" "this" {
   length  = 6
   special = false
   upper   = false
 }
-# This ensures we have unique CAF compliant names for resources.
+# This ensures we have unique CAF compliant names for our resources.
 module "naming" {
   source  = "Azure/naming/azurerm"
   version = "0.4.0"
@@ -93,7 +92,7 @@ module "public_ip" {
   version = "0.1.0"
   count   = var.bypass_ip_cidr == null ? 1 : 0
 }
-# We need this to get the object_id of the current user
+
 data "azurerm_client_config" "current" {}
 
 resource "azurerm_user_assigned_identity" "example_identity" {
@@ -101,9 +100,41 @@ resource "azurerm_user_assigned_identity" "example_identity" {
   name                = module.naming.user_assigned_identity.name_unique
   resource_group_name = azurerm_resource_group.this.name
 }
-# We use the role definition data source to get the id of the Contributor role
+
 data "azurerm_role_definition" "example" {
   name = "Contributor"
+}
+
+
+#create a keyvault for storing the credential with RBAC for the deployment user
+module "avm_res_keyvault_vault" {
+  source  = "Azure/avm-res-keyvault-vault/azurerm"
+  version = "0.5.1"
+
+  location            = azurerm_resource_group.this.location
+  name                = module.naming.key_vault.name_unique
+  resource_group_name = azurerm_resource_group.this.name
+  tenant_id           = data.azurerm_client_config.current.tenant_id
+  network_acls = {
+    default_action = "Allow"
+  }
+  role_assignments = {
+    deployment_user_secrets = {
+      role_definition_id_or_name = "Key Vault Administrator"
+      principal_id               = data.azurerm_client_config.current.object_id
+    }
+
+    customer_managed_key = {
+      role_definition_id_or_name = "Key Vault Crypto Officer"
+      principal_id               = azurerm_user_assigned_identity.example_identity.principal_id
+    }
+  }
+  tags = {
+    Dep = "IT"
+  }
+  wait_for_rbac_before_secret_operations = {
+    create = "60s"
+  }
 }
 
 module "this" {
@@ -115,12 +146,40 @@ module "this" {
   account_kind             = "StorageV2"
   account_replication_type = "ZRS"
   account_tier             = "Standard"
-  azure_files_authentication = {
-    default_share_level_permission = "StorageFileDataSmbShareReader"
-    directory_type                 = "AADKERB"
+  containers = {
+    blob_container0 = {
+      name = "blob-container-${random_string.this.result}-0"
+    }
+    blob_container1 = {
+      name = "blob-container-${random_string.this.result}-1"
+    }
+
   }
-  https_traffic_only_enabled = true
-  is_hns_enabled             = true
+  infrastructure_encryption_enabled = true
+  is_hns_enabled                    = true
+  local_user = {
+    user1 = {
+      name                 = "localuser${random_string.this.result}"
+      ssh_password_enabled = true
+
+      permission_scopes = {
+        blob_scope = {
+          service       = "blob"
+          resource_type = "container"
+          resource_name = "blob-container-${random_string.this.result}-0"
+          permissions   = "rwdl"
+        }
+        file_scope = {
+          service       = "file"
+          resource_type = "share"
+          resource_name = "share-${random_string.this.result}-0"
+          permissions   = "rwdl"
+        }
+      }
+
+    }
+  }
+  local_user_enabled = true
   managed_identities = {
     system_assigned            = true
     user_assigned_resource_ids = [azurerm_user_assigned_identity.example_identity.id]
@@ -133,71 +192,41 @@ module "this" {
     virtual_network_subnet_ids = toset([azurerm_subnet.private.id])
   }
   public_network_access_enabled = true
+  queues = {
+    queue0 = {
+      name = "queue-${random_string.this.result}-0"
+    }
+    queue1 = {
+      name = "queue-${random_string.this.result}-1"
+    }
+  }
   role_assignments = {
     role_assignment_1 = {
       role_definition_id_or_name       = data.azurerm_role_definition.example.name
       principal_id                     = coalesce(var.msi_id, data.azurerm_client_config.current.object_id)
       skip_service_principal_aad_check = false
-    }
+    },
     role_assignment_2 = {
       role_definition_id_or_name       = "Owner"
       principal_id                     = data.azurerm_client_config.current.object_id
       skip_service_principal_aad_check = false
-    }
-    role_assignment_3 = {
-      role_definition_id_or_name       = "Storage Blob Data Owner"
-      principal_id                     = data.azurerm_client_config.current.object_id
-      skip_service_principal_aad_check = false
-    }
-  }
-  shared_access_key_enabled = true
-  storage_data_lake_gen2_filesystems = {
-    data_lake_1 = {
-      name = "datalake1"
-    }
-    data_lake_2 = {
-      name = "datalake2"
+    },
 
-    }
   }
-  storage_data_lake_gen2_paths = {
-    path_1 = {
-      path            = "example-directory"
-      filesystem_name = "datalake1"
-      resource        = "directory"
-      owner           = data.azurerm_client_config.current.object_id
-      group           = "$superuser"
-      ace = [
-        {
-          type        = "user"
-          id          = data.azurerm_client_config.current.object_id
-          permissions = "rwx"
-        },
-        {
-          type        = "group"
-          permissions = "r-x"
-        },
-        {
-          type        = "other"
-          permissions = "---"
-        }
-      ]
-    }
-    path_2 = {
-      path            = "data"
-      filesystem_name = "datalake2"
-      resource        = "directory"
-      owner           = "$superuser"
-    }
-    path_3 = {
-      path            = "logs"
-      filesystem_name = "datalake2"
-      resource        = "directory"
-    }
-  }
+  sftp_enabled              = true
+  shared_access_key_enabled = true
   tags = {
     env   = "Dev"
     owner = "John Doe"
     dept  = "IT"
   }
+}
+
+# Store password in Key Vault
+resource "azurerm_key_vault_secret" "sftp_password" {
+  key_vault_id = module.avm_res_keyvault_vault.resource.id
+  name         = module.this.local_users["user1"].name
+  value        = module.this.local_users["user1"].password
+
+  depends_on = [module.avm_res_keyvault_vault]
 }

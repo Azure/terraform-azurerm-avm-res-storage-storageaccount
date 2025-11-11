@@ -11,7 +11,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = ">= 3.7.0, < 5.0.0"
+      version = ">= 4.37.0, < 5.0.0"
     }
     random = {
       source  = "hashicorp/random"
@@ -145,13 +145,17 @@ module "this" {
       role_definition_id_or_name       = data.azurerm_role_definition.example.name
       principal_id                     = coalesce(var.msi_id, data.azurerm_client_config.current.object_id)
       skip_service_principal_aad_check = false
-    },
+    }
     role_assignment_2 = {
       role_definition_id_or_name       = "Owner"
       principal_id                     = data.azurerm_client_config.current.object_id
       skip_service_principal_aad_check = false
-    },
-
+    }
+    role_assignment_3 = {
+      role_definition_id_or_name       = "Storage Blob Data Owner"
+      principal_id                     = data.azurerm_client_config.current.object_id
+      skip_service_principal_aad_check = false
+    }
   }
   shared_access_key_enabled = true
   storage_data_lake_gen2_filesystems = {
@@ -161,6 +165,41 @@ module "this" {
     data_lake_2 = {
       name = "datalake2"
 
+    }
+  }
+  storage_data_lake_gen2_paths = {
+    path_1 = {
+      path            = "example-directory"
+      filesystem_name = "datalake1"
+      resource        = "directory"
+      owner           = data.azurerm_client_config.current.object_id
+      group           = "$superuser"
+      ace = [
+        {
+          type        = "user"
+          id          = data.azurerm_client_config.current.object_id
+          permissions = "rwx"
+        },
+        {
+          type        = "group"
+          permissions = "r-x"
+        },
+        {
+          type        = "other"
+          permissions = "---"
+        }
+      ]
+    }
+    path_2 = {
+      path            = "data"
+      filesystem_name = "datalake2"
+      resource        = "directory"
+      owner           = "$superuser"
+    }
+    path_3 = {
+      path            = "logs"
+      filesystem_name = "datalake2"
+      resource        = "directory"
     }
   }
   tags = {
@@ -178,7 +217,7 @@ The following requirements are needed by this module:
 
 - <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.7.0)
 
-- <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (>= 3.7.0, < 5.0.0)
+- <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (>= 4.37.0, < 5.0.0)
 
 - <a name="requirement_random"></a> [random](#requirement\_random) (>= 3.5.0, < 4.0.0)
 

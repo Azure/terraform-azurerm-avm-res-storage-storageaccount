@@ -15,8 +15,10 @@ resource "azurerm_storage_account" "this" {
   infrastructure_encryption_enabled = var.infrastructure_encryption_enabled
   is_hns_enabled                    = var.is_hns_enabled
   large_file_share_enabled          = var.large_file_share_enabled
+  local_user_enabled                = var.local_user_enabled
   min_tls_version                   = var.min_tls_version
   nfsv3_enabled                     = var.nfsv3_enabled
+  provisioned_billing_model_version = var.provisioned_billing_model_version
   public_network_access_enabled     = var.public_network_access_enabled
   queue_encryption_key_type         = var.queue_encryption_key_type
   sftp_enabled                      = var.sftp_enabled
@@ -286,6 +288,7 @@ resource "azurerm_role_assignment" "storage_account" {
   condition                              = each.value.condition
   condition_version                      = each.value.condition_version
   delegated_managed_identity_resource_id = each.value.delegated_managed_identity_resource_id
+  principal_type                         = each.value.principal_type
   role_definition_id                     = strcontains(lower(each.value.role_definition_id_or_name), lower(local.role_definition_resource_substring)) ? each.value.role_definition_id_or_name : null
   role_definition_name                   = strcontains(lower(each.value.role_definition_id_or_name), lower(local.role_definition_resource_substring)) ? null : each.value.role_definition_id_or_name
   skip_service_principal_aad_check       = each.value.skip_service_principal_aad_check

@@ -55,6 +55,7 @@ variable "diagnostic_settings_file" {
     event_hub_authorization_rule_resource_id = optional(string, null)
     event_hub_name                           = optional(string, null)
     marketplace_partner_resource_id          = optional(string, null)
+    category                                 = optional(set(string), [])
   }))
   default     = {}
   description = <<DESCRIPTION

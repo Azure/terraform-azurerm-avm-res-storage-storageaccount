@@ -4,7 +4,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = ">= 3.7.0, < 5.0.0"
+      version = ">= 4.37.0, < 5.0.0"
     }
     random = {
       source  = "hashicorp/random"
@@ -135,6 +135,7 @@ module "this" {
 
   }
   https_traffic_only_enabled = true
+  local_user_enabled         = false
   managed_identities = {
     system_assigned            = true
     user_assigned_resource_ids = [azurerm_user_assigned_identity.example_identity.id]

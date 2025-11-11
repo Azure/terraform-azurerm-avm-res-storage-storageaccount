@@ -161,6 +161,12 @@ EOT
   nullable    = false
 }
 
+variable "local_user_enabled" {
+  type        = bool
+  default     = false
+  description = "(Optional) Should Storage Account Local Users be enabled? Defaults to `false`."
+}
+
 variable "min_tls_version" {
   type        = string
   default     = "TLS1_2"
@@ -212,6 +218,17 @@ variable "nfsv3_enabled" {
   type        = bool
   default     = false
   description = "(Optional) Is NFSv3 protocol enabled? Changing this forces a new resource to be created. Defaults to `false`."
+}
+
+variable "provisioned_billing_model_version" {
+  type        = string
+  default     = null
+  description = "(Optional) Specifies the version of the provisioned billing model (e.g. when account_kind = \"FileStorage\" for Storage File). Possible value is V2. Changing this forces a new resource to be created."
+
+  validation {
+    condition     = var.provisioned_billing_model_version == null || var.provisioned_billing_model_version == "V2"
+    error_message = "Invalid value for provisioned_billing_model_version. Valid options are `V2`."
+  }
 }
 
 variable "public_network_access_enabled" {
