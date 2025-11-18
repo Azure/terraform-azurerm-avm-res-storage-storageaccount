@@ -10,7 +10,7 @@ resource "azurerm_monitor_diagnostic_setting" "storage_account" {
   log_analytics_workspace_id     = each.value.workspace_resource_id
 
   dynamic "enabled_metric" {
-    for_each = each.value.metric_categories
+    for_each = each.value.metric_categories != null ? each.value.metric_categories : []
 
     content {
       category = enabled_metric.value
@@ -28,21 +28,21 @@ resource "azurerm_monitor_diagnostic_setting" "blob" {
   log_analytics_workspace_id     = each.value.workspace_resource_id
 
   dynamic "enabled_log" {
-    for_each = try(each.value.log_categories != null ? each.value.log_categories : [], [])
+    for_each = each.value.log_categories != null ? each.value.log_categories : []
 
     content {
       category = enabled_log.value
     }
   }
   dynamic "enabled_log" {
-    for_each = try(each.value.log_groups != null ? each.value.log_groups : [], [])
+    for_each = each.value.log_groups != null ? each.value.log_groups : []
 
     content {
       category_group = enabled_log.value
     }
   }
   dynamic "enabled_metric" {
-    for_each = each.value.metric_categories
+    for_each = each.value.metric_categories != null ? each.value.metric_categories : []
 
     content {
       category = enabled_metric.value
@@ -61,21 +61,21 @@ resource "azurerm_monitor_diagnostic_setting" "queue" {
   log_analytics_workspace_id     = each.value.workspace_resource_id
 
   dynamic "enabled_log" {
-    for_each = try(each.value.log_categories != null ? each.value.log_categories : [], [])
+    for_each = each.value.log_categories != null ? each.value.log_categories : []
 
     content {
       category = enabled_log.value
     }
   }
   dynamic "enabled_log" {
-    for_each = try(each.value.log_groups != null ? each.value.log_groups : [], [])
+    for_each = each.value.log_groups != null ? each.value.log_groups : []
 
     content {
       category_group = enabled_log.value
     }
   }
   dynamic "enabled_metric" {
-    for_each = each.value.metric_categories
+    for_each = each.value.metric_categories != null ? each.value.metric_categories : []
 
     content {
       category = enabled_metric.value
@@ -93,21 +93,21 @@ resource "azurerm_monitor_diagnostic_setting" "table" {
   log_analytics_workspace_id     = each.value.workspace_resource_id
 
   dynamic "enabled_log" {
-    for_each = try(each.value.log_categories != null ? each.value.log_categories : [], [])
+    for_each = each.value.log_categories != null ? each.value.log_categories : []
 
     content {
       category = enabled_log.value
     }
   }
   dynamic "enabled_log" {
-    for_each = try(each.value.log_groups != null ? each.value.log_groups : [], [])
+    for_each = each.value.log_groups != null ? each.value.log_groups : []
 
     content {
       category_group = enabled_log.value
     }
   }
   dynamic "enabled_metric" {
-    for_each = each.value.metric_categories
+    for_each = each.value.metric_categories != null ? each.value.metric_categories : []
 
     content {
       category = enabled_metric.value
@@ -125,21 +125,21 @@ resource "azurerm_monitor_diagnostic_setting" "azure_file" {
   log_analytics_workspace_id     = each.value.workspace_resource_id
 
   dynamic "enabled_log" {
-    for_each = try(each.value.log_categories != null ? each.value.log_categories : [], [])
+    for_each = each.value.log_categories != null ? each.value.log_categories : []
 
     content {
       category = enabled_log.value
     }
   }
   dynamic "enabled_log" {
-    for_each = try(each.value.log_groups != null ? each.value.log_groups : [], [])
+    for_each = each.value.log_groups != null ? each.value.log_groups : []
 
     content {
       category_group = enabled_log.value
     }
   }
   dynamic "enabled_metric" {
-    for_each = each.value.metric_categories
+    for_each = each.value.metric_categories != null ? each.value.metric_categories : []
 
     content {
       category = enabled_metric.value
