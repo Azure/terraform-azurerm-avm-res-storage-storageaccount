@@ -6,20 +6,26 @@ resource "azapi_resource" "share" {
   type      = "Microsoft.Storage/storageAccounts/fileServices/shares@2023-01-01"
   body = {
     properties = {
-      metadata          = each.value.metadata
-      accesstier        = each.value.access_tier
-      enabledProtocols  = each.value.enabled_protocol
-      shareQuota        = each.value.quota
-      rootSquash        = each.value.root_squash
-      signedIdentifiers = each.value.signed_identifiers == null ? [] : each.value.signed_identifiers
-
-
+      metadata         = each.value.metadata
+      accessTier       = each.value.access_tier
+      enabledProtocols = each.value.enabled_protocol
+      shareQuota       = each.value.quota
+      rootSquash       = each.value.root_squash
+      signedIdentifiers = [
+        for signed_identifier in each.value.signed_identifiers : {
+          id = signed_identifier.id
+          accessPolicy = signed_identifier.access_policy == null ? null : {
+            expiryTime = signed_identifier.access_policy.expiry_time
+            permission = signed_identifier.access_policy.permission
+            startTime  = signed_identifier.access_policy.start_time
+          }
+      }]
     }
   }
   create_headers            = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
   delete_headers            = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
   read_headers              = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
-  schema_validation_enabled = false
+  schema_validation_enabled = true
   update_headers            = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
 
   dynamic "timeouts" {
