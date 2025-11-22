@@ -208,6 +208,7 @@ Description: - `change_feed_enabled` - (Optional) Is the blob service properties
 ---
 `delete_retention_policy` block supports the following:
 - `days` - (Optional) Specifies the number of days that the blob should be retained, between `1` and `365` days. Defaults to `7`.
+- `permanent_delete_enabled` - (Optional) Specifies whether permanent delete is enabled. Defaults to `false`.
 
 ---
 `diagnostic_settings` block supports the following:
@@ -237,8 +238,9 @@ object({
     versioning_enabled            = optional(bool, true)
     container_delete_retention_policy = optional(object({
       days = optional(number, 7)
+      permanent_delete_enabled = optional(bool, false)
 
-    }), { days = 7 })
+    }), { days = 7, permanent_delete_enabled = false })
 
     cors_rule = optional(list(object({
       allowed_headers    = list(string)
