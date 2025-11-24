@@ -21,7 +21,7 @@ variable "blob_properties" {
     delete_retention_policy = optional(object({
       enabled = optional(bool, true)
       days    = optional(number, 7)
-    }), { days = 7 })
+    }), {})
     diagnostic_settings = optional(map(object({
       name                                     = optional(string, null)
       log_categories                           = optional(set(string), [])
