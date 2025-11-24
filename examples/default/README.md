@@ -126,20 +126,7 @@ module "this" {
     default_share_level_permission = "StorageFileDataSmbShareReader"
     directory_type                 = "AADKERB"
   }
-  blob_properties = {
-    versioning_enabled = true
-    delete_retention_policy = {
-      enabled = false
-    }
-    container_delete_retention_policy = {
-      enabled = true
-      days    = 4
-
-    }
-
-
-
-  }
+  # }
   containers = {
     blob_container0 = {
       name = "blob-container-${random_string.this.result}-0"

@@ -273,7 +273,7 @@ object({
   })
 ```
 
-Default: `null`
+Default: `{}`
 
 ### <a name="input_containers"></a> [containers](#input\_containers)
 
