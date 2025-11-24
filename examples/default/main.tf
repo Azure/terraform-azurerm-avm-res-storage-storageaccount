@@ -121,6 +121,17 @@ module "this" {
   }
   blob_properties = {
     versioning_enabled = true
+    delete_retention_policy = {
+      enabled = false
+    }
+    container_delete_retention_policy = {
+      enabled = true
+      days    = 4
+
+    }
+
+
+
   }
   containers = {
     blob_container0 = {

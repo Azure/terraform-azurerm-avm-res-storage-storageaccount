@@ -6,7 +6,8 @@ variable "blob_properties" {
     last_access_time_enabled      = optional(bool)
     versioning_enabled            = optional(bool, true)
     container_delete_retention_policy = optional(object({
-      days = optional(number, 7)
+      enabled = optional(bool, true)
+      days    = optional(number, 7)
 
     }), { days = 7 })
 
@@ -18,7 +19,8 @@ variable "blob_properties" {
       max_age_in_seconds = number
     })))
     delete_retention_policy = optional(object({
-      days = optional(number, 7)
+      enabled = optional(bool, true)
+      days    = optional(number, 7)
     }), { days = 7 })
     diagnostic_settings = optional(map(object({
       name                                     = optional(string, null)

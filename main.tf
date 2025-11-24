@@ -62,9 +62,9 @@ resource "azurerm_storage_account" "this" {
       versioning_enabled            = blob_properties.value.versioning_enabled
 
       dynamic "container_delete_retention_policy" {
-        for_each = blob_properties.value.container_delete_retention_policy == null ? [] : [
-          blob_properties.value.container_delete_retention_policy
-        ]
+        for_each = (
+        blob_properties.value.container_delete_retention_policy != null && try(blob_properties.value.container_delete_retention_policy.enabled, true)) ? [blob_properties.value.container_delete_retention_policy] : []
+
 
         content {
           days = container_delete_retention_policy.value.days
@@ -82,9 +82,8 @@ resource "azurerm_storage_account" "this" {
         }
       }
       dynamic "delete_retention_policy" {
-        for_each = blob_properties.value.delete_retention_policy == null ? [] : [
-          blob_properties.value.delete_retention_policy
-        ]
+        for_each = (
+        blob_properties.value.delete_retention_policy != null && try(blob_properties.value.delete_retention_policy.enabled, true)) ? [blob_properties.value.delete_retention_policy] : []
 
         content {
           days = delete_retention_policy.value.days
