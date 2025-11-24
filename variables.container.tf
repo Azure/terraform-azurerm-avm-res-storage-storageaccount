@@ -18,8 +18,9 @@ variable "blob_properties" {
       max_age_in_seconds = number
     })))
     delete_retention_policy = optional(object({
-      days = optional(number, 7)
-    }), { days = 7 })
+      days                     = optional(number, 7)
+      permanent_delete_enabled = optional(bool, false)
+    }), { days = 7, permanent_delete_enabled = false })
     diagnostic_settings = optional(map(object({
       name                                     = optional(string, null)
       log_categories                           = optional(set(string), [])
@@ -59,6 +60,7 @@ variable "blob_properties" {
  ---
  `delete_retention_policy` block supports the following:
  - `days` - (Optional) Specifies the number of days that the blob should be retained, between `1` and `365` days. Defaults to `7`.
+ - `permanent_delete_enabled` - (Optional) Specifies whether permanent delete is enabled. Defaults to `false`.
 
  ---
  `diagnostic_settings` block supports the following:
