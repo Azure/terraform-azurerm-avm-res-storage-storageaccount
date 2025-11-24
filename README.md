@@ -241,7 +241,7 @@ object({
       enabled = optional(bool, true)
       days    = optional(number, 7)
 
-    }), { days = 7 })
+    }), {})
 
     cors_rule = optional(list(object({
       allowed_headers    = list(string)
@@ -251,9 +251,10 @@ object({
       max_age_in_seconds = number
     })))
     delete_retention_policy = optional(object({
-      enabled = optional(bool, true)
-      days    = optional(number, 7)
-    }), { days = 7 })
+      enabled                  = optional(bool, true)
+      days                     = optional(number, 7)
+      permanent_delete_enabled = optional(bool, false)
+    }), {})
     diagnostic_settings = optional(map(object({
       name                                     = optional(string, null)
       log_categories                           = optional(set(string), [])
