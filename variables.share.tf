@@ -26,6 +26,19 @@ variable "azure_files_authentication" {
  - `netbios_domain_name` - (Optional) Specifies the NetBIOS domain name.This is required when `directory_type` is set to `AD`.
  - `storage_sid` - (Optional) Specifies the security identifier (SID) for Azure Storage.This is required when `directory_type` is set to `AD`.
 EOT
+
+  validation {
+    condition = try(
+      var.azure_files_authentication.directory_type != "AD" || (
+        var.azure_files_authentication.active_directory.domain_sid != null &&
+        var.azure_files_authentication.active_directory.storage_sid != null &&
+        var.azure_files_authentication.active_directory.forest_name != null &&
+        var.azure_files_authentication.active_directory.netbios_domain_name != null
+      ),
+      true
+    )
+    error_message = "When directory_type is 'AD', active_directory block with domain_sid, storage_sid, forest_name, and netbios_domain_name is required."
+  }
 }
 
 variable "large_file_share_enabled" {
