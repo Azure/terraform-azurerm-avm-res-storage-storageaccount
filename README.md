@@ -1620,6 +1620,10 @@ Default: `null`
 
 The following outputs are exported:
 
+### <a name="output_azure_files_authentication_validation"></a> [azure\_files\_authentication\_validation](#output\_azure\_files\_authentication\_validation)
+
+Description: Debug output to validate the azure\_files\_authentication condition logic.
+
 ### <a name="output_containers"></a> [containers](#output\_containers)
 
 Description: Map of storage containers that are created.
