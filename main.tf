@@ -65,7 +65,6 @@ resource "azurerm_storage_account" "this" {
         for_each = (
         blob_properties.value.container_delete_retention_policy != null && try(blob_properties.value.container_delete_retention_policy.enabled, true)) ? [blob_properties.value.container_delete_retention_policy] : []
 
-
         content {
           days = container_delete_retention_policy.value.days
         }

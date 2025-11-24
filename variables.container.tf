@@ -49,6 +49,7 @@ variable "blob_properties" {
  ---
  `container_delete_retention_policy` block supports the following:
  - `days` - (Optional) Specifies the number of days that the container should be retained, between `1` and `365` days. Defaults to `7`.
+ - `enabled` - (Optional) Is delete retention policy enabled for containers. Defaults to `true`.
 
  ---
  `cors_rule` block supports the following:
@@ -61,6 +62,7 @@ variable "blob_properties" {
  ---
  `delete_retention_policy` block supports the following:
  - `days` - (Optional) Specifies the number of days that the blob should be retained, between `1` and `365` days. Defaults to `7`.
+ - `enabled` - (Optional) Is delete retention policy enabled for blobs. Defaults to `true`.
 
  ---
  `diagnostic_settings` block supports the following:
