@@ -9,7 +9,7 @@ variable "blob_properties" {
       enabled = optional(bool, true)
       days    = optional(number, 7)
 
-    }), { days = 7 })
+    }), {})
 
     cors_rule = optional(list(object({
       allowed_headers    = list(string)
