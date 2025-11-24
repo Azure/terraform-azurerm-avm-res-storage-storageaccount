@@ -157,13 +157,13 @@ Description: - `directory_type` - (Required) Specifies the directory service use
 - `default_share_level_permission` - (Optional) Specifies the default share level permissions applied to all users. Possible values are StorageFileDataSmbShareReader, StorageFileDataSmbShareContributor, StorageFileDataSmbShareElevatedContributor, or None.
 
 ---
-`active_directory` block supports the following:
+`active_directory`-(Optional) A active\_directory block as defined below. Required when directory\_type is `AD`.:
 - `domain_guid` - (Required) Specifies the domain GUID.
 - `domain_name` - (Required) Specifies the primary domain that the AD DNS server is authoritative for.
-- `domain_sid` - (Optional) Specifies the security identifier (SID).
-- `forest_name` - (Optional) Specifies the Active Directory forest.
-- `netbios_domain_name` - (Optional) Specifies the NetBIOS domain name.
-- `storage_sid` - (Optional) Specifies the security identifier (SID) for Azure Storage.
+- `domain_sid` - (Optional) Specifies the security identifier (SID).This is required when `directory_type` is set to `AD`.
+- `forest_name` - (Optional) Specifies the Active Directory forest. This is required when `directory_type` is set to `AD`.
+- `netbios_domain_name` - (Optional) Specifies the NetBIOS domain name.This is required when `directory_type` is set to `AD`.
+- `storage_sid` - (Optional) Specifies the security identifier (SID) for Azure Storage.This is required when `directory_type` is set to `AD`.
 
 Type:
 

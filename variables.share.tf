@@ -18,14 +18,27 @@ variable "azure_files_authentication" {
  - `default_share_level_permission` - (Optional) Specifies the default share level permissions applied to all users. Possible values are StorageFileDataSmbShareReader, StorageFileDataSmbShareContributor, StorageFileDataSmbShareElevatedContributor, or None.
 
  ---
- `active_directory` block supports the following:
+ `active_directory`-(Optional) A active_directory block as defined below. Required when directory_type is `AD`.:
  - `domain_guid` - (Required) Specifies the domain GUID.
  - `domain_name` - (Required) Specifies the primary domain that the AD DNS server is authoritative for.
- - `domain_sid` - (Optional) Specifies the security identifier (SID).
- - `forest_name` - (Optional) Specifies the Active Directory forest.
- - `netbios_domain_name` - (Optional) Specifies the NetBIOS domain name.
- - `storage_sid` - (Optional) Specifies the security identifier (SID) for Azure Storage.
+ - `domain_sid` - (Optional) Specifies the security identifier (SID).This is required when `directory_type` is set to `AD`.
+ - `forest_name` - (Optional) Specifies the Active Directory forest. This is required when `directory_type` is set to `AD`.
+ - `netbios_domain_name` - (Optional) Specifies the NetBIOS domain name.This is required when `directory_type` is set to `AD`.
+ - `storage_sid` - (Optional) Specifies the security identifier (SID) for Azure Storage.This is required when `directory_type` is set to `AD`.
 EOT
+
+  validation {
+    condition = try(
+      var.azure_files_authentication.directory_type != "AD" || (
+        var.azure_files_authentication.active_directory.domain_sid != null &&
+        var.azure_files_authentication.active_directory.storage_sid != null &&
+        var.azure_files_authentication.active_directory.forest_name != null &&
+        var.azure_files_authentication.active_directory.netbios_domain_name != null
+      ),
+      true
+    )
+    error_message = "When directory_type is 'AD', active_directory block with domain_sid, storage_sid, forest_name, and netbios_domain_name is required."
+  }
 }
 
 variable "large_file_share_enabled" {
