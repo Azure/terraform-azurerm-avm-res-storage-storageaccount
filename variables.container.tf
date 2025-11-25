@@ -6,9 +6,10 @@ variable "blob_properties" {
     last_access_time_enabled      = optional(bool)
     versioning_enabled            = optional(bool, true)
     container_delete_retention_policy = optional(object({
-      days = optional(number, 7)
+      enabled = optional(bool, true)
+      days    = optional(number, 7)
 
-    }), { days = 7 })
+    }), {})
 
     cors_rule = optional(list(object({
       allowed_headers    = list(string)
@@ -18,8 +19,10 @@ variable "blob_properties" {
       max_age_in_seconds = number
     })))
     delete_retention_policy = optional(object({
-      days = optional(number, 7)
-    }), { days = 7 })
+      enabled                  = optional(bool, true)
+      days                     = optional(number, 7)
+      permanent_delete_enabled = optional(bool, false)
+    }), {})
     diagnostic_settings = optional(map(object({
       name                                     = optional(string, null)
       log_categories                           = optional(set(string), [])
@@ -47,6 +50,7 @@ variable "blob_properties" {
  ---
  `container_delete_retention_policy` block supports the following:
  - `days` - (Optional) Specifies the number of days that the container should be retained, between `1` and `365` days. Defaults to `7`.
+ - `enabled` - (Optional) Is delete retention policy enabled for containers. Defaults to `true`.
 
  ---
  `cors_rule` block supports the following:
@@ -59,6 +63,7 @@ variable "blob_properties" {
  ---
  `delete_retention_policy` block supports the following:
  - `days` - (Optional) Specifies the number of days that the blob should be retained, between `1` and `365` days. Defaults to `7`.
+ - `enabled` - (Optional) Is delete retention policy enabled for blobs. Defaults to `true`.
 
  ---
  `diagnostic_settings` block supports the following:
@@ -77,6 +82,14 @@ variable "blob_properties" {
  `restore_policy` block supports the following:
  - `days` - (Required) Specifies the number of days that the blob can be restored, between `1` and `365` days. This must be less than the `days` specified for `delete_retention_policy`.
 EOT
+
+  validation {
+    condition = var.blob_properties == null ? true : (
+      var.blob_properties.restore_policy == null ||
+      try(var.blob_properties.delete_retention_policy.permanent_delete_enabled, false) == false
+    )
+    error_message = "permanent_delete_enabled cannot be set to true if a restore_policy block is defined."
+  }
 }
 
 variable "containers" {

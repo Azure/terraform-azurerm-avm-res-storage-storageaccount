@@ -196,6 +196,7 @@ Description: - `change_feed_enabled` - (Optional) Is the blob service properties
 ---
 `container_delete_retention_policy` block supports the following:
 - `days` - (Optional) Specifies the number of days that the container should be retained, between `1` and `365` days. Defaults to `7`.
+- `enabled` - (Optional) Is delete retention policy enabled for containers. Defaults to `true`.
 
 ---
 `cors_rule` block supports the following:
@@ -208,6 +209,7 @@ Description: - `change_feed_enabled` - (Optional) Is the blob service properties
 ---
 `delete_retention_policy` block supports the following:
 - `days` - (Optional) Specifies the number of days that the blob should be retained, between `1` and `365` days. Defaults to `7`.
+- `enabled` - (Optional) Is delete retention policy enabled for blobs. Defaults to `true`.
 
 ---
 `diagnostic_settings` block supports the following:
@@ -236,9 +238,10 @@ object({
     last_access_time_enabled      = optional(bool)
     versioning_enabled            = optional(bool, true)
     container_delete_retention_policy = optional(object({
-      days = optional(number, 7)
+      enabled = optional(bool, true)
+      days    = optional(number, 7)
 
-    }), { days = 7 })
+    }), {})
 
     cors_rule = optional(list(object({
       allowed_headers    = list(string)
@@ -248,8 +251,10 @@ object({
       max_age_in_seconds = number
     })))
     delete_retention_policy = optional(object({
-      days = optional(number, 7)
-    }), { days = 7 })
+      enabled                  = optional(bool, true)
+      days                     = optional(number, 7)
+      permanent_delete_enabled = optional(bool, false)
+    }), {})
     diagnostic_settings = optional(map(object({
       name                                     = optional(string, null)
       log_categories                           = optional(set(string), [])
