@@ -39,7 +39,7 @@ variable "blob_properties" {
       days = number
     }))
   })
-  default     = {}
+  default     = null
   description = <<-EOT
  - `change_feed_enabled` - (Optional) Is the blob service properties for change feed events enabled? Default to `false`.
  - `change_feed_retention_in_days` - (Optional) The duration of change feed events retention in days. The possible values are between 1 and 146000 days (400 years). Setting this to null (or omit this in the configuration file) indicates an infinite retention of the change feed.
@@ -84,9 +84,9 @@ variable "blob_properties" {
 EOT
 
   validation {
-    condition = (
+    condition = var.blob_properties == null ? true : (
       var.blob_properties.restore_policy == null ||
-      var.blob_properties.delete_retention_policy.permanent_delete_enabled == false
+      try(var.blob_properties.delete_retention_policy.permanent_delete_enabled, false) == false
     )
     error_message = "permanent_delete_enabled cannot be set to true if a restore_policy block is defined."
   }
