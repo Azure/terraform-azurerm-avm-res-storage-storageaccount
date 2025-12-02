@@ -58,6 +58,12 @@ output "name" {
   value       = azurerm_storage_account.this.name
 }
 
+output "primary_access_key" {
+  description = "The primary access key for the Storage Account."
+  ephemeral   = true
+  value       = ephemeral.azapi_resource_action.storage_account_keys.output.keys[0].value
+}
+
 output "private_endpoints" {
   description = "A map of private endpoints. The map key is the supplied input to var.private_endpoints. The map value is the entire azurerm_private_endpoint resource."
   value       = var.private_endpoints_manage_dns_zone_group ? azurerm_private_endpoint.this : azurerm_private_endpoint.this_unmanaged_dns_zone_groups
@@ -83,6 +89,12 @@ output "resource" {
 output "resource_id" {
   description = "The ID of the Storage Account."
   value       = azurerm_storage_account.this.id
+}
+
+output "secondary_access_key" {
+  description = "The secondary access key for the Storage Account."
+  ephemeral   = true
+  value       = ephemeral.azapi_resource_action.storage_account_keys.output.keys[1].value
 }
 
 output "shares" {

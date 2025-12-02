@@ -26,7 +26,7 @@ This Terraform module is designed to create Azure Storage Accounts and its relat
 
 The following requirements are needed by this module:
 
-- <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.7.0)
+- <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.10.0)
 
 - <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) (~> 2.4)
 
@@ -1654,6 +1654,10 @@ The map value contains the following attributes:
 
 Description: The name of the storage account
 
+### <a name="output_primary_access_key"></a> [primary\_access\_key](#output\_primary\_access\_key)
+
+Description: The primary access key for the Storage Account.
+
 ### <a name="output_private_endpoints"></a> [private\_endpoints](#output\_private\_endpoints)
 
 Description: A map of private endpoints. The map key is the supplied input to var.private\_endpoints. The map value is the entire azurerm\_private\_endpoint resource.
@@ -1669,6 +1673,10 @@ Description: This is the full resource output for the Storage Account resource.
 ### <a name="output_resource_id"></a> [resource\_id](#output\_resource\_id)
 
 Description: The ID of the Storage Account.
+
+### <a name="output_secondary_access_key"></a> [secondary\_access\_key](#output\_secondary\_access\_key)
+
+Description: The secondary access key for the Storage Account.
 
 ### <a name="output_shares"></a> [shares](#output\_shares)
 
