@@ -58,6 +58,12 @@ output "name" {
   value       = azurerm_storage_account.this.name
 }
 
+output "primary_access_key" {
+  description = "The primary access key for the Storage Account."
+  sensitive   = true
+  value       = azurerm_storage_account.this.primary_access_key
+}
+
 output "private_endpoints" {
   description = "A map of private endpoints. The map key is the supplied input to var.private_endpoints. The map value is the entire azurerm_private_endpoint resource."
   value       = var.private_endpoints_manage_dns_zone_group ? azurerm_private_endpoint.this : azurerm_private_endpoint.this_unmanaged_dns_zone_groups
@@ -85,6 +91,12 @@ output "resource_id" {
   value       = azurerm_storage_account.this.id
 }
 
+output "secondary_access_key" {
+  description = "The secondary access key for the Storage Account."
+  sensitive   = true
+  value       = azurerm_storage_account.this.secondary_access_key
+}
+
 output "shares" {
   description = "Map of storage storage shares that are created."
   value = {
@@ -104,15 +116,4 @@ output "tables" {
       storage_account_name = azurerm_storage_account.this.name
     }
   }
-}
-output "primary_access_key" {
-  description = "The primary access key for the Storage Account."
-  sensitive   = true
-  value       = azurerm_storage_account.this.primary_access_key
-}
-
-output "secondary_access_key" {
-  description = "The secondary access key for the Storage Account."
-  sensitive   = true
-  value       = azurerm_storage_account.this.secondary_access_key
 }
