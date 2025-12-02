@@ -105,3 +105,14 @@ output "tables" {
     }
   }
 }
+output "primary_access_key" {
+  description = "The primary access key for the Storage Account."
+  sensitive   = true
+  value       = azurerm_storage_account.this.primary_access_key
+}
+
+output "secondary_access_key" {
+  description = "The secondary access key for the Storage Account."
+  sensitive   = true
+  value       = azurerm_storage_account.this.secondary_access_key
+}
