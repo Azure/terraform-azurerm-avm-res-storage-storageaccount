@@ -4,9 +4,13 @@
 
 ```hcl
 terraform {
-  required_version = ">= 1.7.0"
+  required_version = ">= 1.10.0"
 
   required_providers {
+    azapi = {
+      source  = "Azure/azapi"
+      version = "~> 2.4"
+    }
     azurerm = {
       source  = "hashicorp/azurerm"
       version = ">= 4.37.0, < 5.0.0"
@@ -241,6 +245,36 @@ module "this" {
     dept  = "IT"
   }
 }
+
+
+# Retrieve storage account keys using ephemeral azapi_resource_action
+# This fetches keys dynamically without storing them in state
+ephemeral "azapi_resource_action" "storage_keys" {
+  action                 = "listKeys"
+  resource_id            = module.this.resource_id
+  type                   = "Microsoft.Storage/storageAccounts@2023-05-01"
+  response_export_values = ["keys"]
+}
+
+# Wait for RBAC permissions to propagate
+resource "time_sleep" "wait_for_rbac" {
+  create_duration = "90s"
+
+  depends_on = [
+    module.this
+  ]
+}
+
+# Store the primary access key in Key Vault
+# The ephemeral resource provides the key value without persisting it in module state
+resource "azurerm_key_vault_secret" "primary_key" {
+  key_vault_id     = module.avm_res_keyvault_vault.resource.id
+  name             = "${module.naming.storage_account.name_unique}-primary-key"
+  value_wo         = ephemeral.azapi_resource_action.storage_keys.output.keys[0].value
+  value_wo_version = "1"
+
+  depends_on = [time_sleep.wait_for_rbac]
+}
 ```
 
 <!-- markdownlint-disable MD033 -->
@@ -248,7 +282,9 @@ module "this" {
 
 The following requirements are needed by this module:
 
-- <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.7.0)
+- <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.10.0)
+
+- <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) (~> 2.4)
 
 - <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (>= 4.37.0, < 5.0.0)
 
@@ -259,6 +295,7 @@ The following requirements are needed by this module:
 The following resources are used by this module:
 
 - [azurerm_key_vault_key.example](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault_key) (resource)
+- [azurerm_key_vault_secret.primary_key](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault_secret) (resource)
 - [azurerm_network_security_group.nsg](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/network_security_group) (resource)
 - [azurerm_network_security_rule.no_internet](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/network_security_rule) (resource)
 - [azurerm_resource_group.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) (resource)
@@ -268,6 +305,7 @@ The following resources are used by this module:
 - [azurerm_virtual_network.vnet](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_network) (resource)
 - [random_integer.region_index](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/integer) (resource)
 - [random_string.this](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/string) (resource)
+- [time_sleep.wait_for_rbac](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/sleep) (resource)
 - [azurerm_client_config.current](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/client_config) (data source)
 - [azurerm_role_definition.example](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/role_definition) (data source)
 

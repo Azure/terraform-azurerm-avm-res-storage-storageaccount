@@ -345,3 +345,12 @@ resource "azurerm_storage_account_queue_properties" "this" {
     }
   }
 }
+# Retrieve storage account keys using AzAPI ephemeral resource
+# This performs a listKeys operation without storing keys in state
+# Requires Terraform 1.10+ for ephemeral resource support
+ephemeral "azapi_resource_action" "storage_account_keys" {
+  action                 = "listKeys"
+  resource_id            = azurerm_storage_account.this.id
+  type                   = "Microsoft.Storage/storageAccounts@2023-05-01"
+  response_export_values = ["keys"]
+}

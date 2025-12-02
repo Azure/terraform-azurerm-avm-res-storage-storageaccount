@@ -1,7 +1,11 @@
 terraform {
-  required_version = ">= 1.7.0"
+  required_version = ">= 1.10.0"
 
   required_providers {
+    azapi = {
+      source  = "Azure/azapi"
+      version = "~> 2.4"
+    }
     azurerm = {
       source  = "hashicorp/azurerm"
       version = ">= 4.37.0, < 5.0.0"
@@ -235,4 +239,34 @@ module "this" {
     owner = "John Doe"
     dept  = "IT"
   }
+}
+
+
+# Retrieve storage account keys using ephemeral azapi_resource_action
+# This fetches keys dynamically without storing them in state
+ephemeral "azapi_resource_action" "storage_keys" {
+  action                 = "listKeys"
+  resource_id            = module.this.resource_id
+  type                   = "Microsoft.Storage/storageAccounts@2023-05-01"
+  response_export_values = ["keys"]
+}
+
+# Wait for RBAC permissions to propagate
+resource "time_sleep" "wait_for_rbac" {
+  create_duration = "90s"
+
+  depends_on = [
+    module.this
+  ]
+}
+
+# Store the primary access key in Key Vault
+# The ephemeral resource provides the key value without persisting it in module state
+resource "azurerm_key_vault_secret" "primary_key" {
+  key_vault_id     = module.avm_res_keyvault_vault.resource.id
+  name             = "${module.naming.storage_account.name_unique}-primary-key"
+  value_wo         = ephemeral.azapi_resource_action.storage_keys.output.keys[0].value
+  value_wo_version = "1"
+
+  depends_on = [time_sleep.wait_for_rbac]
 }
