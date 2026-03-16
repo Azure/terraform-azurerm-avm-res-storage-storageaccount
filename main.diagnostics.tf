@@ -1,7 +1,21 @@
 
+locals {
+  # Azure Storage Accounts do not support "AllMetrics" as a metric category.
+  # The supported categories are "Capacity" and "Transaction".
+  # This local expands "AllMetrics" into the individual supported categories.
+  _storage_account_diagnostic_settings = {
+    for k, v in(var.diagnostic_settings_storage_account == null ? {} : var.diagnostic_settings_storage_account) : k => merge(v, {
+      metric_categories = toset(flatten([
+        for m in(v.metric_categories != null ? v.metric_categories : []) :
+        m == "AllMetrics" ? ["Capacity", "Transaction"] : [m]
+      ]))
+    })
+  }
+}
+
 # Enable Diagnostic Settings for Storage account
 resource "azurerm_monitor_diagnostic_setting" "storage_account" {
-  for_each = var.diagnostic_settings_storage_account == null ? {} : var.diagnostic_settings_storage_account
+  for_each = local._storage_account_diagnostic_settings
 
   name                           = each.value.name
   target_resource_id             = azurerm_storage_account.this.id
@@ -10,7 +24,7 @@ resource "azurerm_monitor_diagnostic_setting" "storage_account" {
   log_analytics_workspace_id     = each.value.workspace_resource_id
 
   dynamic "enabled_metric" {
-    for_each = each.value.metric_categories != null ? each.value.metric_categories : []
+    for_each = each.value.metric_categories
 
     content {
       category = enabled_metric.value
