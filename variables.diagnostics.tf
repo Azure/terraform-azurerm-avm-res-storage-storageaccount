@@ -149,7 +149,7 @@ variable "diagnostic_settings_storage_account" {
   description = <<DESCRIPTION
 A map of diagnostic settings to create on the Storage Account. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
 
-**Important:** Diagnostic settings on the Storage Account resource itself support only metric_categories (logs are not supported). If you specify this block in a deployment, you must provide at least one metric category. Supported values are `Transaction` and `AllMetrics`.
+**Important:** Diagnostic settings on the Storage Account resource itself support only metric_categories (logs are not supported). If you specify this block in a deployment, you must provide at least one metric category. Supported values are `Capacity`, `Transaction`, and `AllMetrics`.
 
 - `name` - (Optional) The name of the diagnostic setting. One will be generated if not set, however this will not be unique if you want to create multiple diagnostic setting resources.
 - `metric_categories` - (Optional) A set of metric categories to send to the log analytics workspace. Defaults to `["AllMetrics"]`.
@@ -176,8 +176,8 @@ DESCRIPTION
     error_message = "At least one of `workspace_resource_id`, `storage_account_resource_id`, `marketplace_partner_resource_id`, or `event_hub_authorization_rule_resource_id`, must be set."
   }
   validation {
-    condition     = alltrue([for _, v in var.diagnostic_settings_storage_account : alltrue([for m in v.metric_categories : contains(["Transaction", "AllMetrics"], m)])])
-    error_message = "Metric categories must be 'Transaction' or 'AllMetrics'."
+    condition     = alltrue([for _, v in var.diagnostic_settings_storage_account : alltrue([for m in v.metric_categories : contains(["Capacity", "Transaction", "AllMetrics"], m)])])
+    error_message = "Metric categories must be 'Capacity', 'Transaction', or 'AllMetrics'."
   }
 }
 
