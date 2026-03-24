@@ -210,7 +210,7 @@ module "this" {
 
 
   }
-  public_network_access_enabled = true
+  public_network_access_enabled = false
   queues = {
     queue0 = {
       name = "queue-${random_string.this.result}-0"

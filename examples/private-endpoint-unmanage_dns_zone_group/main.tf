@@ -189,7 +189,7 @@ module "this" {
   }
   #Whether to manage private DNS zone groups with this module. If set to false, you must manage private DNS zone groups externally, e.g. using Azure Policy.
   private_endpoints_manage_dns_zone_group = false
-  public_network_access_enabled           = true
+  public_network_access_enabled           = false
   queues = {
     queue0 = {
       name = "queue-${random_string.this.result}-0"
