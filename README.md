@@ -210,6 +210,7 @@ Description: - `change_feed_enabled` - (Optional) Is the blob service properties
 `delete_retention_policy` block supports the following:
 - `days` - (Optional) Specifies the number of days that the blob should be retained, between `1` and `365` days. Defaults to `7`.
 - `enabled` - (Optional) Is delete retention policy enabled for blobs. Defaults to `true`.
+- `permanent_delete_enabled` - (Optional) Specifies whether permanent delete is enabled. Defaults to `false`.
 
 ---
 `diagnostic_settings` block supports the following:
