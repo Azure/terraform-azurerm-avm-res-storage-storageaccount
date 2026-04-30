@@ -12,6 +12,10 @@ resource "azurerm_monitor_diagnostic_setting" "storage_account" {
   partner_solution_id            = each.value.marketplace_partner_resource_id
   storage_account_id             = each.value.storage_account_resource_id
 
+  lifecycle {
+    ignore_changes = [log_analytics_destination_type]
+  }
+
   dynamic "enabled_metric" {
     for_each = each.value.metric_categories != null ? each.value.metric_categories : []
 
@@ -32,6 +36,10 @@ resource "azurerm_monitor_diagnostic_setting" "blob" {
   log_analytics_workspace_id     = each.value.workspace_resource_id
   partner_solution_id            = each.value.marketplace_partner_resource_id
   storage_account_id             = each.value.storage_account_resource_id
+
+  lifecycle {
+    ignore_changes = [log_analytics_destination_type]
+  }
 
   dynamic "enabled_log" {
     for_each = each.value.log_categories != null ? each.value.log_categories : []
@@ -69,6 +77,10 @@ resource "azurerm_monitor_diagnostic_setting" "queue" {
   partner_solution_id            = each.value.marketplace_partner_resource_id
   storage_account_id             = each.value.storage_account_resource_id
 
+  lifecycle {
+    ignore_changes = [log_analytics_destination_type]
+  }
+
   dynamic "enabled_log" {
     for_each = each.value.log_categories != null ? each.value.log_categories : []
 
@@ -104,6 +116,10 @@ resource "azurerm_monitor_diagnostic_setting" "table" {
   partner_solution_id            = each.value.marketplace_partner_resource_id
   storage_account_id             = each.value.storage_account_resource_id
 
+  lifecycle {
+    ignore_changes = [log_analytics_destination_type]
+  }
+
   dynamic "enabled_log" {
     for_each = each.value.log_categories != null ? each.value.log_categories : []
 
@@ -138,6 +154,10 @@ resource "azurerm_monitor_diagnostic_setting" "azure_file" {
   log_analytics_workspace_id     = each.value.workspace_resource_id
   partner_solution_id            = each.value.marketplace_partner_resource_id
   storage_account_id             = each.value.storage_account_resource_id
+
+  lifecycle {
+    ignore_changes = [log_analytics_destination_type]
+  }
 
   dynamic "enabled_log" {
     for_each = each.value.log_categories != null ? each.value.log_categories : []
