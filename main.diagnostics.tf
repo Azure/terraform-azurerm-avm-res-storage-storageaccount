@@ -42,7 +42,7 @@ resource "azurerm_monitor_diagnostic_setting" "blob" {
     }
   }
   dynamic "enabled_metric" {
-    for_each = each.value.metric_categories != null ? each.value.metric_categories : []
+    for_each = local.blob_diagnostic_metric_categories[each.key]
 
     content {
       category = enabled_metric.value
@@ -75,7 +75,7 @@ resource "azurerm_monitor_diagnostic_setting" "queue" {
     }
   }
   dynamic "enabled_metric" {
-    for_each = each.value.metric_categories != null ? each.value.metric_categories : []
+    for_each = local.queue_diagnostic_metric_categories[each.key]
 
     content {
       category = enabled_metric.value
@@ -107,7 +107,7 @@ resource "azurerm_monitor_diagnostic_setting" "table" {
     }
   }
   dynamic "enabled_metric" {
-    for_each = each.value.metric_categories != null ? each.value.metric_categories : []
+    for_each = local.table_diagnostic_metric_categories[each.key]
 
     content {
       category = enabled_metric.value
@@ -139,7 +139,7 @@ resource "azurerm_monitor_diagnostic_setting" "azure_file" {
     }
   }
   dynamic "enabled_metric" {
-    for_each = each.value.metric_categories != null ? each.value.metric_categories : []
+    for_each = local.file_diagnostic_metric_categories[each.key]
 
     content {
       category = enabled_metric.value
