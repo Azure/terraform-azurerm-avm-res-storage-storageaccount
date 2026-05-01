@@ -140,7 +140,7 @@ module "this" {
     virtual_network_subnet_ids = toset([azurerm_subnet.private.id])
   }
   provisioned_billing_model_version = "V2"
-  public_network_access_enabled     = true
+  public_network_access_enabled     = false
   role_assignments = {
     role_assignment_1 = {
       role_definition_id_or_name       = data.azurerm_role_definition.example.name
