@@ -68,5 +68,27 @@ locals {
 
 locals {
   has_management_policy = length(var.storage_management_policy_rule) > 0
+
+  # Azure expands the special "AllMetrics" category to individual metric categories
+  # ("Capacity" and "Transaction") for storage sub-resources. Pre-expanding here
+  # prevents perpetual plan diffs caused by the mismatch between the configured
+  # "AllMetrics" value and what Azure returns when reading the resource state.
+  _diag_sub_resource_metric_inputs = {
+    blob  = { for k, v in var.diagnostic_settings_blob : k => v.metric_categories }
+    file  = { for k, v in var.diagnostic_settings_file : k => v.metric_categories }
+    queue = { for k, v in var.diagnostic_settings_queue : k => v.metric_categories }
+    table = { for k, v in var.diagnostic_settings_table : k => v.metric_categories }
+  }
+  _diag_sub_resource_metric_expanded = {
+    for type_key, settings in local._diag_sub_resource_metric_inputs : type_key => {
+      for k, metric_cats in settings : k => toset(flatten([
+        for cat in coalesce(metric_cats, []) : cat == "AllMetrics" ? ["Capacity", "Transaction"] : [cat]
+      ]))
+    }
+  }
+  blob_diagnostic_metric_categories  = local._diag_sub_resource_metric_expanded["blob"]
+  file_diagnostic_metric_categories  = local._diag_sub_resource_metric_expanded["file"]
+  queue_diagnostic_metric_categories = local._diag_sub_resource_metric_expanded["queue"]
+  table_diagnostic_metric_categories = local._diag_sub_resource_metric_expanded["table"]
 }
 
