@@ -152,7 +152,7 @@ module "this" {
     virtual_network_subnet_ids = toset([azurerm_subnet.private.id])
   }
   # allow_nested_items_to_be_public = false
-  public_network_access_enabled = true
+  public_network_access_enabled = false
   queues = {
     queue0 = {
       name = "queue-${random_string.this.result}-0"
