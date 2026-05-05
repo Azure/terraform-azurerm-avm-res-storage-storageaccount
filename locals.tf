@@ -70,3 +70,9 @@ locals {
   has_management_policy = length(var.storage_management_policy_rule) > 0
 }
 
+locals {
+  # Resource group name extracted from the parent_id input. Used for child resources
+  # (such as private endpoints) that need a discrete resource_group_name.
+  resource_group_name = regex("^/subscriptions/[^/]+/resourceGroups/([^/]+)$", var.parent_id)[0]
+}
+

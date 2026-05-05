@@ -1,356 +1,218 @@
-resource "azurerm_storage_account" "this" {
-  account_replication_type          = var.account_replication_type
-  account_tier                      = var.account_tier
-  location                          = var.location
-  name                              = var.name
-  resource_group_name               = var.resource_group_name
-  access_tier                       = var.account_kind == "BlockBlobStorage" && var.account_tier == "Premium" ? null : var.access_tier
-  account_kind                      = var.account_kind
-  allow_nested_items_to_be_public   = var.allow_nested_items_to_be_public
-  allowed_copy_scope                = var.allowed_copy_scope
-  cross_tenant_replication_enabled  = var.cross_tenant_replication_enabled
-  default_to_oauth_authentication   = var.default_to_oauth_authentication
-  edge_zone                         = var.edge_zone
-  https_traffic_only_enabled        = var.https_traffic_only_enabled
-  infrastructure_encryption_enabled = var.infrastructure_encryption_enabled
-  is_hns_enabled                    = var.is_hns_enabled
-  large_file_share_enabled          = var.large_file_share_enabled
-  local_user_enabled                = var.local_user_enabled
-  min_tls_version                   = var.min_tls_version
-  nfsv3_enabled                     = var.nfsv3_enabled
-  provisioned_billing_model_version = var.provisioned_billing_model_version
-  public_network_access_enabled     = var.public_network_access_enabled
-  queue_encryption_key_type         = var.queue_encryption_key_type
-  sftp_enabled                      = var.sftp_enabled
-  shared_access_key_enabled         = var.shared_access_key_enabled
-  table_encryption_key_type         = var.table_encryption_key_type
-  tags                              = var.tags
+locals {
+  # SKU name combines tier + replication, with optional V2 suffix when the
+  # provisioned billing model V2 is requested (StandardV2_*, PremiumV2_*).
+  sku_name = var.provisioned_billing_model_version == "V2" ? "${var.account_tier}V2_${var.account_replication_type}" : "${var.account_tier}_${var.account_replication_type}"
 
-  dynamic "azure_files_authentication" {
-    for_each = var.azure_files_authentication == null ? [] : [
-      var.azure_files_authentication
+  # Whether a customer-managed key is configured.
+  customer_managed_key_enabled = var.customer_managed_key != null
+
+  # Identity composition. Returns null when no identity is configured so the
+  # body omits the field entirely.
+  managed_identity_type = (
+    var.managed_identities.system_assigned && length(var.managed_identities.user_assigned_resource_ids) > 0 ? "SystemAssigned,UserAssigned" :
+    var.managed_identities.system_assigned ? "SystemAssigned" :
+    length(var.managed_identities.user_assigned_resource_ids) > 0 ? "UserAssigned" :
+    null
+  )
+
+  # Encryption services keyType (Account vs Service) for queue/table.
+  encryption_services_present = (
+    var.queue_encryption_key_type != null ||
+    var.table_encryption_key_type != null ||
+    var.infrastructure_encryption_enabled ||
+    local.customer_managed_key_enabled
+  )
+
+  encryption_services = {
+    queue = var.queue_encryption_key_type == null ? null : {
+      keyType = var.queue_encryption_key_type
+      enabled = true
+    }
+    table = var.table_encryption_key_type == null ? null : {
+      keyType = var.table_encryption_key_type
+      enabled = true
+    }
+  }
+
+  encryption_keyvault = local.customer_managed_key_enabled ? {
+    keyname     = var.customer_managed_key.key_name
+    keyvaulturi = data.azapi_resource.customer_managed_key_vault[0].output.properties.vaultUri
+    keyversion  = var.customer_managed_key.key_version
+  } : null
+
+  encryption_identity = local.customer_managed_key_enabled && try(var.customer_managed_key.user_assigned_identity, null) != null ? {
+    userAssignedIdentity = var.customer_managed_key.user_assigned_identity.resource_id
+  } : null
+
+  encryption = local.encryption_services_present ? {
+    keySource                       = local.customer_managed_key_enabled ? "Microsoft.Keyvault" : "Microsoft.Storage"
+    requireInfrastructureEncryption = var.infrastructure_encryption_enabled ? true : null
+    services                        = { for k, v in local.encryption_services : k => v if v != null }
+    keyvaultproperties              = local.encryption_keyvault
+    identity                        = local.encryption_identity
+  } : null
+
+  # Network ACLs mapping
+  network_acls = var.network_rules == null ? null : {
+    bypass        = var.network_rules.bypass == null ? null : (length(var.network_rules.bypass) == 0 ? "None" : join(", ", tolist(var.network_rules.bypass)))
+    defaultAction = var.network_rules.default_action
+    ipRules       = var.network_rules.ip_rules == null ? null : [for ip in var.network_rules.ip_rules : { value = ip, action = "Allow" }]
+    virtualNetworkRules = var.network_rules.virtual_network_subnet_ids == null ? null : [
+      for id in var.network_rules.virtual_network_subnet_ids : { id = id, action = "Allow" }
     ]
-
-    content {
-      directory_type                 = azure_files_authentication.value.directory_type
-      default_share_level_permission = azure_files_authentication.value.default_share_level_permission
-
-      dynamic "active_directory" {
-        for_each = azure_files_authentication.value.active_directory == null ? [] : [
-          azure_files_authentication.value.active_directory
-        ]
-
-        content {
-          domain_guid         = active_directory.value.domain_guid
-          domain_name         = active_directory.value.domain_name
-          domain_sid          = active_directory.value.domain_sid
-          forest_name         = active_directory.value.forest_name
-          netbios_domain_name = active_directory.value.netbios_domain_name
-          storage_sid         = active_directory.value.storage_sid
-        }
+    resourceAccessRules = var.network_rules.private_link_access == null ? null : [
+      for r in var.network_rules.private_link_access : {
+        resourceId = r.endpoint_resource_id
+        tenantId   = r.endpoint_tenant_id
       }
+    ]
+  }
+
+  # Azure Files identity-based auth mapping
+  azure_files_identity_based_authentication = var.azure_files_authentication == null ? null : {
+    directoryServiceOptions = var.azure_files_authentication.directory_type
+    defaultSharePermission  = var.azure_files_authentication.default_share_level_permission
+    activeDirectoryProperties = var.azure_files_authentication.active_directory == null ? null : {
+      domainGuid        = var.azure_files_authentication.active_directory.domain_guid
+      domainName        = var.azure_files_authentication.active_directory.domain_name
+      domainSid         = var.azure_files_authentication.active_directory.domain_sid
+      forestName        = var.azure_files_authentication.active_directory.forest_name
+      netBiosDomainName = var.azure_files_authentication.active_directory.netbios_domain_name
+      azureStorageSid   = var.azure_files_authentication.active_directory.storage_sid
     }
   }
-  dynamic "blob_properties" {
-    for_each = var.blob_properties == null ? [] : [var.blob_properties]
 
-    content {
-      change_feed_enabled           = blob_properties.value.change_feed_enabled
-      change_feed_retention_in_days = blob_properties.value.change_feed_retention_in_days
-      default_service_version       = blob_properties.value.default_service_version
-      last_access_time_enabled      = blob_properties.value.last_access_time_enabled
-      versioning_enabled            = blob_properties.value.versioning_enabled
+  # Routing preference
+  routing_preference = var.routing == null ? null : {
+    routingChoice             = var.routing.choice
+    publishInternetEndpoints  = var.routing.publish_internet_endpoints
+    publishMicrosoftEndpoints = var.routing.publish_microsoft_endpoints
+  }
 
-      dynamic "container_delete_retention_policy" {
-        for_each = blob_properties.value.container_delete_retention_policy.enabled ? [blob_properties.value.container_delete_retention_policy] : []
+  # SAS policy
+  sas_policy = var.sas_policy == null ? null : {
+    sasExpirationPeriod = var.sas_policy.expiration_period
+    expirationAction    = var.sas_policy.expiration_action
+  }
 
-        content {
-          days = container_delete_retention_policy.value.days
-        }
-      }
-      dynamic "cors_rule" {
-        for_each = blob_properties.value.cors_rule == null ? [] : blob_properties.value.cors_rule
+  # Custom domain
+  custom_domain = var.custom_domain == null ? null : {
+    name             = var.custom_domain.name
+    useSubDomainName = var.custom_domain.use_subdomain
+  }
 
-        content {
-          allowed_headers    = cors_rule.value.allowed_headers
-          allowed_methods    = cors_rule.value.allowed_methods
-          allowed_origins    = cors_rule.value.allowed_origins
-          exposed_headers    = cors_rule.value.exposed_headers
-          max_age_in_seconds = cors_rule.value.max_age_in_seconds
-        }
-      }
-      dynamic "delete_retention_policy" {
-        for_each = blob_properties.value.delete_retention_policy.enabled ? [blob_properties.value.delete_retention_policy] : []
-
-        content {
-          days                     = delete_retention_policy.value.days
-          permanent_delete_enabled = delete_retention_policy.value.permanent_delete_enabled
-        }
-      }
-      dynamic "restore_policy" {
-        for_each = blob_properties.value.restore_policy == null ? [] : [blob_properties.value.restore_policy]
-
-        content {
-          days = restore_policy.value.days
-        }
-      }
+  # Account-level immutability policy (immutableStorageWithVersioning)
+  immutable_storage_with_versioning = var.immutability_policy == null ? null : {
+    enabled = true
+    immutabilityPolicy = {
+      allowProtectedAppendWrites            = var.immutability_policy.allow_protected_append_writes
+      immutabilityPeriodSinceCreationInDays = var.immutability_policy.period_since_creation_in_days
+      state                                 = var.immutability_policy.state
     }
   }
-  dynamic "custom_domain" {
-    for_each = var.custom_domain == null ? [] : [var.custom_domain]
 
-    content {
-      name          = custom_domain.value.name
-      use_subdomain = custom_domain.value.use_subdomain
+  extended_location = var.edge_zone == null ? null : {
+    name = var.edge_zone
+    type = "EdgeZone"
+  }
+
+  large_file_shares_state       = var.large_file_share_enabled == null ? null : (var.large_file_share_enabled ? "Enabled" : "Disabled")
+  public_network_access_setting = var.public_network_access_enabled == null ? null : (var.public_network_access_enabled ? "Enabled" : "Disabled")
+}
+
+# Customer-managed key vault data source. We need the vault URI for the
+# encryption block; the user supplies a vault resource ID.
+data "azapi_resource" "customer_managed_key_vault" {
+  count = local.customer_managed_key_enabled ? 1 : 0
+
+  type                   = "Microsoft.KeyVault/vaults@2023-07-01"
+  resource_id            = var.customer_managed_key.key_vault_resource_id
+  response_export_values = ["properties.vaultUri"]
+}
+
+resource "azapi_resource" "this" {
+  type      = "Microsoft.Storage/storageAccounts@2024-01-01"
+  name      = var.name
+  parent_id = var.parent_id
+  location  = var.location
+  tags      = var.tags
+
+  identity = local.managed_identity_type == null ? null : {
+    type         = local.managed_identity_type
+    identity_ids = var.managed_identities.user_assigned_resource_ids
+  }
+
+  body = {
+    kind             = var.account_kind
+    extendedLocation = local.extended_location
+    sku = {
+      name = local.sku_name
+    }
+    properties = {
+      accessTier                            = var.account_kind == "BlockBlobStorage" && var.account_tier == "Premium" ? null : var.access_tier
+      allowBlobPublicAccess                 = var.allow_nested_items_to_be_public
+      allowCrossTenantReplication           = var.cross_tenant_replication_enabled
+      allowedCopyScope                      = var.allowed_copy_scope
+      allowSharedKeyAccess                  = var.shared_access_key_enabled
+      azureFilesIdentityBasedAuthentication = local.azure_files_identity_based_authentication
+      customDomain                          = local.custom_domain
+      defaultToOAuthAuthentication          = var.default_to_oauth_authentication
+      encryption                            = local.encryption
+      immutableStorageWithVersioning        = local.immutable_storage_with_versioning
+      isHnsEnabled                          = var.is_hns_enabled
+      isLocalUserEnabled                    = var.local_user_enabled
+      isNfsV3Enabled                        = var.nfsv3_enabled
+      isSftpEnabled                         = var.sftp_enabled
+      largeFileSharesState                  = local.large_file_shares_state
+      minimumTlsVersion                     = var.min_tls_version
+      networkAcls                           = local.network_acls
+      publicNetworkAccess                   = local.public_network_access_setting
+      routingPreference                     = local.routing_preference
+      sasPolicy                             = local.sas_policy
+      supportsHttpsTrafficOnly              = var.https_traffic_only_enabled
     }
   }
-  dynamic "identity" {
-    for_each = (var.managed_identities.system_assigned || length(var.managed_identities.user_assigned_resource_ids) > 0) ? { this = var.managed_identities } : {}
 
-    content {
-      type         = identity.value.system_assigned && length(identity.value.user_assigned_resource_ids) > 0 ? "SystemAssigned, UserAssigned" : length(identity.value.user_assigned_resource_ids) > 0 ? "UserAssigned" : "SystemAssigned"
-      identity_ids = identity.value.user_assigned_resource_ids
-    }
-  }
-  dynamic "immutability_policy" {
-    for_each = var.immutability_policy == null ? [] : [var.immutability_policy]
+  create_headers = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
+  delete_headers = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
+  read_headers   = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
+  update_headers = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
 
-    content {
-      allow_protected_append_writes = immutability_policy.value.allow_protected_append_writes
-      period_since_creation_in_days = immutability_policy.value.period_since_creation_in_days
-      state                         = immutability_policy.value.state
-    }
-  }
-  dynamic "network_rules" {
-    for_each = var.network_rules == null ? [] : [var.network_rules]
+  response_export_values = [
+    "identity",
+    "properties.primaryEndpoints",
+    "properties.secondaryEndpoints",
+    "properties.primaryLocation",
+    "properties.secondaryLocation",
+  ]
 
-    content {
-      default_action             = network_rules.value.default_action
-      bypass                     = network_rules.value.bypass
-      ip_rules                   = network_rules.value.ip_rules
-      virtual_network_subnet_ids = network_rules.value.virtual_network_subnet_ids
+  retry = var.retry
 
-      dynamic "private_link_access" {
-        for_each = var.network_rules.private_link_access == null ? [] : var.network_rules.private_link_access
-
-        content {
-          endpoint_resource_id = private_link_access.value.endpoint_resource_id
-          endpoint_tenant_id   = private_link_access.value.endpoint_tenant_id
-        }
-      }
-    }
-  }
-  dynamic "routing" {
-    for_each = var.routing == null ? [] : [var.routing]
-
-    content {
-      choice                      = routing.value.choice
-      publish_internet_endpoints  = routing.value.publish_internet_endpoints
-      publish_microsoft_endpoints = routing.value.publish_microsoft_endpoints
-    }
-  }
-  dynamic "sas_policy" {
-    for_each = var.sas_policy == null ? [] : [var.sas_policy]
-
-    content {
-      expiration_period = sas_policy.value.expiration_period
-      expiration_action = sas_policy.value.expiration_action
-    }
-  }
-  dynamic "share_properties" {
-    for_each = var.share_properties == null ? [] : [var.share_properties]
-
-    content {
-      dynamic "cors_rule" {
-        for_each = share_properties.value.cors_rule == null ? [] : share_properties.value.cors_rule
-
-        content {
-          allowed_headers    = cors_rule.value.allowed_headers
-          allowed_methods    = cors_rule.value.allowed_methods
-          allowed_origins    = cors_rule.value.allowed_origins
-          exposed_headers    = cors_rule.value.exposed_headers
-          max_age_in_seconds = cors_rule.value.max_age_in_seconds
-        }
-      }
-      dynamic "retention_policy" {
-        for_each = share_properties.value.retention_policy == null ? [] : [share_properties.value.retention_policy]
-
-        content {
-          days = retention_policy.value.days
-        }
-      }
-      dynamic "smb" {
-        for_each = share_properties.value.smb == null ? [] : [share_properties.value.smb]
-
-        content {
-          authentication_types            = smb.value.authentication_types
-          channel_encryption_type         = smb.value.channel_encryption_type
-          kerberos_ticket_encryption_type = smb.value.kerberos_ticket_encryption_type
-          multichannel_enabled            = smb.value.multichannel_enabled
-          versions                        = smb.value.versions
-        }
-      }
-    }
-  }
   dynamic "timeouts" {
     for_each = var.timeouts == null ? [] : [var.timeouts]
 
     content {
       create = timeouts.value.create
-      delete = timeouts.value.delete
       read   = timeouts.value.read
       update = timeouts.value.update
-    }
-  }
-
-  lifecycle {
-    ignore_changes = [
-      customer_managed_key, queue_properties, static_website
-    ]
-  }
-}
-
-resource "azurerm_storage_account_local_user" "this" {
-  for_each = var.local_user
-
-  name                 = each.value.name
-  storage_account_id   = azurerm_storage_account.this.id
-  home_directory       = each.value.home_directory
-  ssh_key_enabled      = each.value.ssh_key_enabled
-  ssh_password_enabled = each.value.ssh_password_enabled
-
-  dynamic "permission_scope" {
-    for_each = each.value.permission_scope == null ? [] : each.value.permission_scope
-
-    content {
-      resource_name = permission_scope.value.resource_name
-      service       = permission_scope.value.service
-
-      dynamic "permissions" {
-        for_each = [permission_scope.value.permissions]
-
-        content {
-          create = permissions.value.create
-          delete = permissions.value.delete
-          list   = permissions.value.list
-          read   = permissions.value.read
-          write  = permissions.value.write
-        }
-      }
-    }
-  }
-  dynamic "ssh_authorized_key" {
-    for_each = each.value.ssh_authorized_key == null ? [] : each.value.ssh_authorized_key
-
-    content {
-      key         = ssh_authorized_key.value.key
-      description = ssh_authorized_key.value.description
-    }
-  }
-  dynamic "timeouts" {
-    for_each = each.value.timeouts == null ? [] : [each.value.timeouts]
-
-    content {
-      create = timeouts.value.create
       delete = timeouts.value.delete
-      read   = timeouts.value.read
-      update = timeouts.value.update
     }
   }
 }
 
-
-resource "azurerm_storage_account_customer_managed_key" "this" {
-  count = var.customer_managed_key != null ? 1 : 0
-
-  key_name                  = var.customer_managed_key.key_name
-  storage_account_id        = azurerm_storage_account.this.id
-  key_vault_id              = var.customer_managed_key.key_vault_resource_id
-  key_version               = var.customer_managed_key.key_version
-  user_assigned_identity_id = try(var.customer_managed_key.user_assigned_identity.resource_id, null)
-
-  lifecycle {
-    precondition {
-      condition     = (var.account_kind == "StorageV2" || var.account_tier == "Premium")
-      error_message = "`var.customer_managed_key` can only be set when the `account_kind` is set to `StorageV2` or `account_tier` set to `Premium`, and the identity type is `UserAssigned`."
-    }
-  }
+# State migration: the storage account previously was azurerm_storage_account.this
+# but maps to the same ARM resource ID, so a moved block lets state transition
+# without recreation.
+moved {
+  from = azurerm_storage_account.this
+  to   = azapi_resource.this
 }
 
-resource "azurerm_role_assignment" "storage_account" {
-  for_each = var.role_assignments
-
-  principal_id                           = each.value.principal_id
-  scope                                  = azurerm_storage_account.this.id
-  condition                              = each.value.condition
-  condition_version                      = each.value.condition_version
-  delegated_managed_identity_resource_id = each.value.delegated_managed_identity_resource_id
-  principal_type                         = each.value.principal_type
-  role_definition_id                     = strcontains(lower(each.value.role_definition_id_or_name), lower(local.role_definition_resource_substring)) ? each.value.role_definition_id_or_name : null
-  role_definition_name                   = strcontains(lower(each.value.role_definition_id_or_name), lower(local.role_definition_resource_substring)) ? null : each.value.role_definition_id_or_name
-  skip_service_principal_aad_check       = each.value.skip_service_principal_aad_check
-}
-
-resource "azurerm_storage_account_static_website" "this" {
-  for_each = var.static_website == null ? {} : var.static_website
-
-  storage_account_id = azurerm_storage_account.this.id
-  error_404_document = each.value.error_404_document
-  index_document     = each.value.index_document
-}
-
-resource "azurerm_storage_account_queue_properties" "this" {
-  for_each = var.queue_properties
-
-  storage_account_id = azurerm_storage_account.this.id
-
-  dynamic "cors_rule" {
-    for_each = each.value.cors_rule
-
-    content {
-      allowed_headers    = cors_rule.value.allowed_headers
-      allowed_methods    = cors_rule.value.allowed_methods
-      allowed_origins    = cors_rule.value.allowed_origins
-      exposed_headers    = cors_rule.value.exposed_headers
-      max_age_in_seconds = cors_rule.value.max_age_in_seconds
-    }
-  }
-  dynamic "hour_metrics" {
-    for_each = each.value.hour_metrics == null ? [] : ["1"]
-
-    content {
-      version               = each.value.hour_metrics.version
-      include_apis          = each.value.hour_metrics.include_apis
-      retention_policy_days = each.value.hour_metrics.retention_policy_days
-    }
-  }
-  dynamic "logging" {
-    for_each = each.value.logging == null ? [] : ["1"]
-
-    content {
-      delete                = each.value.logging.delete
-      read                  = each.value.logging.read
-      version               = each.value.logging.version
-      write                 = each.value.logging.write
-      retention_policy_days = each.value.logging.retention_policy_days
-    }
-  }
-  dynamic "minute_metrics" {
-    for_each = each.value.minute_metrics == null ? [] : ["1"]
-
-    content {
-      version               = each.value.minute_metrics.version
-      include_apis          = each.value.minute_metrics.include_apis
-      retention_policy_days = each.value.minute_metrics.retention_policy_days
-    }
-  }
-}
-# Retrieve storage account keys using AzAPI ephemeral resource
-# This performs a listKeys operation without storing keys in state
-# Requires Terraform 1.10+ for ephemeral resource support
+# Retrieve storage account keys using AzAPI ephemeral resource. This performs a
+# listKeys operation without storing keys in state. Requires Terraform 1.10+.
 ephemeral "azapi_resource_action" "storage_account_keys" {
+  type                   = "Microsoft.Storage/storageAccounts@2024-01-01"
+  resource_id            = azapi_resource.this.id
   action                 = "listKeys"
-  resource_id            = azurerm_storage_account.this.id
-  type                   = "Microsoft.Storage/storageAccounts@2023-05-01"
   response_export_values = ["keys"]
 }

@@ -2,7 +2,7 @@ resource "azapi_resource" "share" {
   for_each = var.shares
 
   name      = each.value.name
-  parent_id = "${azurerm_storage_account.this.id}/fileServices/default"
+  parent_id = "${azapi_resource.this.id}/fileServices/default"
   type      = "Microsoft.Storage/storageAccounts/fileServices/shares@2023-01-01"
   body = {
     properties = {

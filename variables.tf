@@ -18,9 +18,15 @@ variable "name" {
 }
 
 # This is required for most resource modules
-variable "resource_group_name" {
+variable "parent_id" {
   type        = string
-  description = "The resource group where the resources will be deployed."
+  description = "The Azure resource ID of the parent resource group, in the form `/subscriptions/{subscription_id}/resourceGroups/{resource_group_name}`."
+  nullable    = false
+
+  validation {
+    condition     = can(regex("^/subscriptions/[^/]+/resourceGroups/[^/]+$", var.parent_id))
+    error_message = "`parent_id` must be a valid resource group resource ID, in the form `/subscriptions/{subscription_id}/resourceGroups/{resource_group_name}`."
+  }
 }
 
 variable "customer_managed_key" {
@@ -120,6 +126,7 @@ variable "private_endpoints" {
     network_interface_name                  = optional(string, null)
     location                                = optional(string, null)
     resource_group_name                     = optional(string, null)
+    parent_id                               = optional(string, null)
     ip_configurations = optional(map(object({
       name               = string
       private_ip_address = string
@@ -141,7 +148,8 @@ A map of private endpoints to create on the resource. The map key is deliberatel
 - `private_service_connection_name` - (Optional) The name of the private service connection. One will be generated if not set.
 - `network_interface_name` - (Optional) The name of the network interface. One will be generated if not set.
 - `location` - (Optional) The Azure location where the resources will be deployed. Defaults to the location of the resource group.
-- `resource_group_name` - (Optional) The resource group where the resources will be deployed. Defaults to the resource group of the resource.
+- `resource_group_name` - (Deprecated) The resource group where the resources will be deployed. Defaults to the resource group of the storage account. Prefer `parent_id`.
+- `parent_id` - (Optional) The full resource ID of the parent resource group for the private endpoint, in the form `/subscriptions/{subscription_id}/resourceGroups/{resource_group_name}`. Defaults to the storage account's `parent_id`.
 - `ip_configurations` - (Optional) A map of IP configurations to create on the private endpoint. If not specified the platform will create one. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
   - `name` - The name of the IP configuration.
   - `private_ip_address` - The private IP address of the IP configuration.
@@ -187,4 +195,40 @@ variable "tags" {
   type        = map(string)
   default     = null
   description = "Custom tags to apply to the resource."
+}
+
+variable "retry" {
+  type = object({
+    error_message_regex  = optional(list(string))
+    interval_seconds     = optional(number)
+    max_interval_seconds = optional(number)
+    multiplier           = optional(number)
+    randomization_factor = optional(number)
+  })
+  default     = null
+  description = <<DESCRIPTION
+Retry configuration applied to every `azapi` resource managed by the module (root storage account and all submodules). Defaults to `null` (no custom retry).
+
+- `error_message_regex`  - (Optional) A list of regex patterns matching error messages that trigger a retry.
+- `interval_seconds`     - (Optional) Initial interval between retries in seconds.
+- `max_interval_seconds` - (Optional) Maximum interval between retries in seconds.
+- `multiplier`           - (Optional) Multiplier applied to the interval after each retry attempt.
+- `randomization_factor` - (Optional) Random jitter (0.0 - 1.0) applied to the interval between retries.
+
+See <https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource#retry> for full semantics.
+DESCRIPTION
+}
+
+variable "timeouts" {
+  type = object({
+    create = optional(string)
+    read   = optional(string)
+    update = optional(string)
+    delete = optional(string)
+  })
+  default     = null
+  description = <<DESCRIPTION
+Per-operation timeouts applied to the root storage account `azapi_resource`. Each value is a Go duration string (e.g. `30m`, `1h`).
+Submodules accept their own per-item `timeouts` overrides; this variable controls the root storage account only.
+DESCRIPTION
 }

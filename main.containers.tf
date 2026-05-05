@@ -3,7 +3,7 @@ resource "azapi_resource" "containers" {
   for_each = var.containers
 
   name      = each.value.name
-  parent_id = "${azurerm_storage_account.this.id}/blobServices/default"
+  parent_id = "${azapi_resource.this.id}/blobServices/default"
   type      = "Microsoft.Storage/storageAccounts/blobServices/containers@2023-01-01"
   body = {
     properties = {

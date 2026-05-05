@@ -2,7 +2,7 @@ resource "azapi_resource" "queue" {
   for_each = var.queues
 
   name      = each.value.name
-  parent_id = "${azurerm_storage_account.this.id}/queueServices/default"
+  parent_id = "${azapi_resource.this.id}/queueServices/default"
   type      = "Microsoft.Storage/storageAccounts/queueServices/queues@2023-01-01"
   body = {
     properties = {

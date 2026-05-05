@@ -2,7 +2,7 @@ resource "azapi_resource" "table" {
   for_each = var.tables
 
   name      = each.value.name
-  parent_id = "${azurerm_storage_account.this.id}/tableServices/default"
+  parent_id = "${azapi_resource.this.id}/tableServices/default"
   type      = "Microsoft.Storage/storageAccounts/tableServices/tables@2023-01-01"
   body = {
     properties = {
