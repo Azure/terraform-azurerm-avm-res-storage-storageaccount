@@ -115,11 +115,6 @@ module "this" {
   account_kind             = "StorageV2"
   account_replication_type = "GRS"
   account_tier             = "Standard"
-  blob_properties = {
-    versioning_enabled       = true
-    last_access_time_enabled = true
-
-  }
   containers = {
     blob_container0 = {
       name = "blob-container-${random_string.this.result}-0"
