@@ -228,7 +228,8 @@ variable "timeouts" {
   })
   default     = null
   description = <<DESCRIPTION
-Per-operation timeouts applied to the root storage account `azapi_resource`. Each value is a Go duration string (e.g. `30m`, `1h`).
-Submodules accept their own per-item `timeouts` overrides; this variable controls the root storage account only.
+Default per-operation timeouts applied to every `azapi` resource managed by the module. Each value is a Go duration string (e.g. `30m`, `1h`).
+
+The root storage account uses these values directly. Submodules (containers, queues, shares, tables, diagnostic settings, private endpoints, management policy, local users, role assignments, Data Lake Gen2 filesystems) use these as a default that can be overridden per-item via the item's own `timeouts` field.
 DESCRIPTION
 }

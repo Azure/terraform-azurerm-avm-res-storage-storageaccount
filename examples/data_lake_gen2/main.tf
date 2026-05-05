@@ -1,5 +1,5 @@
 terraform {
-  required_version = ">= 1.7.0"
+  required_version = ">= 1.10.0"
 
   required_providers {
     azurerm = {
@@ -9,6 +9,10 @@ terraform {
     random = {
       source  = "hashicorp/random"
       version = ">= 3.5.0, < 4.0.0"
+    }
+    time = {
+      source  = "hashicorp/time"
+      version = ">= 0.9.0, < 1.0.0"
     }
   }
 }
@@ -111,7 +115,7 @@ module "this" {
 
   location                 = azurerm_resource_group.this.location
   name                     = module.naming.storage_account.name_unique
-  resource_group_name      = azurerm_resource_group.this.name
+  parent_id                = azurerm_resource_group.this.id
   account_kind             = "StorageV2"
   account_replication_type = "ZRS"
   account_tier             = "Standard"
@@ -160,44 +164,78 @@ module "this" {
 
     }
   }
-  storage_data_lake_gen2_paths = {
-    path_1 = {
-      path            = "example-directory"
-      filesystem_name = "datalake1"
-      resource        = "directory"
-      owner           = data.azurerm_client_config.current.object_id
-      group           = "$superuser"
-      ace = [
-        {
-          type        = "user"
-          id          = data.azurerm_client_config.current.object_id
-          permissions = "rwx"
-        },
-        {
-          type        = "group"
-          permissions = "r-x"
-        },
-        {
-          type        = "other"
-          permissions = "---"
-        }
-      ]
-    }
-    path_2 = {
-      path            = "data"
-      filesystem_name = "datalake2"
-      resource        = "directory"
-      owner           = "$superuser"
-    }
-    path_3 = {
-      path            = "logs"
-      filesystem_name = "datalake2"
-      resource        = "directory"
-    }
-  }
   tags = {
     env   = "Dev"
     owner = "John Doe"
     dept  = "IT"
   }
+}
+
+# v1.0.0 BREAKING CHANGE: This module no longer manages the Data Lake Gen2
+# data-plane (POSIX ACLs, owner/group, paths). To continue managing these
+# features, declare the azurerm-provider resources directly alongside this
+# module. The example below mirrors the pre-1.0.0 input shape using
+# `azurerm_storage_data_lake_gen2_path` resources, plus shows how to set the
+# owner/group/ace on a filesystem via the new
+# `azurerm_storage_data_lake_gen2_filesystem` data source.
+#
+# Note: requires the azurerm provider in the consuming root module. AzAPI
+# does not currently expose the DFS data-plane API needed for these
+# operations, so they remain on the azurerm provider.
+
+# Wait for the storage account RBAC role assignments to take effect before
+# making data-plane calls. Otherwise the Storage Blob Data Owner permission
+# may not be propagated yet and `azurerm_storage_data_lake_gen2_path` will
+# fail with an authorization error.
+resource "time_sleep" "wait_for_rbac" {
+  create_duration = "30s"
+
+  depends_on = [module.this]
+}
+
+# Companion: ACL/owner/group on a filesystem root. We use the azurerm
+# resource directly (NOT the dropped `ace`/`owner`/`group` fields on the
+# module input) so the data-plane call is performed against the storage
+# account managed by this module.
+resource "azurerm_storage_data_lake_gen2_path" "directory_with_acl" {
+  filesystem_name    = "datalake1"
+  path               = "example-directory"
+  resource           = "directory"
+  storage_account_id = module.this.resource_id
+  owner              = data.azurerm_client_config.current.object_id
+  group              = "$superuser"
+  ace {
+    type        = "user"
+    id          = data.azurerm_client_config.current.object_id
+    permissions = "rwx"
+  }
+  ace {
+    type        = "group"
+    permissions = "r-x"
+  }
+  ace {
+    type        = "other"
+    permissions = "---"
+  }
+
+  depends_on = [time_sleep.wait_for_rbac]
+}
+
+resource "azurerm_storage_data_lake_gen2_path" "data_directory" {
+  filesystem_name    = "datalake2"
+  path               = "data"
+  resource           = "directory"
+  storage_account_id = module.this.resource_id
+  owner              = "$superuser"
+
+  depends_on = [time_sleep.wait_for_rbac]
+}
+
+resource "azurerm_storage_data_lake_gen2_path" "logs_directory" {
+  filesystem_name    = "datalake2"
+  path               = "logs"
+  resource           = "directory"
+  storage_account_id = module.this.resource_id
+
+  depends_on = [time_sleep.wait_for_rbac]
 }

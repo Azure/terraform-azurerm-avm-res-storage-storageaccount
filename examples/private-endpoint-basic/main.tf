@@ -1,6 +1,6 @@
 
 terraform {
-  required_version = ">= 1.11"
+  required_version = ">= 1.10.0"
 
   required_providers {
     azurerm = {
@@ -74,9 +74,9 @@ module "storage_account" {
   #version = "0.6.3"
   source = "../.."
 
-  location            = var.location
-  name                = local.storage_account_name
-  resource_group_name = module.resource_group.name
+  location  = var.location
+  name      = local.storage_account_name
+  parent_id = module.resource_group.resource_id
   containers = {
     demo = {
       name = "demo"
