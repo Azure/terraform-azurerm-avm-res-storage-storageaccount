@@ -9,9 +9,22 @@ module "shares" {
   enabled_protocol    = each.value.enabled_protocol
   metadata            = each.value.metadata
   retry               = var.retry
-  role_assignments    = each.value.role_assignments
   root_squash         = each.value.root_squash
   signed_identifiers  = each.value.signed_identifiers
+  timeouts            = each.value.timeouts != null ? each.value.timeouts : var.timeouts
+  tracing_tags_header = var.enable_telemetry ? local.avm_azapi_header : null
+}
+
+# Per-share role assignments. Created at the root because the share submodule
+# does not (and per AVM lint cannot) embed the `role_assignments` submodule via
+# a relative `../role_assignments` source.
+module "share_role_assignments" {
+  source   = "./modules/role_assignments"
+  for_each = var.shares
+
+  scope               = module.shares[each.key].resource_id
+  retry               = var.retry
+  role_assignments    = each.value.role_assignments
   timeouts            = each.value.timeouts != null ? each.value.timeouts : var.timeouts
   tracing_tags_header = var.enable_telemetry ? local.avm_azapi_header : null
 }

@@ -84,19 +84,11 @@ object({
 
 Default: `null`
 
-### <a name="input_tracing_tags_header"></a> [tracing\_tags\_header](#input\_tracing\_tags\_header)
-
-Description: Optional User-Agent string injected into AzAPI request headers.
-
-Type: `string`
-
-Default: `null`
-
 ## Outputs
 
 The following outputs are exported:
 
-### <a name="output_id"></a> [id](#output\_id)
+### <a name="output_resource_id"></a> [resource\_id](#output\_resource\_id)
 
 Description: The resource ID of the patched blobServices/default.
 

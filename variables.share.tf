@@ -1,3 +1,8 @@
+# NOTE: var.share_properties (file service-level CORS, retention policy, SMB
+# settings, diagnostics) was removed in v1.0.0 (azapi rewrite). Configure those
+# settings directly via Microsoft.Storage/storageAccounts/fileServices if
+# needed; this module no longer exposes them.
+
 variable "azure_files_authentication" {
   type = object({
     directory_type                 = optional(string, "AADKERB")
@@ -45,76 +50,6 @@ variable "large_file_share_enabled" {
   type        = bool
   default     = null
   description = "(Optional) Is Large File Share Enabled?"
-}
-
-variable "share_properties" {
-  type = object({
-    cors_rule = optional(list(object({
-      allowed_headers    = list(string)
-      allowed_methods    = list(string)
-      allowed_origins    = list(string)
-      exposed_headers    = list(string)
-      max_age_in_seconds = number
-    })))
-    diagnostic_settings = optional(map(object({
-      name                                     = optional(string, null)
-      log_categories                           = optional(set(string), [])
-      log_groups                               = optional(set(string), ["allLogs"])
-      metric_categories                        = optional(set(string), ["AllMetrics"])
-      log_analytics_destination_type           = optional(string, "Dedicated")
-      workspace_resource_id                    = optional(string, null)
-      resource_id                              = optional(string, null)
-      event_hub_authorization_rule_resource_id = optional(string, null)
-      event_hub_name                           = optional(string, null)
-      marketplace_partner_resource_id          = optional(string, null)
-    })), {})
-    retention_policy = optional(object({
-      days = optional(number)
-    }))
-    smb = optional(object({
-      authentication_types            = optional(set(string))
-      channel_encryption_type         = optional(set(string))
-      kerberos_ticket_encryption_type = optional(set(string))
-      multichannel_enabled            = optional(bool)
-      versions                        = optional(set(string))
-    }))
-  })
-  default     = null
-  description = <<-EOT
-
- ---
- `cors_rule` block supports the following:
- - `allowed_headers` - (Required) A list of headers that are allowed to be a part of the cross-origin request.
- - `allowed_methods` - (Required) A list of HTTP methods that are allowed to be executed by the origin. Valid options are `DELETE`, `GET`, `HEAD`, `MERGE`, `POST`, `OPTIONS`, `PUT` or `PATCH`.
- - `allowed_origins` - (Required) A list of origin domains that will be allowed by CORS.
- - `exposed_headers` - (Required) A list of response headers that are exposed to CORS clients.
- - `max_age_in_seconds` - (Required) The number of seconds the client should cache a preflight response.
-
- ---
- `diagnostic_settings` block supports the following:
- - `name` - (Optional) The name of the diagnostic setting. Defaults to `null`.
- - `log_categories` - (Optional) A set of log categories to enable. Defaults to an empty set.
- - `log_groups` - (Optional) A set of log groups to enable. Defaults to `["allLogs"]`.
- - `metric_categories` - (Optional) A set of metric categories to enable. Defaults to `["AllMetrics"]`.
- - `log_analytics_destination_type` - (Optional) The destination type for log analytics. Defaults to `"Dedicated"`.
- - `workspace_resource_id` - (Optional) The resource ID of the Log Analytics workspace. Defaults to `null`.
- - `resource_id` - (Optional) The resource ID of the target resource for diagnostics. Defaults to `null`.
- - `event_hub_authorization_rule_resource_id` - (Optional) The resource ID of the Event Hub authorization rule. Defaults to `null`.
- - `event_hub_name` - (Optional) The name of the Event Hub. Defaults to `null`.
- - `marketplace_partner_resource_id` - (Optional) The resource ID of the marketplace partner. Defaults to `null`.
-
- ---
- `retention_policy` block supports the following:
- - `days` - (Optional) Specifies the number of days that the `azurerm_shares` should be retained, between `1` and `365` days. Defaults to `7`.
-
- ---
- `smb` block supports the following:
- - `authentication_types` - (Optional) A set of SMB authentication methods. Possible values are `NTLMv2`, and `Kerberos`.
- - `channel_encryption_type` - (Optional) A set of SMB channel encryption. Possible values are `AES-128-CCM`, `AES-128-GCM`, and `AES-256-GCM`.
- - `kerberos_ticket_encryption_type` - (Optional) A set of Kerberos ticket encryption. Possible values are `RC4-HMAC`, and `AES-256`.
- - `multichannel_enabled` - (Optional) Indicates whether multichannel is enabled. Defaults to `false`. This is only supported on Premium storage accounts.
- - `versions` - (Optional) A set of SMB protocol versions. Possible values are `SMB2.1`, `SMB3.0`, and `SMB3.1.1`.
-EOT
 }
 
 variable "shares" {

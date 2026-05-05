@@ -35,13 +35,3 @@ resource "azapi_resource" "this" {
     }
   }
 }
-
-module "role_assignments" {
-  source = "../role_assignments"
-
-  scope               = azapi_resource.this.id
-  retry               = var.retry
-  role_assignments    = var.role_assignments
-  timeouts            = var.timeouts
-  tracing_tags_header = var.tracing_tags_header
-}

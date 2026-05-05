@@ -34,8 +34,6 @@ The following requirements are needed by this module:
 
 - <a name="requirement_random"></a> [random](#requirement\_random) (>= 3.5.0, < 4.0.0)
 
-- <a name="requirement_time"></a> [time](#requirement\_time) (>= 0.9.0, < 1.0.0)
-
 ## Resources
 
 The following resources are used by this module:
@@ -152,96 +150,6 @@ object({
       forest_name         = optional(string)
       netbios_domain_name = optional(string)
       storage_sid         = optional(string)
-    }))
-  })
-```
-
-Default: `null`
-
-### <a name="input_blob_properties"></a> [blob\_properties](#input\_blob\_properties)
-
-Description: - `change_feed_enabled` - (Optional) Is the blob service properties for change feed events enabled? Default to `false`.
-- `change_feed_retention_in_days` - (Optional) The duration of change feed events retention in days. The possible values are between 1 and 146000 days (400 years). Setting this to null (or omit this in the configuration file) indicates an infinite retention of the change feed.
-- `default_service_version` - (Optional) The API Version which should be used by default for requests to the Data Plane API if an incoming request doesn't specify an API Version.
-- `last_access_time_enabled` - (Optional) Is the last access time based tracking enabled? Default to `false`.
-- `versioning_enabled` - (Optional) Is versioning enabled? Default to `true`.
-
----
-`container_delete_retention_policy` block supports the following:
-- `days` - (Optional) Specifies the number of days that the container should be retained, between `1` and `365` days. Defaults to `7`.
-- `enabled` - (Optional) Is delete retention policy enabled for containers. Defaults to `true`.
-
----
-`cors_rule` block supports the following:
-- `allowed_headers` - (Required) A list of headers that are allowed to be a part of the cross-origin request.
-- `allowed_methods` - (Required) A list of HTTP methods that are allowed to be executed by the origin. Valid options are `DELETE`, `GET`, `HEAD`, `MERGE`, `POST`, `OPTIONS`, `PUT` or `PATCH`.
-- `allowed_origins` - (Required) A list of origin domains that will be allowed by CORS.
-- `exposed_headers` - (Required) A list of response headers that are exposed to CORS clients.
-- `max_age_in_seconds` - (Required) The number of seconds the client should cache a preflight response.
-
----
-`delete_retention_policy` block supports the following:
-- `days` - (Optional) Specifies the number of days that the blob should be retained, between `1` and `365` days. Defaults to `7`.
-- `enabled` - (Optional) Is delete retention policy enabled for blobs. Defaults to `true`.
-
----
-`diagnostic_settings` block supports the following:
-- `name` - (Optional) The name of the diagnostic setting. Defaults to `null`.
-- `log_categories` - (Optional) A set of log categories to enable. Defaults to an empty set.
-- `log_groups` - (Optional) A set of log groups to enable. Defaults to `["allLogs"]`.
-- `metric_categories` - (Optional) A set of metric categories to enable. Defaults to `["AllMetrics"]`.
-- `log_analytics_destination_type` - (Optional) The destination type for log analytics. Defaults to `"Dedicated"`.
-- `workspace_resource_id` - (Optional) The resource ID of the Log Analytics workspace. Defaults to `null`.
-- `resource_id` - (Optional) The resource ID of the target resource for diagnostics. Defaults to `null`.
-- `event_hub_authorization_rule_resource_id` - (Optional) The resource ID of the Event Hub authorization rule. Defaults to `null`.
-- `event_hub_name` - (Optional) The name of the Event Hub. Defaults to `null`.
-- `marketplace_partner_resource_id` - (Optional) The resource ID of the marketplace partner. Defaults to `null`.
-
----
-`restore_policy` block supports the following:
-- `days` - (Required) Specifies the number of days that the blob can be restored, between `1` and `365` days. This must be less than the `days` specified for `delete_retention_policy`.
-
-Type:
-
-```hcl
-object({
-    change_feed_enabled           = optional(bool)
-    change_feed_retention_in_days = optional(number)
-    default_service_version       = optional(string)
-    last_access_time_enabled      = optional(bool)
-    versioning_enabled            = optional(bool, true)
-    container_delete_retention_policy = optional(object({
-      enabled = optional(bool, true)
-      days    = optional(number, 7)
-
-    }), {})
-
-    cors_rule = optional(list(object({
-      allowed_headers    = list(string)
-      allowed_methods    = list(string)
-      allowed_origins    = list(string)
-      exposed_headers    = list(string)
-      max_age_in_seconds = number
-    })))
-    delete_retention_policy = optional(object({
-      enabled                  = optional(bool, true)
-      days                     = optional(number, 7)
-      permanent_delete_enabled = optional(bool, false)
-    }), {})
-    diagnostic_settings = optional(map(object({
-      name                                     = optional(string, null)
-      log_categories                           = optional(set(string), [])
-      log_groups                               = optional(set(string), ["allLogs"])
-      metric_categories                        = optional(set(string), ["AllMetrics"])
-      log_analytics_destination_type           = optional(string, "Dedicated")
-      workspace_resource_id                    = optional(string, null)
-      resource_id                              = optional(string, null)
-      event_hub_authorization_rule_resource_id = optional(string, null)
-      event_hub_name                           = optional(string, null)
-      marketplace_partner_resource_id          = optional(string, null)
-    })), {})
-    restore_policy = optional(object({
-      days = number
     }))
   })
 ```
@@ -788,8 +696,7 @@ Description: A map of private endpoints to create on the resource. The map key i
 - `private_service_connection_name` - (Optional) The name of the private service connection. One will be generated if not set.
 - `network_interface_name` - (Optional) The name of the network interface. One will be generated if not set.
 - `location` - (Optional) The Azure location where the resources will be deployed. Defaults to the location of the resource group.
-- `resource_group_name` - (Deprecated) The resource group where the resources will be deployed. Defaults to the resource group of the storage account. Prefer `parent_id`.
-- `parent_id` - (Optional) The full resource ID of the parent resource group for the private endpoint, in the form `/subscriptions/{subscription_id}/resourceGroups/{resource_group_name}`. Defaults to the storage account's `parent_id`.
+- `resource_group_name` - (Optional) The resource group where the resources will be deployed. Defaults to the resource group of the storage account.
 - `ip_configurations` - (Optional) A map of IP configurations to create on the private endpoint. If not specified the platform will create one. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
   - `name` - The name of the IP configuration.
   - `private_ip_address` - The private IP address of the IP configuration.
@@ -823,7 +730,6 @@ map(object({
     network_interface_name                  = optional(string, null)
     location                                = optional(string, null)
     resource_group_name                     = optional(string, null)
-    parent_id                               = optional(string, null)
     ip_configurations = optional(map(object({
       name               = string
       private_ip_address = string
@@ -864,97 +770,6 @@ Description: (Optional) The encryption type of the queue service. Possible value
 Type: `string`
 
 Default: `null`
-
-### <a name="input_queue_properties"></a> [queue\_properties](#input\_queue\_properties)
-
-Description:
----
-`cors_rule` block supports the following:
-- `allowed_headers` - (Required) A list of headers that are allowed to be a part of the cross-origin request.
-- `allowed_methods` - (Required) A list of HTTP methods that are allowed to be executed by the origin. Valid options are `DELETE`, `GET`, `HEAD`, `MERGE`, `POST`, `OPTIONS`, `PUT` or `PATCH`.
-- `allowed_origins` - (Required) A list of origin domains that will be allowed by CORS.
-- `exposed_headers` - (Required) A list of response headers that are exposed to CORS clients.
-- `max_age_in_seconds` - (Required) The number of seconds the client should cache a preflight response.
-
----
-`diagnostic_settings` block supports the following:
-- `name` - (Optional) The name of the diagnostic setting. Defaults to `null`.
-- `log_categories` - (Optional) A set of log categories to enable. Defaults to an empty set.
-- `log_groups` - (Optional) A set of log groups to enable. Defaults to `["allLogs"]`.
-- `metric_categories` - (Optional) A set of metric categories to enable. Defaults to `["AllMetrics"]`.
-- `log_analytics_destination_type` - (Optional) The destination type for log analytics. Defaults to `"Dedicated"`.
-- `workspace_resource_id` - (Optional) The resource ID of the Log Analytics workspace. Defaults to `null`.
-- `resource_id` - (Optional) The resource ID of the target resource for diagnostics. Defaults to `null`.
-- `event_hub_authorization_rule_resource_id` - (Optional) The resource ID of the Event Hub authorization rule. Defaults to `null`.
-- `event_hub_name` - (Optional) The name of the Event Hub. Defaults to `null`.
-- `marketplace_partner_resource_id` - (Optional) The resource ID of the marketplace partner. Defaults to `null`.
-
----
-`hour_metrics` block supports the following:
-- `enabled` - (Required) Indicates whether hour metrics are enabled for the Queue service.
-- `include_apis` - (Optional) Indicates whether metrics should generate summary statistics for called API operations.
-- `retention_policy_days` - (Optional) Specifies the number of days that logs will be retained.
-- `version` - (Required) The version of storage analytics to configure.
-
----
-`logging` block supports the following:
-- `delete` - (Required) Indicates whether all delete requests should be logged.
-- `read` - (Required) Indicates whether all read requests should be logged.
-- `retention_policy_days` - (Optional) Specifies the number of days that logs will be retained.
-- `version` - (Required) The version of storage analytics to configure.
-- `write` - (Required) Indicates whether all write requests should be logged.
-
----
-`minute_metrics` block supports the following:
-- `enabled` - (Required) Indicates whether minute metrics are enabled for the Queue service.
-- `include_apis` - (Optional) Indicates whether metrics should generate summary statistics for called API operations.
-- `retention_policy_days` - (Optional) Specifies the number of days that logs will be retained.
-- `version` - (Required) The version of storage analytics to configure.
-
-Type:
-
-```hcl
-map(object({
-    cors_rule = optional(map(object({
-      allowed_headers    = list(string)
-      allowed_methods    = list(string)
-      allowed_origins    = list(string)
-      exposed_headers    = list(string)
-      max_age_in_seconds = number
-    })), {})
-    # diagnostic_settings = optional(map(object({
-    #   name                                     = optional(string, null)
-    #   log_categories                           = optional(set(string), [])
-    #   log_groups                               = optional(set(string), ["allLogs"])
-    #   metric_categories                        = optional(set(string), ["AllMetrics"])
-    #   log_analytics_destination_type           = optional(string, "Dedicated")
-    #   workspace_resource_id                    = optional(string, null)
-    #   resource_id                              = optional(string, null)
-    #   event_hub_authorization_rule_resource_id = optional(string, null)
-    #   event_hub_name                           = optional(string, null)
-    #   marketplace_partner_resource_id          = optional(string, null)
-    # })), {})
-    hour_metrics = optional(object({
-      include_apis          = optional(bool)
-      retention_policy_days = optional(number)
-      version               = string
-    }))
-    logging = optional(object({
-      delete                = bool
-      read                  = bool
-      retention_policy_days = optional(number)
-      version               = string
-      write                 = bool
-    }))
-    minute_metrics = optional(object({
-      include_apis          = optional(bool)
-      retention_policy_days = optional(number)
-      version               = string
-    }))
-  }))
-```
-
-Default: `{}`
 
 ### <a name="input_queues"></a> [queues](#input\_queues)
 
@@ -1090,80 +905,6 @@ Description: (Optional) Boolean, enable SFTP for the storage account.  Defaults 
 Type: `bool`
 
 Default: `false`
-
-### <a name="input_share_properties"></a> [share\_properties](#input\_share\_properties)
-
-Description:
----
-`cors_rule` block supports the following:
-- `allowed_headers` - (Required) A list of headers that are allowed to be a part of the cross-origin request.
-- `allowed_methods` - (Required) A list of HTTP methods that are allowed to be executed by the origin. Valid options are `DELETE`, `GET`, `HEAD`, `MERGE`, `POST`, `OPTIONS`, `PUT` or `PATCH`.
-- `allowed_origins` - (Required) A list of origin domains that will be allowed by CORS.
-- `exposed_headers` - (Required) A list of response headers that are exposed to CORS clients.
-- `max_age_in_seconds` - (Required) The number of seconds the client should cache a preflight response.
-
----
-`diagnostic_settings` block supports the following:
-- `name` - (Optional) The name of the diagnostic setting. Defaults to `null`.
-- `log_categories` - (Optional) A set of log categories to enable. Defaults to an empty set.
-- `log_groups` - (Optional) A set of log groups to enable. Defaults to `["allLogs"]`.
-- `metric_categories` - (Optional) A set of metric categories to enable. Defaults to `["AllMetrics"]`.
-- `log_analytics_destination_type` - (Optional) The destination type for log analytics. Defaults to `"Dedicated"`.
-- `workspace_resource_id` - (Optional) The resource ID of the Log Analytics workspace. Defaults to `null`.
-- `resource_id` - (Optional) The resource ID of the target resource for diagnostics. Defaults to `null`.
-- `event_hub_authorization_rule_resource_id` - (Optional) The resource ID of the Event Hub authorization rule. Defaults to `null`.
-- `event_hub_name` - (Optional) The name of the Event Hub. Defaults to `null`.
-- `marketplace_partner_resource_id` - (Optional) The resource ID of the marketplace partner. Defaults to `null`.
-
----
-`retention_policy` block supports the following:
-- `days` - (Optional) Specifies the number of days that the `azurerm_shares` should be retained, between `1` and `365` days. Defaults to `7`.
-
----
-`smb` block supports the following:
-- `authentication_types` - (Optional) A set of SMB authentication methods. Possible values are `NTLMv2`, and `Kerberos`.
-- `channel_encryption_type` - (Optional) A set of SMB channel encryption. Possible values are `AES-128-CCM`, `AES-128-GCM`, and `AES-256-GCM`.
-- `kerberos_ticket_encryption_type` - (Optional) A set of Kerberos ticket encryption. Possible values are `RC4-HMAC`, and `AES-256`.
-- `multichannel_enabled` - (Optional) Indicates whether multichannel is enabled. Defaults to `false`. This is only supported on Premium storage accounts.
-- `versions` - (Optional) A set of SMB protocol versions. Possible values are `SMB2.1`, `SMB3.0`, and `SMB3.1.1`.
-
-Type:
-
-```hcl
-object({
-    cors_rule = optional(list(object({
-      allowed_headers    = list(string)
-      allowed_methods    = list(string)
-      allowed_origins    = list(string)
-      exposed_headers    = list(string)
-      max_age_in_seconds = number
-    })))
-    diagnostic_settings = optional(map(object({
-      name                                     = optional(string, null)
-      log_categories                           = optional(set(string), [])
-      log_groups                               = optional(set(string), ["allLogs"])
-      metric_categories                        = optional(set(string), ["AllMetrics"])
-      log_analytics_destination_type           = optional(string, "Dedicated")
-      workspace_resource_id                    = optional(string, null)
-      resource_id                              = optional(string, null)
-      event_hub_authorization_rule_resource_id = optional(string, null)
-      event_hub_name                           = optional(string, null)
-      marketplace_partner_resource_id          = optional(string, null)
-    })), {})
-    retention_policy = optional(object({
-      days = optional(number)
-    }))
-    smb = optional(object({
-      authentication_types            = optional(set(string))
-      channel_encryption_type         = optional(set(string))
-      kerberos_ticket_encryption_type = optional(set(string))
-      multichannel_enabled            = optional(bool)
-      versions                        = optional(set(string))
-    }))
-  })
-```
-
-Default: `null`
 
 ### <a name="input_shared_access_key_enabled"></a> [shared\_access\_key\_enabled](#input\_shared\_access\_key\_enabled)
 
@@ -1573,6 +1314,12 @@ Description: Map of storage tables that are created.
 
 The following Modules are called:
 
+### <a name="module_container_role_assignments"></a> [container\_role\_assignments](#module\_container\_role\_assignments)
+
+Source: ./modules/role_assignments
+
+Version:
+
 ### <a name="module_containers"></a> [containers](#module\_containers)
 
 Source: ./modules/container
@@ -1627,9 +1374,21 @@ Source: ./modules/management_policy
 
 Version:
 
+### <a name="module_private_endpoint_role_assignments"></a> [private\_endpoint\_role\_assignments](#module\_private\_endpoint\_role\_assignments)
+
+Source: ./modules/role_assignments
+
+Version:
+
 ### <a name="module_private_endpoints"></a> [private\_endpoints](#module\_private\_endpoints)
 
 Source: ./modules/private_endpoint
+
+Version:
+
+### <a name="module_queue_role_assignments"></a> [queue\_role\_assignments](#module\_queue\_role\_assignments)
+
+Source: ./modules/role_assignments
 
 Version:
 
@@ -1645,6 +1404,12 @@ Source: ./modules/role_assignments
 
 Version:
 
+### <a name="module_share_role_assignments"></a> [share\_role\_assignments](#module\_share\_role\_assignments)
+
+Source: ./modules/role_assignments
+
+Version:
+
 ### <a name="module_shares"></a> [shares](#module\_shares)
 
 Source: ./modules/share
@@ -1654,6 +1419,12 @@ Version:
 ### <a name="module_static_website"></a> [static\_website](#module\_static\_website)
 
 Source: ./modules/static_website
+
+Version:
+
+### <a name="module_table_role_assignments"></a> [table\_role\_assignments](#module\_table\_role\_assignments)
+
+Source: ./modules/role_assignments
 
 Version:
 

@@ -3,11 +3,6 @@ output "home_directory" {
   value       = var.home_directory
 }
 
-output "id" {
-  description = "The resource ID of the local user."
-  value       = azapi_resource.this.id
-}
-
 output "name" {
   description = "The name of the local user."
   value       = azapi_resource.this.name
@@ -16,6 +11,11 @@ output "name" {
 output "resource" {
   description = "The full local user azapi_resource."
   value       = azapi_resource.this
+}
+
+output "resource_id" {
+  description = "The resource ID of the local user."
+  value       = azapi_resource.this.id
 }
 
 output "sid" {

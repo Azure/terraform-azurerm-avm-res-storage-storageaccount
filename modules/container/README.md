@@ -119,27 +119,6 @@ object({
 
 Default: `null`
 
-### <a name="input_role_assignments"></a> [role\_assignments](#input\_role\_assignments)
-
-Description: Map of role assignments to create at the container scope.
-
-Type:
-
-```hcl
-map(object({
-    role_definition_id_or_name             = string
-    principal_id                           = string
-    principal_type                         = optional(string, null)
-    description                            = optional(string, null)
-    skip_service_principal_aad_check       = optional(bool, false)
-    condition                              = optional(string, null)
-    condition_version                      = optional(string, null)
-    delegated_managed_identity_resource_id = optional(string, null)
-  }))
-```
-
-Default: `{}`
-
 ### <a name="input_timeouts"></a> [timeouts](#input\_timeouts)
 
 Description: Timeouts applied to AzAPI resources managed by this module.
@@ -169,10 +148,6 @@ Default: `null`
 
 The following outputs are exported:
 
-### <a name="output_id"></a> [id](#output\_id)
-
-Description: The resource ID of the container.
-
 ### <a name="output_name"></a> [name](#output\_name)
 
 Description: The name of the container.
@@ -181,19 +156,13 @@ Description: The name of the container.
 
 Description: The full container azapi\_resource.
 
-### <a name="output_role_assignments"></a> [role\_assignments](#output\_role\_assignments)
+### <a name="output_resource_id"></a> [resource\_id](#output\_resource\_id)
 
-Description: Map of role assignments created at the container scope.
+Description: The resource ID of the container.
 
 ## Modules
 
-The following Modules are called:
-
-### <a name="module_role_assignments"></a> [role\_assignments](#module\_role\_assignments)
-
-Source: ../role_assignments
-
-Version:
+No modules.
 
 <!-- END\_TF\_DOCS -->
 <!-- END_TF_DOCS -->

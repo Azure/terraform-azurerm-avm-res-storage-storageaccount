@@ -151,10 +151,6 @@ The following outputs are exported:
 
 Description: The home directory of the local user.
 
-### <a name="output_id"></a> [id](#output\_id)
-
-Description: The resource ID of the local user.
-
 ### <a name="output_name"></a> [name](#output\_name)
 
 Description: The name of the local user.
@@ -162,6 +158,10 @@ Description: The name of the local user.
 ### <a name="output_resource"></a> [resource](#output\_resource)
 
 Description: The full local user azapi\_resource.
+
+### <a name="output_resource_id"></a> [resource\_id](#output\_resource\_id)
+
+Description: The resource ID of the local user.
 
 ### <a name="output_sid"></a> [sid](#output\_sid)
 

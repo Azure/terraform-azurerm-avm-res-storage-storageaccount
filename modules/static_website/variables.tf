@@ -36,9 +36,3 @@ variable "timeouts" {
   default     = null
   description = "Timeouts applied to the AzAPI resource."
 }
-
-variable "tracing_tags_header" {
-  type        = string
-  default     = null
-  description = "Optional User-Agent string injected into AzAPI request headers."
-}

@@ -164,10 +164,6 @@ Default: `null`
 
 The following outputs are exported:
 
-### <a name="output_id"></a> [id](#output\_id)
-
-Description: The resource ID of the diagnostic setting.
-
 ### <a name="output_name"></a> [name](#output\_name)
 
 Description: The name of the diagnostic setting.
@@ -175,6 +171,10 @@ Description: The name of the diagnostic setting.
 ### <a name="output_resource"></a> [resource](#output\_resource)
 
 Description: The full diagnostic setting azapi\_resource.
+
+### <a name="output_resource_id"></a> [resource\_id](#output\_resource\_id)
+
+Description: The resource ID of the diagnostic setting.
 
 ## Modules
 

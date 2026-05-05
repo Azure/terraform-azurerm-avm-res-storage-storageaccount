@@ -89,6 +89,7 @@ module "this" {
       }
     }
   }
+  enable_telemetry = var.enable_telemetry
   network_rules = {
     bypass         = ["AzureServices"]
     default_action = "Deny"

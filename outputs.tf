@@ -11,7 +11,7 @@ output "containers" {
   value = {
     for k, m in module.containers :
     k => {
-      id   = m.id
+      id   = m.resource_id
       name = m.name
     }
   }
@@ -22,7 +22,7 @@ output "data_lake_gen2_filesystems" {
   value = {
     for k, m in module.data_lake_filesystems :
     k => {
-      id   = m.id
+      id   = m.resource_id
       name = m.name
     }
   }
@@ -54,7 +54,7 @@ DESCRIPTION
   value = {
     for k, m in module.local_users :
     k => {
-      id                   = m.id
+      id                   = m.resource_id
       name                 = m.name
       home_directory       = m.home_directory
       sid                  = m.sid
@@ -82,7 +82,7 @@ output "queues" {
   value = {
     for k, m in module.queues :
     k => {
-      id   = m.id
+      id   = m.resource_id
       name = m.name
     }
   }
@@ -104,7 +104,7 @@ output "shares" {
   value = {
     for k, m in module.shares :
     k => {
-      id   = m.id
+      id   = m.resource_id
       name = m.name
     }
   }
@@ -115,7 +115,7 @@ output "tables" {
   value = {
     for k, m in module.tables :
     k => {
-      id                   = m.id
+      id                   = m.resource_id
       name                 = m.name
       storage_account_name = azapi_resource.this.name
     }

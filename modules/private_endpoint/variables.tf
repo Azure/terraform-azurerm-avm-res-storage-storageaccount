@@ -41,13 +41,6 @@ variable "application_security_group_resource_ids" {
   nullable    = false
 }
 
-variable "enable_telemetry" {
-  type        = bool
-  default     = true
-  description = "Controls whether telemetry headers are injected. Used in concert with `tracing_tags_header`."
-  nullable    = false
-}
-
 variable "ip_configurations" {
   type = map(object({
     name               = string
@@ -107,22 +100,6 @@ variable "retry" {
   })
   default     = null
   description = "Retry configuration applied to AzAPI resources managed by this module."
-}
-
-variable "role_assignments" {
-  type = map(object({
-    role_definition_id_or_name             = string
-    principal_id                           = string
-    principal_type                         = optional(string, null)
-    description                            = optional(string, null)
-    skip_service_principal_aad_check       = optional(bool, false)
-    condition                              = optional(string, null)
-    condition_version                      = optional(string, null)
-    delegated_managed_identity_resource_id = optional(string, null)
-  }))
-  default     = {}
-  description = "Map of role assignments to create at the private endpoint scope."
-  nullable    = false
 }
 
 variable "tags" {

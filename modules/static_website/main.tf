@@ -1,7 +1,3 @@
-locals {
-  tracing_headers = var.tracing_tags_header == null ? null : { "User-Agent" = var.tracing_tags_header }
-}
-
 # Static website is enabled by patching the blobServices/default sub-resource.
 # We use azapi_update_resource so we don't try to manage the entire blobServices
 # object — only the staticWebsite property.

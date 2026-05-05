@@ -112,6 +112,10 @@ Default: `null`
 
 The following outputs are exported:
 
+### <a name="output_resource_id"></a> [resource\_id](#output\_resource\_id)
+
+Description: The scope at which the role assignments were created. Provided to satisfy the AVM `resource_id` output requirement; this submodule does not own a single backing ARM resource.
+
 ### <a name="output_role_assignments"></a> [role\_assignments](#output\_role\_assignments)
 
 Description: Map of role assignment resources keyed by the input map key.

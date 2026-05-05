@@ -134,13 +134,13 @@ Default: `null`
 
 The following outputs are exported:
 
-### <a name="output_id"></a> [id](#output\_id)
-
-Description: The resource ID of the management policy.
-
 ### <a name="output_resource"></a> [resource](#output\_resource)
 
 Description: The full management policy azapi\_resource.
+
+### <a name="output_resource_id"></a> [resource\_id](#output\_resource\_id)
+
+Description: The resource ID of the management policy.
 
 ## Modules
 

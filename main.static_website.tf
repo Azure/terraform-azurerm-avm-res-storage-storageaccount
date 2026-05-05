@@ -4,10 +4,9 @@ module "static_website" {
   source   = "./modules/static_website"
   for_each = var.static_website == null ? {} : var.static_website
 
-  storage_account_id  = azapi_resource.this.id
-  error_404_document  = each.value.error_404_document
-  index_document      = each.value.index_document
-  retry               = var.retry
-  timeouts            = var.timeouts
-  tracing_tags_header = var.enable_telemetry ? local.avm_azapi_header : null
+  storage_account_id = azapi_resource.this.id
+  error_404_document = each.value.error_404_document
+  index_document     = each.value.index_document
+  retry              = var.retry
+  timeouts           = var.timeouts
 }
