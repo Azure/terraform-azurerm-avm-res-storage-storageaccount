@@ -71,8 +71,6 @@ module "this" {
     error_message_regex  = ["TooManyRequests", "ResourceNotFound", "RetryableError"]
     interval_seconds     = 5
     max_interval_seconds = 60
-    multiplier           = 2.0
-    randomization_factor = 0.5
   }
 
   # Module-wide timeouts. Apply to every AzAPI resource managed by the module

@@ -60,12 +60,10 @@ resource "azapi_resource" "this" {
   }
 }
 
-# Retrieve generated SSH password (if enabled) via listKeys ephemeral action.
-ephemeral "azapi_resource_action" "keys" {
-  count = var.ssh_password_enabled ? 1 : 0
-
-  type                   = "Microsoft.Storage/storageAccounts/localUsers@2024-01-01"
-  resource_id            = azapi_resource.this.id
-  action                 = "listKeys"
-  response_export_values = ["sshPassword", "sharedKey"]
-}
+# Note: the generated SSH password is exposed via the local user's `listKeys`
+# ARM action. Because ephemeral resource values cannot be returned from a
+# module, retrieving the SSH password is left to the consumer. Declare an
+# `ephemeral "azapi_resource_action"` block in your root module pointing at
+# the local user resource (resource_id = `module.<...>.local_users["<key>"].id`,
+# action = "listKeys", response_export_values = ["sshPassword", "sharedKey"])
+# and consume the result via `write_only` arguments or other ephemeral sinks.

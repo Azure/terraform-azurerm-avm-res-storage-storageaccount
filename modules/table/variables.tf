@@ -44,8 +44,6 @@ variable "retry" {
     error_message_regex  = optional(list(string))
     interval_seconds     = optional(number)
     max_interval_seconds = optional(number)
-    multiplier           = optional(number)
-    randomization_factor = optional(number)
   })
   default     = null
   description = "Retry configuration applied to AzAPI resources managed by this module."

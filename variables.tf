@@ -202,8 +202,6 @@ variable "retry" {
     error_message_regex  = optional(list(string))
     interval_seconds     = optional(number)
     max_interval_seconds = optional(number)
-    multiplier           = optional(number)
-    randomization_factor = optional(number)
   })
   default     = null
   description = <<DESCRIPTION
@@ -212,8 +210,6 @@ Retry configuration applied to every `azapi` resource managed by the module (roo
 - `error_message_regex`  - (Optional) A list of regex patterns matching error messages that trigger a retry.
 - `interval_seconds`     - (Optional) Initial interval between retries in seconds.
 - `max_interval_seconds` - (Optional) Maximum interval between retries in seconds.
-- `multiplier`           - (Optional) Multiplier applied to the interval after each retry attempt.
-- `randomization_factor` - (Optional) Random jitter (0.0 - 1.0) applied to the interval between retries.
 
 See <https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource#retry> for full semantics.
 DESCRIPTION

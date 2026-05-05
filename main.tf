@@ -9,7 +9,7 @@ locals {
   # Identity composition. Returns null when no identity is configured so the
   # body omits the field entirely.
   managed_identity_type = (
-    var.managed_identities.system_assigned && length(var.managed_identities.user_assigned_resource_ids) > 0 ? "SystemAssigned,UserAssigned" :
+    var.managed_identities.system_assigned && length(var.managed_identities.user_assigned_resource_ids) > 0 ? "SystemAssigned, UserAssigned" :
     var.managed_identities.system_assigned ? "SystemAssigned" :
     length(var.managed_identities.user_assigned_resource_ids) > 0 ? "UserAssigned" :
     null
