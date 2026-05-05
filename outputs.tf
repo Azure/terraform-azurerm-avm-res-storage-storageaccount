@@ -1,10 +1,10 @@
 output "containers" {
   description = "Map of storage containers that are created."
   value = {
-    for name, container in azapi_resource.containers :
-    name => {
-      id   = container.id
-      name = container.name
+    for k, m in module.containers :
+    k => {
+      id   = m.id
+      name = m.name
     }
   }
 }
@@ -12,97 +12,100 @@ output "containers" {
 output "data_lake_gen2_filesystems" {
   description = "Map of Data Lake Gen2 filesystems that are created."
   value = {
-    for name, filesystem in azurerm_storage_data_lake_gen2_filesystem.this :
-    name => {
-      id   = filesystem.id
-      name = filesystem.name
+    for k, m in module.data_lake_filesystems :
+    k => {
+      id   = m.id
+      name = m.name
     }
   }
 }
 
 output "fqdn" {
   description = "Fqdns for storage services."
-  value       = { for svc in local.endpoints : svc => "${azurerm_storage_account.this.name}.${svc}.core.windows.net" }
+  value       = { for svc in local.endpoints : svc => "${azapi_resource.this.name}.${svc}.core.windows.net" }
 }
 
 output "local_users" {
   description = <<DESCRIPTION
-A map of Storage Account Local Users. The map key is the supplied input to var.local_user. Contains sensitive information including passwords when ssh_password_enabled is true.
+A map of Storage Account Local Users. The map key matches `var.local_user`.
 
 The map value contains the following attributes:
 - `id` - The ID of the Storage Account Local User.
 - `name` - The name of the Storage Account Local User.
 - `home_directory` - The home directory of the Storage Account Local User.
-- `password` - The password of the Storage Account Local User (sensitive).
 - `sid` - The unique Security Identifier (SID) of the Storage Account Local User.
 - `ssh_key_enabled` - Specifies whether SSH Key authentication is enabled.
 - `ssh_password_enabled` - Specifies whether SSH password authentication is enabled.
+
+NOTE: The local user `password` attribute is no longer exported as a non-sensitive
+output. Use the ephemeral `azapi_resource_action.keys` inside the local_user
+submodule (or a `listKeys` action of your own) to retrieve credentials at apply
+time without persisting them in state.
 DESCRIPTION
   sensitive   = true
   value = {
-    for key, user in azurerm_storage_account_local_user.this :
-    key => {
-      id                   = user.id
-      name                 = user.name
-      home_directory       = user.home_directory
-      password             = user.password
-      sid                  = user.sid
-      ssh_key_enabled      = user.ssh_key_enabled
-      ssh_password_enabled = user.ssh_password_enabled
+    for k, m in module.local_users :
+    k => {
+      id                   = m.id
+      name                 = m.name
+      home_directory       = m.home_directory
+      sid                  = m.sid
+      ssh_key_enabled      = m.ssh_key_enabled
+      ssh_password_enabled = m.ssh_password_enabled
     }
   }
 }
 
 output "name" {
-  description = "The name of the storage account"
-  value       = azurerm_storage_account.this.name
+  description = "The name of the storage account."
+  value       = azapi_resource.this.name
 }
 
-output "primary_access_key" {
-  description = "The primary access key for the Storage Account."
-  ephemeral   = true
-  value       = ephemeral.azapi_resource_action.storage_account_keys.output.keys[0].value
-}
+# v1.0.0 BREAKING CHANGE: `primary_access_key` / `secondary_access_key`
+# outputs are removed because the access keys are now retrieved via the
+# ephemeral `azapi_resource_action.storage_account_keys` resource inside the
+# module and Terraform does not permit ephemeral outputs at the root module
+# level. Consumers needing programmatic access to the keys should instantiate
+# their own `ephemeral "azapi_resource_action"` block targeting the storage
+# account `id` exported from this module (`module.<name>.resource_id`).
 
 output "private_endpoints" {
-  description = "A map of private endpoints. The map key is the supplied input to var.private_endpoints. The map value is the entire azurerm_private_endpoint resource."
-  value       = var.private_endpoints_manage_dns_zone_group ? azurerm_private_endpoint.this : azurerm_private_endpoint.this_unmanaged_dns_zone_groups
+  description = "A map of private endpoints. The map key matches `var.private_endpoints`. Each value is the full azapi_resource exposing the private endpoint."
+  value = {
+    for k, m in module.private_endpoints :
+    k => m.resource
+  }
 }
 
 output "queues" {
   description = "Map of storage queues that are created."
   value = {
-    for name, queue in azapi_resource.queue :
-    name => {
-      id   = queue.id
-      name = queue.name
+    for k, m in module.queues :
+    k => {
+      id   = m.id
+      name = m.name
     }
   }
 }
 
 output "resource" {
-  description = "This is the full resource output for the Storage Account resource."
+  description = "The full Storage Account azapi_resource."
   sensitive   = true
-  value       = azurerm_storage_account.this
+  value       = azapi_resource.this
 }
 
 output "resource_id" {
   description = "The ID of the Storage Account."
-  value       = azurerm_storage_account.this.id
-}
-
-output "secondary_access_key" {
-  description = "The secondary access key for the Storage Account."
-  ephemeral   = true
-  value       = ephemeral.azapi_resource_action.storage_account_keys.output.keys[1].value
+  value       = azapi_resource.this.id
 }
 
 output "shares" {
-  description = "Map of storage storage shares that are created."
+  description = "Map of storage file shares that are created."
   value = {
-    for name, share in azapi_resource.share : name => {
-      id   = share.id
-      name = share.name
+    for k, m in module.shares :
+    k => {
+      id   = m.id
+      name = m.name
     }
   }
 }
@@ -110,10 +113,11 @@ output "shares" {
 output "tables" {
   description = "Map of storage tables that are created."
   value = {
-    for name, table in azapi_resource.table : name => {
-      id                   = table.id
-      name                 = table.name
-      storage_account_name = azurerm_storage_account.this.name
+    for k, m in module.tables :
+    k => {
+      id                   = m.id
+      name                 = m.name
+      storage_account_name = azapi_resource.this.name
     }
   }
 }

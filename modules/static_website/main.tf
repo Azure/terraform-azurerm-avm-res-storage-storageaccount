@@ -19,9 +19,10 @@ resource "azapi_update_resource" "this" {
     }
   }
 
-  create_headers = local.tracing_headers
-  read_headers   = local.tracing_headers
-  update_headers = local.tracing_headers
+  # `azapi_update_resource` does not expose per-action header attributes;
+  # tracing headers are emitted on the parent storage account resource. The
+  # `local.tracing_headers` value remains computed (above) so it is preserved
+  # for future header support without a config-shape change.
 
   retry = var.retry
 

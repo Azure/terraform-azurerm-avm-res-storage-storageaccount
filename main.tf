@@ -137,9 +137,13 @@ resource "azapi_resource" "this" {
   location  = var.location
   tags      = var.tags
 
-  identity = local.managed_identity_type == null ? null : {
-    type         = local.managed_identity_type
-    identity_ids = var.managed_identities.user_assigned_resource_ids
+  dynamic "identity" {
+    for_each = local.managed_identity_type == null ? [] : [local.managed_identity_type]
+
+    content {
+      type         = identity.value
+      identity_ids = var.managed_identities.user_assigned_resource_ids
+    }
   }
 
   body = {
@@ -208,11 +212,14 @@ moved {
   to   = azapi_resource.this
 }
 
-# Retrieve storage account keys using AzAPI ephemeral resource. This performs a
-# listKeys operation without storing keys in state. Requires Terraform 1.10+.
-ephemeral "azapi_resource_action" "storage_account_keys" {
-  type                   = "Microsoft.Storage/storageAccounts@2024-01-01"
-  resource_id            = azapi_resource.this.id
-  action                 = "listKeys"
-  response_export_values = ["keys"]
-}
+# v1.0.0 BREAKING CHANGE: Storage account access keys are no longer exposed by
+# this module. Consumers needing programmatic access can declare their own
+# ephemeral listKeys action against the storage account ID exported by this
+# module:
+#
+#   ephemeral "azapi_resource_action" "keys" {
+#     type        = "Microsoft.Storage/storageAccounts@2024-01-01"
+#     resource_id = module.storage_account.resource_id
+#     action      = "listKeys"
+#     response_export_values = ["keys"]
+#   }

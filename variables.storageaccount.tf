@@ -287,18 +287,5 @@ variable "static_website" {
 EOT
 }
 
-variable "timeouts" {
-  type = object({
-    create = optional(string)
-    delete = optional(string)
-    read   = optional(string)
-    update = optional(string)
-  })
-  default     = null
-  description = <<-EOT
- - `create` - (Defaults to 60 minutes) Used when creating the Storage Account.
- - `delete` - (Defaults to 60 minutes) Used when deleting the Storage Account.
- - `read` - (Defaults to 5 minutes) Used when retrieving the Storage Account.
- - `update` - (Defaults to 60 minutes) Used when updating the Storage Account.
-EOT
-}
+# `variable "timeouts"` is declared in variables.tf (the AzAPI-flavoured
+# definition that flows through to all submodules).
