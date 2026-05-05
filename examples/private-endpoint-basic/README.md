@@ -7,7 +7,7 @@ This illustrates the use of private endpoints with a fully private setup.
 ```hcl
 
 terraform {
-  required_version = ">= 1.11"
+  required_version = ">= 1.10.0"
 
   required_providers {
     azurerm = {
@@ -81,9 +81,9 @@ module "storage_account" {
   #version = "0.6.3"
   source = "../.."
 
-  location            = var.location
-  name                = local.storage_account_name
-  resource_group_name = module.resource_group.name
+  location  = var.location
+  name      = local.storage_account_name
+  parent_id = module.resource_group.resource_id
   containers = {
     demo = {
       name = "demo"
@@ -104,7 +104,7 @@ module "storage_account" {
 
 The following requirements are needed by this module:
 
-- <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.11)
+- <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.10.0)
 
 - <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (>= 4.37.0, < 5.0.0)
 

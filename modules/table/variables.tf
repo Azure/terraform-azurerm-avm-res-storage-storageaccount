@@ -1,26 +1,23 @@
-variable "storage_account_id" {
-  type        = string
-  description = "(Required) The full resource ID of the parent storage account."
-  nullable    = false
-}
-
 variable "name" {
   type        = string
   description = "(Required) The name of the table."
   nullable    = false
 }
 
-variable "signed_identifiers" {
-  type = list(object({
-    id = string
-    access_policy = optional(object({
-      expiry_time = string
-      permission  = string
-      start_time  = string
-    }))
-  }))
+variable "storage_account_id" {
+  type        = string
+  description = "(Required) The full resource ID of the parent storage account."
+  nullable    = false
+}
+
+variable "retry" {
+  type = object({
+    error_message_regex  = optional(list(string))
+    interval_seconds     = optional(number)
+    max_interval_seconds = optional(number)
+  })
   default     = null
-  description = "(Optional) Signed identifiers / access policies for the table."
+  description = "Retry configuration applied to AzAPI resources managed by this module."
 }
 
 variable "role_assignments" {
@@ -39,14 +36,17 @@ variable "role_assignments" {
   nullable    = false
 }
 
-variable "retry" {
-  type = object({
-    error_message_regex  = optional(list(string))
-    interval_seconds     = optional(number)
-    max_interval_seconds = optional(number)
-  })
+variable "signed_identifiers" {
+  type = list(object({
+    id = string
+    access_policy = optional(object({
+      expiry_time = string
+      permission  = string
+      start_time  = string
+    }))
+  }))
   default     = null
-  description = "Retry configuration applied to AzAPI resources managed by this module."
+  description = "(Optional) Signed identifiers / access policies for the table."
 }
 
 variable "timeouts" {

@@ -6,7 +6,7 @@ This deploys the module in its simplest form.
 
 ```hcl
 terraform {
-  required_version = ">= 1.7.0"
+  required_version = ">= 1.10.0"
 
   required_providers {
     azurerm = {
@@ -16,6 +16,10 @@ terraform {
     random = {
       source  = "hashicorp/random"
       version = ">= 3.5.0, < 4.0.0"
+    }
+    time = {
+      source  = "hashicorp/time"
+      version = ">= 0.9.0, < 1.0.0"
     }
   }
 }
@@ -118,7 +122,7 @@ module "this" {
 
   location                 = azurerm_resource_group.this.location
   name                     = module.naming.storage_account.name_unique
-  resource_group_name      = azurerm_resource_group.this.name
+  parent_id                = azurerm_resource_group.this.id
   account_kind             = "StorageV2"
   account_replication_type = "ZRS"
   account_tier             = "Standard"
@@ -167,46 +171,81 @@ module "this" {
 
     }
   }
-  storage_data_lake_gen2_paths = {
-    path_1 = {
-      path            = "example-directory"
-      filesystem_name = "datalake1"
-      resource        = "directory"
-      owner           = data.azurerm_client_config.current.object_id
-      group           = "$superuser"
-      ace = [
-        {
-          type        = "user"
-          id          = data.azurerm_client_config.current.object_id
-          permissions = "rwx"
-        },
-        {
-          type        = "group"
-          permissions = "r-x"
-        },
-        {
-          type        = "other"
-          permissions = "---"
-        }
-      ]
-    }
-    path_2 = {
-      path            = "data"
-      filesystem_name = "datalake2"
-      resource        = "directory"
-      owner           = "$superuser"
-    }
-    path_3 = {
-      path            = "logs"
-      filesystem_name = "datalake2"
-      resource        = "directory"
-    }
-  }
   tags = {
     env   = "Dev"
     owner = "John Doe"
     dept  = "IT"
   }
+}
+
+# v1.0.0 BREAKING CHANGE: This module no longer manages the Data Lake Gen2
+# data-plane (POSIX ACLs, owner/group, paths). To continue managing these
+# features, declare the azurerm-provider resources directly alongside this
+# module. The example below mirrors the pre-1.0.0 input shape using
+# `azurerm_storage_data_lake_gen2_path` resources, plus shows how to set the
+# owner/group/ace on a filesystem via the new
+# `azurerm_storage_data_lake_gen2_filesystem` data source.
+#
+# Note: requires the azurerm provider in the consuming root module. AzAPI
+# does not currently expose the DFS data-plane API needed for these
+# operations, so they remain on the azurerm provider.
+
+# Wait for the storage account RBAC role assignments to take effect before
+# making data-plane calls. Otherwise the Storage Blob Data Owner permission
+# may not be propagated yet and `azurerm_storage_data_lake_gen2_path` will
+# fail with an authorization error.
+resource "time_sleep" "wait_for_rbac" {
+  create_duration = "30s"
+
+  depends_on = [module.this]
+}
+
+# Companion: ACL/owner/group on a filesystem root. We use the azurerm
+# resource directly (NOT the dropped `ace`/`owner`/`group` fields on the
+# module input) so the data-plane call is performed against the storage
+# account managed by this module.
+resource "azurerm_storage_data_lake_gen2_path" "directory_with_acl" {
+  filesystem_name    = "datalake1"
+  path               = "example-directory"
+  resource           = "directory"
+  storage_account_id = module.this.resource_id
+  group              = "$superuser"
+  owner              = data.azurerm_client_config.current.object_id
+
+  ace {
+    permissions = "rwx"
+    type        = "user"
+    id          = data.azurerm_client_config.current.object_id
+  }
+  ace {
+    permissions = "r-x"
+    type        = "group"
+  }
+  ace {
+    permissions = "---"
+    type        = "other"
+  }
+
+  depends_on = [time_sleep.wait_for_rbac]
+}
+
+resource "azurerm_storage_data_lake_gen2_path" "data_directory" {
+  filesystem_name    = "datalake2"
+  path               = "data"
+  resource           = "directory"
+  storage_account_id = module.this.resource_id
+  owner              = "$superuser"
+
+  depends_on = [time_sleep.wait_for_rbac]
+}
+
+resource "azurerm_storage_data_lake_gen2_path" "logs_directory" {
+  filesystem_name    = "datalake2"
+  path               = "logs"
+  resource           = "directory"
+  storage_account_id = module.this.resource_id
+
+  depends_on = [time_sleep.wait_for_rbac]
 }
 ```
 
@@ -215,11 +254,13 @@ module "this" {
 
 The following requirements are needed by this module:
 
-- <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.7.0)
+- <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.10.0)
 
 - <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (>= 4.37.0, < 5.0.0)
 
 - <a name="requirement_random"></a> [random](#requirement\_random) (>= 3.5.0, < 4.0.0)
+
+- <a name="requirement_time"></a> [time](#requirement\_time) (>= 0.9.0, < 1.0.0)
 
 ## Resources
 
@@ -228,12 +269,16 @@ The following resources are used by this module:
 - [azurerm_network_security_group.nsg](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/network_security_group) (resource)
 - [azurerm_network_security_rule.no_internet](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/network_security_rule) (resource)
 - [azurerm_resource_group.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) (resource)
+- [azurerm_storage_data_lake_gen2_path.data_directory](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_data_lake_gen2_path) (resource)
+- [azurerm_storage_data_lake_gen2_path.directory_with_acl](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_data_lake_gen2_path) (resource)
+- [azurerm_storage_data_lake_gen2_path.logs_directory](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_data_lake_gen2_path) (resource)
 - [azurerm_subnet.private](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet) (resource)
 - [azurerm_subnet_network_security_group_association.private](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet_network_security_group_association) (resource)
 - [azurerm_user_assigned_identity.example_identity](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/user_assigned_identity) (resource)
 - [azurerm_virtual_network.vnet](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_network) (resource)
 - [random_integer.region_index](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/integer) (resource)
 - [random_string.this](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/string) (resource)
+- [time_sleep.wait_for_rbac](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/sleep) (resource)
 - [azurerm_client_config.current](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/client_config) (data source)
 - [azurerm_role_definition.example](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/role_definition) (data source)
 

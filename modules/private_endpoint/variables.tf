@@ -1,6 +1,6 @@
-variable "parent_id" {
+variable "location" {
   type        = string
-  description = "(Required) The full resource ID of the resource group in which the private endpoint will be created."
+  description = "(Required) The Azure region of the private endpoint."
   nullable    = false
 }
 
@@ -10,16 +10,16 @@ variable "name" {
   nullable    = false
 }
 
-variable "location" {
+variable "parent_id" {
   type        = string
-  description = "(Required) The Azure region of the private endpoint."
+  description = "(Required) The full resource ID of the resource group in which the private endpoint will be created."
   nullable    = false
 }
 
-variable "tags" {
-  type        = map(string)
-  default     = null
-  description = "(Optional) Tags to apply to the private endpoint."
+variable "private_connection_resource_id" {
+  type        = string
+  description = "(Required) The full resource ID of the resource that the private endpoint connects to (the storage account)."
+  nullable    = false
 }
 
 variable "subnet_resource_id" {
@@ -34,22 +34,18 @@ variable "subresource_name" {
   nullable    = false
 }
 
-variable "private_connection_resource_id" {
-  type        = string
-  description = "(Required) The full resource ID of the resource that the private endpoint connects to (the storage account)."
+variable "application_security_group_resource_ids" {
+  type        = map(string)
+  default     = {}
+  description = "(Optional) Application security groups to associate with the private endpoint. Map key is arbitrary, value is the ASG resource ID."
   nullable    = false
 }
 
-variable "private_service_connection_name" {
-  type        = string
-  default     = null
-  description = "(Optional) The name of the private service connection. Defaults to `pse-<endpoint name>`."
-}
-
-variable "network_interface_name" {
-  type        = string
-  default     = null
-  description = "(Optional) Custom name for the network interface created with the private endpoint."
+variable "enable_telemetry" {
+  type        = bool
+  default     = true
+  description = "Controls whether telemetry headers are injected. Used in concert with `tracing_tags_header`."
+  nullable    = false
 }
 
 variable "ip_configurations" {
@@ -62,11 +58,13 @@ variable "ip_configurations" {
   nullable    = false
 }
 
-variable "application_security_group_resource_ids" {
-  type        = map(string)
-  default     = {}
-  description = "(Optional) Application security groups to associate with the private endpoint. Map key is arbitrary, value is the ASG resource ID."
-  nullable    = false
+variable "lock" {
+  type = object({
+    name = optional(string, null)
+    kind = string
+  })
+  default     = null
+  description = "(Optional) Lock to apply to the private endpoint."
 }
 
 variable "manage_dns_zone_group" {
@@ -74,6 +72,12 @@ variable "manage_dns_zone_group" {
   default     = true
   description = "(Optional) Whether the private endpoint's DNS zone group should be managed by this module."
   nullable    = false
+}
+
+variable "network_interface_name" {
+  type        = string
+  default     = null
+  description = "(Optional) Custom name for the network interface created with the private endpoint."
 }
 
 variable "private_dns_zone_group_name" {
@@ -89,13 +93,20 @@ variable "private_dns_zone_resource_ids" {
   nullable    = false
 }
 
-variable "lock" {
+variable "private_service_connection_name" {
+  type        = string
+  default     = null
+  description = "(Optional) The name of the private service connection. Defaults to `pse-<endpoint name>`."
+}
+
+variable "retry" {
   type = object({
-    name = optional(string, null)
-    kind = string
+    error_message_regex  = optional(list(string))
+    interval_seconds     = optional(number)
+    max_interval_seconds = optional(number)
   })
   default     = null
-  description = "(Optional) Lock to apply to the private endpoint."
+  description = "Retry configuration applied to AzAPI resources managed by this module."
 }
 
 variable "role_assignments" {
@@ -114,14 +125,10 @@ variable "role_assignments" {
   nullable    = false
 }
 
-variable "retry" {
-  type = object({
-    error_message_regex  = optional(list(string))
-    interval_seconds     = optional(number)
-    max_interval_seconds = optional(number)
-  })
+variable "tags" {
+  type        = map(string)
   default     = null
-  description = "Retry configuration applied to AzAPI resources managed by this module."
+  description = "(Optional) Tags to apply to the private endpoint."
 }
 
 variable "timeouts" {
@@ -139,11 +146,4 @@ variable "tracing_tags_header" {
   type        = string
   default     = null
   description = "Optional User-Agent string injected into AzAPI request headers."
-}
-
-variable "enable_telemetry" {
-  type        = bool
-  default     = true
-  description = "Controls whether telemetry headers are injected. Used in concert with `tracing_tags_header`."
-  nullable    = false
 }

@@ -1,9 +1,3 @@
-variable "storage_account_id" {
-  type        = string
-  description = "(Required) The full resource ID of the parent storage account."
-  nullable    = false
-}
-
 variable "rules" {
   type = map(object({
     enabled = bool
@@ -51,6 +45,12 @@ variable "rules" {
     })
   }))
   description = "(Required) Map of management policy rules. See README for details."
+  nullable    = false
+}
+
+variable "storage_account_id" {
+  type        = string
+  description = "(Required) The full resource ID of the parent storage account."
   nullable    = false
 }
 

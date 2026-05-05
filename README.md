@@ -28,9 +28,7 @@ The following requirements are needed by this module:
 
 - <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.10.0)
 
-- <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) (~> 2.4)
-
-- <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (>= 4.37.0, < 5.0.0)
+- <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) (~> 2.8)
 
 - <a name="requirement_modtm"></a> [modtm](#requirement\_modtm) (~> 0.3)
 
@@ -42,37 +40,12 @@ The following requirements are needed by this module:
 
 The following resources are used by this module:
 
-- [azapi_resource.containers](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
-- [azapi_resource.queue](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
-- [azapi_resource.share](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
-- [azapi_resource.table](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
-- [azurerm_management_lock.this_storage_account](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/management_lock) (resource)
-- [azurerm_monitor_diagnostic_setting.azure_file](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_diagnostic_setting) (resource)
-- [azurerm_monitor_diagnostic_setting.blob](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_diagnostic_setting) (resource)
-- [azurerm_monitor_diagnostic_setting.queue](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_diagnostic_setting) (resource)
-- [azurerm_monitor_diagnostic_setting.storage_account](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_diagnostic_setting) (resource)
-- [azurerm_monitor_diagnostic_setting.table](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_diagnostic_setting) (resource)
-- [azurerm_private_endpoint.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint) (resource)
-- [azurerm_private_endpoint.this_unmanaged_dns_zone_groups](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint) (resource)
-- [azurerm_private_endpoint_application_security_group_association.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint_application_security_group_association) (resource)
-- [azurerm_role_assignment.containers](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) (resource)
-- [azurerm_role_assignment.private_endpoint](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) (resource)
-- [azurerm_role_assignment.queues](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) (resource)
-- [azurerm_role_assignment.shares](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) (resource)
-- [azurerm_role_assignment.storage_account](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) (resource)
-- [azurerm_role_assignment.tables](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) (resource)
-- [azurerm_storage_account.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account) (resource)
-- [azurerm_storage_account_customer_managed_key.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account_customer_managed_key) (resource)
-- [azurerm_storage_account_local_user.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account_local_user) (resource)
-- [azurerm_storage_account_queue_properties.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account_queue_properties) (resource)
-- [azurerm_storage_account_static_website.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account_static_website) (resource)
-- [azurerm_storage_data_lake_gen2_filesystem.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_data_lake_gen2_filesystem) (resource)
-- [azurerm_storage_data_lake_gen2_path.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_data_lake_gen2_path) (resource)
-- [azurerm_storage_management_policy.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_management_policy) (resource)
+- [azapi_resource.lock](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
+- [azapi_resource.this](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
 - [modtm_telemetry.telemetry](https://registry.terraform.io/providers/Azure/modtm/latest/docs/resources/telemetry) (resource)
 - [random_uuid.telemetry](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/uuid) (resource)
-- [time_sleep.wait_for_rbac](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/sleep) (resource)
 - [azapi_client_config.telemetry](https://registry.terraform.io/providers/Azure/azapi/latest/docs/data-sources/client_config) (data source)
+- [azapi_resource.customer_managed_key_vault](https://registry.terraform.io/providers/Azure/azapi/latest/docs/data-sources/resource) (data source)
 - [modtm_module_source.telemetry](https://registry.terraform.io/providers/Azure/modtm/latest/docs/data-sources/module_source) (data source)
 
 <!-- markdownlint-disable MD013 -->
@@ -93,9 +66,9 @@ Description: The name of the resource.
 
 Type: `string`
 
-### <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name)
+### <a name="input_parent_id"></a> [parent\_id](#input\_parent\_id)
 
-Description: The resource group where the resources will be deployed.
+Description: The Azure resource ID of the parent resource group, in the form `/subscriptions/{subscription_id}/resourceGroups/{resource_group_name}`.
 
 Type: `string`
 
@@ -815,7 +788,8 @@ Description: A map of private endpoints to create on the resource. The map key i
 - `private_service_connection_name` - (Optional) The name of the private service connection. One will be generated if not set.
 - `network_interface_name` - (Optional) The name of the network interface. One will be generated if not set.
 - `location` - (Optional) The Azure location where the resources will be deployed. Defaults to the location of the resource group.
-- `resource_group_name` - (Optional) The resource group where the resources will be deployed. Defaults to the resource group of the resource.
+- `resource_group_name` - (Deprecated) The resource group where the resources will be deployed. Defaults to the resource group of the storage account. Prefer `parent_id`.
+- `parent_id` - (Optional) The full resource ID of the parent resource group for the private endpoint, in the form `/subscriptions/{subscription_id}/resourceGroups/{resource_group_name}`. Defaults to the storage account's `parent_id`.
 - `ip_configurations` - (Optional) A map of IP configurations to create on the private endpoint. If not specified the platform will create one. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
   - `name` - The name of the IP configuration.
   - `private_ip_address` - The private IP address of the IP configuration.
@@ -849,6 +823,7 @@ map(object({
     network_interface_name                  = optional(string, null)
     location                                = optional(string, null)
     resource_group_name                     = optional(string, null)
+    parent_id                               = optional(string, null)
     ip_configurations = optional(map(object({
       name               = string
       private_ip_address = string
@@ -1021,6 +996,28 @@ map(object({
 ```
 
 Default: `{}`
+
+### <a name="input_retry"></a> [retry](#input\_retry)
+
+Description: Retry configuration applied to every `azapi` resource managed by the module (root storage account and all submodules). Defaults to `null` (no custom retry).
+
+- `error_message_regex`  - (Optional) A list of regex patterns matching error messages that trigger a retry.
+- `interval_seconds`     - (Optional) Initial interval between retries in seconds.
+- `max_interval_seconds` - (Optional) Maximum interval between retries in seconds.
+
+See <https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource#retry> for full semantics.
+
+Type:
+
+```hcl
+object({
+    error_message_regex  = optional(list(string))
+    interval_seconds     = optional(number)
+    max_interval_seconds = optional(number)
+  })
+```
+
+Default: `null`
 
 ### <a name="input_role_assignments"></a> [role\_assignments](#input\_role\_assignments)
 
@@ -1258,139 +1255,30 @@ map(object({
 
 Default: `null`
 
-### <a name="input_storage_data_lake_gen2_filesystem"></a> [storage\_data\_lake\_gen2\_filesystem](#input\_storage\_data\_lake\_gen2\_filesystem)
-
-Description: DEPRECATED, please use `var.storage_data_lake_gen2_filesystems` instead.
-- `default_encryption_scope` - (Optional) The default encryption scope to use for this filesystem. Changing this forces a new resource to be created.
-- `group` - (Optional) Specifies the Object ID of the Azure Active Directory Group to make the owning group of the root path (i.e. `/`). Possible values also include `$superuser`.
-- `name` - (Required) The name of the Data Lake Gen2 File System which should be created within the Storage Account. Must be unique within the storage account the queue is located. Changing this forces a new resource to be created.
-- `owner` - (Optional) Specifies the Object ID of the Azure Active Directory User to make the owning user of the root path (i.e. `/`). Possible values also include `$superuser`.
-- `properties` - (Optional) A mapping of Key to Base64-Encoded Values which should be assigned to this Data Lake Gen2 File System.
----
-`ace` block supports the following:
-- `id` - (Optional) Specifies the Object ID of the Azure Active Directory User or Group that the entry relates to. Only valid for `user` or `group` entries.
-- `permissions` - (Required) Specifies the permissions for the entry in `rwx` form. For example, `rwx` gives full permissions but `r--` only gives read permissions.
-- `scope` - (Optional) Specifies whether the ACE represents an `access` entry or a `default` entry. Default value is `access`.
-- `type` - (Required) Specifies the type of entry. Can be `user`, `group`, `mask` or `other`.
-
----
-`timeouts` block supports the following:
-- `create` - (Defaults to 30 minutes) Used when creating the Data Lake Gen2 File System.
-- `delete` - (Defaults to 30 minutes) Used when deleting the Data Lake Gen2 File System.
-- `read` - (Defaults to 5 minutes) Used when retrieving the Data Lake Gen2 File System.
-- `update` - (Defaults to 30 minutes) Used when updating the Data Lake Gen2 File System.
-
-Type:
-
-```hcl
-object({
-    default_encryption_scope = optional(string)
-    group                    = optional(string)
-    name                     = string
-    owner                    = optional(string)
-    properties               = optional(map(string))
-    ace = optional(set(object({
-      id          = optional(string)
-      permissions = string
-      scope       = optional(string)
-      type        = string
-    })))
-    timeouts = optional(object({
-      create = optional(string)
-      delete = optional(string)
-      read   = optional(string)
-      update = optional(string)
-    }))
-  })
-```
-
-Default: `null`
-
 ### <a name="input_storage_data_lake_gen2_filesystems"></a> [storage\_data\_lake\_gen2\_filesystems](#input\_storage\_data\_lake\_gen2\_filesystems)
 
-Description: - `default_encryption_scope` - (Optional) The default encryption scope to use for this filesystem. Changing this forces a new resource to be created.
-- `group` - (Optional) Specifies the Object ID of the Azure Active Directory Group to make the owning group of the root path (i.e. `/`). Possible values also include `$superuser`.
-- `name` - (Required) The name of the Data Lake Gen2 File System which should be created within the Storage Account. Must be unique within the storage account the queue is located. Changing this forces a new resource to be created.
-- `owner` - (Optional) Specifies the Object ID of the Azure Active Directory User to make the owning user of the root path (i.e. `/`). Possible values also include `$superuser`.
-- `properties` - (Optional) A mapping of Key to Base64-Encoded Values which should be assigned to this Data Lake Gen2 File System.
----
-`ace` block supports the following:
-- `id` - (Optional) Specifies the Object ID of the Azure Active Directory User or Group that the entry relates to. Only valid for `user` or `group` entries.
-- `permissions` - (Required) Specifies the permissions for the entry in `rwx` form. For example, `rwx` gives full permissions but `r--` only gives read permissions.
-- `scope` - (Optional) Specifies whether the ACE represents an `access` entry or a `default` entry. Default value is `access`.
-- `type` - (Required) Specifies the type of entry. Can be `user`, `group`, `mask` or `other`.
+Description: A map of Data Lake Gen2 filesystems to create on the storage account.
+
+- `default_encryption_scope` - (Optional) The default encryption scope to use for this filesystem. Changing this forces a new resource to be created.
+- `name` - (Required) The name of the Data Lake Gen2 File System which should be created within the Storage Account. Must be unique within the storage account. Changing this forces a new resource to be created.
+- `properties` - (Optional) A mapping of key/value pairs assigned to this filesystem (passed as ARM container metadata).
+
+> **v1.0.0 BREAKING CHANGE**: The `owner`, `group` and `ace` (POSIX ACL) fields, plus the standalone `var.storage_data_lake_gen2_paths` variable, are no longer supported. Those features required Data Lake DFS data-plane API calls which the AzAPI provider does not exercise. Manage them externally if required (see `examples/data_lake_gen2/` for a recipe using `azurerm_storage_data_lake_gen2_path` alongside this module).
 
 ---
 `timeouts` block supports the following:
-- `create` - (Defaults to 30 minutes) Used when creating the Data Lake Gen2 File System.
-- `delete` - (Defaults to 30 minutes) Used when deleting the Data Lake Gen2 File System.
-- `read` - (Defaults to 5 minutes) Used when retrieving the Data Lake Gen2 File System.
-- `update` - (Defaults to 30 minutes) Used when updating the Data Lake Gen2 File System.
+- `create` - Used when creating the Data Lake Gen2 File System.
+- `delete` - Used when deleting the Data Lake Gen2 File System.
+- `read` - Used when retrieving the Data Lake Gen2 File System.
+- `update` - Used when updating the Data Lake Gen2 File System.
 
 Type:
 
 ```hcl
 map(object({
     default_encryption_scope = optional(string)
-    group                    = optional(string)
     name                     = string
-    owner                    = optional(string)
     properties               = optional(map(string))
-    ace = optional(set(object({
-      id          = optional(string)
-      permissions = string
-      scope       = optional(string)
-      type        = string
-    })))
-    timeouts = optional(object({
-      create = optional(string)
-      delete = optional(string)
-      read   = optional(string)
-      update = optional(string)
-    }))
-  }))
-```
-
-Default: `{}`
-
-### <a name="input_storage_data_lake_gen2_paths"></a> [storage\_data\_lake\_gen2\_paths](#input\_storage\_data\_lake\_gen2\_paths)
-
-Description: - `path` - (Required) The path which should be created within the Data Lake Gen2 File System in the Storage Account. Changing this forces a new resource to be created.
-- `filesystem_name` - (Required) The name of the Data Lake Gen2 File System which should be created within the Storage Account. Changing this forces a new resource to be created.
-- `storage_account_id` - (Required) The ID of the Storage Account where the Data Lake Gen2 File System exists. Changing this forces a new resource to be created.
-- `resource` - (Required) The type of resource. Possible values are `directory` or `file`. Changing this forces a new resource to be created.
-- `owner` - (Optional) Specifies the Object ID of the Azure Active Directory User to make the owning user. Possible values also include `$superuser`.
-- `group` - (Optional) Specifies the Object ID of the Azure Active Directory Group to make the owning group. Possible values also include `$superuser`.
-
----
-`ace` block supports the following:
-- `id` - (Optional) Specifies the Object ID of the Azure Active Directory User or Group that the entry relates to. Only valid for `user` or `group` entries.
-- `permissions` - (Required) Specifies the permissions for the entry in `rwx` form. For example, `rwx` gives full permissions but `r--` only gives read permissions.
-- `scope` - (Optional) Specifies whether the ACE represents an `access` entry or a `default` entry. Default value is `access`.
-- `type` - (Required) Specifies the type of entry. Can be `user`, `group`, `mask` or `other`.
-
----
-`timeouts` block supports the following:
-- `create` - (Defaults to 30 minutes) Used when creating the Data Lake Gen2 Path.
-- `delete` - (Defaults to 30 minutes) Used when deleting the Data Lake Gen2 Path.
-- `read` - (Defaults to 5 minutes) Used when retrieving the Data Lake Gen2 Path.
-- `update` - (Defaults to 30 minutes) Used when updating the Data Lake Gen2 Path.
-
-Type:
-
-```hcl
-map(object({
-    path            = string
-    filesystem_name = string
-    resource        = string
-    owner           = optional(string)
-    group           = optional(string)
-    ace = optional(set(object({
-      id          = optional(string)
-      permissions = string
-      scope       = optional(string)
-      type        = string
-    })))
     timeouts = optional(object({
       create = optional(string)
       delete = optional(string)
@@ -1603,19 +1491,18 @@ Default: `null`
 
 ### <a name="input_timeouts"></a> [timeouts](#input\_timeouts)
 
-Description: - `create` - (Defaults to 60 minutes) Used when creating the Storage Account.
-- `delete` - (Defaults to 60 minutes) Used when deleting the Storage Account.
-- `read` - (Defaults to 5 minutes) Used when retrieving the Storage Account.
-- `update` - (Defaults to 60 minutes) Used when updating the Storage Account.
+Description: Default per-operation timeouts applied to every `azapi` resource managed by the module. Each value is a Go duration string (e.g. `30m`, `1h`).
+
+The root storage account uses these values directly. Submodules (containers, queues, shares, tables, diagnostic settings, private endpoints, management policy, local users, role assignments, Data Lake Gen2 filesystems) use these as a default that can be overridden per-item via the item's own `timeouts` field.
 
 Type:
 
 ```hcl
 object({
     create = optional(string)
-    delete = optional(string)
     read   = optional(string)
     update = optional(string)
+    delete = optional(string)
   })
 ```
 
@@ -1639,28 +1526,28 @@ Description: Fqdns for storage services.
 
 ### <a name="output_local_users"></a> [local\_users](#output\_local\_users)
 
-Description: A map of Storage Account Local Users. The map key is the supplied input to var.local\_user. Contains sensitive information including passwords when ssh\_password\_enabled is true.
+Description: A map of Storage Account Local Users. The map key matches `var.local_user`.
 
 The map value contains the following attributes:
 - `id` - The ID of the Storage Account Local User.
 - `name` - The name of the Storage Account Local User.
 - `home_directory` - The home directory of the Storage Account Local User.
-- `password` - The password of the Storage Account Local User (sensitive).
 - `sid` - The unique Security Identifier (SID) of the Storage Account Local User.
 - `ssh_key_enabled` - Specifies whether SSH Key authentication is enabled.
 - `ssh_password_enabled` - Specifies whether SSH password authentication is enabled.
 
+NOTE: The local user `password` attribute is no longer exported as a non-sensitive  
+output. Use the ephemeral `azapi_resource_action.keys` inside the local\_user  
+submodule (or a `listKeys` action of your own) to retrieve credentials at apply  
+time without persisting them in state.
+
 ### <a name="output_name"></a> [name](#output\_name)
 
-Description: The name of the storage account
-
-### <a name="output_primary_access_key"></a> [primary\_access\_key](#output\_primary\_access\_key)
-
-Description: The primary access key for the Storage Account.
+Description: The name of the storage account.
 
 ### <a name="output_private_endpoints"></a> [private\_endpoints](#output\_private\_endpoints)
 
-Description: A map of private endpoints. The map key is the supplied input to var.private\_endpoints. The map value is the entire azurerm\_private\_endpoint resource.
+Description: A map of private endpoints. The map key matches `var.private_endpoints`. Each value is the full azapi\_resource exposing the private endpoint.
 
 ### <a name="output_queues"></a> [queues](#output\_queues)
 
@@ -1668,19 +1555,15 @@ Description: Map of storage queues that are created.
 
 ### <a name="output_resource"></a> [resource](#output\_resource)
 
-Description: This is the full resource output for the Storage Account resource.
+Description: The full Storage Account azapi\_resource.
 
 ### <a name="output_resource_id"></a> [resource\_id](#output\_resource\_id)
 
 Description: The ID of the Storage Account.
 
-### <a name="output_secondary_access_key"></a> [secondary\_access\_key](#output\_secondary\_access\_key)
-
-Description: The secondary access key for the Storage Account.
-
 ### <a name="output_shares"></a> [shares](#output\_shares)
 
-Description: Map of storage storage shares that are created.
+Description: Map of storage file shares that are created.
 
 ### <a name="output_tables"></a> [tables](#output\_tables)
 
@@ -1688,7 +1571,97 @@ Description: Map of storage tables that are created.
 
 ## Modules
 
-No modules.
+The following Modules are called:
+
+### <a name="module_containers"></a> [containers](#module\_containers)
+
+Source: ./modules/container
+
+Version:
+
+### <a name="module_data_lake_filesystems"></a> [data\_lake\_filesystems](#module\_data\_lake\_filesystems)
+
+Source: ./modules/data_lake_filesystem
+
+Version:
+
+### <a name="module_diagnostic_setting_blob"></a> [diagnostic\_setting\_blob](#module\_diagnostic\_setting\_blob)
+
+Source: ./modules/diagnostic_setting
+
+Version:
+
+### <a name="module_diagnostic_setting_file"></a> [diagnostic\_setting\_file](#module\_diagnostic\_setting\_file)
+
+Source: ./modules/diagnostic_setting
+
+Version:
+
+### <a name="module_diagnostic_setting_queue"></a> [diagnostic\_setting\_queue](#module\_diagnostic\_setting\_queue)
+
+Source: ./modules/diagnostic_setting
+
+Version:
+
+### <a name="module_diagnostic_setting_storage_account"></a> [diagnostic\_setting\_storage\_account](#module\_diagnostic\_setting\_storage\_account)
+
+Source: ./modules/diagnostic_setting
+
+Version:
+
+### <a name="module_diagnostic_setting_table"></a> [diagnostic\_setting\_table](#module\_diagnostic\_setting\_table)
+
+Source: ./modules/diagnostic_setting
+
+Version:
+
+### <a name="module_local_users"></a> [local\_users](#module\_local\_users)
+
+Source: ./modules/local_user
+
+Version:
+
+### <a name="module_management_policy"></a> [management\_policy](#module\_management\_policy)
+
+Source: ./modules/management_policy
+
+Version:
+
+### <a name="module_private_endpoints"></a> [private\_endpoints](#module\_private\_endpoints)
+
+Source: ./modules/private_endpoint
+
+Version:
+
+### <a name="module_queues"></a> [queues](#module\_queues)
+
+Source: ./modules/queue
+
+Version:
+
+### <a name="module_role_assignments"></a> [role\_assignments](#module\_role\_assignments)
+
+Source: ./modules/role_assignments
+
+Version:
+
+### <a name="module_shares"></a> [shares](#module\_shares)
+
+Source: ./modules/share
+
+Version:
+
+### <a name="module_static_website"></a> [static\_website](#module\_static\_website)
+
+Source: ./modules/static_website
+
+Version:
+
+### <a name="module_tables"></a> [tables](#module\_tables)
+
+Source: ./modules/table
+
+Version:
 
 <!-- markdownlint-disable-next-line MD041 -->
 ## Data Collection

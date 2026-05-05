@@ -1,12 +1,12 @@
-variable "storage_account_id" {
-  type        = string
-  description = "(Required) The full resource ID of the parent storage account."
-  nullable    = false
-}
-
 variable "name" {
   type        = string
   description = "(Required) The name of the Data Lake Gen2 filesystem."
+  nullable    = false
+}
+
+variable "storage_account_id" {
+  type        = string
+  description = "(Required) The full resource ID of the parent storage account."
   nullable    = false
 }
 

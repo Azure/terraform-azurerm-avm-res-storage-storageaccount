@@ -1,28 +1,39 @@
 locals {
-  # SKU name combines tier + replication, with optional V2 suffix when the
-  # provisioned billing model V2 is requested (StandardV2_*, PremiumV2_*).
-  sku_name = var.provisioned_billing_model_version == "V2" ? "${var.account_tier}V2_${var.account_replication_type}" : "${var.account_tier}_${var.account_replication_type}"
-
+  # Azure Files identity-based auth mapping
+  azure_files_identity_based_authentication = var.azure_files_authentication == null ? null : {
+    directoryServiceOptions = var.azure_files_authentication.directory_type
+    defaultSharePermission  = var.azure_files_authentication.default_share_level_permission
+    activeDirectoryProperties = var.azure_files_authentication.active_directory == null ? null : {
+      domainGuid        = var.azure_files_authentication.active_directory.domain_guid
+      domainName        = var.azure_files_authentication.active_directory.domain_name
+      domainSid         = var.azure_files_authentication.active_directory.domain_sid
+      forestName        = var.azure_files_authentication.active_directory.forest_name
+      netBiosDomainName = var.azure_files_authentication.active_directory.netbios_domain_name
+      azureStorageSid   = var.azure_files_authentication.active_directory.storage_sid
+    }
+  }
+  # Custom domain
+  custom_domain = var.custom_domain == null ? null : {
+    name             = var.custom_domain.name
+    useSubDomainName = var.custom_domain.use_subdomain
+  }
   # Whether a customer-managed key is configured.
   customer_managed_key_enabled = var.customer_managed_key != null
-
-  # Identity composition. Returns null when no identity is configured so the
-  # body omits the field entirely.
-  managed_identity_type = (
-    var.managed_identities.system_assigned && length(var.managed_identities.user_assigned_resource_ids) > 0 ? "SystemAssigned, UserAssigned" :
-    var.managed_identities.system_assigned ? "SystemAssigned" :
-    length(var.managed_identities.user_assigned_resource_ids) > 0 ? "UserAssigned" :
-    null
-  )
-
-  # Encryption services keyType (Account vs Service) for queue/table.
-  encryption_services_present = (
-    var.queue_encryption_key_type != null ||
-    var.table_encryption_key_type != null ||
-    var.infrastructure_encryption_enabled ||
-    local.customer_managed_key_enabled
-  )
-
+  encryption = local.encryption_services_present ? {
+    keySource                       = local.customer_managed_key_enabled ? "Microsoft.Keyvault" : "Microsoft.Storage"
+    requireInfrastructureEncryption = var.infrastructure_encryption_enabled ? true : null
+    services                        = { for k, v in local.encryption_services : k => v if v != null }
+    keyvaultproperties              = local.encryption_keyvault
+    identity                        = local.encryption_identity
+  } : null
+  encryption_identity = local.customer_managed_key_enabled && try(var.customer_managed_key.user_assigned_identity, null) != null ? {
+    userAssignedIdentity = var.customer_managed_key.user_assigned_identity.resource_id
+  } : null
+  encryption_keyvault = local.customer_managed_key_enabled ? {
+    keyname     = var.customer_managed_key.key_name
+    keyvaulturi = data.azapi_resource.customer_managed_key_vault[0].output.properties.vaultUri
+    keyversion  = var.customer_managed_key.key_version
+  } : null
   encryption_services = {
     queue = var.queue_encryption_key_type == null ? null : {
       keyType = var.queue_encryption_key_type
@@ -33,25 +44,35 @@ locals {
       enabled = true
     }
   }
-
-  encryption_keyvault = local.customer_managed_key_enabled ? {
-    keyname     = var.customer_managed_key.key_name
-    keyvaulturi = data.azapi_resource.customer_managed_key_vault[0].output.properties.vaultUri
-    keyversion  = var.customer_managed_key.key_version
-  } : null
-
-  encryption_identity = local.customer_managed_key_enabled && try(var.customer_managed_key.user_assigned_identity, null) != null ? {
-    userAssignedIdentity = var.customer_managed_key.user_assigned_identity.resource_id
-  } : null
-
-  encryption = local.encryption_services_present ? {
-    keySource                       = local.customer_managed_key_enabled ? "Microsoft.Keyvault" : "Microsoft.Storage"
-    requireInfrastructureEncryption = var.infrastructure_encryption_enabled ? true : null
-    services                        = { for k, v in local.encryption_services : k => v if v != null }
-    keyvaultproperties              = local.encryption_keyvault
-    identity                        = local.encryption_identity
-  } : null
-
+  # Encryption services keyType (Account vs Service) for queue/table.
+  encryption_services_present = (
+    var.queue_encryption_key_type != null ||
+    var.table_encryption_key_type != null ||
+    var.infrastructure_encryption_enabled ||
+    local.customer_managed_key_enabled
+  )
+  extended_location = var.edge_zone == null ? null : {
+    name = var.edge_zone
+    type = "EdgeZone"
+  }
+  # Account-level immutability policy (immutableStorageWithVersioning)
+  immutable_storage_with_versioning = var.immutability_policy == null ? null : {
+    enabled = true
+    immutabilityPolicy = {
+      allowProtectedAppendWrites            = var.immutability_policy.allow_protected_append_writes
+      immutabilityPeriodSinceCreationInDays = var.immutability_policy.period_since_creation_in_days
+      state                                 = var.immutability_policy.state
+    }
+  }
+  large_file_shares_state = var.large_file_share_enabled == null ? null : (var.large_file_share_enabled ? "Enabled" : "Disabled")
+  # Identity composition. Returns null when no identity is configured so the
+  # body omits the field entirely.
+  managed_identity_type = (
+    var.managed_identities.system_assigned && length(var.managed_identities.user_assigned_resource_ids) > 0 ? "SystemAssigned, UserAssigned" :
+    var.managed_identities.system_assigned ? "SystemAssigned" :
+    length(var.managed_identities.user_assigned_resource_ids) > 0 ? "UserAssigned" :
+    null
+  )
   # Network ACLs mapping
   network_acls = var.network_rules == null ? null : {
     bypass        = var.network_rules.bypass == null ? null : (length(var.network_rules.bypass) == 0 ? "None" : join(", ", tolist(var.network_rules.bypass)))
@@ -67,57 +88,21 @@ locals {
       }
     ]
   }
-
-  # Azure Files identity-based auth mapping
-  azure_files_identity_based_authentication = var.azure_files_authentication == null ? null : {
-    directoryServiceOptions = var.azure_files_authentication.directory_type
-    defaultSharePermission  = var.azure_files_authentication.default_share_level_permission
-    activeDirectoryProperties = var.azure_files_authentication.active_directory == null ? null : {
-      domainGuid        = var.azure_files_authentication.active_directory.domain_guid
-      domainName        = var.azure_files_authentication.active_directory.domain_name
-      domainSid         = var.azure_files_authentication.active_directory.domain_sid
-      forestName        = var.azure_files_authentication.active_directory.forest_name
-      netBiosDomainName = var.azure_files_authentication.active_directory.netbios_domain_name
-      azureStorageSid   = var.azure_files_authentication.active_directory.storage_sid
-    }
-  }
-
+  public_network_access_setting = var.public_network_access_enabled == null ? null : (var.public_network_access_enabled ? "Enabled" : "Disabled")
   # Routing preference
   routing_preference = var.routing == null ? null : {
     routingChoice             = var.routing.choice
     publishInternetEndpoints  = var.routing.publish_internet_endpoints
     publishMicrosoftEndpoints = var.routing.publish_microsoft_endpoints
   }
-
   # SAS policy
   sas_policy = var.sas_policy == null ? null : {
     sasExpirationPeriod = var.sas_policy.expiration_period
     expirationAction    = var.sas_policy.expiration_action
   }
-
-  # Custom domain
-  custom_domain = var.custom_domain == null ? null : {
-    name             = var.custom_domain.name
-    useSubDomainName = var.custom_domain.use_subdomain
-  }
-
-  # Account-level immutability policy (immutableStorageWithVersioning)
-  immutable_storage_with_versioning = var.immutability_policy == null ? null : {
-    enabled = true
-    immutabilityPolicy = {
-      allowProtectedAppendWrites            = var.immutability_policy.allow_protected_append_writes
-      immutabilityPeriodSinceCreationInDays = var.immutability_policy.period_since_creation_in_days
-      state                                 = var.immutability_policy.state
-    }
-  }
-
-  extended_location = var.edge_zone == null ? null : {
-    name = var.edge_zone
-    type = "EdgeZone"
-  }
-
-  large_file_shares_state       = var.large_file_share_enabled == null ? null : (var.large_file_share_enabled ? "Enabled" : "Disabled")
-  public_network_access_setting = var.public_network_access_enabled == null ? null : (var.public_network_access_enabled ? "Enabled" : "Disabled")
+  # SKU name combines tier + replication, with optional V2 suffix when the
+  # provisioned billing model V2 is requested (StandardV2_*, PremiumV2_*).
+  sku_name = var.provisioned_billing_model_version == "V2" ? "${var.account_tier}V2_${var.account_replication_type}" : "${var.account_tier}_${var.account_replication_type}"
 }
 
 # Customer-managed key vault data source. We need the vault URI for the
@@ -125,27 +110,16 @@ locals {
 data "azapi_resource" "customer_managed_key_vault" {
   count = local.customer_managed_key_enabled ? 1 : 0
 
-  type                   = "Microsoft.KeyVault/vaults@2023-07-01"
   resource_id            = var.customer_managed_key.key_vault_resource_id
+  type                   = "Microsoft.KeyVault/vaults@2023-07-01"
   response_export_values = ["properties.vaultUri"]
 }
 
 resource "azapi_resource" "this" {
-  type      = "Microsoft.Storage/storageAccounts@2024-01-01"
+  location  = var.location
   name      = var.name
   parent_id = var.parent_id
-  location  = var.location
-  tags      = var.tags
-
-  dynamic "identity" {
-    for_each = local.managed_identity_type == null ? [] : [local.managed_identity_type]
-
-    content {
-      type         = identity.value
-      identity_ids = var.managed_identities.user_assigned_resource_ids
-    }
-  }
-
+  type      = "Microsoft.Storage/storageAccounts@2024-01-01"
   body = {
     kind             = var.account_kind
     extendedLocation = local.extended_location
@@ -176,12 +150,9 @@ resource "azapi_resource" "this" {
       supportsHttpsTrafficOnly              = var.https_traffic_only_enabled
     }
   }
-
   create_headers = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
   delete_headers = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
   read_headers   = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
-  update_headers = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
-
   response_export_values = [
     "identity",
     "properties.primaryEndpoints",
@@ -189,17 +160,26 @@ resource "azapi_resource" "this" {
     "properties.primaryLocation",
     "properties.secondaryLocation",
   ]
+  retry          = var.retry
+  tags           = var.tags
+  update_headers = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
 
-  retry = var.retry
+  dynamic "identity" {
+    for_each = local.managed_identity_type == null ? [] : [local.managed_identity_type]
 
+    content {
+      type         = identity.value
+      identity_ids = var.managed_identities.user_assigned_resource_ids
+    }
+  }
   dynamic "timeouts" {
     for_each = var.timeouts == null ? [] : [var.timeouts]
 
     content {
       create = timeouts.value.create
+      delete = timeouts.value.delete
       read   = timeouts.value.read
       update = timeouts.value.update
-      delete = timeouts.value.delete
     }
   }
 }

@@ -202,20 +202,21 @@ resource "azurerm_storage_data_lake_gen2_path" "directory_with_acl" {
   path               = "example-directory"
   resource           = "directory"
   storage_account_id = module.this.resource_id
-  owner              = data.azurerm_client_config.current.object_id
   group              = "$superuser"
+  owner              = data.azurerm_client_config.current.object_id
+
   ace {
+    permissions = "rwx"
     type        = "user"
     id          = data.azurerm_client_config.current.object_id
-    permissions = "rwx"
   }
   ace {
-    type        = "group"
     permissions = "r-x"
+    type        = "group"
   }
   ace {
-    type        = "other"
     permissions = "---"
+    type        = "other"
   }
 
   depends_on = [time_sleep.wait_for_rbac]

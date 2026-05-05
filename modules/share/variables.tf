@@ -1,12 +1,18 @@
-variable "storage_account_id" {
-  type        = string
-  description = "(Required) The full resource ID of the parent storage account."
-  nullable    = false
-}
-
 variable "name" {
   type        = string
   description = "(Required) The name of the file share."
+  nullable    = false
+}
+
+variable "quota" {
+  type        = number
+  description = "(Required) The maximum size of the share, in gigabytes."
+  nullable    = false
+}
+
+variable "storage_account_id" {
+  type        = string
+  description = "(Required) The full resource ID of the parent storage account."
   nullable    = false
 }
 
@@ -28,9 +34,29 @@ variable "metadata" {
   description = "(Optional) Metadata for the share."
 }
 
-variable "quota" {
-  type        = number
-  description = "(Required) The maximum size of the share, in gigabytes."
+variable "retry" {
+  type = object({
+    error_message_regex  = optional(list(string))
+    interval_seconds     = optional(number)
+    max_interval_seconds = optional(number)
+  })
+  default     = null
+  description = "Retry configuration applied to AzAPI resources managed by this module."
+}
+
+variable "role_assignments" {
+  type = map(object({
+    role_definition_id_or_name             = string
+    principal_id                           = string
+    principal_type                         = optional(string, null)
+    description                            = optional(string, null)
+    skip_service_principal_aad_check       = optional(bool, false)
+    condition                              = optional(string, null)
+    condition_version                      = optional(string, null)
+    delegated_managed_identity_resource_id = optional(string, null)
+  }))
+  default     = {}
+  description = "Map of role assignments to create at the share scope."
   nullable    = false
 }
 
@@ -51,32 +77,6 @@ variable "signed_identifiers" {
   }))
   default     = null
   description = "(Optional) Signed identifiers / access policies for the share."
-}
-
-variable "role_assignments" {
-  type = map(object({
-    role_definition_id_or_name             = string
-    principal_id                           = string
-    principal_type                         = optional(string, null)
-    description                            = optional(string, null)
-    skip_service_principal_aad_check       = optional(bool, false)
-    condition                              = optional(string, null)
-    condition_version                      = optional(string, null)
-    delegated_managed_identity_resource_id = optional(string, null)
-  }))
-  default     = {}
-  description = "Map of role assignments to create at the share scope."
-  nullable    = false
-}
-
-variable "retry" {
-  type = object({
-    error_message_regex  = optional(list(string))
-    interval_seconds     = optional(number)
-    max_interval_seconds = optional(number)
-  })
-  default     = null
-  description = "Retry configuration applied to AzAPI resources managed by this module."
 }
 
 variable "timeouts" {

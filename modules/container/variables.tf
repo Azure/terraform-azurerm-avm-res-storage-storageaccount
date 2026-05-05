@@ -1,25 +1,13 @@
-variable "storage_account_id" {
-  type        = string
-  description = "(Required) The full resource ID of the parent storage account."
-  nullable    = false
-}
-
 variable "name" {
   type        = string
   description = "(Required) The name of the container."
   nullable    = false
 }
 
-variable "public_access" {
+variable "storage_account_id" {
   type        = string
-  default     = "None"
-  description = "(Optional) Specifies the level of public access. Valid values: `None`, `Blob`, `Container`. Defaults to `None`."
-}
-
-variable "metadata" {
-  type        = map(string)
-  default     = null
-  description = "(Optional) Container metadata. Keys must be lowercase."
+  description = "(Required) The full resource ID of the parent storage account."
+  nullable    = false
 }
 
 variable "default_encryption_scope" {
@@ -54,6 +42,28 @@ variable "immutable_storage_with_versioning" {
   description = "(Optional) Configures container-level immutability with version-level WORM."
 }
 
+variable "metadata" {
+  type        = map(string)
+  default     = null
+  description = "(Optional) Container metadata. Keys must be lowercase."
+}
+
+variable "public_access" {
+  type        = string
+  default     = "None"
+  description = "(Optional) Specifies the level of public access. Valid values: `None`, `Blob`, `Container`. Defaults to `None`."
+}
+
+variable "retry" {
+  type = object({
+    error_message_regex  = optional(list(string))
+    interval_seconds     = optional(number)
+    max_interval_seconds = optional(number)
+  })
+  default     = null
+  description = "Retry configuration applied to AzAPI resources managed by this module."
+}
+
 variable "role_assignments" {
   type = map(object({
     role_definition_id_or_name             = string
@@ -68,16 +78,6 @@ variable "role_assignments" {
   default     = {}
   description = "Map of role assignments to create at the container scope."
   nullable    = false
-}
-
-variable "retry" {
-  type = object({
-    error_message_regex  = optional(list(string))
-    interval_seconds     = optional(number)
-    max_interval_seconds = optional(number)
-  })
-  default     = null
-  description = "Retry configuration applied to AzAPI resources managed by this module."
 }
 
 variable "timeouts" {

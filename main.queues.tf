@@ -2,12 +2,11 @@ module "queues" {
   source   = "./modules/queue"
   for_each = var.queues
 
-  storage_account_id = azapi_resource.this.id
-  name               = each.value.name
-  metadata           = each.value.metadata
-
-  role_assignments    = each.value.role_assignments
+  name                = each.value.name
+  storage_account_id  = azapi_resource.this.id
+  metadata            = each.value.metadata
   retry               = var.retry
+  role_assignments    = each.value.role_assignments
   timeouts            = each.value.timeouts != null ? each.value.timeouts : var.timeouts
   tracing_tags_header = var.enable_telemetry ? local.avm_azapi_header : null
 }

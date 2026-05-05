@@ -4,6 +4,16 @@ variable "scope" {
   nullable    = false
 }
 
+variable "retry" {
+  type = object({
+    error_message_regex  = optional(list(string))
+    interval_seconds     = optional(number)
+    max_interval_seconds = optional(number)
+  })
+  default     = null
+  description = "Retry configuration applied to every AzAPI resource managed by this module. See AzAPI provider docs for details."
+}
+
 variable "role_assignments" {
   type = map(object({
     role_definition_id_or_name             = string
@@ -29,16 +39,6 @@ A map of role assignments to create at the supplied scope. The map key is delibe
 - `principal_type`                       - (Optional) The type of principal (`User`, `Group`, `ServicePrincipal`, `ForeignGroup`, `Device`).
 EOT
   nullable    = false
-}
-
-variable "retry" {
-  type = object({
-    error_message_regex  = optional(list(string))
-    interval_seconds     = optional(number)
-    max_interval_seconds = optional(number)
-  })
-  default     = null
-  description = "Retry configuration applied to every AzAPI resource managed by this module. See AzAPI provider docs for details."
 }
 
 variable "timeouts" {

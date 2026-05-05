@@ -4,16 +4,16 @@ variable "storage_account_id" {
   nullable    = false
 }
 
-variable "index_document" {
-  type        = string
-  default     = null
-  description = "(Optional) The webpage that Azure Storage serves for requests to the root of a website or any subfolder."
-}
-
 variable "error_404_document" {
   type        = string
   default     = null
   description = "(Optional) The absolute path to a custom webpage to use for 404 not-found errors."
+}
+
+variable "index_document" {
+  type        = string
+  default     = null
+  description = "(Optional) The webpage that Azure Storage serves for requests to the root of a website or any subfolder."
 }
 
 variable "retry" {

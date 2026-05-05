@@ -13,12 +13,11 @@ module "data_lake_filesystems" {
   source   = "./modules/data_lake_filesystem"
   for_each = var.storage_data_lake_gen2_filesystems
 
-  storage_account_id       = azapi_resource.this.id
   name                     = each.value.name
+  storage_account_id       = azapi_resource.this.id
   default_encryption_scope = each.value.default_encryption_scope
   metadata                 = each.value.properties
-
-  retry               = var.retry
-  timeouts            = each.value.timeouts != null ? each.value.timeouts : var.timeouts
-  tracing_tags_header = var.enable_telemetry ? local.avm_azapi_header : null
+  retry                    = var.retry
+  timeouts                 = each.value.timeouts != null ? each.value.timeouts : var.timeouts
+  tracing_tags_header      = var.enable_telemetry ? local.avm_azapi_header : null
 }

@@ -1,6 +1,4 @@
 locals {
-  tracing_headers = var.tracing_tags_header == null ? null : { "User-Agent" = var.tracing_tags_header }
-
   permission_string = var.permission_scope == null ? null : [
     for ps in var.permission_scope : {
       service      = ps.service
@@ -14,20 +12,19 @@ locals {
       ))
     }
   ]
-
   ssh_keys = var.ssh_authorized_key == null ? null : [
     for k in var.ssh_authorized_key : {
       description = k.description
       key         = k.key
     }
   ]
+  tracing_headers = var.tracing_tags_header == null ? null : { "User-Agent" = var.tracing_tags_header }
 }
 
 resource "azapi_resource" "this" {
-  type      = "Microsoft.Storage/storageAccounts/localUsers@2024-01-01"
   name      = var.name
   parent_id = var.storage_account_id
-
+  type      = "Microsoft.Storage/storageAccounts/localUsers@2024-01-01"
   body = {
     properties = {
       homeDirectory     = var.home_directory
@@ -38,24 +35,21 @@ resource "azapi_resource" "this" {
       permissionScopes  = local.permission_string
     }
   }
-
-  create_headers = local.tracing_headers
-  delete_headers = local.tracing_headers
-  read_headers   = local.tracing_headers
-  update_headers = local.tracing_headers
-
+  create_headers         = local.tracing_headers
+  delete_headers         = local.tracing_headers
+  read_headers           = local.tracing_headers
   response_export_values = ["properties.sid"]
-
-  retry = var.retry
+  retry                  = var.retry
+  update_headers         = local.tracing_headers
 
   dynamic "timeouts" {
     for_each = var.timeouts == null ? [] : [var.timeouts]
 
     content {
       create = timeouts.value.create
+      delete = timeouts.value.delete
       read   = timeouts.value.read
       update = timeouts.value.update
-      delete = timeouts.value.delete
     }
   }
 }

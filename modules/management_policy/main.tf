@@ -1,6 +1,4 @@
 locals {
-  tracing_headers = var.tracing_tags_header == null ? null : { "User-Agent" = var.tracing_tags_header }
-
   # Map snake_case Terraform variable shapes to the ARM camelCase contract.
   arm_rules = [
     for k, r in var.rules : {
@@ -104,13 +102,13 @@ locals {
       }
     }
   ]
+  tracing_headers = var.tracing_tags_header == null ? null : { "User-Agent" = var.tracing_tags_header }
 }
 
 resource "azapi_resource" "this" {
-  type      = "Microsoft.Storage/storageAccounts/managementPolicies@2024-01-01"
   name      = "default"
   parent_id = var.storage_account_id
-
+  type      = "Microsoft.Storage/storageAccounts/managementPolicies@2024-01-01"
   body = {
     properties = {
       policy = {
@@ -118,22 +116,20 @@ resource "azapi_resource" "this" {
       }
     }
   }
-
   create_headers = local.tracing_headers
   delete_headers = local.tracing_headers
   read_headers   = local.tracing_headers
+  retry          = var.retry
   update_headers = local.tracing_headers
-
-  retry = var.retry
 
   dynamic "timeouts" {
     for_each = var.timeouts == null ? [] : [var.timeouts]
 
     content {
       create = timeouts.value.create
+      delete = timeouts.value.delete
       read   = timeouts.value.read
       update = timeouts.value.update
-      delete = timeouts.value.delete
     }
   }
 }

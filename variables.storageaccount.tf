@@ -1,3 +1,5 @@
+# `variable "timeouts"` is declared in variables.tf (the AzAPI-flavoured
+# definition that flows through to all submodules).
 variable "access_tier" {
   type        = string
   default     = "Hot"
@@ -286,6 +288,3 @@ variable "static_website" {
  - `index_document` - (Optional) The webpage that Azure Storage serves for requests to the root of a website or any subfolder. For example, index.html. The value is case-sensitive.
 EOT
 }
-
-# `variable "timeouts"` is declared in variables.tf (the AzAPI-flavoured
-# definition that flows through to all submodules).

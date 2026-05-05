@@ -62,26 +62,6 @@ module "this" {
   account_kind             = "StorageV2"
   account_replication_type = "LRS"
   account_tier             = "Standard"
-
-  # Module-wide retry. Applies to every AzAPI resource managed by the module
-  # and every submodule (containers, queues, shares, tables, diagnostic
-  # settings, private endpoints, management policy, local users, role
-  # assignments, Data Lake Gen2 filesystems) unless overridden per-item.
-  retry = {
-    error_message_regex  = ["TooManyRequests", "ResourceNotFound", "RetryableError"]
-    interval_seconds     = 5
-    max_interval_seconds = 60
-  }
-
-  # Module-wide timeouts. Apply to every AzAPI resource managed by the module
-  # and every submodule, unless overridden per-item via `<item>.timeouts`.
-  timeouts = {
-    create = "60m"
-    read   = "5m"
-    update = "60m"
-    delete = "60m"
-  }
-
   # Per-item timeout overrides take precedence over the module-level value
   # above. Here we give container-create a longer ceiling because immutability
   # policy creation can be slow.
@@ -99,15 +79,30 @@ module "this" {
       }
     }
   }
-
   network_rules = {
     bypass         = ["AzureServices"]
     default_action = "Deny"
   }
   public_network_access_enabled = false
-  shared_access_key_enabled     = false
-
+  # Module-wide retry. Applies to every AzAPI resource managed by the module
+  # and every submodule (containers, queues, shares, tables, diagnostic
+  # settings, private endpoints, management policy, local users, role
+  # assignments, Data Lake Gen2 filesystems) unless overridden per-item.
+  retry = {
+    error_message_regex  = ["TooManyRequests", "ResourceNotFound", "RetryableError"]
+    interval_seconds     = 5
+    max_interval_seconds = 60
+  }
+  shared_access_key_enabled = false
   tags = {
     env = "Dev"
+  }
+  # Module-wide timeouts. Apply to every AzAPI resource managed by the module
+  # and every submodule, unless overridden per-item via `<item>.timeouts`.
+  timeouts = {
+    create = "60m"
+    read   = "5m"
+    update = "60m"
+    delete = "60m"
   }
 }

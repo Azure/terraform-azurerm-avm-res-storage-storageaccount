@@ -1,20 +1,17 @@
 locals {
-  tracing_headers = var.tracing_tags_header == null ? null : { "User-Agent" = var.tracing_tags_header }
-
   # Compose the logs[] array. Each entry has either category or categoryGroup.
   log_entries = concat(
     [for c in var.log_categories : { category = c, enabled = true }],
     [for g in var.log_groups : { categoryGroup = g, enabled = true }],
   )
-
-  metric_entries = [for m in var.metric_categories : { category = m, enabled = true }]
+  metric_entries  = [for m in var.metric_categories : { category = m, enabled = true }]
+  tracing_headers = var.tracing_tags_header == null ? null : { "User-Agent" = var.tracing_tags_header }
 }
 
 resource "azapi_resource" "this" {
-  type      = "Microsoft.Insights/diagnosticSettings@2021-05-01-preview"
   name      = var.name
   parent_id = var.target_resource_id
-
+  type      = "Microsoft.Insights/diagnosticSettings@2021-05-01-preview"
   body = {
     properties = {
       workspaceId                 = var.workspace_resource_id
@@ -27,24 +24,21 @@ resource "azapi_resource" "this" {
       metrics                     = length(local.metric_entries) == 0 ? null : local.metric_entries
     }
   }
-
+  create_headers            = local.tracing_headers
+  delete_headers            = local.tracing_headers
+  read_headers              = local.tracing_headers
+  retry                     = var.retry
   schema_validation_enabled = false
-
-  create_headers = local.tracing_headers
-  delete_headers = local.tracing_headers
-  read_headers   = local.tracing_headers
-  update_headers = local.tracing_headers
-
-  retry = var.retry
+  update_headers            = local.tracing_headers
 
   dynamic "timeouts" {
     for_each = var.timeouts == null ? [] : [var.timeouts]
 
     content {
       create = timeouts.value.create
+      delete = timeouts.value.delete
       read   = timeouts.value.read
       update = timeouts.value.update
-      delete = timeouts.value.delete
     }
   }
 
