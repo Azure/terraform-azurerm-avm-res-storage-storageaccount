@@ -12,9 +12,9 @@ terraform {
   required_version = ">= 1.10.0"
 
   required_providers {
-    azurerm = {
-      source  = "hashicorp/azurerm"
-      version = ">= 4.37.0, < 5.0.0"
+    azapi = {
+      source  = "Azure/azapi"
+      version = "~> 2.8"
     }
     random = {
       source  = "hashicorp/random"
@@ -23,19 +23,13 @@ terraform {
   }
 }
 
-provider "azurerm" {
-  features {
-    resource_group {
-      prevent_deletion_if_contains_resources = false
-    }
-  }
-  resource_provider_registrations = "none"
-  storage_use_azuread             = true
-}
+provider "azapi" {}
 
 locals {
   test_regions = ["eastus", "eastus2", "westus2", "westus3"]
 }
+
+data "azapi_client_config" "current" {}
 
 resource "random_integer" "region_index" {
   max = length(local.test_regions) - 1
@@ -54,9 +48,11 @@ module "naming" {
   version = "0.4.0"
 }
 
-resource "azurerm_resource_group" "this" {
-  location = local.test_regions[random_integer.region_index.result]
-  name     = module.naming.resource_group.name_unique
+resource "azapi_resource" "rg" {
+  location  = local.test_regions[random_integer.region_index.result]
+  name      = module.naming.resource_group.name_unique
+  parent_id = "/subscriptions/${data.azapi_client_config.current.subscription_id}"
+  type      = "Microsoft.Resources/resourceGroups@2021-04-01"
 }
 
 # This example shows how to inject custom retry semantics and timeouts. The
@@ -66,9 +62,9 @@ resource "azurerm_resource_group" "this" {
 module "this" {
   source = "../.."
 
-  location                 = azurerm_resource_group.this.location
+  location                 = azapi_resource.rg.location
   name                     = module.naming.storage_account.name_unique
-  parent_id                = azurerm_resource_group.this.id
+  parent_id                = azapi_resource.rg.id
   account_kind             = "StorageV2"
   account_replication_type = "LRS"
   account_tier             = "Standard"
@@ -126,7 +122,7 @@ The following requirements are needed by this module:
 
 - <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.10.0)
 
-- <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (>= 4.37.0, < 5.0.0)
+- <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) (~> 2.8)
 
 - <a name="requirement_random"></a> [random](#requirement\_random) (>= 3.5.0, < 4.0.0)
 
@@ -134,9 +130,10 @@ The following requirements are needed by this module:
 
 The following resources are used by this module:
 
-- [azurerm_resource_group.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) (resource)
+- [azapi_resource.rg](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
 - [random_integer.region_index](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/integer) (resource)
 - [random_string.this](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/string) (resource)
+- [azapi_client_config.current](https://registry.terraform.io/providers/Azure/azapi/latest/docs/data-sources/client_config) (data source)
 
 <!-- markdownlint-disable MD013 -->
 ## Required Inputs

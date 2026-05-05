@@ -6,7 +6,7 @@ output "containers" {
 output "eventhub_authorization_rule_primary_key" {
   description = "Primary key for the event hub authorisation rule"
   sensitive   = true
-  value       = azurerm_eventhub_authorization_rule.this.primary_key
+  value       = data.azapi_resource_action.eventhub_auth_rule_keys.output.primaryKey
 }
 
 output "queue" {

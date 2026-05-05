@@ -2,9 +2,9 @@ terraform {
   required_version = ">= 1.10.0"
 
   required_providers {
-    azurerm = {
-      source  = "hashicorp/azurerm"
-      version = ">= 4.37.0, < 5.0.0"
+    azapi = {
+      source  = "Azure/azapi"
+      version = "~> 2.8"
     }
     random = {
       source  = "hashicorp/random"
@@ -13,20 +13,14 @@ terraform {
   }
 }
 
-provider "azurerm" {
-  features {
-    resource_group {
-      prevent_deletion_if_contains_resources = false
-    }
-  }
-  resource_provider_registrations = "none"
-  storage_use_azuread             = true
-}
+provider "azapi" {}
 
 # This allows us to randomize the region for the resource group.
 locals {
   test_regions = ["eastus", "eastus2", "westus2", "westus3"]
 }
+# We need this to get the object_id of the current user
+data "azapi_client_config" "current" {}
 # This allows us to randomize the region for the resource group.
 resource "random_integer" "region_index" {
   max = length(local.test_regions) - 1
@@ -45,49 +39,70 @@ module "naming" {
 }
 
 
-resource "azurerm_resource_group" "this" {
-  location = local.test_regions[random_integer.region_index.result]
-  name     = module.naming.resource_group.name_unique
+resource "azapi_resource" "rg" {
+  location  = local.test_regions[random_integer.region_index.result]
+  name      = module.naming.resource_group.name_unique
+  parent_id = "/subscriptions/${data.azapi_client_config.current.subscription_id}"
+  type      = "Microsoft.Resources/resourceGroups@2021-04-01"
 }
 
-resource "azurerm_virtual_network" "vnet" {
-  location            = azurerm_resource_group.this.location
-  name                = module.naming.virtual_network.name_unique
-  resource_group_name = azurerm_resource_group.this.name
-  address_space       = ["192.168.0.0/16"]
+resource "azapi_resource" "vnet" {
+  location  = azapi_resource.rg.location
+  name      = module.naming.virtual_network.name_unique
+  parent_id = azapi_resource.rg.id
+  type      = "Microsoft.Network/virtualNetworks@2023-11-01"
+  body = {
+    properties = {
+      addressSpace = {
+        addressPrefixes = ["192.168.0.0/16"]
+      }
+    }
+  }
 }
 
-resource "azurerm_subnet" "private" {
-  address_prefixes     = ["192.168.0.0/24"]
-  name                 = module.naming.subnet.name_unique
-  resource_group_name  = azurerm_resource_group.this.name
-  virtual_network_name = azurerm_virtual_network.vnet.name
-  service_endpoints    = ["Microsoft.Storage"]
+resource "azapi_resource" "nsg" {
+  location  = azapi_resource.rg.location
+  name      = module.naming.network_security_group.name_unique
+  parent_id = azapi_resource.rg.id
+  type      = "Microsoft.Network/networkSecurityGroups@2023-11-01"
+  body = {
+    properties = {}
+  }
 }
 
-resource "azurerm_network_security_group" "nsg" {
-  location            = azurerm_resource_group.this.location
-  name                = module.naming.network_security_group.name_unique
-  resource_group_name = azurerm_resource_group.this.name
+resource "azapi_resource" "subnet" {
+  name      = module.naming.subnet.name_unique
+  parent_id = azapi_resource.vnet.id
+  type      = "Microsoft.Network/virtualNetworks/subnets@2023-11-01"
+  body = {
+    properties = {
+      addressPrefix = "192.168.0.0/24"
+      serviceEndpoints = [
+        { service = "Microsoft.Storage" }
+      ]
+      networkSecurityGroup = {
+        id = azapi_resource.nsg.id
+      }
+    }
+  }
 }
 
-resource "azurerm_subnet_network_security_group_association" "private" {
-  network_security_group_id = azurerm_network_security_group.nsg.id
-  subnet_id                 = azurerm_subnet.private.id
-}
-
-resource "azurerm_network_security_rule" "no_internet" {
-  access                      = "Deny"
-  direction                   = "Outbound"
-  name                        = module.naming.network_security_rule.name_unique
-  network_security_group_name = azurerm_network_security_group.nsg.name
-  priority                    = 100
-  protocol                    = "*"
-  resource_group_name         = azurerm_resource_group.this.name
-  destination_address_prefix  = "Internet"
-  destination_port_range      = "*"
-  source_address_prefix       = azurerm_subnet.private.address_prefixes[0]
-  source_port_range           = "*"
+resource "azapi_resource" "no_internet_rule" {
+  name      = module.naming.network_security_rule.name_unique
+  parent_id = azapi_resource.nsg.id
+  type      = "Microsoft.Network/networkSecurityGroups/securityRules@2023-11-01"
+  body = {
+    properties = {
+      access                   = "Deny"
+      direction                = "Outbound"
+      priority                 = 100
+      protocol                 = "*"
+      sourceAddressPrefix      = "192.168.0.0/24"
+      sourcePortRange          = "*"
+      destinationAddressPrefix = "Internet"
+      destinationPortRange     = "*"
+    }
+  }
 }
 
 module "public_ip" {
@@ -95,25 +110,21 @@ module "public_ip" {
   version = "0.1.0"
   count   = var.bypass_ip_cidr == null ? 1 : 0
 }
-# We need this to get the object_id of the current user
-data "azurerm_client_config" "current" {}
 
-resource "azurerm_user_assigned_identity" "example_identity" {
-  location            = azurerm_resource_group.this.location
-  name                = module.naming.user_assigned_identity.name_unique
-  resource_group_name = azurerm_resource_group.this.name
-}
-# We use the role definition data source to get the id of the Contributor role
-data "azurerm_role_definition" "example" {
-  name = "Contributor"
+resource "azapi_resource" "example_identity" {
+  location  = azapi_resource.rg.location
+  name      = module.naming.user_assigned_identity.name_unique
+  parent_id = azapi_resource.rg.id
+  type      = "Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31"
+  body      = {}
 }
 
 module "this" {
   source = "../.."
 
-  location                 = azurerm_resource_group.this.location
+  location                 = azapi_resource.rg.location
   name                     = module.naming.storage_account.name_unique
-  parent_id                = azurerm_resource_group.this.id
+  parent_id                = azapi_resource.rg.id
   account_kind             = "StorageV2"
   account_replication_type = "ZRS"
   account_tier             = "Standard"
@@ -123,7 +134,7 @@ module "this" {
       role_assignments = {
         rbac_storage_blob_data_contributor = {
           role_definition_id_or_name = "Storage Blob Data Contributor"
-          principal_id               = data.azurerm_client_config.current.object_id
+          principal_id               = data.azapi_client_config.current.object_id
         }
       }
     }
@@ -132,7 +143,7 @@ module "this" {
       role_assignments = {
         rbac_storage_blob_data_reader = {
           role_definition_id_or_name = "Storage Blob Data Reader"
-          principal_id               = data.azurerm_client_config.current.object_id
+          principal_id               = data.azapi_client_config.current.object_id
         }
       }
     }
@@ -140,14 +151,14 @@ module "this" {
   }
   managed_identities = {
     system_assigned            = true
-    user_assigned_resource_ids = [azurerm_user_assigned_identity.example_identity.id]
+    user_assigned_resource_ids = [azapi_resource.example_identity.id]
   }
   min_tls_version = "TLS1_2"
   network_rules = {
     bypass                     = ["AzureServices"]
     default_action             = "Deny"
     ip_rules                   = [try(module.public_ip[0].public_ip, var.bypass_ip_cidr)]
-    virtual_network_subnet_ids = toset([azurerm_subnet.private.id])
+    virtual_network_subnet_ids = toset([azapi_resource.subnet.id])
   }
   public_network_access_enabled = false
   queues = {
@@ -156,7 +167,7 @@ module "this" {
       role_assignments = {
         rbac_storage_queue_data_reader = {
           role_definition_id_or_name = "Storage Queue Data Reader"
-          principal_id               = data.azurerm_client_config.current.object_id
+          principal_id               = data.azapi_client_config.current.object_id
         }
       }
     }
@@ -165,20 +176,20 @@ module "this" {
       role_assignments = {
         rbac_storage_queue_data_contributor = {
           role_definition_id_or_name = "Storage Queue Data Contributor"
-          principal_id               = data.azurerm_client_config.current.object_id
+          principal_id               = data.azapi_client_config.current.object_id
         }
       }
     }
   }
   role_assignments = {
     role_assignment_1 = {
-      role_definition_id_or_name       = data.azurerm_role_definition.example.name
-      principal_id                     = coalesce(var.msi_id, data.azurerm_client_config.current.object_id)
+      role_definition_id_or_name       = "Contributor"
+      principal_id                     = coalesce(var.msi_id, data.azapi_client_config.current.object_id)
       skip_service_principal_aad_check = false
     },
     role_assignment_2 = {
       role_definition_id_or_name       = "Owner"
-      principal_id                     = data.azurerm_client_config.current.object_id
+      principal_id                     = data.azapi_client_config.current.object_id
       skip_service_principal_aad_check = false
     },
 
@@ -191,7 +202,7 @@ module "this" {
       role_assignments = {
         rbac_storage_share_data_reader = {
           role_definition_id_or_name = "Storage File Data SMB Share Reader"
-          principal_id               = data.azurerm_client_config.current.object_id
+          principal_id               = data.azapi_client_config.current.object_id
         }
       }
     }
@@ -201,7 +212,7 @@ module "this" {
       role_assignments = {
         rbac_storage_share_data_contributor = {
           role_definition_id_or_name = "Storage File Data SMB Share Contributor"
-          principal_id               = data.azurerm_client_config.current.object_id
+          principal_id               = data.azapi_client_config.current.object_id
         }
       }
     }
@@ -212,7 +223,7 @@ module "this" {
       role_assignments = {
         rbac_storage_table_data_reader = {
           role_definition_id_or_name = "Storage Table Data Reader"
-          principal_id               = data.azurerm_client_config.current.object_id
+          principal_id               = data.azapi_client_config.current.object_id
         }
       }
     }
@@ -221,7 +232,7 @@ module "this" {
       role_assignments = {
         rbac_storage_table_data_contributor = {
           role_definition_id_or_name = "Storage Table Data Contributor"
-          principal_id               = data.azurerm_client_config.current.object_id
+          principal_id               = data.azapi_client_config.current.object_id
         }
       }
     }
