@@ -73,6 +73,7 @@ terraform.rc
 .DS_Store
 avm.tflint_module.hcl
 avm.tflint_module.merged.hcl
+avm-pre-commit.log
 
 #IntelliJ IDEA
 .idea/
