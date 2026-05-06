@@ -55,82 +55,17 @@ module "naming" {
 data "azurerm_client_config" "current" {}
 
 # This is required for resource modules
-resource "azapi_resource" "rg" {
+resource "azapi_resource" "resource_group" {
   location  = local.test_regions[random_integer.region_index.result]
   name      = module.naming.resource_group.name_unique
   parent_id = "/subscriptions/${data.azurerm_client_config.current.subscription_id}"
   type      = "Microsoft.Resources/resourceGroups@2021-04-01"
 }
 
-resource "azapi_resource" "vnet" {
-  location  = azapi_resource.rg.location
-  name      = module.naming.virtual_network.name_unique
-  parent_id = azapi_resource.rg.id
-  type      = "Microsoft.Network/virtualNetworks@2023-11-01"
-  body = {
-    properties = {
-      addressSpace = {
-        addressPrefixes = ["192.168.0.0/16"]
-      }
-    }
-  }
-}
-
-resource "azapi_resource" "nsg" {
-  location  = azapi_resource.rg.location
-  name      = module.naming.network_security_group.name_unique
-  parent_id = azapi_resource.rg.id
-  type      = "Microsoft.Network/networkSecurityGroups@2023-11-01"
-  body = {
-    properties = {}
-  }
-}
-
-resource "azapi_resource" "subnet" {
-  name      = module.naming.subnet.name_unique
-  parent_id = azapi_resource.vnet.id
-  type      = "Microsoft.Network/virtualNetworks/subnets@2023-11-01"
-  body = {
-    properties = {
-      addressPrefix = "192.168.0.0/24"
-      serviceEndpoints = [
-        { service = "Microsoft.Storage" }
-      ]
-      networkSecurityGroup = {
-        id = azapi_resource.nsg.id
-      }
-    }
-  }
-}
-
-resource "azapi_resource" "no_internet_rule" {
-  name      = module.naming.network_security_rule.name_unique
-  parent_id = azapi_resource.nsg.id
-  type      = "Microsoft.Network/networkSecurityGroups/securityRules@2023-11-01"
-  body = {
-    properties = {
-      access                   = "Deny"
-      direction                = "Outbound"
-      priority                 = 100
-      protocol                 = "*"
-      sourceAddressPrefix      = "192.168.0.0/24"
-      sourcePortRange          = "*"
-      destinationAddressPrefix = "Internet"
-      destinationPortRange     = "*"
-    }
-  }
-}
-
-module "public_ip" {
-  source  = "lonegunmanb/public-ip/lonegunmanb"
-  version = "0.1.0"
-  count   = var.bypass_ip_cidr == null ? 1 : 0
-}
-
 resource "azapi_resource" "example_identity" {
-  location  = azapi_resource.rg.location
+  location  = azapi_resource.resource_group.location
   name      = module.naming.user_assigned_identity.name_unique
-  parent_id = azapi_resource.rg.id
+  parent_id = azapi_resource.resource_group.id
   type      = "Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31"
   body      = {}
 }
@@ -138,29 +73,20 @@ resource "azapi_resource" "example_identity" {
 module "this" {
   source = "../.."
 
-  location                 = azapi_resource.rg.location
-  name                     = module.naming.storage_account.name_unique
-  parent_id                = azapi_resource.rg.id
-  account_kind             = "StorageV2"
-  account_replication_type = "ZRS"
-  account_tier             = "Standard"
+  location  = azapi_resource.resource_group.location
+  name      = module.naming.storage_account.name_unique
+  parent_id = azapi_resource.resource_group.id
   azure_files_authentication = {
     default_share_level_permission = "StorageFileDataSmbShareReader"
     directory_type                 = "AADKERB"
   }
-  https_traffic_only_enabled = true
-  is_hns_enabled             = true
+  is_hns_enabled = true
   managed_identities = {
     system_assigned            = true
     user_assigned_resource_ids = [azapi_resource.example_identity.id]
   }
-  min_tls_version = "TLS1_2"
-  network_rules = {
-    bypass                     = ["AzureServices"]
-    default_action             = "Deny"
-    ip_rules                   = [try(module.public_ip[0].public_ip, var.bypass_ip_cidr)]
-    virtual_network_subnet_ids = toset([azapi_resource.subnet.id])
-  }
+  # Data Lake Gen2 path resources require data plane access; allow public access.
+  network_rules                 = null
   public_network_access_enabled = true
   role_assignments = {
     role_assignment_1 = {

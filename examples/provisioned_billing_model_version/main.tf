@@ -12,13 +12,14 @@ terraform {
     }
   }
 }
-
 provider "azapi" {}
+
 locals {
   test_regions = ["eastus", "eastus2", "westus2", "westus3"]
 }
 # We need this to get the object_id of the current user
 data "azapi_client_config" "current" {}
+# This allows us to randomize the region for the resource group.
 resource "random_integer" "region_index" {
   max = length(local.test_regions) - 1
   min = 0
@@ -37,17 +38,17 @@ module "naming" {
 }
 
 # This is required for resource modules
-resource "azapi_resource" "rg" {
+resource "azapi_resource" "resource_group" {
   location  = local.test_regions[random_integer.region_index.result]
   name      = module.naming.resource_group.name_unique
   parent_id = "/subscriptions/${data.azapi_client_config.current.subscription_id}"
   type      = "Microsoft.Resources/resourceGroups@2021-04-01"
 }
 
-resource "azapi_resource" "vnet" {
-  location  = azapi_resource.rg.location
+resource "azapi_resource" "virtual_network" {
+  location  = azapi_resource.resource_group.location
   name      = module.naming.virtual_network.name_unique
-  parent_id = azapi_resource.rg.id
+  parent_id = azapi_resource.resource_group.id
   type      = "Microsoft.Network/virtualNetworks@2023-11-01"
   body = {
     properties = {
@@ -58,10 +59,10 @@ resource "azapi_resource" "vnet" {
   }
 }
 
-resource "azapi_resource" "nsg" {
-  location  = azapi_resource.rg.location
+resource "azapi_resource" "network_security_group" {
+  location  = azapi_resource.resource_group.location
   name      = module.naming.network_security_group.name_unique
-  parent_id = azapi_resource.rg.id
+  parent_id = azapi_resource.resource_group.id
   type      = "Microsoft.Network/networkSecurityGroups@2023-11-01"
   body = {
     properties = {}
@@ -70,7 +71,7 @@ resource "azapi_resource" "nsg" {
 
 resource "azapi_resource" "subnet" {
   name      = module.naming.subnet.name_unique
-  parent_id = azapi_resource.vnet.id
+  parent_id = azapi_resource.virtual_network.id
   type      = "Microsoft.Network/virtualNetworks/subnets@2023-11-01"
   body = {
     properties = {
@@ -79,7 +80,7 @@ resource "azapi_resource" "subnet" {
         { service = "Microsoft.Storage" }
       ]
       networkSecurityGroup = {
-        id = azapi_resource.nsg.id
+        id = azapi_resource.network_security_group.id
       }
     }
   }
@@ -87,7 +88,7 @@ resource "azapi_resource" "subnet" {
 
 resource "azapi_resource" "no_internet_rule" {
   name      = module.naming.network_security_rule.name_unique
-  parent_id = azapi_resource.nsg.id
+  parent_id = azapi_resource.network_security_group.id
   type      = "Microsoft.Network/networkSecurityGroups/securityRules@2023-11-01"
   body = {
     properties = {
@@ -103,16 +104,10 @@ resource "azapi_resource" "no_internet_rule" {
   }
 }
 
-module "public_ip" {
-  source  = "lonegunmanb/public-ip/lonegunmanb"
-  version = "0.1.0"
-  count   = var.bypass_ip_cidr == null ? 1 : 0
-}
-
 resource "azapi_resource" "example_identity" {
-  location  = azapi_resource.rg.location
+  location  = azapi_resource.resource_group.location
   name      = module.naming.user_assigned_identity.name_unique
-  parent_id = azapi_resource.rg.id
+  parent_id = azapi_resource.resource_group.id
   type      = "Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31"
   body      = {}
 }
@@ -120,27 +115,22 @@ resource "azapi_resource" "example_identity" {
 module "this" {
   source = "../.."
 
-  location                 = azapi_resource.rg.location
+  location                 = azapi_resource.resource_group.location
   name                     = module.naming.storage_account.name_unique
-  parent_id                = azapi_resource.rg.id
+  parent_id                = azapi_resource.resource_group.id
   account_kind             = "FileStorage"
-  account_replication_type = "ZRS"
+  account_replication_type = "LRS"
   account_tier             = "Premium"
   azure_files_authentication = {
     default_share_level_permission = "StorageFileDataSmbShareReader"
     directory_type                 = "AADKERB"
   }
-  https_traffic_only_enabled = true
-  local_user_enabled         = false
+  infrastructure_encryption_enabled = true
   managed_identities = {
     system_assigned            = true
     user_assigned_resource_ids = [azapi_resource.example_identity.id]
   }
-  min_tls_version = "TLS1_2"
   network_rules = {
-    bypass                     = ["AzureServices"]
-    default_action             = "Deny"
-    ip_rules                   = [try(module.public_ip[0].public_ip, var.bypass_ip_cidr)]
     virtual_network_subnet_ids = toset([azapi_resource.subnet.id])
   }
   provisioned_billing_model_version = "V2"
@@ -161,8 +151,9 @@ module "this" {
   shared_access_key_enabled = true
   shares = {
     premium_share = {
-      name             = "premium-share"
+      name             = "share-${random_string.this.result}-premium"
       quota            = 100
+      access_tier      = "Premium"
       enabled_protocol = "SMB"
     }
   }
