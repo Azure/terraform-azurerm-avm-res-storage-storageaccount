@@ -37,7 +37,7 @@ variable "subresource_name" {
 variable "application_security_group_resource_ids" {
   type        = map(string)
   default     = {}
-  description = "(Optional) Application security groups to associate with the private endpoint. Map key is arbitrary, value is the ASG resource ID."
+  description = "(Optional) Application security groups to associate with the private endpoint. Defaults to `{}`. Map key is arbitrary; value is the ASG resource ID."
   nullable    = false
 }
 
@@ -47,7 +47,12 @@ variable "ip_configurations" {
     private_ip_address = string
   }))
   default     = {}
-  description = "(Optional) Static IP configurations for the private endpoint."
+  description = <<-EOT
+(Optional) Static IP configurations for the private endpoint. Defaults to `{}` (the platform allocates IPs). The map key is arbitrary; each value supports:
+
+- `name` - (Required) The name of the IP configuration.
+- `private_ip_address` - (Required) The static private IP address to assign.
+EOT
   nullable    = false
 }
 
@@ -57,39 +62,44 @@ variable "lock" {
     kind = string
   })
   default     = null
-  description = "(Optional) Lock to apply to the private endpoint."
+  description = <<-EOT
+(Optional) Management lock to apply to the private endpoint. Defaults to `null` (no lock).
+
+- `kind` - (Required) The kind of lock. Possible values are `CanNotDelete` and `ReadOnly`.
+- `name` - (Optional) The name of the lock. Defaults to `null` (auto-generated).
+EOT
 }
 
 variable "manage_dns_zone_group" {
   type        = bool
   default     = true
-  description = "(Optional) Whether the private endpoint's DNS zone group should be managed by this module."
+  description = "(Optional) Whether the private endpoint's DNS zone group should be managed by this module. Defaults to `true`."
   nullable    = false
 }
 
 variable "network_interface_name" {
   type        = string
   default     = null
-  description = "(Optional) Custom name for the network interface created with the private endpoint."
+  description = "(Optional) Custom name for the network interface created with the private endpoint. Defaults to `null` (auto-generated)."
 }
 
 variable "private_dns_zone_group_name" {
   type        = string
   default     = "default"
-  description = "(Optional) The name of the private DNS zone group."
+  description = "(Optional) The name of the private DNS zone group. Defaults to `default`."
 }
 
 variable "private_dns_zone_resource_ids" {
   type        = set(string)
   default     = []
-  description = "(Optional) Private DNS zone resource IDs to associate with the private endpoint."
+  description = "(Optional) Private DNS zone resource IDs to associate with the private endpoint. Defaults to `[]` (no zones associated)."
   nullable    = false
 }
 
 variable "private_service_connection_name" {
   type        = string
   default     = null
-  description = "(Optional) The name of the private service connection. Defaults to `pse-<endpoint name>`."
+  description = "(Optional) The name of the private service connection. Defaults to `null` (auto-generated as `pse-<endpoint name>`)."
 }
 
 variable "retry" {
@@ -99,13 +109,19 @@ variable "retry" {
     max_interval_seconds = optional(number)
   })
   default     = null
-  description = "Retry configuration applied to AzAPI resources managed by this module."
+  description = <<-EOT
+(Optional) Retry configuration applied to AzAPI resources managed by this module. Defaults to `null` (no custom retry).
+
+- `error_message_regex` - (Optional) A list of regex patterns matching error messages that trigger a retry. Defaults to `null`.
+- `interval_seconds` - (Optional) Initial interval between retries in seconds. Defaults to `null` (provider default).
+- `max_interval_seconds` - (Optional) Maximum interval between retries in seconds. Defaults to `null` (provider default).
+EOT
 }
 
 variable "tags" {
   type        = map(string)
   default     = null
-  description = "(Optional) Tags to apply to the private endpoint."
+  description = "(Optional) Tags to apply to the private endpoint. Defaults to `null` (no tags)."
 }
 
 variable "timeouts" {
@@ -116,11 +132,18 @@ variable "timeouts" {
     delete = optional(string)
   })
   default     = null
-  description = "Timeouts applied to AzAPI resources managed by this module."
+  description = <<-EOT
+(Optional) Per-operation timeouts applied to AzAPI resources managed by this module. Defaults to `null` (provider defaults). Each value is a Go duration string (e.g. `30m`, `1h`).
+
+- `create` - (Optional) Timeout for create operations. Defaults to `null`.
+- `read` - (Optional) Timeout for read operations. Defaults to `null`.
+- `update` - (Optional) Timeout for update operations. Defaults to `null`.
+- `delete` - (Optional) Timeout for delete operations. Defaults to `null`.
+EOT
 }
 
 variable "tracing_tags_header" {
   type        = string
   default     = null
-  description = "Optional User-Agent string injected into AzAPI request headers."
+  description = "(Optional) User-Agent string injected into AzAPI request headers. Defaults to `null` (no custom header)."
 }

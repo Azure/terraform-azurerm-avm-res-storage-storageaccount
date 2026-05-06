@@ -7,13 +7,13 @@ variable "storage_account_id" {
 variable "error_404_document" {
   type        = string
   default     = null
-  description = "(Optional) The absolute path to a custom webpage to use for 404 not-found errors."
+  description = "(Optional) The absolute path to a custom webpage to use for 404 not-found errors. Defaults to `null` (Azure Storage returns the default error page)."
 }
 
 variable "index_document" {
   type        = string
   default     = null
-  description = "(Optional) The webpage that Azure Storage serves for requests to the root of a website or any subfolder."
+  description = "(Optional) The webpage that Azure Storage serves for requests to the root of a website or any subfolder. Defaults to `null` (no index document configured)."
 }
 
 variable "retry" {
@@ -23,7 +23,13 @@ variable "retry" {
     max_interval_seconds = optional(number)
   })
   default     = null
-  description = "Retry configuration applied to the AzAPI resource."
+  description = <<-EOT
+(Optional) Retry configuration applied to the AzAPI resource. Defaults to `null` (no custom retry).
+
+- `error_message_regex` - (Optional) A list of regex patterns matching error messages that trigger a retry. Defaults to `null`.
+- `interval_seconds` - (Optional) Initial interval between retries in seconds. Defaults to `null` (provider default).
+- `max_interval_seconds` - (Optional) Maximum interval between retries in seconds. Defaults to `null` (provider default).
+EOT
 }
 
 variable "timeouts" {
@@ -34,5 +40,12 @@ variable "timeouts" {
     delete = optional(string)
   })
   default     = null
-  description = "Timeouts applied to the AzAPI resource."
+  description = <<-EOT
+(Optional) Per-operation timeouts applied to the AzAPI resource. Defaults to `null` (provider defaults). Each value is a Go duration string (e.g. `30m`, `1h`).
+
+- `create` - (Optional) Timeout for create operations. Defaults to `null`.
+- `read` - (Optional) Timeout for read operations. Defaults to `null`.
+- `update` - (Optional) Timeout for update operations. Defaults to `null`.
+- `delete` - (Optional) Timeout for delete operations. Defaults to `null`.
+EOT
 }

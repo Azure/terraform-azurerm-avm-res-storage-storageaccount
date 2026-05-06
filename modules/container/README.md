@@ -43,7 +43,7 @@ The following input variables are optional (have default values):
 
 ### <a name="input_default_encryption_scope"></a> [default\_encryption\_scope](#input\_default\_encryption\_scope)
 
-Description: (Optional) The default encryption scope to use for blob operations on the container.
+Description: (Optional) The default encryption scope to use for blob operations on the container. Defaults to `null` (the storage account default encryption scope is used).
 
 Type: `string`
 
@@ -51,7 +51,7 @@ Default: `null`
 
 ### <a name="input_deny_encryption_scope_override"></a> [deny\_encryption\_scope\_override](#input\_deny\_encryption\_scope\_override)
 
-Description: (Optional) When set to true, blocks blob uploads from specifying a different encryption scope.
+Description: (Optional) When set to `true`, blocks blob uploads from specifying a different encryption scope. Defaults to `null` (`false`).
 
 Type: `bool`
 
@@ -59,7 +59,7 @@ Default: `null`
 
 ### <a name="input_enable_nfs_v3_all_squash"></a> [enable\_nfs\_v3\_all\_squash](#input\_enable\_nfs\_v3\_all\_squash)
 
-Description: (Optional) Enable NFSv3 all squash (only valid for NFSv3 enabled accounts).
+Description: (Optional) Enable NFSv3 all squash (only valid for NFSv3 enabled accounts). Defaults to `null` (`false`).
 
 Type: `bool`
 
@@ -67,7 +67,7 @@ Default: `null`
 
 ### <a name="input_enable_nfs_v3_root_squash"></a> [enable\_nfs\_v3\_root\_squash](#input\_enable\_nfs\_v3\_root\_squash)
 
-Description: (Optional) Enable NFSv3 root squash (only valid for NFSv3 enabled accounts).
+Description: (Optional) Enable NFSv3 root squash (only valid for NFSv3 enabled accounts). Defaults to `null` (`false`).
 
 Type: `bool`
 
@@ -75,7 +75,9 @@ Default: `null`
 
 ### <a name="input_immutable_storage_with_versioning"></a> [immutable\_storage\_with\_versioning](#input\_immutable\_storage\_with\_versioning)
 
-Description: (Optional) Configures container-level immutability with version-level WORM.
+Description: (Optional) Configures container-level immutability with version-level WORM. Defaults to `null` (immutability disabled).
+
+- `enabled` - (Required) Whether immutable storage with versioning is enabled.
 
 Type:
 
@@ -89,7 +91,7 @@ Default: `null`
 
 ### <a name="input_metadata"></a> [metadata](#input\_metadata)
 
-Description: (Optional) Container metadata. Keys must be lowercase.
+Description: (Optional) Container metadata. Keys must be lowercase. Defaults to `null` (no metadata).
 
 Type: `map(string)`
 
@@ -105,7 +107,11 @@ Default: `"None"`
 
 ### <a name="input_retry"></a> [retry](#input\_retry)
 
-Description: Retry configuration applied to AzAPI resources managed by this module.
+Description: (Optional) Retry configuration applied to AzAPI resources managed by this module. Defaults to `null` (no custom retry).
+
+- `error_message_regex` - (Optional) A list of regex patterns matching error messages that trigger a retry. Defaults to `null`.
+- `interval_seconds` - (Optional) Initial interval between retries in seconds. Defaults to `null` (provider default).
+- `max_interval_seconds` - (Optional) Maximum interval between retries in seconds. Defaults to `null` (provider default).
 
 Type:
 
@@ -121,7 +127,12 @@ Default: `null`
 
 ### <a name="input_timeouts"></a> [timeouts](#input\_timeouts)
 
-Description: Timeouts applied to AzAPI resources managed by this module.
+Description: (Optional) Per-operation timeouts applied to AzAPI resources managed by this module. Defaults to `null` (provider defaults). Each value is a Go duration string (e.g. `30m`, `1h`).
+
+- `create` - (Optional) Timeout for create operations. Defaults to `null`.
+- `read` - (Optional) Timeout for read operations. Defaults to `null`.
+- `update` - (Optional) Timeout for update operations. Defaults to `null`.
+- `delete` - (Optional) Timeout for delete operations. Defaults to `null`.
 
 Type:
 
@@ -138,7 +149,7 @@ Default: `null`
 
 ### <a name="input_tracing_tags_header"></a> [tracing\_tags\_header](#input\_tracing\_tags\_header)
 
-Description: Optional User-Agent string injected into AzAPI request headers.
+Description: (Optional) User-Agent string injected into AzAPI request headers. Defaults to `null` (no custom header).
 
 Type: `string`
 

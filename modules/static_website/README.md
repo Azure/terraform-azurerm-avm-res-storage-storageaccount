@@ -37,7 +37,7 @@ The following input variables are optional (have default values):
 
 ### <a name="input_error_404_document"></a> [error\_404\_document](#input\_error\_404\_document)
 
-Description: (Optional) The absolute path to a custom webpage to use for 404 not-found errors.
+Description: (Optional) The absolute path to a custom webpage to use for 404 not-found errors. Defaults to `null` (Azure Storage returns the default error page).
 
 Type: `string`
 
@@ -45,7 +45,7 @@ Default: `null`
 
 ### <a name="input_index_document"></a> [index\_document](#input\_index\_document)
 
-Description: (Optional) The webpage that Azure Storage serves for requests to the root of a website or any subfolder.
+Description: (Optional) The webpage that Azure Storage serves for requests to the root of a website or any subfolder. Defaults to `null` (no index document configured).
 
 Type: `string`
 
@@ -53,7 +53,11 @@ Default: `null`
 
 ### <a name="input_retry"></a> [retry](#input\_retry)
 
-Description: Retry configuration applied to the AzAPI resource.
+Description: (Optional) Retry configuration applied to the AzAPI resource. Defaults to `null` (no custom retry).
+
+- `error_message_regex` - (Optional) A list of regex patterns matching error messages that trigger a retry. Defaults to `null`.
+- `interval_seconds` - (Optional) Initial interval between retries in seconds. Defaults to `null` (provider default).
+- `max_interval_seconds` - (Optional) Maximum interval between retries in seconds. Defaults to `null` (provider default).
 
 Type:
 
@@ -69,7 +73,12 @@ Default: `null`
 
 ### <a name="input_timeouts"></a> [timeouts](#input\_timeouts)
 
-Description: Timeouts applied to the AzAPI resource.
+Description: (Optional) Per-operation timeouts applied to the AzAPI resource. Defaults to `null` (provider defaults). Each value is a Go duration string (e.g. `30m`, `1h`).
+
+- `create` - (Optional) Timeout for create operations. Defaults to `null`.
+- `read` - (Optional) Timeout for read operations. Defaults to `null`.
+- `update` - (Optional) Timeout for update operations. Defaults to `null`.
+- `delete` - (Optional) Timeout for delete operations. Defaults to `null`.
 
 Type:
 

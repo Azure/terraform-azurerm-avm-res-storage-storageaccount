@@ -49,7 +49,7 @@ The following input variables are optional (have default values):
 
 ### <a name="input_access_tier"></a> [access\_tier](#input\_access\_tier)
 
-Description: (Optional) The access tier of the file share. Possible values are `Hot`, `Cool`, `TransactionOptimized`, `Premium`.
+Description: (Optional) The access tier of the file share. Possible values are `Hot`, `Cool`, `TransactionOptimized`, `Premium`. Defaults to `null` (the platform applies its default for the storage account kind).
 
 Type: `string`
 
@@ -57,7 +57,7 @@ Default: `null`
 
 ### <a name="input_enabled_protocol"></a> [enabled\_protocol](#input\_enabled\_protocol)
 
-Description: (Optional) The protocol used for the share. Possible values are `SMB` and `NFS`.
+Description: (Optional) The protocol used for the share. Possible values are `SMB` and `NFS`. Defaults to `null` (`SMB`).
 
 Type: `string`
 
@@ -65,7 +65,7 @@ Default: `null`
 
 ### <a name="input_metadata"></a> [metadata](#input\_metadata)
 
-Description: (Optional) Metadata for the share.
+Description: (Optional) Metadata for the share. Defaults to `null` (no metadata).
 
 Type: `map(string)`
 
@@ -73,7 +73,11 @@ Default: `null`
 
 ### <a name="input_retry"></a> [retry](#input\_retry)
 
-Description: Retry configuration applied to AzAPI resources managed by this module.
+Description: (Optional) Retry configuration applied to AzAPI resources managed by this module. Defaults to `null` (no custom retry).
+
+- `error_message_regex` - (Optional) A list of regex patterns matching error messages that trigger a retry. Defaults to `null`.
+- `interval_seconds` - (Optional) Initial interval between retries in seconds. Defaults to `null` (provider default).
+- `max_interval_seconds` - (Optional) Maximum interval between retries in seconds. Defaults to `null` (provider default).
 
 Type:
 
@@ -89,7 +93,7 @@ Default: `null`
 
 ### <a name="input_root_squash"></a> [root\_squash](#input\_root\_squash)
 
-Description: (Optional) The root squash behaviour for an NFS share. Possible values are `NoRootSquash`, `RootSquash`, `AllSquash`.
+Description: (Optional) The root squash behaviour for an NFS share. Possible values are `NoRootSquash`, `RootSquash`, `AllSquash`. Defaults to `null` (only valid when `enabled_protocol` is `NFS`).
 
 Type: `string`
 
@@ -97,7 +101,13 @@ Default: `null`
 
 ### <a name="input_signed_identifiers"></a> [signed\_identifiers](#input\_signed\_identifiers)
 
-Description: (Optional) Signed identifiers / access policies for the share.
+Description: (Optional) Signed identifiers / stored access policies for the share. Defaults to `null` (no signed identifiers). A maximum of 5 signed identifiers may be defined. Each entry supports:
+
+- `id` - (Required) The ID for this signed identifier (1-64 characters).
+- `access_policy` - (Optional) The access policy for this signed identifier. Defaults to `null`. Supports:
+  - `expiry_time` - (Required) The ISO-8061 UTC time at which the access policy expires.
+  - `permission` - (Required) The permissions granted by the access policy. Possible values include any combination of `r` (read), `w` (write), `d` (delete), `l` (list), `c` (create).
+  - `start_time` - (Required) The ISO-8061 UTC time at which the access policy becomes valid.
 
 Type:
 
@@ -116,7 +126,12 @@ Default: `null`
 
 ### <a name="input_timeouts"></a> [timeouts](#input\_timeouts)
 
-Description: Timeouts applied to AzAPI resources managed by this module.
+Description: (Optional) Per-operation timeouts applied to AzAPI resources managed by this module. Defaults to `null` (provider defaults). Each value is a Go duration string (e.g. `30m`, `1h`).
+
+- `create` - (Optional) Timeout for create operations. Defaults to `null`.
+- `read` - (Optional) Timeout for read operations. Defaults to `null`.
+- `update` - (Optional) Timeout for update operations. Defaults to `null`.
+- `delete` - (Optional) Timeout for delete operations. Defaults to `null`.
 
 Type:
 
@@ -133,7 +148,7 @@ Default: `null`
 
 ### <a name="input_tracing_tags_header"></a> [tracing\_tags\_header](#input\_tracing\_tags\_header)
 
-Description: Optional User-Agent string injected into AzAPI request headers.
+Description: (Optional) User-Agent string injected into AzAPI request headers. Defaults to `null` (no custom header).
 
 Type: `string`
 

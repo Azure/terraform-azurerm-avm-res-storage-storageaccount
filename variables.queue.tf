@@ -6,7 +6,7 @@
 variable "queue_encryption_key_type" {
   type        = string
   default     = null
-  description = "(Optional) The encryption type of the queue service. Possible values are `Service` and `Account`. Changing this forces a new resource to be created. Default value is `Service`."
+  description = "(Optional) The encryption type of the queue service. Possible values are `Service` and `Account`. Defaults to `null` (Azure platform default of `Service`). Changing this forces a new resource to be created."
 }
 
 variable "queues" {
@@ -32,17 +32,16 @@ variable "queues" {
   }))
   default     = {}
   description = <<-EOT
- - `metadata` - (Optional) A mapping of MetaData which should be assigned to this Storage Queue.
- - `name` - (Required) The name of the Queue which should be created within the Storage Account. Must be unique within the storage account the queue is located. Changing this forces a new resource to be created.
+A map of queues to create on the storage account. The map key is arbitrary; the value supports the following attributes. Defaults to `{}` (no queues).
 
-Supply role assignments in the same way as for `var.role_assignments`.
-
- ---
- `timeouts` block supports the following:
- - `create` - (Defaults to 30 minutes) Used when creating the Storage Queue.
- - `delete` - (Defaults to 30 minutes) Used when deleting the Storage Queue.
- - `read` - (Defaults to 5 minutes) Used when retrieving the Storage Queue.
- - `update` - (Defaults to 30 minutes) Used when updating the Storage Queue.
+- `name` - (Required) The name of the Queue which should be created within the Storage Account. Must be unique within the storage account. Changing this forces a new resource to be created.
+- `metadata` - (Optional) A mapping of MetaData which should be assigned to this Storage Queue. Defaults to `null`.
+- `role_assignments` - (Optional) A map of role assignments to create on the queue. Defaults to `{}`. See `var.role_assignments` for the attribute schema.
+- `timeouts` - (Optional) Per-operation timeouts for the queue resource. Defaults to `null` (uses provider defaults inherited from `var.timeouts`). Supports:
+  - `create` - (Optional) Timeout for create operations.
+  - `delete` - (Optional) Timeout for delete operations.
+  - `read` - (Optional) Timeout for read operations.
+  - `update` - (Optional) Timeout for update operations.
 EOT
   nullable    = false
 }

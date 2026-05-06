@@ -39,23 +39,22 @@ variable "customer_managed_key" {
   })
   default     = null
   description = <<DESCRIPTION
-    Defines a customer managed key to use for encryption.
+Defines a customer managed key to use for encryption. Defaults to `null` (Microsoft-managed keys).
 
-    object({
-      key_vault_resource_id              = (Required) - The full Azure Resource ID of the key_vault where the customer managed key will be referenced from.
-      key_name                           = (Required) - The key name for the customer managed key in the key vault.
-      key_version                        = (Optional) - The version of the key to use
-      user_assigned_identity_resource_id = (Optional) - The user assigned identity to use when access the key vault
-    })
+- `key_vault_resource_id` - (Required) The full Azure Resource ID of the key vault where the customer managed key will be referenced from.
+- `key_name` - (Required) The key name for the customer managed key in the key vault.
+- `key_version` - (Optional) The version of the key to use. If `null`, the latest version is tracked automatically.
+- `user_assigned_identity` - (Optional) A user assigned identity used to access the key vault. Defaults to `null`, in which case the storage account's system-assigned identity is used.
+  - `resource_id` - (Required) The full Azure Resource ID of the user assigned identity.
 
-    Example Inputs:
-    ```terraform
-    customer_managed_key = {
-      key_vault_resource_id = "/subscriptions/0000000-0000-0000-0000-000000000000/resourceGroups/test-resource-group/providers/Microsoft.KeyVault/vaults/example-key-vault"
-      key_name              = "sample-customer-key"
-    }
-    ```
-   DESCRIPTION
+Example Inputs:
+```terraform
+customer_managed_key = {
+  key_vault_resource_id = "/subscriptions/0000000-0000-0000-0000-000000000000/resourceGroups/test-resource-group/providers/Microsoft.KeyVault/vaults/example-key-vault"
+  key_name              = "sample-customer-key"
+}
+```
+DESCRIPTION
 }
 
 variable "enable_telemetry" {
@@ -75,7 +74,12 @@ variable "lock" {
     kind = string
   })
   default     = null
-  description = "The lock level to apply. Default is `None`. Possible values are `None`, `CanNotDelete`, and `ReadOnly`."
+  description = <<DESCRIPTION
+Controls the management lock applied to the storage account. Defaults to `null` (no lock).
+
+- `kind` - (Required) The kind of lock to apply. Possible values are `CanNotDelete` and `ReadOnly`.
+- `name` - (Optional) The name of the lock. If not specified, a name will be generated.
+DESCRIPTION
 
   validation {
     condition     = var.lock != null ? contains(["CanNotDelete", "ReadOnly"], var.lock.kind) : true
@@ -132,24 +136,34 @@ variable "private_endpoints" {
   }))
   default     = {}
   description = <<DESCRIPTION
-A map of private endpoints to create on the resource. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
+A map of private endpoints to create on the resource. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time. Defaults to `{}` (no private endpoints).
 
+- `subnet_resource_id` - (Required) The resource ID of the subnet to deploy the private endpoint in.
+- `subresource_name` - (Required) The service name of the private endpoint. Possible values are `blob`, `dfs`, `file`, `queue`, `table`, and `web`.
 - `name` - (Optional) The name of the private endpoint. One will be generated if not set. The name must be set if multiple private endpoints are created to avoid conflicting resources.
-- `role_assignments` - (Optional) A map of role assignments to create on the private endpoint. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time. See `var.role_assignments` for more information.
-- `lock` - (Optional) The lock level to apply to the private endpoint. Default is `None`. Possible values are `None`, `CanNotDelete`, and `ReadOnly`.
-- `tags` - (Optional) A mapping of tags to assign to the private endpoint.
-- `subnet_resource_id` - The resource ID of the subnet to deploy the private endpoint in.
-- `subresource_name` - The service name of the private endpoint.  Possible value are `blob`, 'dfs', 'file', `queue`, `table`, and `web`.
-- `private_dns_zone_group_name` - (Optional) The name of the private DNS zone group. One will be generated if not set.
-- `private_dns_zone_resource_ids` - (Optional) A set of resource IDs of private DNS zones to associate with the private endpoint. If not set, no zone groups will be created and the private endpoint will not be associated with any private DNS zones. DNS records must be managed external to this module.
-- `application_security_group_resource_ids` - (Optional) A map of resource IDs of application security groups to associate with the private endpoint. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
-- `private_service_connection_name` - (Optional) The name of the private service connection. One will be generated if not set.
-- `network_interface_name` - (Optional) The name of the network interface. One will be generated if not set.
-- `location` - (Optional) The Azure location where the resources will be deployed. Defaults to the location of the resource group.
+- `role_assignments` - (Optional) A map of role assignments to create on the private endpoint. Defaults to `{}`. The map key is deliberately arbitrary to avoid issues where map keys may be unknown at plan time. Each value supports:
+  - `role_definition_id_or_name` - (Required) The ID or name of the role definition to assign to the principal.
+  - `principal_id` - (Required) The ID of the principal to assign the role to.
+  - `description` - (Optional) The description of the role assignment. Defaults to `null`.
+  - `skip_service_principal_aad_check` - (Optional) If `true`, skips the Azure Active Directory check for the service principal in the tenant. Defaults to `false`.
+  - `condition` - (Optional) The condition which will be used to scope the role assignment. Defaults to `null`.
+  - `condition_version` - (Optional) The version of the condition syntax. Valid value is `2.0`. Defaults to `null`.
+  - `delegated_managed_identity_resource_id` - (Optional) The resource ID of the delegated managed identity. Defaults to `null`.
+  - `principal_type` - (Optional) The type of principal. One of `User`, `Group`, `ServicePrincipal`, `ForeignGroup`, `Device`. Defaults to `null`.
+- `lock` - (Optional) The management lock to apply to the private endpoint. Defaults to `null` (no lock). Supports:
+  - `kind` - (Required) The kind of lock. Possible values are `CanNotDelete` and `ReadOnly`.
+  - `name` - (Optional) The name of the lock. Defaults to `null` (auto-generated).
+- `tags` - (Optional) A mapping of tags to assign to the private endpoint. Defaults to `null`.
+- `private_dns_zone_group_name` - (Optional) The name of the private DNS zone group. Defaults to `default`.
+- `private_dns_zone_resource_ids` - (Optional) A set of resource IDs of private DNS zones to associate with the private endpoint. Defaults to `[]`. If empty, no zone groups will be created and the private endpoint will not be associated with any private DNS zones; DNS records must be managed external to this module.
+- `application_security_group_associations` - (Optional) A map of resource IDs of application security groups to associate with the private endpoint. Defaults to `{}`. The map key is deliberately arbitrary to avoid issues where map keys may be unknown at plan time; the value is the application security group resource ID.
+- `private_service_connection_name` - (Optional) The name of the private service connection. One will be generated if not set. Defaults to `null`.
+- `network_interface_name` - (Optional) The name of the network interface. One will be generated if not set. Defaults to `null`.
+- `location` - (Optional) The Azure location where the resources will be deployed. Defaults to the location of the storage account.
 - `resource_group_name` - (Optional) The resource group where the resources will be deployed. Defaults to the resource group of the storage account.
-- `ip_configurations` - (Optional) A map of IP configurations to create on the private endpoint. If not specified the platform will create one. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
-  - `name` - The name of the IP configuration.
-  - `private_ip_address` - The private IP address of the IP configuration.
+- `ip_configurations` - (Optional) A map of IP configurations to create on the private endpoint. Defaults to `{}` (the platform allocates IPs). The map key is deliberately arbitrary to avoid issues where map keys may be unknown at plan time. Each value supports:
+  - `name` - (Required) The name of the IP configuration.
+  - `private_ip_address` - (Required) The private IP address of the IP configuration.
 DESCRIPTION
   nullable    = false
 }
@@ -157,7 +171,7 @@ DESCRIPTION
 variable "private_endpoints_manage_dns_zone_group" {
   type        = bool
   default     = true
-  description = "Whether to manage private DNS zone groups with this module. If set to false, you must manage private DNS zone groups externally, e.g. using Azure Policy."
+  description = "Whether to manage private DNS zone groups with this module. Defaults to `true`. If set to `false`, you must manage private DNS zone groups externally, e.g. using Azure Policy."
   nullable    = false
 }
 
@@ -192,16 +206,18 @@ variable "role_assignments" {
   }))
   default     = {}
   description = <<DESCRIPTION
-A map of role assignments to create on the resource. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
+A map of role assignments to create on the resource. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time. Defaults to `{}`.
 
-- `role_definition_id_or_name` - The ID or name of the role definition to assign to the principal.
-- `principal_id` - The ID of the principal to assign the role to.
-- `description` - The description of the role assignment.
-- `skip_service_principal_aad_check` - If set to true, skips the Azure Active Directory check for the service principal in the tenant. Defaults to false.
-- `condition` - The condition which will be used to scope the role assignment.
-- `condition_version` - The version of the condition syntax. Valid values are '2.0'.
+- `role_definition_id_or_name` - (Required) The ID or name of the role definition to assign to the principal.
+- `principal_id` - (Required) The ID of the principal to assign the role to.
+- `description` - (Optional) The description of the role assignment. Defaults to `null`.
+- `skip_service_principal_aad_check` - (Optional) If `true`, skips the Azure Active Directory check for the service principal in the tenant. Defaults to `false`.
+- `condition` - (Optional) The condition which will be used to scope the role assignment. Defaults to `null`.
+- `condition_version` - (Optional) The version of the condition syntax. Valid value is `2.0`. Defaults to `null`.
+- `delegated_managed_identity_resource_id` - (Optional) The resource ID of the delegated managed identity. Defaults to `null`.
+- `principal_type` - (Optional) The type of principal. One of `User`, `Group`, `ServicePrincipal`, `ForeignGroup`, `Device`. Defaults to `null`.
 
-> Note: only set `skip_service_principal_aad_check` to true if you are assigning a role to a service principal.
+> Note: only set `skip_service_principal_aad_check` to `true` if you are assigning a role to a service principal.
 DESCRIPTION
   nullable    = false
 }
@@ -221,7 +237,12 @@ variable "timeouts" {
   })
   default     = null
   description = <<DESCRIPTION
-Default per-operation timeouts applied to every `azapi` resource managed by the module. Each value is a Go duration string (e.g. `30m`, `1h`).
+Default per-operation timeouts applied to every `azapi` resource managed by the module. Defaults to `null` (provider defaults). Each value is a Go duration string (e.g. `30m`, `1h`).
+
+- `create` - (Optional) Timeout for create operations. Defaults to `null`.
+- `read` - (Optional) Timeout for read operations. Defaults to `null`.
+- `update` - (Optional) Timeout for update operations. Defaults to `null`.
+- `delete` - (Optional) Timeout for delete operations. Defaults to `null`.
 
 The root storage account uses these values directly. Submodules (containers, queues, shares, tables, diagnostic settings, private endpoints, management policy, local users, role assignments, Data Lake Gen2 filesystems) use these as a default that can be overridden per-item via the item's own `timeouts` field.
 DESCRIPTION

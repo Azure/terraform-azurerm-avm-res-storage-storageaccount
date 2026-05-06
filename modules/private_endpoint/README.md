@@ -69,7 +69,7 @@ The following input variables are optional (have default values):
 
 ### <a name="input_application_security_group_resource_ids"></a> [application\_security\_group\_resource\_ids](#input\_application\_security\_group\_resource\_ids)
 
-Description: (Optional) Application security groups to associate with the private endpoint. Map key is arbitrary, value is the ASG resource ID.
+Description: (Optional) Application security groups to associate with the private endpoint. Defaults to `{}`. Map key is arbitrary; value is the ASG resource ID.
 
 Type: `map(string)`
 
@@ -77,7 +77,10 @@ Default: `{}`
 
 ### <a name="input_ip_configurations"></a> [ip\_configurations](#input\_ip\_configurations)
 
-Description: (Optional) Static IP configurations for the private endpoint.
+Description: (Optional) Static IP configurations for the private endpoint. Defaults to `{}` (the platform allocates IPs). The map key is arbitrary; each value supports:
+
+- `name` - (Required) The name of the IP configuration.
+- `private_ip_address` - (Required) The static private IP address to assign.
 
 Type:
 
@@ -92,7 +95,10 @@ Default: `{}`
 
 ### <a name="input_lock"></a> [lock](#input\_lock)
 
-Description: (Optional) Lock to apply to the private endpoint.
+Description: (Optional) Management lock to apply to the private endpoint. Defaults to `null` (no lock).
+
+- `kind` - (Required) The kind of lock. Possible values are `CanNotDelete` and `ReadOnly`.
+- `name` - (Optional) The name of the lock. Defaults to `null` (auto-generated).
 
 Type:
 
@@ -107,7 +113,7 @@ Default: `null`
 
 ### <a name="input_manage_dns_zone_group"></a> [manage\_dns\_zone\_group](#input\_manage\_dns\_zone\_group)
 
-Description: (Optional) Whether the private endpoint's DNS zone group should be managed by this module.
+Description: (Optional) Whether the private endpoint's DNS zone group should be managed by this module. Defaults to `true`.
 
 Type: `bool`
 
@@ -115,7 +121,7 @@ Default: `true`
 
 ### <a name="input_network_interface_name"></a> [network\_interface\_name](#input\_network\_interface\_name)
 
-Description: (Optional) Custom name for the network interface created with the private endpoint.
+Description: (Optional) Custom name for the network interface created with the private endpoint. Defaults to `null` (auto-generated).
 
 Type: `string`
 
@@ -123,7 +129,7 @@ Default: `null`
 
 ### <a name="input_private_dns_zone_group_name"></a> [private\_dns\_zone\_group\_name](#input\_private\_dns\_zone\_group\_name)
 
-Description: (Optional) The name of the private DNS zone group.
+Description: (Optional) The name of the private DNS zone group. Defaults to `default`.
 
 Type: `string`
 
@@ -131,7 +137,7 @@ Default: `"default"`
 
 ### <a name="input_private_dns_zone_resource_ids"></a> [private\_dns\_zone\_resource\_ids](#input\_private\_dns\_zone\_resource\_ids)
 
-Description: (Optional) Private DNS zone resource IDs to associate with the private endpoint.
+Description: (Optional) Private DNS zone resource IDs to associate with the private endpoint. Defaults to `[]` (no zones associated).
 
 Type: `set(string)`
 
@@ -139,7 +145,7 @@ Default: `[]`
 
 ### <a name="input_private_service_connection_name"></a> [private\_service\_connection\_name](#input\_private\_service\_connection\_name)
 
-Description: (Optional) The name of the private service connection. Defaults to `pse-<endpoint name>`.
+Description: (Optional) The name of the private service connection. Defaults to `null` (auto-generated as `pse-<endpoint name>`).
 
 Type: `string`
 
@@ -147,7 +153,11 @@ Default: `null`
 
 ### <a name="input_retry"></a> [retry](#input\_retry)
 
-Description: Retry configuration applied to AzAPI resources managed by this module.
+Description: (Optional) Retry configuration applied to AzAPI resources managed by this module. Defaults to `null` (no custom retry).
+
+- `error_message_regex` - (Optional) A list of regex patterns matching error messages that trigger a retry. Defaults to `null`.
+- `interval_seconds` - (Optional) Initial interval between retries in seconds. Defaults to `null` (provider default).
+- `max_interval_seconds` - (Optional) Maximum interval between retries in seconds. Defaults to `null` (provider default).
 
 Type:
 
@@ -163,7 +173,7 @@ Default: `null`
 
 ### <a name="input_tags"></a> [tags](#input\_tags)
 
-Description: (Optional) Tags to apply to the private endpoint.
+Description: (Optional) Tags to apply to the private endpoint. Defaults to `null` (no tags).
 
 Type: `map(string)`
 
@@ -171,7 +181,12 @@ Default: `null`
 
 ### <a name="input_timeouts"></a> [timeouts](#input\_timeouts)
 
-Description: Timeouts applied to AzAPI resources managed by this module.
+Description: (Optional) Per-operation timeouts applied to AzAPI resources managed by this module. Defaults to `null` (provider defaults). Each value is a Go duration string (e.g. `30m`, `1h`).
+
+- `create` - (Optional) Timeout for create operations. Defaults to `null`.
+- `read` - (Optional) Timeout for read operations. Defaults to `null`.
+- `update` - (Optional) Timeout for update operations. Defaults to `null`.
+- `delete` - (Optional) Timeout for delete operations. Defaults to `null`.
 
 Type:
 
@@ -188,7 +203,7 @@ Default: `null`
 
 ### <a name="input_tracing_tags_header"></a> [tracing\_tags\_header](#input\_tracing\_tags\_header)
 
-Description: Optional User-Agent string injected into AzAPI request headers.
+Description: (Optional) User-Agent string injected into AzAPI request headers. Defaults to `null` (no custom header).
 
 Type: `string`
 

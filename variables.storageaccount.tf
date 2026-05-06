@@ -25,7 +25,7 @@ variable "account_kind" {
 variable "account_replication_type" {
   type        = string
   default     = "ZRS"
-  description = "(Required) Defines the type of replication to use for this storage account. Valid options are `LRS`, `GRS`, `RAGRS`, `ZRS`, `GZRS` and `RAGZRS`.  Defaults to `ZRS`"
+  description = "(Optional) Defines the type of replication to use for this storage account. Valid options are `LRS`, `GRS`, `RAGRS`, `ZRS`, `GZRS` and `RAGZRS`. Defaults to `ZRS`."
   nullable    = false
 
   validation {
@@ -37,7 +37,7 @@ variable "account_replication_type" {
 variable "account_tier" {
   type        = string
   default     = "Standard"
-  description = "(Required) Defines the Tier to use for this storage account. Valid options are `Standard` and `Premium`. For `BlockBlobStorage` and `FileStorage` accounts only `Premium` is valid. Changing this forces a new resource to be created."
+  description = "(Optional) Defines the Tier to use for this storage account. Valid options are `Standard` and `Premium`. For `BlockBlobStorage` and `FileStorage` accounts only `Premium` is valid. Changing this forces a new resource to be created. Defaults to `Standard`."
   nullable    = false
 
   validation {
@@ -55,7 +55,7 @@ variable "allow_nested_items_to_be_public" {
 variable "allowed_copy_scope" {
   type        = string
   default     = null
-  description = "(Optional) Restrict copy to and from Storage Accounts within an AAD tenant or with Private Links to the same VNet. Possible values are `AAD` and `PrivateLink`."
+  description = "(Optional) Restrict copy to and from Storage Accounts within an AAD tenant or with Private Links to the same VNet. Possible values are `AAD` and `PrivateLink`. Defaults to `null` (no restriction)."
 }
 
 variable "cross_tenant_replication_enabled" {
@@ -71,21 +71,23 @@ variable "custom_domain" {
   })
   default     = null
   description = <<-EOT
- - `name` - (Required) The Custom Domain Name to use for the Storage Account, which will be validated by Azure.
- - `use_subdomain` - (Optional) Should the Custom Domain Name be validated by using indirect CNAME validation?
+Configures a custom domain for the storage account. Defaults to `null` (no custom domain).
+
+- `name` - (Required) The Custom Domain Name to use for the Storage Account, which will be validated by Azure.
+- `use_subdomain` - (Optional) Should the Custom Domain Name be validated by using indirect CNAME validation? Defaults to `null`.
 EOT
 }
 
 variable "default_to_oauth_authentication" {
   type        = bool
   default     = null
-  description = "(Optional) Default to Azure Active Directory authorization in the Azure portal when accessing the Storage Account. The default value is `false`"
+  description = "(Optional) Default to Azure Active Directory authorization in the Azure portal when accessing the Storage Account. Defaults to `null` (Azure platform default of `false`)."
 }
 
 variable "edge_zone" {
   type        = string
   default     = null
-  description = "(Optional) Specifies the Edge Zone within the Azure Region where this Storage Account should exist. Changing this forces a new Storage Account to be created."
+  description = "(Optional) Specifies the Edge Zone within the Azure Region where this Storage Account should exist. Defaults to `null`. Changing this forces a new Storage Account to be created."
 }
 
 variable "https_traffic_only_enabled" {
@@ -130,35 +132,29 @@ variable "local_user" {
   }))
   default     = {}
   description = <<-EOT
- - `home_directory` - (Optional) The home directory of the Storage Account Local User.
- - `name` - (Required) The name which should be used for this Storage Account Local User. Changing this forces a new Storage Account Local User to be created.
- - `ssh_key_enabled` - (Optional) Specifies whether SSH Key Authentication is enabled. Defaults to `false`.
- - `ssh_password_enabled` - (Optional) Specifies whether SSH Password Authentication is enabled. Defaults to `false`.
+A map of Storage Account Local Users to create. The map key is arbitrary; the value supports the following attributes. Defaults to `{}` (no local users).
 
- ---
- `permission_scope` block supports the following:
- - `resource_name` - (Required) The container name (when `service` is set to `blob`) or the file share name (when `service` is set to `file`), used by the Storage Account Local User.
- - `service` - (Required) The storage service used by this Storage Account Local User. Possible values are `blob` and `file`.
-
- ---
- `permissions` block supports the following:
- - `create` - (Optional) Specifies if the Local User has the create permission for this scope. Defaults to `false`.
- - `delete` - (Optional) Specifies if the Local User has the delete permission for this scope. Defaults to `false`.
- - `list` - (Optional) Specifies if the Local User has the list permission for this scope. Defaults to `false`.
- - `read` - (Optional) Specifies if the Local User has the read permission for this scope. Defaults to `false`.
- - `write` - (Optional) Specifies if the Local User has the write permission for this scope. Defaults to `false`.
-
- ---
- `ssh_authorized_key` block supports the following:
- - `description` - (Optional) The description of this SSH authorized key.
- - `key` - (Required) The public key value of this SSH authorized key.
-
- ---
- `timeouts` block supports the following:
- - `create` - (Defaults to 30 minutes) Used when creating the Storage Account Local User.
- - `delete` - (Defaults to 30 minutes) Used when deleting the Storage Account Local User.
- - `read` - (Defaults to 5 minutes) Used when retrieving the Storage Account Local User.
- - `update` - (Defaults to 30 minutes) Used when updating the Storage Account Local User.
+- `name` - (Required) The name which should be used for this Storage Account Local User. Changing this forces a new Storage Account Local User to be created.
+- `home_directory` - (Optional) The home directory of the Storage Account Local User. Defaults to `null`.
+- `ssh_key_enabled` - (Optional) Specifies whether SSH Key Authentication is enabled. Defaults to `null` (Azure platform default of `false`).
+- `ssh_password_enabled` - (Optional) Specifies whether SSH Password Authentication is enabled. Defaults to `null` (Azure platform default of `false`).
+- `permission_scope` - (Optional) A list of permission scopes for the local user. Defaults to `null`. Each entry supports:
+  - `resource_name` - (Required) The container name (when `service` is set to `blob`) or the file share name (when `service` is set to `file`).
+  - `service` - (Required) The storage service used by this Storage Account Local User. Possible values are `blob` and `file`.
+  - `permissions` - (Required) An object describing the permissions granted at this scope. Supports:
+    - `create` - (Optional) Whether the local user has the create permission for this scope. Defaults to `null` (`false`).
+    - `delete` - (Optional) Whether the local user has the delete permission for this scope. Defaults to `null` (`false`).
+    - `list` - (Optional) Whether the local user has the list permission for this scope. Defaults to `null` (`false`).
+    - `read` - (Optional) Whether the local user has the read permission for this scope. Defaults to `null` (`false`).
+    - `write` - (Optional) Whether the local user has the write permission for this scope. Defaults to `null` (`false`).
+- `ssh_authorized_key` - (Optional) A list of SSH authorized keys for the local user. Defaults to `null`. Each entry supports:
+  - `key` - (Required) The public key value of this SSH authorized key.
+  - `description` - (Optional) The description of this SSH authorized key. Defaults to `null`.
+- `timeouts` - (Optional) Per-operation timeouts for the local user resource. Defaults to `null` (uses provider defaults inherited from `var.timeouts`). Supports:
+  - `create` - (Optional) Timeout for create operations.
+  - `delete` - (Optional) Timeout for delete operations.
+  - `read` - (Optional) Timeout for read operations.
+  - `update` - (Optional) Timeout for update operations.
 EOT
   nullable    = false
 }
@@ -194,25 +190,22 @@ variable "network_rules" {
   })
   default     = {}
   description = <<-EOT
- > Note the default value for this variable will block all public access to the storage account. If you want to disable all network rules, set this value to `null`.
+Network rules restricting access to the storage account. Defaults to `{}`, which applies the object's own per-attribute defaults (effectively `default_action = "Deny"` with `bypass = ["AzureServices"]`).
 
- - `bypass` - (Optional) Specifies whether traffic is bypassed for Logging/Metrics/AzureServices. Valid options are any combination of `Logging`, `Metrics`, `AzureServices`, or `None`.
- - `default_action` - (Required) Specifies the default action of allow or deny when no other rules match. Valid options are `Deny` or `Allow`.
- - `ip_rules` - (Optional) List of public IP or IP ranges in CIDR Format. Only IPv4 addresses are allowed. Private IP address ranges (as defined in [RFC 1918](https://tools.ietf.org/html/rfc1918#section-3)) are not allowed.
- - `storage_account_id` - (Required) Specifies the ID of the storage account. Changing this forces a new resource to be created.
- - `virtual_network_subnet_ids` - (Optional) A list of virtual network subnet ids to secure the storage account.
+> Note: the default value blocks all public access to the storage account. If you want to disable all network rules, set this value to `null`.
 
- ---
- `private_link_access` block supports the following:
- - `endpoint_resource_id` - (Required) The resource id of the resource access rule to be granted access.
- - `endpoint_tenant_id` - (Optional) The tenant id of the resource of the resource access rule to be granted access. Defaults to the current tenant id.
-
- ---
- `timeouts` block supports the following:
- - `create` - (Defaults to 60 minutes) Used when creating the  Network Rules for this Storage Account.
- - `delete` - (Defaults to 60 minutes) Used when deleting the Network Rules for this Storage Account.
- - `read` - (Defaults to 5 minutes) Used when retrieving the Network Rules for this Storage Account.
- - `update` - (Defaults to 60 minutes) Used when updating the Network Rules for this Storage Account.
+- `bypass` - (Optional) Specifies whether traffic is bypassed for Logging/Metrics/AzureServices. Valid options are any combination of `Logging`, `Metrics`, `AzureServices`, or `None`. Defaults to `["AzureServices"]`.
+- `default_action` - (Optional) Specifies the default action of allow or deny when no other rules match. Valid options are `Deny` or `Allow`. Defaults to `Deny`.
+- `ip_rules` - (Optional) List of public IP or IP ranges in CIDR format. Only IPv4 addresses are allowed. Private IP address ranges (as defined in [RFC 1918](https://tools.ietf.org/html/rfc1918#section-3)) are not allowed. Defaults to `[]`.
+- `virtual_network_subnet_ids` - (Optional) A set of virtual network subnet IDs to secure the storage account. Defaults to `[]`.
+- `private_link_access` - (Optional) A list of private link access rules. Defaults to `null`. Each entry supports:
+  - `endpoint_resource_id` - (Required) The resource ID of the resource access rule to be granted access.
+  - `endpoint_tenant_id` - (Optional) The tenant ID of the resource of the resource access rule to be granted access. Defaults to the current tenant ID.
+- `timeouts` - (Optional) Per-operation timeouts for the network rules resource. Defaults to `null` (uses provider defaults). Supports:
+  - `create` - (Optional) Timeout for create operations.
+  - `delete` - (Optional) Timeout for delete operations.
+  - `read` - (Optional) Timeout for read operations.
+  - `update` - (Optional) Timeout for update operations.
 EOT
 }
 
@@ -225,7 +218,7 @@ variable "nfsv3_enabled" {
 variable "provisioned_billing_model_version" {
   type        = string
   default     = null
-  description = "(Optional) Specifies the version of the provisioned billing model (e.g. when account_kind = \"FileStorage\" for Storage File). Possible value is V2. Changing this forces a new resource to be created."
+  description = "(Optional) Specifies the version of the provisioned billing model (e.g. when `account_kind = \"FileStorage\"` for Storage File). Possible value is `V2`. Defaults to `null`. Changing this forces a new resource to be created."
 
   validation {
     condition     = var.provisioned_billing_model_version == null || var.provisioned_billing_model_version == "V2"
@@ -247,9 +240,11 @@ variable "routing" {
   })
   default     = null
   description = <<-EOT
- - `choice` - (Optional) Specifies the kind of network routing opted by the user. Possible values are `InternetRouting` and `MicrosoftRouting`. Defaults to `MicrosoftRouting`.
- - `publish_internet_endpoints` - (Optional) Should internet routing storage endpoints be published? Defaults to `false`.
- - `publish_microsoft_endpoints` - (Optional) Should Microsoft routing storage endpoints be published? Defaults to `false`.
+Configures the storage account routing preference. Defaults to `null` (Azure platform defaults).
+
+- `choice` - (Optional) Specifies the kind of network routing opted by the user. Possible values are `InternetRouting` and `MicrosoftRouting`. Defaults to `MicrosoftRouting`.
+- `publish_internet_endpoints` - (Optional) Should internet routing storage endpoints be published? Defaults to `false`.
+- `publish_microsoft_endpoints` - (Optional) Should Microsoft routing storage endpoints be published? Defaults to `false`.
 EOT
 }
 
@@ -260,8 +255,10 @@ variable "sas_policy" {
   })
   default     = null
   description = <<-EOT
- - `expiration_action` - (Optional) The SAS expiration action. The only possible value is `Log` at this moment. Defaults to `Log`.
- - `expiration_period` - (Required) The SAS expiration period in format of `DD.HH:MM:SS`.
+Configures the SAS policy on the storage account. Defaults to `null` (no SAS policy).
+
+- `expiration_period` - (Required) The SAS expiration period in the format `DD.HH:MM:SS`.
+- `expiration_action` - (Optional) The SAS expiration action. The only possible value is `Log` at this moment. Defaults to `Log`.
 EOT
 }
 
@@ -274,7 +271,7 @@ variable "sftp_enabled" {
 variable "shared_access_key_enabled" {
   type        = bool
   default     = false
-  description = "(Optional) Indicates whether the storage account permits requests to be authorized with the account access key via Shared Key. If false, then all requests, including shared access signatures, must be authorized with Azure Active Directory (Azure AD). The default value is `false`."
+  description = "(Optional) Indicates whether the storage account permits requests to be authorized with the account access key via Shared Key. If `false`, then all requests, including shared access signatures, must be authorized with Azure Active Directory (Azure AD). Defaults to `false`."
 }
 
 variable "static_website" {
@@ -284,7 +281,9 @@ variable "static_website" {
   }))
   default     = null
   description = <<-EOT
- - `error_404_document` - (Optional) The absolute path to a custom webpage that should be used when a request is made which does not correspond to an existing file.
- - `index_document` - (Optional) The webpage that Azure Storage serves for requests to the root of a website or any subfolder. For example, index.html. The value is case-sensitive.
+A map of static website configurations to apply to the storage account. Defaults to `null` (static website disabled). The map key is arbitrary; only the first entry is used by the underlying API.
+
+- `error_404_document` - (Optional) The absolute path to a custom webpage that should be used when a request is made which does not correspond to an existing file. Defaults to `null`.
+- `index_document` - (Optional) The webpage that Azure Storage serves for requests to the root of a website or any subfolder. For example, `index.html`. The value is case-sensitive. Defaults to `null`.
 EOT
 }

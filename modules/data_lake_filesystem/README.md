@@ -43,7 +43,7 @@ The following input variables are optional (have default values):
 
 ### <a name="input_default_encryption_scope"></a> [default\_encryption\_scope](#input\_default\_encryption\_scope)
 
-Description: (Optional) The default encryption scope to use for this filesystem.
+Description: (Optional) The default encryption scope to use for this filesystem. Defaults to `null` (the storage account default encryption scope is used).
 
 Type: `string`
 
@@ -51,7 +51,7 @@ Default: `null`
 
 ### <a name="input_metadata"></a> [metadata](#input\_metadata)
 
-Description: (Optional) A mapping of key-value pairs assigned to this filesystem.
+Description: (Optional) A mapping of key-value pairs assigned to this filesystem. Defaults to `null` (no metadata).
 
 Type: `map(string)`
 
@@ -59,7 +59,11 @@ Default: `null`
 
 ### <a name="input_retry"></a> [retry](#input\_retry)
 
-Description: Retry configuration applied to the AzAPI resource.
+Description: (Optional) Retry configuration applied to the AzAPI resource. Defaults to `null` (no custom retry).
+
+- `error_message_regex` - (Optional) A list of regex patterns matching error messages that trigger a retry. Defaults to `null`.
+- `interval_seconds` - (Optional) Initial interval between retries in seconds. Defaults to `null` (provider default).
+- `max_interval_seconds` - (Optional) Maximum interval between retries in seconds. Defaults to `null` (provider default).
 
 Type:
 
@@ -75,7 +79,12 @@ Default: `null`
 
 ### <a name="input_timeouts"></a> [timeouts](#input\_timeouts)
 
-Description: Timeouts applied to the AzAPI resource.
+Description: (Optional) Per-operation timeouts applied to the AzAPI resource. Defaults to `null` (provider defaults). Each value is a Go duration string (e.g. `30m`, `1h`).
+
+- `create` - (Optional) Timeout for create operations. Defaults to `null`.
+- `read` - (Optional) Timeout for read operations. Defaults to `null`.
+- `update` - (Optional) Timeout for update operations. Defaults to `null`.
+- `delete` - (Optional) Timeout for delete operations. Defaults to `null`.
 
 Type:
 
@@ -92,7 +101,7 @@ Default: `null`
 
 ### <a name="input_tracing_tags_header"></a> [tracing\_tags\_header](#input\_tracing\_tags\_header)
 
-Description: Optional User-Agent string injected into AzAPI request headers.
+Description: (Optional) User-Agent string injected into AzAPI request headers. Defaults to `null` (no custom header).
 
 Type: `string`
 

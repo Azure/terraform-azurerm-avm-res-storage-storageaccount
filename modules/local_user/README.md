@@ -43,7 +43,7 @@ The following input variables are optional (have default values):
 
 ### <a name="input_home_directory"></a> [home\_directory](#input\_home\_directory)
 
-Description: (Optional) The home directory of the storage account local user.
+Description: (Optional) The home directory of the storage account local user. Defaults to `null`.
 
 Type: `string`
 
@@ -51,7 +51,16 @@ Default: `null`
 
 ### <a name="input_permission_scope"></a> [permission\_scope](#input\_permission\_scope)
 
-Description: (Optional) A list of permission scopes for the local user.
+Description: (Optional) A list of permission scopes for the local user. Defaults to `null` (no scopes). Each entry supports:
+
+- `resource_name` - (Required) The container name (when `service` is set to `blob`) or the file share name (when `service` is set to `file`).
+- `service` - (Required) The storage service used by this Storage Account Local User. Possible values are `blob` and `file`.
+- `permissions` - (Required) An object describing the permissions granted at this scope. Supports:
+  - `create` - (Optional) Whether the local user has the create permission for this scope. Defaults to `null` (`false`).
+  - `delete` - (Optional) Whether the local user has the delete permission for this scope. Defaults to `null` (`false`).
+  - `list` - (Optional) Whether the local user has the list permission for this scope. Defaults to `null` (`false`).
+  - `read` - (Optional) Whether the local user has the read permission for this scope. Defaults to `null` (`false`).
+  - `write` - (Optional) Whether the local user has the write permission for this scope. Defaults to `null` (`false`).
 
 Type:
 
@@ -73,7 +82,11 @@ Default: `null`
 
 ### <a name="input_retry"></a> [retry](#input\_retry)
 
-Description: Retry configuration applied to the AzAPI resource.
+Description: (Optional) Retry configuration applied to the AzAPI resource. Defaults to `null` (no custom retry).
+
+- `error_message_regex` - (Optional) A list of regex patterns matching error messages that trigger a retry. Defaults to `null`.
+- `interval_seconds` - (Optional) Initial interval between retries in seconds. Defaults to `null` (provider default).
+- `max_interval_seconds` - (Optional) Maximum interval between retries in seconds. Defaults to `null` (provider default).
 
 Type:
 
@@ -89,7 +102,10 @@ Default: `null`
 
 ### <a name="input_ssh_authorized_key"></a> [ssh\_authorized\_key](#input\_ssh\_authorized\_key)
 
-Description: (Optional) A list of SSH authorized keys for the local user.
+Description: (Optional) A list of SSH authorized keys for the local user. Defaults to `null` (no keys). Each entry supports:
+
+- `key` - (Required) The public key value of this SSH authorized key.
+- `description` - (Optional) The description of this SSH authorized key. Defaults to `null`.
 
 Type:
 
@@ -120,7 +136,12 @@ Default: `false`
 
 ### <a name="input_timeouts"></a> [timeouts](#input\_timeouts)
 
-Description: Timeouts applied to the AzAPI resource.
+Description: (Optional) Per-operation timeouts applied to the AzAPI resource. Defaults to `null` (provider defaults). Each value is a Go duration string (e.g. `30m`, `1h`).
+
+- `create` - (Optional) Timeout for create operations. Defaults to `null`.
+- `read` - (Optional) Timeout for read operations. Defaults to `null`.
+- `update` - (Optional) Timeout for update operations. Defaults to `null`.
+- `delete` - (Optional) Timeout for delete operations. Defaults to `null`.
 
 Type:
 
@@ -137,7 +158,7 @@ Default: `null`
 
 ### <a name="input_tracing_tags_header"></a> [tracing\_tags\_header](#input\_tracing\_tags\_header)
 
-Description: Optional User-Agent string injected into AzAPI request headers.
+Description: (Optional) User-Agent string injected into AzAPI request headers. Defaults to `null` (no custom header).
 
 Type: `string`
 
