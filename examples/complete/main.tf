@@ -200,7 +200,7 @@ data "azapi_resource_action" "event_hub_auth_rule_keys" {
 #     storage account itself plus the blob, file, queue, and table services.
 #   * Module-wide retry and timeout configuration that propagates to every
 #     AzAPI resource and every submodule.
-#   * An immutable container with a longer per-item timeout override.
+#   * A blob container with longer per-item timeout overrides.
 module "this" {
   source = "../.."
 
@@ -230,13 +230,10 @@ module "this" {
         }
       }
     }
-    immutable_container = {
-      name = "immutable-${random_string.this.result}"
-      immutable_storage_with_versioning = {
-        enabled = true
-      }
+    blob_container_long_timeouts = {
+      name = "long-timeouts-${random_string.this.result}"
       # Per-item timeout overrides take precedence over the module-wide
-      # value below. Immutability policy creation can be slow.
+      # value below.
       timeouts = {
         create = "90m"
         read   = "5m"
