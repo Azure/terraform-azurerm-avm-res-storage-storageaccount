@@ -1,5 +1,5 @@
 locals {
-  signed_identifiers_body = var.signed_identifiers == null ? null : [
+  signed_identifiers_body = var.signed_identifiers == null ? [] : [
     for si in var.signed_identifiers : {
       id = si.id
       accessPolicy = si.access_policy == null ? null : {

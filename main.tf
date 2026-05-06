@@ -19,16 +19,25 @@ locals {
   }
   # Whether a customer-managed key is configured.
   customer_managed_key_enabled = var.customer_managed_key != null
-  # Always emit the encryption block populated with the server defaults; Azure
-  # returns these values regardless of what is sent, so omitting them causes
-  # perpetual plan drift on subsequent reads.
+  # Initial encryption block sent on storage account create. CMK fields
+  # (keySource = Microsoft.Keyvault, identity, keyvaultproperties) cannot be
+  # accepted by ARM in the same PUT that first associates the user-assigned
+  # identity with the account, so they are applied via azapi_update_resource
+  # in a second step (see azapi_update_resource.customer_managed_key).
   encryption = {
-    keySource                       = local.customer_managed_key_enabled ? "Microsoft.Keyvault" : "Microsoft.Storage"
+    keySource                       = "Microsoft.Storage"
+    requireInfrastructureEncryption = var.infrastructure_encryption_enabled ? true : null
+    services                        = { for k, v in local.encryption_services : k => v if v != null }
+  }
+  # Full encryption body applied via azapi_update_resource once the storage
+  # account exists and its identity is in place.
+  encryption_cmk = local.customer_managed_key_enabled ? {
+    keySource                       = "Microsoft.Keyvault"
     requireInfrastructureEncryption = var.infrastructure_encryption_enabled ? true : null
     services                        = { for k, v in local.encryption_services : k => v if v != null }
     keyvaultproperties              = local.encryption_keyvault
     identity                        = local.encryption_identity
-  }
+  } : null
   encryption_identity = local.customer_managed_key_enabled && try(var.customer_managed_key.user_assigned_identity, null) != null ? {
     userAssignedIdentity = var.customer_managed_key.user_assigned_identity.resource_id
   } : null
@@ -174,6 +183,43 @@ resource "azapi_resource" "this" {
     content {
       create = timeouts.value.create
       delete = timeouts.value.delete
+      read   = timeouts.value.read
+      update = timeouts.value.update
+    }
+  }
+
+  lifecycle {
+    # CMK fields are owned by azapi_update_resource.customer_managed_key.
+    ignore_changes = [
+      body.properties.encryption.keySource,
+      body.properties.encryption.identity,
+      body.properties.encryption.keyvaultproperties,
+    ]
+  }
+}
+
+# Customer-managed key encryption is applied as a second step. Azure rejects a
+# single PUT that both associates a user-assigned identity with the storage
+# account and references that identity in `properties.encryption.identity`, so
+# the account is created with default Microsoft.Storage encryption and then
+# patched to Microsoft.Keyvault here.
+resource "azapi_update_resource" "customer_managed_key" {
+  count = local.customer_managed_key_enabled ? 1 : 0
+
+  resource_id = azapi_resource.this.id
+  type        = "Microsoft.Storage/storageAccounts@2024-01-01"
+  body = {
+    properties = {
+      encryption = local.encryption_cmk
+    }
+  }
+  retry = var.retry
+
+  dynamic "timeouts" {
+    for_each = var.timeouts == null ? [] : [var.timeouts]
+
+    content {
+      create = timeouts.value.create
       read   = timeouts.value.read
       update = timeouts.value.update
     }
