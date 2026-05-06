@@ -19,13 +19,16 @@ locals {
   }
   # Whether a customer-managed key is configured.
   customer_managed_key_enabled = var.customer_managed_key != null
-  encryption = local.encryption_services_present ? {
+  # Always emit the encryption block populated with the server defaults; Azure
+  # returns these values regardless of what is sent, so omitting them causes
+  # perpetual plan drift on subsequent reads.
+  encryption = {
     keySource                       = local.customer_managed_key_enabled ? "Microsoft.Keyvault" : "Microsoft.Storage"
     requireInfrastructureEncryption = var.infrastructure_encryption_enabled ? true : null
     services                        = { for k, v in local.encryption_services : k => v if v != null }
     keyvaultproperties              = local.encryption_keyvault
     identity                        = local.encryption_identity
-  } : null
+  }
   encryption_identity = local.customer_managed_key_enabled && try(var.customer_managed_key.user_assigned_identity, null) != null ? {
     userAssignedIdentity = var.customer_managed_key.user_assigned_identity.resource_id
   } : null
@@ -44,13 +47,6 @@ locals {
       enabled = true
     }
   }
-  # Encryption services keyType (Account vs Service) for queue/table.
-  encryption_services_present = (
-    var.queue_encryption_key_type != null ||
-    var.table_encryption_key_type != null ||
-    var.infrastructure_encryption_enabled ||
-    local.customer_managed_key_enabled
-  )
   extended_location = var.edge_zone == null ? null : {
     name = var.edge_zone
     type = "EdgeZone"

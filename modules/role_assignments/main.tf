@@ -70,4 +70,9 @@ resource "azapi_resource" "this" {
       update = timeouts.value.update
     }
   }
+
+  lifecycle {
+    # principalType is server-resolved (User/ServicePrincipal/Group) when not specified; ignore to avoid drift.
+    ignore_changes = [body.properties.principalType]
+  }
 }

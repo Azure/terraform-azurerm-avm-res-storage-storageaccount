@@ -1,5 +1,5 @@
 locals {
-  signed_identifiers_body = var.signed_identifiers == null ? null : [
+  signed_identifiers_body = var.signed_identifiers == null ? [] : [
     for si in var.signed_identifiers : {
       id = si.id
       accessPolicy = si.access_policy == null ? null : {
@@ -18,7 +18,7 @@ resource "azapi_resource" "this" {
   type      = "Microsoft.Storage/storageAccounts/fileServices/shares@2024-01-01"
   body = {
     properties = {
-      accessTier        = var.access_tier
+      accessTier        = coalesce(var.access_tier, "TransactionOptimized")
       enabledProtocols  = var.enabled_protocol
       metadata          = var.metadata
       shareQuota        = var.quota

@@ -2,8 +2,8 @@ locals {
   body_properties = {
     metadata                       = var.metadata == null ? {} : var.metadata
     publicAccess                   = var.public_access
-    defaultEncryptionScope         = var.default_encryption_scope
-    denyEncryptionScopeOverride    = var.deny_encryption_scope_override
+    defaultEncryptionScope         = coalesce(var.default_encryption_scope, "$account-encryption-key")
+    denyEncryptionScopeOverride    = var.deny_encryption_scope_override == null ? false : var.deny_encryption_scope_override
     enableNfsV3AllSquash           = var.enable_nfs_v3_all_squash
     enableNfsV3RootSquash          = var.enable_nfs_v3_root_squash
     immutableStorageWithVersioning = var.immutable_storage_with_versioning
