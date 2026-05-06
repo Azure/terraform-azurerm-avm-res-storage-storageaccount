@@ -13,12 +13,21 @@ module "interfaces" {
 resource "azapi_resource" "this" {
   for_each = module.interfaces.diagnostic_settings_azapi_v2
 
-  name                      = each.value.name
-  parent_id                 = var.parent_id
-  type                      = each.value.type
-  body                      = each.value.body
-  create_headers            = local.tracing_headers
-  delete_headers            = local.tracing_headers
+  name           = each.value.name
+  parent_id      = var.parent_id
+  type           = each.value.type
+  body           = each.value.body
+  create_headers = local.tracing_headers
+  delete_headers = local.tracing_headers
+  ignore_other_items_in_list = [
+    "properties.logs",
+    "properties.metrics",
+  ]
+  list_unique_id_property = {
+    "properties.logs"    = "category, categoryGroup"
+    "properties.metrics" = "category"
+  }
+  ignore_null_property      = true
   read_headers              = local.tracing_headers
   retry                     = var.retry
   schema_validation_enabled = false

@@ -35,8 +35,8 @@ resource "azapi_resource" "this" {
           }
         }
       ]
-      ipConfigurations          = length(local.ip_configurations_body) == 0 ? null : local.ip_configurations_body
-      applicationSecurityGroups = length(local.asg_body) == 0 ? null : local.asg_body
+      ipConfigurations          = local.ip_configurations_body
+      applicationSecurityGroups = local.asg_body
     }
   }
   create_headers = local.tracing_headers
