@@ -213,7 +213,9 @@ resource "azapi_update_resource" "customer_managed_key" {
       encryption = local.encryption_cmk
     }
   }
-  retry = var.retry
+  read_headers   = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
+  retry          = var.retry
+  update_headers = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
 
   dynamic "timeouts" {
     for_each = var.timeouts == null ? [] : [var.timeouts]

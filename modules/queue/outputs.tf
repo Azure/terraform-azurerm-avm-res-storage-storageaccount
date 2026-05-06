@@ -12,3 +12,8 @@ output "resource_id" {
   description = "The resource ID of the queue."
   value       = azapi_resource.this.id
 }
+
+output "role_assignments" {
+  description = "Map of role assignment resources created at the queue scope, keyed by the input map key."
+  value       = module.role_assignments.role_assignments
+}

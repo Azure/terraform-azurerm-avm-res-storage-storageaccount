@@ -6,19 +6,6 @@ module "queues" {
   storage_account_id  = azapi_resource.this.id
   metadata            = each.value.metadata
   retry               = var.retry
-  timeouts            = each.value.timeouts != null ? each.value.timeouts : var.timeouts
-  tracing_tags_header = var.enable_telemetry ? local.avm_azapi_header : null
-}
-
-# Per-queue role assignments. Created at the root because the queue submodule
-# does not (and per AVM lint cannot) embed the `role_assignments` submodule via
-# a relative `../role_assignments` source.
-module "queue_role_assignments" {
-  source   = "./modules/role_assignments"
-  for_each = var.queues
-
-  scope               = module.queues[each.key].resource_id
-  retry               = var.retry
   role_assignments    = each.value.role_assignments
   timeouts            = each.value.timeouts != null ? each.value.timeouts : var.timeouts
   tracing_tags_header = var.enable_telemetry ? local.avm_azapi_header : null
@@ -27,4 +14,11 @@ module "queue_role_assignments" {
 moved {
   from = azapi_resource.queue
   to   = module.queues.azapi_resource.this
+}
+
+# Per-queue role assignments are now created inside the queue submodule.
+# Migrate state from the historical root-level module to the nested module.
+moved {
+  from = module.queue_role_assignments
+  to   = module.queues.module.role_assignments
 }

@@ -171,6 +171,27 @@ object({
 
 Default: `null`
 
+### <a name="input_role_assignments"></a> [role\_assignments](#input\_role\_assignments)
+
+Description: (Optional) A map of role assignments to create at the private endpoint scope. Defaults to `{}`. See the `role_assignments` submodule for the attribute schema.
+
+Type:
+
+```hcl
+map(object({
+    role_definition_id_or_name             = string
+    principal_id                           = string
+    description                            = optional(string, null)
+    skip_service_principal_aad_check       = optional(bool, false)
+    condition                              = optional(string, null)
+    condition_version                      = optional(string, null)
+    delegated_managed_identity_resource_id = optional(string, null)
+    principal_type                         = optional(string, null)
+  }))
+```
+
+Default: `{}`
+
 ### <a name="input_tags"></a> [tags](#input\_tags)
 
 Description: (Optional) Tags to apply to the private endpoint. Defaults to `null` (no tags).
@@ -229,9 +250,19 @@ Description: The full private endpoint azapi\_resource.
 
 Description: The resource ID of the private endpoint.
 
+### <a name="output_role_assignments"></a> [role\_assignments](#output\_role\_assignments)
+
+Description: Map of role assignment resources created at the private endpoint scope, keyed by the input map key.
+
 ## Modules
 
-No modules.
+The following Modules are called:
+
+### <a name="module_role_assignments"></a> [role\_assignments](#module\_role\_assignments)
+
+Source: ../role_assignments
+
+Version:
 
 <!-- END\_TF\_DOCS -->
 <!-- END_TF_DOCS -->

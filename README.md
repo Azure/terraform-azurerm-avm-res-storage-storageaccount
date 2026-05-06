@@ -40,6 +40,7 @@ The following resources are used by this module:
 
 - [azapi_resource.lock](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
 - [azapi_resource.this](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
+- [azapi_update_resource.customer_managed_key](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/update_resource) (resource)
 - [modtm_telemetry.telemetry](https://registry.terraform.io/providers/Azure/modtm/latest/docs/resources/telemetry) (resource)
 - [random_uuid.telemetry](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/uuid) (resource)
 - [azapi_client_config.telemetry](https://registry.terraform.io/providers/Azure/azapi/latest/docs/data-sources/client_config) (data source)
@@ -1382,12 +1383,6 @@ Description: Map of storage tables that are created.
 
 The following Modules are called:
 
-### <a name="module_container_role_assignments"></a> [container\_role\_assignments](#module\_container\_role\_assignments)
-
-Source: ./modules/role_assignments
-
-Version:
-
 ### <a name="module_containers"></a> [containers](#module\_containers)
 
 Source: ./modules/container
@@ -1442,21 +1437,9 @@ Source: ./modules/management_policy
 
 Version:
 
-### <a name="module_private_endpoint_role_assignments"></a> [private\_endpoint\_role\_assignments](#module\_private\_endpoint\_role\_assignments)
-
-Source: ./modules/role_assignments
-
-Version:
-
 ### <a name="module_private_endpoints"></a> [private\_endpoints](#module\_private\_endpoints)
 
 Source: ./modules/private_endpoint
-
-Version:
-
-### <a name="module_queue_role_assignments"></a> [queue\_role\_assignments](#module\_queue\_role\_assignments)
-
-Source: ./modules/role_assignments
 
 Version:
 
@@ -1472,12 +1455,6 @@ Source: ./modules/role_assignments
 
 Version:
 
-### <a name="module_share_role_assignments"></a> [share\_role\_assignments](#module\_share\_role\_assignments)
-
-Source: ./modules/role_assignments
-
-Version:
-
 ### <a name="module_shares"></a> [shares](#module\_shares)
 
 Source: ./modules/share
@@ -1487,12 +1464,6 @@ Version:
 ### <a name="module_static_website"></a> [static\_website](#module\_static\_website)
 
 Source: ./modules/static_website
-
-Version:
-
-### <a name="module_table_role_assignments"></a> [table\_role\_assignments](#module\_table\_role\_assignments)
-
-Source: ./modules/role_assignments
 
 Version:
 

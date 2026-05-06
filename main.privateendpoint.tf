@@ -17,21 +17,16 @@ module "private_endpoints" {
   private_dns_zone_resource_ids           = each.value.private_dns_zone_resource_ids
   private_service_connection_name         = each.value.private_service_connection_name
   retry                                   = var.retry
+  role_assignments                        = each.value.role_assignments
   tags                                    = each.value.tags
   timeouts                                = var.timeouts
   tracing_tags_header                     = var.enable_telemetry ? local.avm_azapi_header : null
 }
 
-# Per-private-endpoint role assignments. Created at the root because the
-# private_endpoint submodule does not (and per AVM lint cannot) embed the
-# `role_assignments` submodule via a relative `../role_assignments` source.
-module "private_endpoint_role_assignments" {
-  source   = "./modules/role_assignments"
-  for_each = var.private_endpoints
-
-  scope               = module.private_endpoints[each.key].resource_id
-  retry               = var.retry
-  role_assignments    = each.value.role_assignments
-  timeouts            = var.timeouts
-  tracing_tags_header = var.enable_telemetry ? local.avm_azapi_header : null
+# Per-private-endpoint role assignments are now created inside the
+# private_endpoint submodule. Migrate state from the historical root-level
+# module to the nested module.
+moved {
+  from = module.private_endpoint_role_assignments
+  to   = module.private_endpoints.module.role_assignments
 }

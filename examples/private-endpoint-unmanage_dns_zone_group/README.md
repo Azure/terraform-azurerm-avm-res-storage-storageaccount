@@ -43,18 +43,17 @@ module "naming" {
   version = "0.4.0"
 }
 
-
-resource "azapi_resource" "rg" {
+resource "azapi_resource" "resource_group" {
   location  = local.test_regions[random_integer.region_index.result]
   name      = module.naming.resource_group.name_unique
   parent_id = "/subscriptions/${data.azapi_client_config.current.subscription_id}"
   type      = "Microsoft.Resources/resourceGroups@2021-04-01"
 }
 
-resource "azapi_resource" "vnet" {
-  location  = azapi_resource.rg.location
+resource "azapi_resource" "virtual_network" {
+  location  = azapi_resource.resource_group.location
   name      = module.naming.virtual_network.name_unique
-  parent_id = azapi_resource.rg.id
+  parent_id = azapi_resource.resource_group.id
   type      = "Microsoft.Network/virtualNetworks@2023-11-01"
   body = {
     properties = {
@@ -65,10 +64,10 @@ resource "azapi_resource" "vnet" {
   }
 }
 
-resource "azapi_resource" "nsg" {
-  location  = azapi_resource.rg.location
+resource "azapi_resource" "network_security_group" {
+  location  = azapi_resource.resource_group.location
   name      = module.naming.network_security_group.name_unique
-  parent_id = azapi_resource.rg.id
+  parent_id = azapi_resource.resource_group.id
   type      = "Microsoft.Network/networkSecurityGroups@2023-11-01"
   body = {
     properties = {}
@@ -77,7 +76,7 @@ resource "azapi_resource" "nsg" {
 
 resource "azapi_resource" "subnet" {
   name      = module.naming.subnet.name_unique
-  parent_id = azapi_resource.vnet.id
+  parent_id = azapi_resource.virtual_network.id
   type      = "Microsoft.Network/virtualNetworks/subnets@2023-11-01"
   body = {
     properties = {
@@ -86,7 +85,7 @@ resource "azapi_resource" "subnet" {
         { service = "Microsoft.Storage" }
       ]
       networkSecurityGroup = {
-        id = azapi_resource.nsg.id
+        id = azapi_resource.network_security_group.id
       }
     }
   }
@@ -94,7 +93,7 @@ resource "azapi_resource" "subnet" {
 
 resource "azapi_resource" "no_internet_rule" {
   name      = module.naming.network_security_rule.name_unique
-  parent_id = azapi_resource.nsg.id
+  parent_id = azapi_resource.network_security_group.id
   type      = "Microsoft.Network/networkSecurityGroups/securityRules@2023-11-01"
   body = {
     properties = {
@@ -114,17 +113,12 @@ locals {
   endpoints = toset(["blob", "queue", "table", "file"])
 }
 
-module "public_ip" {
-  source  = "lonegunmanb/public-ip/lonegunmanb"
-  version = "0.1.0"
-  count   = var.bypass_ip_cidr == null ? 1 : 0
-}
 resource "azapi_resource" "private_dns_zone" {
   for_each = local.endpoints
 
   location  = "global"
   name      = "privatelink.${each.value}.core.windows.net"
-  parent_id = azapi_resource.rg.id
+  parent_id = azapi_resource.resource_group.id
   type      = "Microsoft.Network/privateDnsZones@2020-06-01"
   body = {
     properties = {}
@@ -138,23 +132,23 @@ resource "azapi_resource" "private_dns_link" {
   for_each = azapi_resource.private_dns_zone
 
   location  = "global"
-  name      = "${each.key}_${azapi_resource.vnet.name}-link"
+  name      = "${each.key}_${azapi_resource.virtual_network.name}-link"
   parent_id = each.value.id
   type      = "Microsoft.Network/privateDnsZones/virtualNetworkLinks@2020-06-01"
   body = {
     properties = {
       registrationEnabled = false
       virtualNetwork = {
-        id = azapi_resource.vnet.id
+        id = azapi_resource.virtual_network.id
       }
     }
   }
 }
 
 resource "azapi_resource" "example_identity" {
-  location  = azapi_resource.rg.location
+  location  = azapi_resource.resource_group.location
   name      = module.naming.user_assigned_identity.name_unique
-  parent_id = azapi_resource.rg.id
+  parent_id = azapi_resource.resource_group.id
   type      = "Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31"
   body      = {}
 }
@@ -163,12 +157,9 @@ resource "azapi_resource" "example_identity" {
 module "this" {
   source = "../.."
 
-  location                 = azapi_resource.rg.location
-  name                     = module.naming.storage_account.name_unique
-  parent_id                = azapi_resource.rg.id
-  account_kind             = "StorageV2"
-  account_replication_type = "ZRS"
-  account_tier             = "Standard"
+  location  = azapi_resource.resource_group.location
+  name      = module.naming.storage_account.name_unique
+  parent_id = azapi_resource.resource_group.id
   containers = {
     blob_container0 = {
       name = "blob-container-${random_string.this.result}-0"
@@ -182,11 +173,7 @@ module "this" {
     system_assigned            = true
     user_assigned_resource_ids = [azapi_resource.example_identity.id]
   }
-  min_tls_version = "TLS1_2"
   network_rules = {
-    bypass                     = ["AzureServices"]
-    default_action             = "Deny"
-    ip_rules                   = [try(module.public_ip[0].public_ip, var.bypass_ip_cidr)]
     virtual_network_subnet_ids = toset([azapi_resource.subnet.id])
   }
   #create a private endpoint for each endpoint type
@@ -242,7 +229,6 @@ module "this" {
     },
 
   }
-  shared_access_key_enabled = true
   shares = {
     share0 = {
       name  = "share-${random_string.this.result}-0"
@@ -267,7 +253,6 @@ module "this" {
     dept  = "IT"
   }
 }
-
 ```
 
 <!-- markdownlint-disable MD033 -->
@@ -286,13 +271,13 @@ The following requirements are needed by this module:
 The following resources are used by this module:
 
 - [azapi_resource.example_identity](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
+- [azapi_resource.network_security_group](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
 - [azapi_resource.no_internet_rule](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
-- [azapi_resource.nsg](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
 - [azapi_resource.private_dns_link](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
 - [azapi_resource.private_dns_zone](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
-- [azapi_resource.rg](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
+- [azapi_resource.resource_group](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
 - [azapi_resource.subnet](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
-- [azapi_resource.vnet](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
+- [azapi_resource.virtual_network](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
 - [random_integer.region_index](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/integer) (resource)
 - [random_string.this](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/string) (resource)
 - [azapi_client_config.current](https://registry.terraform.io/providers/Azure/azapi/latest/docs/data-sources/client_config) (data source)
@@ -305,14 +290,6 @@ No required inputs.
 ## Optional Inputs
 
 The following input variables are optional (have default values):
-
-### <a name="input_bypass_ip_cidr"></a> [bypass\_ip\_cidr](#input\_bypass\_ip\_cidr)
-
-Description: value to bypass the IP CIDR on firewall rules
-
-Type: `string`
-
-Default: `null`
 
 ### <a name="input_msi_id"></a> [msi\_id](#input\_msi\_id)
 
@@ -335,12 +312,6 @@ The following Modules are called:
 Source: Azure/naming/azurerm
 
 Version: 0.4.0
-
-### <a name="module_public_ip"></a> [public\_ip](#module\_public\_ip)
-
-Source: lonegunmanb/public-ip/lonegunmanb
-
-Version: 0.1.0
 
 ### <a name="module_this"></a> [this](#module\_this)
 

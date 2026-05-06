@@ -55,17 +55,17 @@ module "naming" {
 data "azurerm_client_config" "current" {}
 
 # This is required for resource modules
-resource "azapi_resource" "rg" {
+resource "azapi_resource" "resource_group" {
   location  = local.test_regions[random_integer.region_index.result]
   name      = module.naming.resource_group.name_unique
   parent_id = "/subscriptions/${data.azurerm_client_config.current.subscription_id}"
   type      = "Microsoft.Resources/resourceGroups@2021-04-01"
 }
 
-resource "azapi_resource" "vnet" {
-  location  = azapi_resource.rg.location
+resource "azapi_resource" "virtual_network" {
+  location  = azapi_resource.resource_group.location
   name      = module.naming.virtual_network.name_unique
-  parent_id = azapi_resource.rg.id
+  parent_id = azapi_resource.resource_group.id
   type      = "Microsoft.Network/virtualNetworks@2023-11-01"
   body = {
     properties = {
@@ -76,10 +76,10 @@ resource "azapi_resource" "vnet" {
   }
 }
 
-resource "azapi_resource" "nsg" {
-  location  = azapi_resource.rg.location
+resource "azapi_resource" "network_security_group" {
+  location  = azapi_resource.resource_group.location
   name      = module.naming.network_security_group.name_unique
-  parent_id = azapi_resource.rg.id
+  parent_id = azapi_resource.resource_group.id
   type      = "Microsoft.Network/networkSecurityGroups@2023-11-01"
   body = {
     properties = {}
@@ -88,7 +88,7 @@ resource "azapi_resource" "nsg" {
 
 resource "azapi_resource" "subnet" {
   name      = module.naming.subnet.name_unique
-  parent_id = azapi_resource.vnet.id
+  parent_id = azapi_resource.virtual_network.id
   type      = "Microsoft.Network/virtualNetworks/subnets@2023-11-01"
   body = {
     properties = {
@@ -97,7 +97,7 @@ resource "azapi_resource" "subnet" {
         { service = "Microsoft.Storage" }
       ]
       networkSecurityGroup = {
-        id = azapi_resource.nsg.id
+        id = azapi_resource.network_security_group.id
       }
     }
   }
@@ -105,7 +105,7 @@ resource "azapi_resource" "subnet" {
 
 resource "azapi_resource" "no_internet_rule" {
   name      = module.naming.network_security_rule.name_unique
-  parent_id = azapi_resource.nsg.id
+  parent_id = azapi_resource.network_security_group.id
   type      = "Microsoft.Network/networkSecurityGroups/securityRules@2023-11-01"
   body = {
     properties = {
@@ -121,16 +121,10 @@ resource "azapi_resource" "no_internet_rule" {
   }
 }
 
-module "public_ip" {
-  source  = "lonegunmanb/public-ip/lonegunmanb"
-  version = "0.1.0"
-  count   = var.bypass_ip_cidr == null ? 1 : 0
-}
-
 resource "azapi_resource" "example_identity" {
-  location               = azapi_resource.rg.location
+  location               = azapi_resource.resource_group.location
   name                   = module.naming.user_assigned_identity.name_unique
-  parent_id              = azapi_resource.rg.id
+  parent_id              = azapi_resource.resource_group.id
   type                   = "Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31"
   body                   = {}
   response_export_values = ["properties"]
@@ -142,9 +136,9 @@ module "avm_res_keyvault_vault" {
   source  = "Azure/avm-res-keyvault-vault/azurerm"
   version = "0.5.1"
 
-  location            = azapi_resource.rg.location
+  location            = azapi_resource.resource_group.location
   name                = module.naming.key_vault.name_unique
-  resource_group_name = azapi_resource.rg.name
+  resource_group_name = azapi_resource.resource_group.name
   tenant_id           = data.azurerm_client_config.current.tenant_id
   network_acls = {
     default_action = "Allow"
@@ -171,12 +165,9 @@ module "avm_res_keyvault_vault" {
 module "this" {
   source = "../.."
 
-  location                 = azapi_resource.rg.location
-  name                     = module.naming.storage_account.name_unique
-  parent_id                = azapi_resource.rg.id
-  account_kind             = "StorageV2"
-  account_replication_type = "ZRS"
-  account_tier             = "Standard"
+  location  = azapi_resource.resource_group.location
+  name      = module.naming.storage_account.name_unique
+  parent_id = azapi_resource.resource_group.id
   containers = {
     blob_container0 = {
       name = "blob-container-${random_string.this.result}-0"
@@ -215,11 +206,7 @@ module "this" {
     system_assigned            = true
     user_assigned_resource_ids = [azapi_resource.example_identity.id]
   }
-  min_tls_version = "TLS1_2"
   network_rules = {
-    bypass                     = ["AzureServices"]
-    default_action             = "Deny"
-    ip_rules                   = [try(module.public_ip[0].public_ip, var.bypass_ip_cidr)]
     virtual_network_subnet_ids = toset([azapi_resource.subnet.id])
   }
   public_network_access_enabled = false
@@ -281,11 +268,11 @@ The following requirements are needed by this module:
 The following resources are used by this module:
 
 - [azapi_resource.example_identity](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
+- [azapi_resource.network_security_group](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
 - [azapi_resource.no_internet_rule](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
-- [azapi_resource.nsg](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
-- [azapi_resource.rg](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
+- [azapi_resource.resource_group](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
 - [azapi_resource.subnet](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
-- [azapi_resource.vnet](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
+- [azapi_resource.virtual_network](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
 - [azurerm_key_vault_secret.sftp_password](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault_secret) (resource)
 - [random_integer.region_index](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/integer) (resource)
 - [random_string.this](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/string) (resource)
@@ -299,14 +286,6 @@ No required inputs.
 ## Optional Inputs
 
 The following input variables are optional (have default values):
-
-### <a name="input_bypass_ip_cidr"></a> [bypass\_ip\_cidr](#input\_bypass\_ip\_cidr)
-
-Description: value to bypass the IP CIDR on firewall rules
-
-Type: `string`
-
-Default: `null`
 
 ### <a name="input_msi_id"></a> [msi\_id](#input\_msi\_id)
 
@@ -339,12 +318,6 @@ Version: 0.5.1
 Source: Azure/naming/azurerm
 
 Version: 0.4.0
-
-### <a name="module_public_ip"></a> [public\_ip](#module\_public\_ip)
-
-Source: lonegunmanb/public-ip/lonegunmanb
-
-Version: 0.1.0
 
 ### <a name="module_this"></a> [this](#module\_this)
 
