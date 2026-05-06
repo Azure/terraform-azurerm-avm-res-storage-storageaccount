@@ -25,15 +25,9 @@ The following resources are used by this module:
 
 The following input variables are required:
 
-### <a name="input_name"></a> [name](#input\_name)
+### <a name="input_parent_id"></a> [parent\_id](#input\_parent\_id)
 
-Description: (Required) The name of the diagnostic setting.
-
-Type: `string`
-
-### <a name="input_target_resource_id"></a> [target\_resource\_id](#input\_target\_resource\_id)
-
-Description: (Required) The full resource ID of the resource the diagnostic setting is being created on.
+Description: (Required) The full resource ID of the parent resource that the diagnostic setting will be attached to (for example a Storage Account, blob service, queue service, table service, or file service).
 
 Type: `string`
 
@@ -41,71 +35,54 @@ Type: `string`
 
 The following input variables are optional (have default values):
 
-### <a name="input_event_hub_authorization_rule_resource_id"></a> [event\_hub\_authorization\_rule\_resource\_id](#input\_event\_hub\_authorization\_rule\_resource\_id)
+### <a name="input_diagnostic_settings"></a> [diagnostic\_settings](#input\_diagnostic\_settings)
 
-Description: (Optional) Resource ID of the Event Hub authorization rule.
+Description: (Optional) A map of diagnostic settings to create against `parent_id`. Uses the v2 diagnostic settings schema from `Azure/avm-utl-interfaces/azure`.
 
-Type: `string`
+Type:
 
-Default: `null`
-
-### <a name="input_event_hub_name"></a> [event\_hub\_name](#input\_event\_hub\_name)
-
-Description: (Optional) The name of the Event Hub.
-
-Type: `string`
-
-Default: `null`
-
-### <a name="input_log_analytics_destination_type"></a> [log\_analytics\_destination\_type](#input\_log\_analytics\_destination\_type)
-
-Description: (Optional) Destination type for log analytics. One of `Dedicated` or `AzureDiagnostics`.
-
-Type: `string`
-
-Default: `"Dedicated"`
-
-### <a name="input_log_categories"></a> [log\_categories](#input\_log\_categories)
-
-Description: (Optional) A set of individual log categories to enable.
-
-Type: `set(string)`
-
-Default: `[]`
-
-### <a name="input_log_groups"></a> [log\_groups](#input\_log\_groups)
-
-Description: (Optional) A set of log category groups to enable (e.g. `allLogs`).
-
-Type: `set(string)`
-
-Default: `[]`
-
-### <a name="input_marketplace_partner_resource_id"></a> [marketplace\_partner\_resource\_id](#input\_marketplace\_partner\_resource\_id)
-
-Description: (Optional) The full ARM resource ID of the Marketplace Partner destination.
-
-Type: `string`
-
-Default: `null`
-
-### <a name="input_metric_categories"></a> [metric\_categories](#input\_metric\_categories)
-
-Description: (Optional) A set of metric categories to enable.
-
-Type: `set(string)`
-
-Default:
-
-```json
-[
-  "AllMetrics"
-]
+```hcl
+map(object({
+    name = optional(string, null)
+    logs = optional(set(object({
+      category       = optional(string, null)
+      category_group = optional(string, null)
+      enabled        = optional(bool, true)
+      retention_policy = optional(object({
+        days    = optional(number, 0)
+        enabled = optional(bool, false)
+      }), {})
+    })), [])
+    metrics = optional(set(object({
+      category = optional(string, null)
+      enabled  = optional(bool, true)
+      retention_policy = optional(object({
+        days    = optional(number, 0)
+        enabled = optional(bool, false)
+      }), {})
+    })), [])
+    log_analytics_destination_type           = optional(string, "Dedicated")
+    workspace_resource_id                    = optional(string, null)
+    storage_account_resource_id              = optional(string, null)
+    event_hub_authorization_rule_resource_id = optional(string, null)
+    event_hub_name                           = optional(string, null)
+    marketplace_partner_resource_id          = optional(string, null)
+  }))
 ```
+
+Default: `{}`
+
+### <a name="input_enable_telemetry"></a> [enable\_telemetry](#input\_enable\_telemetry)
+
+Description: Controls telemetry for the underlying `Azure/avm-utl-interfaces/azure` module.
+
+Type: `bool`
+
+Default: `true`
 
 ### <a name="input_retry"></a> [retry](#input\_retry)
 
-Description: Retry configuration applied to the AzAPI resource.
+Description: Retry configuration applied to each AzAPI diagnostic setting resource.
 
 Type:
 
@@ -119,17 +96,9 @@ object({
 
 Default: `null`
 
-### <a name="input_storage_account_resource_id"></a> [storage\_account\_resource\_id](#input\_storage\_account\_resource\_id)
-
-Description: (Optional) Resource ID of the storage account destination.
-
-Type: `string`
-
-Default: `null`
-
 ### <a name="input_timeouts"></a> [timeouts](#input\_timeouts)
 
-Description: Timeouts applied to the AzAPI resource.
+Description: Timeouts applied to each AzAPI diagnostic setting resource.
 
 Type:
 
@@ -146,15 +115,7 @@ Default: `null`
 
 ### <a name="input_tracing_tags_header"></a> [tracing\_tags\_header](#input\_tracing\_tags\_header)
 
-Description: Optional User-Agent string injected into AzAPI request headers.
-
-Type: `string`
-
-Default: `null`
-
-### <a name="input_workspace_resource_id"></a> [workspace\_resource\_id](#input\_workspace\_resource\_id)
-
-Description: (Optional) Resource ID of the Log Analytics workspace destination.
+Description: Optional User-Agent string injected into AzAPI request headers for telemetry.
 
 Type: `string`
 
@@ -164,21 +125,27 @@ Default: `null`
 
 The following outputs are exported:
 
-### <a name="output_name"></a> [name](#output\_name)
+### <a name="output_names"></a> [names](#output\_names)
 
-Description: The name of the diagnostic setting.
+Description: Map from input key to the generated diagnostic setting name.
 
-### <a name="output_resource"></a> [resource](#output\_resource)
+### <a name="output_resource_ids"></a> [resource\_ids](#output\_resource\_ids)
 
-Description: The full diagnostic setting azapi\_resource.
+Description: Map from input key to the resource ID of the diagnostic setting.
 
-### <a name="output_resource_id"></a> [resource\_id](#output\_resource\_id)
+### <a name="output_resources"></a> [resources](#output\_resources)
 
-Description: The resource ID of the diagnostic setting.
+Description: Map from input key to the full diagnostic setting azapi\_resource.
 
 ## Modules
 
-No modules.
+The following Modules are called:
+
+### <a name="module_interfaces"></a> [interfaces](#module\_interfaces)
+
+Source: Azure/avm-utl-interfaces/azure
+
+Version: 0.6.0
 
 <!-- END\_TF\_DOCS -->
 <!-- END_TF_DOCS -->

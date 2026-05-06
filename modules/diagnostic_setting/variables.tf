@@ -1,57 +1,45 @@
-variable "name" {
+variable "parent_id" {
   type        = string
-  description = "(Required) The name of the diagnostic setting."
+  description = "(Required) The full resource ID of the parent resource that the diagnostic setting will be attached to (for example a Storage Account, blob service, queue service, table service, or file service)."
   nullable    = false
 }
 
-variable "target_resource_id" {
-  type        = string
-  description = "(Required) The full resource ID of the resource the diagnostic setting is being created on."
+variable "diagnostic_settings" {
+  type = map(object({
+    name = optional(string, null)
+    logs = optional(set(object({
+      category       = optional(string, null)
+      category_group = optional(string, null)
+      enabled        = optional(bool, true)
+      retention_policy = optional(object({
+        days    = optional(number, 0)
+        enabled = optional(bool, false)
+      }), {})
+    })), [])
+    metrics = optional(set(object({
+      category = optional(string, null)
+      enabled  = optional(bool, true)
+      retention_policy = optional(object({
+        days    = optional(number, 0)
+        enabled = optional(bool, false)
+      }), {})
+    })), [])
+    log_analytics_destination_type           = optional(string, "Dedicated")
+    workspace_resource_id                    = optional(string, null)
+    storage_account_resource_id              = optional(string, null)
+    event_hub_authorization_rule_resource_id = optional(string, null)
+    event_hub_name                           = optional(string, null)
+    marketplace_partner_resource_id          = optional(string, null)
+  }))
+  default     = {}
+  description = "(Optional) A map of diagnostic settings to create against `parent_id`. Uses the v2 diagnostic settings schema from `Azure/avm-utl-interfaces/azure`."
   nullable    = false
 }
 
-variable "event_hub_authorization_rule_resource_id" {
-  type        = string
-  default     = null
-  description = "(Optional) Resource ID of the Event Hub authorization rule."
-}
-
-variable "event_hub_name" {
-  type        = string
-  default     = null
-  description = "(Optional) The name of the Event Hub."
-}
-
-variable "log_analytics_destination_type" {
-  type        = string
-  default     = "Dedicated"
-  description = "(Optional) Destination type for log analytics. One of `Dedicated` or `AzureDiagnostics`."
-}
-
-variable "log_categories" {
-  type        = set(string)
-  default     = []
-  description = "(Optional) A set of individual log categories to enable."
-  nullable    = false
-}
-
-variable "log_groups" {
-  type        = set(string)
-  default     = []
-  description = "(Optional) A set of log category groups to enable (e.g. `allLogs`)."
-  nullable    = false
-}
-
-variable "marketplace_partner_resource_id" {
-  type        = string
-  default     = null
-  description = "(Optional) The full ARM resource ID of the Marketplace Partner destination."
-}
-
-variable "metric_categories" {
-  type        = set(string)
-  default     = ["AllMetrics"]
-  description = "(Optional) A set of metric categories to enable."
+variable "enable_telemetry" {
+  type        = bool
+  default     = true
+  description = "Controls telemetry for the underlying `Azure/avm-utl-interfaces/azure` module."
   nullable    = false
 }
 
@@ -62,13 +50,7 @@ variable "retry" {
     max_interval_seconds = optional(number)
   })
   default     = null
-  description = "Retry configuration applied to the AzAPI resource."
-}
-
-variable "storage_account_resource_id" {
-  type        = string
-  default     = null
-  description = "(Optional) Resource ID of the storage account destination."
+  description = "Retry configuration applied to each AzAPI diagnostic setting resource."
 }
 
 variable "timeouts" {
@@ -79,17 +61,11 @@ variable "timeouts" {
     delete = optional(string)
   })
   default     = null
-  description = "Timeouts applied to the AzAPI resource."
+  description = "Timeouts applied to each AzAPI diagnostic setting resource."
 }
 
 variable "tracing_tags_header" {
   type        = string
   default     = null
-  description = "Optional User-Agent string injected into AzAPI request headers."
-}
-
-variable "workspace_resource_id" {
-  type        = string
-  default     = null
-  description = "(Optional) Resource ID of the Log Analytics workspace destination."
+  description = "Optional User-Agent string injected into AzAPI request headers for telemetry."
 }

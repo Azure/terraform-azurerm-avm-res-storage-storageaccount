@@ -145,12 +145,15 @@ module "this" {
     blob11 = {
       name                                     = "diag"
       workspace_resource_id                    = azapi_resource.law.id
-      eventhub_name                            = azapi_resource.eventhub.name
+      event_hub_name                           = azapi_resource.eventhub.name
       event_hub_authorization_rule_resource_id = "${azapi_resource.eventhub_namespace.id}/authorizationRules/RootManageSharedAccessKey"
-      log_categories                           = ["StorageWrite", "StorageDelete"]
-      metric_categories                        = ["Transaction"]
-      log_groups                               = []
-
+      logs = [
+        { category = "StorageWrite" },
+        { category = "StorageDelete" },
+      ]
+      metrics = [
+        { category = "Transaction" },
+      ]
     }
   }
   # setting up diagnostic settings for file
@@ -158,12 +161,14 @@ module "this" {
     file1 = {
       name                                     = "diag"
       workspace_resource_id                    = azapi_resource.law.id
-      eventhub_name                            = azapi_resource.eventhub.name
+      event_hub_name                           = azapi_resource.eventhub.name
       event_hub_authorization_rule_resource_id = "${azapi_resource.eventhub_namespace.id}/authorizationRules/RootManageSharedAccessKey"
-      metric_categories                        = ["Transaction"]
-      log_groups                               = ["Audit"]
-      # log_categories                           = ["StorageWrite", "StorageDelete"]
-
+      logs = [
+        { category_group = "audit" },
+      ]
+      metrics = [
+        { category = "Transaction" },
+      ]
     }
   }
   # setting up diagnostic settings for queue
@@ -171,11 +176,15 @@ module "this" {
     queue = {
       name                                     = "diag"
       workspace_resource_id                    = azapi_resource.law.id
-      eventhub_name                            = azapi_resource.eventhub.name
+      event_hub_name                           = azapi_resource.eventhub.name
       event_hub_authorization_rule_resource_id = "${azapi_resource.eventhub_namespace.id}/authorizationRules/RootManageSharedAccessKey"
-      metric_categories                        = ["Transaction"]
-      log_groups                               = []
-      log_categories                           = ["StorageWrite", "StorageDelete"]
+      logs = [
+        { category = "StorageWrite" },
+        { category = "StorageDelete" },
+      ]
+      metrics = [
+        { category = "Transaction" },
+      ]
     }
   }
   #setting up diagnostic settings for storage account
@@ -183,9 +192,11 @@ module "this" {
     storage = {
       name                                     = "diag"
       workspace_resource_id                    = azapi_resource.law.id
-      metric_categories                        = ["Transaction"]
-      eventhub_name                            = azapi_resource.eventhub.name
+      event_hub_name                           = azapi_resource.eventhub.name
       event_hub_authorization_rule_resource_id = "${azapi_resource.eventhub_namespace.id}/authorizationRules/RootManageSharedAccessKey"
+      metrics = [
+        { category = "Transaction" },
+      ]
     }
   }
   # setting up diagnostic settings for table
@@ -193,12 +204,14 @@ module "this" {
     table = {
       name                                     = "diag"
       workspace_resource_id                    = azapi_resource.law.id
-      eventhub_name                            = azapi_resource.eventhub.name
+      event_hub_name                           = azapi_resource.eventhub.name
       event_hub_authorization_rule_resource_id = "${azapi_resource.eventhub_namespace.id}/authorizationRules/RootManageSharedAccessKey"
-      metric_categories                        = ["Transaction"]
-      log_categories                           = ["StorageWrite"]
-      log_groups                               = []
-
+      logs = [
+        { category = "StorageWrite" },
+      ]
+      metrics = [
+        { category = "Transaction" },
+      ]
     }
   }
   managed_identities = {
