@@ -4,9 +4,14 @@ output "containers" {
 }
 
 output "eventhub_authorization_rule_primary_key" {
-  description = "Primary key for the event hub authorisation rule"
+  description = "Primary key for the event hub authorisation rule used by the diagnostic settings."
   sensitive   = true
-  value       = data.azapi_resource_action.eventhub_auth_rule_keys.output.primaryKey
+  value       = data.azapi_resource_action.event_hub_auth_rule_keys.output.primaryKey
+}
+
+output "private_endpoints" {
+  description = "value of private endpoints"
+  value       = module.this.private_endpoints
 }
 
 output "queue" {
