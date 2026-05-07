@@ -35,4 +35,12 @@ resource "azapi_resource" "this" {
       update = timeouts.value.update
     }
   }
+
+  lifecycle {
+    # defaultEncryptionScope is set at container creation time and cannot be
+    # mutated afterwards (Azure rejects PUT updates without the special
+    # x-ms-default-encryption-scope/x-ms-deny-encryption-scope-override
+    # headers). Ignoring drift avoids spurious updates and apply failures.
+    ignore_changes = [body.properties.defaultEncryptionScope]
+  }
 }
