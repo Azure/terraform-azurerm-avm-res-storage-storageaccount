@@ -160,7 +160,6 @@ module "this" {
     premium_share = {
       name             = "share-${random_string.this.result}-premium"
       quota            = 100
-      access_tier      = "Premium"
       enabled_protocol = "SMB"
     }
   }

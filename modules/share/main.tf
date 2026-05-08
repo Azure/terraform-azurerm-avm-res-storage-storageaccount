@@ -18,7 +18,7 @@ resource "azapi_resource" "this" {
   type      = "Microsoft.Storage/storageAccounts/fileServices/shares@2024-01-01"
   body = {
     properties = {
-      accessTier        = coalesce(var.access_tier, "TransactionOptimized")
+      accessTier        = var.access_tier
       enabledProtocols  = var.enabled_protocol
       metadata          = var.metadata
       shareQuota        = var.quota
@@ -28,6 +28,7 @@ resource "azapi_resource" "this" {
   }
   create_headers            = local.tracing_headers
   delete_headers            = local.tracing_headers
+  ignore_null_property      = true
   read_headers              = local.tracing_headers
   retry                     = var.retry
   schema_validation_enabled = false
