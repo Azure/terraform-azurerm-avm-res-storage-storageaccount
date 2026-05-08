@@ -204,10 +204,9 @@ module "this" {
           #         tier_to_cold_after_days_since_modification_greater_than = 30
           #         tier_to_cool_after_days_since_creation_greater_than = 30
           #       tier_to_cool_after_days_since_modification_greater_than = 30
-          auto_tier_to_hot_from_cool_enabled = true
+          auto_tier_to_hot_from_cool_enabled = false
           #         delete_after_days_since_creation_greater_than = 30
-          delete_after_days_since_last_access_time_greater_than = 30
-          #         delete_after_days_since_modification_greater_than = 30
+          delete_after_days_since_modification_greater_than      = 30
           tier_to_archive_after_days_since_creation_greater_than = 30
           #         tier_to_archive_after_days_since_last_access_time_greater_than = 30
           tier_to_archive_after_days_since_last_tier_change_greater_than = 30
@@ -216,8 +215,7 @@ module "this" {
           #         tier_to_cold_after_days_since_last_access_time_greater_than = 30
           #         tier_to_cold_after_days_since_modification_greater_than = 30
           #         tier_to_cool_after_days_since_creation_greater_than = 30
-          tier_to_cool_after_days_since_last_access_time_greater_than = 30
-          #       tier_to_cool_after_days_since_modification_greater_than = 30
+          tier_to_cool_after_days_since_modification_greater_than = 30
         }
         #         snapshot = {
         #           change_tier_to_archive_after_days_since_creation               = 30
