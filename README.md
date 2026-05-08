@@ -1346,10 +1346,14 @@ The map value contains the following attributes:
 - `ssh_key_enabled` - Specifies whether SSH Key authentication is enabled.
 - `ssh_password_enabled` - Specifies whether SSH password authentication is enabled.
 
-NOTE: The local user `password` attribute is no longer exported as a non-sensitive  
-output. Use the ephemeral `azapi_resource_action.keys` inside the local\_user  
-submodule (or a `listKeys` action of your own) to retrieve credentials at apply  
-time without persisting them in state.
+NOTE: The local user `password` attribute is no longer exported. The Storage RP  
+only returns the password from the `regeneratePassword` ARM action (the
+`listKeys` action returns an empty body because the password is not persisted  
+server-side). Declare a managed `azapi_resource_action` resource with
+`action = "regeneratePassword"` and `response_export_values = ["sshPassword"]`  
+in the consuming root module; the default `apply_after_create` behavior calls  
+the action exactly once at create so the password is stable. Pipe the result  
+through `value_wo` on `azurerm_key_vault_secret` to keep it out of state.
 
 ### <a name="output_name"></a> [name](#output\_name)
 

@@ -235,11 +235,30 @@ module "this" {
   }
 }
 
-# Store password in Key Vault
+# Generate the SSH password for the local user. The Storage RP only returns the
+# password from the regeneratePassword action; listKeys returns an empty body
+# because Azure does not persist the password server-side. We invoke
+# regeneratePassword via a managed azapi_resource_action so the action runs once
+# at create (not on every plan/apply, which would rotate the password) and the
+# returned value can be consumed by downstream resources.
+resource "azapi_resource_action" "regenerate_local_user_password" {
+  action                 = "regeneratePassword"
+  method                 = "POST"
+  resource_id            = module.this.local_users["user1"].id
+  type                   = "Microsoft.Storage/storageAccounts/localUsers@2024-01-01"
+  response_export_values = ["sshPassword"]
+
+  depends_on = [module.this]
+}
+
+# Store the password in Key Vault. Using value_wo keeps the secret value out of
+# the azurerm_key_vault_secret state; value_wo_version stays stable so the
+# secret is written once and not re-applied on every plan.
 resource "azurerm_key_vault_secret" "sftp_password" {
-  key_vault_id = module.avm_res_keyvault_vault.resource.id
-  name         = module.this.local_users["user1"].name
-  value        = module.this.local_users["user1"].password
+  key_vault_id     = module.avm_res_keyvault_vault.resource.id
+  name             = module.this.local_users["user1"].name
+  value_wo         = azapi_resource_action.regenerate_local_user_password.output.sshPassword
+  value_wo_version = "1"
 
   depends_on = [module.avm_res_keyvault_vault]
 }
