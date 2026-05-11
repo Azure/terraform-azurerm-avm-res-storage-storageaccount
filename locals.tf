@@ -12,55 +12,11 @@ locals {
       azureStorageSid   = var.azure_files_authentication.active_directory.storage_sid
     }
   }
-  blob_endpoint = length(var.containers) == 0 ? [] : ["blob"]
   # Custom domain
   custom_domain = var.custom_domain == null ? null : {
     name             = var.custom_domain.name
     useSubDomainName = var.custom_domain.use_subdomain
   }
-  # Whether a customer-managed key is configured.
-  customer_managed_key_enabled = var.customer_managed_key != null
-  # Effective tier parsed back from the resolved SKU name (strips any V2
-  # suffix), so tier-aware logic honours `var.account_sku_name` overrides.
-  effective_account_tier = replace(split("_", local.sku_name)[0], "V2", "")
-  # Initial encryption block sent on storage account create. CMK fields
-  # (keySource = Microsoft.Keyvault, identity, keyvaultproperties) cannot be
-  # accepted by ARM in the same PUT that first associates the user-assigned
-  # identity with the account, so they are applied via azapi_update_resource
-  # in a second step (see azapi_update_resource.customer_managed_key).
-  encryption = {
-    keySource                       = "Microsoft.Storage"
-    requireInfrastructureEncryption = var.infrastructure_encryption_enabled ? true : null
-    services                        = { for k, v in local.encryption_services : k => v if v != null }
-  }
-  # Full encryption body applied via azapi_update_resource once the storage
-  # account exists and its identity is in place.
-  encryption_cmk = local.customer_managed_key_enabled ? {
-    keySource                       = "Microsoft.Keyvault"
-    requireInfrastructureEncryption = var.infrastructure_encryption_enabled ? true : null
-    services                        = { for k, v in local.encryption_services : k => v if v != null }
-    keyvaultproperties              = local.encryption_keyvault
-    identity                        = local.encryption_identity
-  } : null
-  encryption_identity = local.customer_managed_key_enabled && try(var.customer_managed_key.user_assigned_identity, null) != null ? {
-    userAssignedIdentity = var.customer_managed_key.user_assigned_identity.resource_id
-  } : null
-  encryption_keyvault = local.customer_managed_key_enabled ? {
-    keyname     = var.customer_managed_key.key_name
-    keyvaulturi = data.azapi_resource.customer_managed_key_vault[0].output.properties.vaultUri
-    keyversion  = var.customer_managed_key.key_version
-  } : null
-  encryption_services = {
-    queue = var.queue_encryption_key_type == null ? null : {
-      keyType = var.queue_encryption_key_type
-      enabled = true
-    }
-    table = var.table_encryption_key_type == null ? null : {
-      keyType = var.table_encryption_key_type
-      enabled = true
-    }
-  }
-  endpoints = toset(concat(local.blob_endpoint, local.queue_endpoint, local.table_endpoint))
   extended_location = var.edge_zone == null ? null : {
     name = var.edge_zone
     type = "EdgeZone"
@@ -99,7 +55,6 @@ locals {
     ]
   }
   public_network_access_setting = var.public_network_access_enabled == null ? null : (var.public_network_access_enabled ? "Enabled" : "Disabled")
-  queue_endpoint                = length(var.queues) == 0 ? [] : ["queue"]
   # Routing preference
   routing_preference = var.routing == null ? null : {
     routingChoice             = var.routing.choice
@@ -111,9 +66,4 @@ locals {
     sasExpirationPeriod = var.sas_policy.expiration_period
     expirationAction    = var.sas_policy.expiration_action
   }
-  # SKU name combines tier + replication, with optional V2 suffix when the
-  # provisioned billing model V2 is requested (StandardV2_*, PremiumV2_*).
-  # When `var.account_sku_name` is supplied it wins over the derived value.
-  sku_name       = coalesce(var.account_sku_name, var.provisioned_billing_model_version == "V2" ? "${var.account_tier}V2_${var.account_replication_type}" : "${var.account_tier}_${var.account_replication_type}")
-  table_endpoint = length(var.tables) == 0 ? [] : ["table"]
 }
