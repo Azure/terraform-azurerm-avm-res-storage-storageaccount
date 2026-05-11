@@ -116,11 +116,12 @@ resource "azapi_resource" "this" {
       }
     }
   }
-  create_headers = local.tracing_headers
-  delete_headers = local.tracing_headers
-  read_headers   = local.tracing_headers
-  retry          = var.retry
-  update_headers = local.tracing_headers
+  create_headers         = local.tracing_headers
+  delete_headers         = local.tracing_headers
+  read_headers           = local.tracing_headers
+  response_export_values = []
+  retry                  = var.retry
+  update_headers         = local.tracing_headers
 
   dynamic "timeouts" {
     for_each = var.timeouts == null ? [] : [var.timeouts]

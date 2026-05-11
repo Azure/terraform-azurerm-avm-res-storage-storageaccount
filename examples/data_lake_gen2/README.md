@@ -63,18 +63,20 @@ module "naming" {
 data "azurerm_client_config" "current" {}
 
 resource "azapi_resource" "resource_group" {
-  location  = local.test_regions[random_integer.region_index.result]
-  name      = module.naming.resource_group.name_unique
-  parent_id = "/subscriptions/${data.azurerm_client_config.current.subscription_id}"
-  type      = "Microsoft.Resources/resourceGroups@2021-04-01"
+  location               = local.test_regions[random_integer.region_index.result]
+  name                   = module.naming.resource_group.name_unique
+  parent_id              = "/subscriptions/${data.azurerm_client_config.current.subscription_id}"
+  type                   = "Microsoft.Resources/resourceGroups@2021-04-01"
+  response_export_values = []
 }
 
 resource "azapi_resource" "example_identity" {
-  location  = azapi_resource.resource_group.location
-  name      = module.naming.user_assigned_identity.name_unique
-  parent_id = azapi_resource.resource_group.id
-  type      = "Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31"
-  body      = {}
+  location               = azapi_resource.resource_group.location
+  name                   = module.naming.user_assigned_identity.name_unique
+  parent_id              = azapi_resource.resource_group.id
+  type                   = "Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31"
+  body                   = {}
+  response_export_values = []
 }
 
 module "this" {

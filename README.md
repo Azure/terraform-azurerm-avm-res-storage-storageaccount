@@ -1369,7 +1369,13 @@ Description: The name of the storage account.
 
 ### <a name="output_private_endpoints"></a> [private\_endpoints](#output\_private\_endpoints)
 
-Description: A map of private endpoints. The map key matches `var.private_endpoints`. Each value is the full azapi\_resource exposing the private endpoint.
+Description: A map of private endpoints created by the module. The map key matches `var.private_endpoints`.
+
+Each value is an object with:
+- `id` - The resource ID of the private endpoint.
+- `name` - The name of the private endpoint.
+- `private_dns_zone_group_id` - The resource ID of the managed private DNS zone group, or `null` if not managed by this module.
+- `role_assignments` - Map of role assignments created at the private endpoint scope.
 
 ### <a name="output_queues"></a> [queues](#output\_queues)
 

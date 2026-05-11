@@ -40,10 +40,11 @@ module "naming" {
 }
 
 resource "azapi_resource" "resource_group" {
-  location  = local.test_regions[random_integer.region_index.result]
-  name      = module.naming.resource_group.name_unique
-  parent_id = "/subscriptions/${data.azapi_client_config.current.subscription_id}"
-  type      = "Microsoft.Resources/resourceGroups@2021-04-01"
+  location               = local.test_regions[random_integer.region_index.result]
+  name                   = module.naming.resource_group.name_unique
+  parent_id              = "/subscriptions/${data.azapi_client_config.current.subscription_id}"
+  type                   = "Microsoft.Resources/resourceGroups@2021-04-01"
+  response_export_values = []
 }
 
 resource "azapi_resource" "virtual_network" {
@@ -58,6 +59,7 @@ resource "azapi_resource" "virtual_network" {
       }
     }
   }
+  response_export_values = []
 }
 
 resource "azapi_resource" "subnet" {
@@ -72,6 +74,7 @@ resource "azapi_resource" "subnet" {
       ]
     }
   }
+  response_export_values = []
 }
 
 resource "azapi_resource" "private_endpoint_subnet" {
@@ -83,6 +86,7 @@ resource "azapi_resource" "private_endpoint_subnet" {
       addressPrefix = "192.168.1.0/24"
     }
   }
+  response_export_values = []
 
   depends_on = [azapi_resource.subnet]
 }
@@ -97,6 +101,7 @@ resource "azapi_resource" "private_dns_zone" {
   body = {
     properties = {}
   }
+  response_export_values = []
   retry = {
     error_message_regex  = ["CannotDeleteResource"]
     interval_seconds     = 15
@@ -119,14 +124,16 @@ resource "azapi_resource" "private_dns_link" {
       }
     }
   }
+  response_export_values = []
 }
 
 resource "azapi_resource" "example_identity" {
-  location  = azapi_resource.resource_group.location
-  name      = module.naming.user_assigned_identity.name_unique
-  parent_id = azapi_resource.resource_group.id
-  type      = "Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31"
-  body      = {}
+  location               = azapi_resource.resource_group.location
+  name                   = module.naming.user_assigned_identity.name_unique
+  parent_id              = azapi_resource.resource_group.id
+  type                   = "Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31"
+  body                   = {}
+  response_export_values = []
 }
 
 resource "azapi_resource" "log_analytics_workspace" {
@@ -141,6 +148,7 @@ resource "azapi_resource" "log_analytics_workspace" {
       }
     }
   }
+  response_export_values = []
 }
 
 resource "azapi_resource" "event_hub_namespace" {
@@ -161,6 +169,7 @@ resource "azapi_resource" "event_hub_namespace" {
       zoneRedundant          = true
     }
   }
+  response_export_values = []
 }
 
 resource "azapi_resource" "event_hub" {
@@ -173,6 +182,7 @@ resource "azapi_resource" "event_hub" {
       partitionCount         = 2
     }
   }
+  response_export_values = []
 }
 
 resource "azapi_resource" "event_hub_authorization_rule" {
@@ -184,6 +194,7 @@ resource "azapi_resource" "event_hub_authorization_rule" {
       rights = ["Listen"]
     }
   }
+  response_export_values = []
 }
 
 # Fetch the listen key for the event hub authorisation rule (used by an output).

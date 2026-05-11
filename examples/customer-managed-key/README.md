@@ -61,10 +61,11 @@ module "naming" {
 data "azurerm_client_config" "current" {}
 
 resource "azapi_resource" "resource_group" {
-  location  = local.test_regions[random_integer.region_index.result]
-  name      = module.naming.resource_group.name_unique
-  parent_id = "/subscriptions/${data.azurerm_client_config.current.subscription_id}"
-  type      = "Microsoft.Resources/resourceGroups@2021-04-01"
+  location               = local.test_regions[random_integer.region_index.result]
+  name                   = module.naming.resource_group.name_unique
+  parent_id              = "/subscriptions/${data.azurerm_client_config.current.subscription_id}"
+  type                   = "Microsoft.Resources/resourceGroups@2021-04-01"
+  response_export_values = []
 }
 
 resource "azapi_resource" "virtual_network" {
@@ -79,6 +80,7 @@ resource "azapi_resource" "virtual_network" {
       }
     }
   }
+  response_export_values = []
 }
 
 resource "azapi_resource" "network_security_group" {
@@ -89,6 +91,7 @@ resource "azapi_resource" "network_security_group" {
   body = {
     properties = {}
   }
+  response_export_values = []
 }
 
 resource "azapi_resource" "subnet" {
@@ -106,6 +109,7 @@ resource "azapi_resource" "subnet" {
       }
     }
   }
+  response_export_values = []
 }
 
 resource "azapi_resource" "no_internet_rule" {
@@ -124,6 +128,7 @@ resource "azapi_resource" "no_internet_rule" {
       destinationPortRange     = "*"
     }
   }
+  response_export_values = []
 }
 
 resource "azapi_resource" "example_identity" {

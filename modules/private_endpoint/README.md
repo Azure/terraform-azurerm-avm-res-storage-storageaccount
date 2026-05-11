@@ -238,13 +238,9 @@ The following outputs are exported:
 
 Description: The name of the private endpoint.
 
-### <a name="output_private_dns_zone_group"></a> [private\_dns\_zone\_group](#output\_private\_dns\_zone\_group)
+### <a name="output_private_dns_zone_group_id"></a> [private\_dns\_zone\_group\_id](#output\_private\_dns\_zone\_group\_id)
 
-Description: The private DNS zone group resource (if managed by this module).
-
-### <a name="output_resource"></a> [resource](#output\_resource)
-
-Description: The full private endpoint azapi\_resource.
+Description: The resource ID of the private DNS zone group (if managed by this module), otherwise `null`.
 
 ### <a name="output_resource_id"></a> [resource\_id](#output\_resource\_id)
 

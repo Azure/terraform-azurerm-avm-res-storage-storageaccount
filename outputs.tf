@@ -74,10 +74,23 @@ output "name" {
 }
 
 output "private_endpoints" {
-  description = "A map of private endpoints. The map key matches `var.private_endpoints`. Each value is the full azapi_resource exposing the private endpoint."
+  description = <<DESCRIPTION
+A map of private endpoints created by the module. The map key matches `var.private_endpoints`.
+
+Each value is an object with:
+- `id` - The resource ID of the private endpoint.
+- `name` - The name of the private endpoint.
+- `private_dns_zone_group_id` - The resource ID of the managed private DNS zone group, or `null` if not managed by this module.
+- `role_assignments` - Map of role assignments created at the private endpoint scope.
+DESCRIPTION
   value = {
     for k, m in module.private_endpoints :
-    k => m.resource
+    k => {
+      id                        = m.resource_id
+      name                      = m.name
+      private_dns_zone_group_id = m.private_dns_zone_group_id
+      role_assignments          = m.role_assignments
+    }
   }
 }
 

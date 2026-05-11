@@ -29,6 +29,7 @@ resource "azapi_resource" "this" {
     "properties.metrics" = "category"
   }
   read_headers              = local.tracing_headers
+  response_export_values    = []
   retry                     = var.retry
   schema_validation_enabled = false
   update_headers            = local.tracing_headers

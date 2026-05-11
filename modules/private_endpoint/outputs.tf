@@ -3,14 +3,9 @@ output "name" {
   value       = azapi_resource.this.name
 }
 
-output "private_dns_zone_group" {
-  description = "The private DNS zone group resource (if managed by this module)."
-  value       = length(azapi_resource.private_dns_zone_group) > 0 ? azapi_resource.private_dns_zone_group[0] : null
-}
-
-output "resource" {
-  description = "The full private endpoint azapi_resource."
-  value       = azapi_resource.this
+output "private_dns_zone_group_id" {
+  description = "The resource ID of the private DNS zone group (if managed by this module), otherwise `null`."
+  value       = length(azapi_resource.private_dns_zone_group) > 0 ? azapi_resource.private_dns_zone_group[0].id : null
 }
 
 output "resource_id" {

@@ -14,6 +14,7 @@ resource "azapi_resource" "this" {
   create_headers            = local.tracing_headers
   delete_headers            = local.tracing_headers
   read_headers              = local.tracing_headers
+  response_export_values    = []
   retry                     = var.retry
   schema_validation_enabled = false
   update_headers            = local.tracing_headers

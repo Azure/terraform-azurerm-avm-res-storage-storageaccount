@@ -39,12 +39,13 @@ resource "azapi_resource" "this" {
       applicationSecurityGroups = local.asg_body
     }
   }
-  create_headers = local.tracing_headers
-  delete_headers = local.tracing_headers
-  read_headers   = local.tracing_headers
-  retry          = var.retry
-  tags           = var.tags
-  update_headers = local.tracing_headers
+  create_headers         = local.tracing_headers
+  delete_headers         = local.tracing_headers
+  read_headers           = local.tracing_headers
+  response_export_values = []
+  retry                  = var.retry
+  tags                   = var.tags
+  update_headers         = local.tracing_headers
 
   dynamic "timeouts" {
     for_each = var.timeouts == null ? [] : [var.timeouts]
@@ -77,11 +78,12 @@ resource "azapi_resource" "private_dns_zone_group" {
       ]
     }
   }
-  create_headers = local.tracing_headers
-  delete_headers = local.tracing_headers
-  read_headers   = local.tracing_headers
-  retry          = var.retry
-  update_headers = local.tracing_headers
+  create_headers         = local.tracing_headers
+  delete_headers         = local.tracing_headers
+  read_headers           = local.tracing_headers
+  response_export_values = []
+  retry                  = var.retry
+  update_headers         = local.tracing_headers
 
   dynamic "timeouts" {
     for_each = var.timeouts == null ? [] : [var.timeouts]
@@ -108,11 +110,12 @@ resource "azapi_resource" "lock" {
       notes = var.lock.kind == "CanNotDelete" ? "Cannot delete the resource or its child resources." : "Cannot delete or modify the resource or its child resources."
     }
   }
-  create_headers = local.tracing_headers
-  delete_headers = local.tracing_headers
-  read_headers   = local.tracing_headers
-  retry          = var.retry
-  update_headers = local.tracing_headers
+  create_headers         = local.tracing_headers
+  delete_headers         = local.tracing_headers
+  read_headers           = local.tracing_headers
+  response_export_values = []
+  retry                  = var.retry
+  update_headers         = local.tracing_headers
 
   dynamic "timeouts" {
     for_each = var.timeouts == null ? [] : [var.timeouts]
