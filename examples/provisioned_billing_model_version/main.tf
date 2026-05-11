@@ -119,7 +119,7 @@ module "this" {
   name                     = module.naming.storage_account.name_unique
   parent_id                = azapi_resource.resource_group.id
   account_kind             = "FileStorage"
-  account_replication_type = "LRS"
+  account_replication_type = "ZRS"
   account_tier             = "Premium"
   azure_files_authentication = {
     default_share_level_permission = "StorageFileDataSmbShareReader"
