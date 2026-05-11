@@ -48,13 +48,11 @@ resource "random_string" "this" {
   upper   = false
 }
 
-# This ensures we have unique CAF compliant names for resources.
 module "naming" {
   source  = "Azure/naming/azurerm"
   version = "0.4.0"
 }
 
-# We need this to get the object_id and tenant_id of the current user (used for RBAC and DLG2 ACLs which use the azurerm provider data-plane).
 data "azurerm_client_config" "current" {}
 
 resource "azapi_resource" "resource_group" {

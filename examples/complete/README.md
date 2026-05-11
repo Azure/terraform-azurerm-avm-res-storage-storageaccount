@@ -37,7 +37,6 @@ locals {
   test_regions = ["eastus", "eastus2", "westus2", "westus3"]
 }
 
-# We need this to get the object_id of the current user
 data "azapi_client_config" "current" {}
 
 resource "random_integer" "region_index" {
@@ -52,7 +51,6 @@ resource "random_string" "this" {
   upper   = false
 }
 
-# This ensures we have unique CAF compliant names for resources.
 module "naming" {
   source  = "Azure/naming/azurerm"
   version = "0.4.0"

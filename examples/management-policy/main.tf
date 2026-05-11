@@ -32,7 +32,6 @@ resource "random_string" "this" {
   upper   = false
 }
 
-# This ensures we have unique CAF compliant names for resources.
 module "naming" {
   source  = "Azure/naming/azurerm"
   version = "0.4.0"

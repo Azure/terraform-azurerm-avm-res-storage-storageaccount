@@ -53,13 +53,11 @@ resource "random_string" "this" {
   upper   = false
 }
 
-# This ensures we have unique CAF compliant names for our resources.
 module "naming" {
   source  = "Azure/naming/azurerm"
   version = "0.4.0"
 }
 
-# We need this to get the object_id of the current user (used by avm-res-keyvault-vault module which is azurerm-based)
 data "azurerm_client_config" "current" {}
 
 resource "azapi_resource" "resource_group" {
@@ -137,7 +135,6 @@ resource "azapi_resource" "example_identity" {
   response_export_values = ["properties"]
 }
 
-#Create a Customer Managed Key for a Storage Account.
 resource "azurerm_key_vault_key" "example" {
   key_opts = [
     "decrypt",
@@ -155,7 +152,6 @@ resource "azurerm_key_vault_key" "example" {
   depends_on = [module.avm_res_keyvault_vault]
 }
 
-#create a keyvault for storing the credential with RBAC for the deployment user
 module "avm_res_keyvault_vault" {
   source  = "Azure/avm-res-keyvault-vault/azurerm"
   version = "0.5.1"
