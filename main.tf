@@ -19,6 +19,9 @@ locals {
   }
   # Whether a customer-managed key is configured.
   customer_managed_key_enabled = var.customer_managed_key != null
+  # Effective tier parsed back from the resolved SKU name (strips any V2
+  # suffix), so tier-aware logic honours `var.account_sku_name` overrides.
+  effective_account_tier = replace(split("_", local.sku_name)[0], "V2", "")
   # Initial encryption block sent on storage account create. CMK fields
   # (keySource = Microsoft.Keyvault, identity, keyvaultproperties) cannot be
   # accepted by ARM in the same PUT that first associates the user-assigned
@@ -133,7 +136,7 @@ resource "azapi_resource" "this" {
       name = local.sku_name
     }
     properties = {
-      accessTier                            = var.account_kind == "BlockBlobStorage" && var.account_tier == "Premium" ? null : var.access_tier
+      accessTier                            = var.account_kind == "BlockBlobStorage" && local.effective_account_tier == "Premium" ? null : var.access_tier
       allowBlobPublicAccess                 = var.allow_nested_items_to_be_public
       allowCrossTenantReplication           = var.cross_tenant_replication_enabled
       allowedCopyScope                      = var.allowed_copy_scope

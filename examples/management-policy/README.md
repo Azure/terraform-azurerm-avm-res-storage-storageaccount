@@ -121,10 +121,10 @@ resource "azapi_resource" "example_identity" {
 module "this" {
   source = "../.."
 
-  location                 = azapi_resource.resource_group.location
-  name                     = module.naming.storage_account.name_unique
-  parent_id                = azapi_resource.resource_group.id
-  account_replication_type = "GRS"
+  location         = azapi_resource.resource_group.location
+  name             = module.naming.storage_account.name_unique
+  parent_id        = azapi_resource.resource_group.id
+  account_sku_name = "Standard_GRS"
   containers = {
     blob_container0 = {
       name = "blob-container-${random_string.this.result}-0"

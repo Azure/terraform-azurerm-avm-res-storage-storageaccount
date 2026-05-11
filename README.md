@@ -93,7 +93,7 @@ Default: `"StorageV2"`
 
 ### <a name="input_account_replication_type"></a> [account\_replication\_type](#input\_account\_replication\_type)
 
-Description: (Optional) Defines the type of replication to use for this storage account. Valid options are `LRS`, `GRS`, `RAGRS`, `ZRS`, `GZRS` and `RAGZRS`. Defaults to `ZRS`.
+Description: [DEPRECATED] (Optional) Defines the type of replication to use for this storage account. Valid options are `LRS`, `GRS`, `RAGRS`, `ZRS`, `GZRS` and `RAGZRS`. Defaults to `ZRS`. This variable is only honoured when `account_sku_name` is set to `null`; otherwise `account_sku_name` wins. Prefer `account_sku_name`.
 
 Type: `string`
 
@@ -101,15 +101,15 @@ Default: `"ZRS"`
 
 ### <a name="input_account_sku_name"></a> [account\_sku\_name](#input\_account\_sku\_name)
 
-Description: (Optional) Explicit storage account SKU name (e.g. `Standard_LRS`, `Premium_ZRS`, `PremiumV2_LRS`, `StandardV2_GZRS`). When set, this value is sent to Azure verbatim and overrides the SKU derived from `account_tier`, `account_replication_type` and `provisioned_billing_model_version`. Use this for SKU combinations the derived form cannot express.
+Description: (Optional) Explicit storage account SKU name (e.g. `Standard_LRS`, `Premium_ZRS`, `PremiumV2_LRS`, `StandardV2_GZRS`). When set, this value is sent to Azure verbatim and overrides the SKU derived from `account_tier`, `account_replication_type` and `provisioned_billing_model_version` - those variables are only honoured when `account_sku_name` is explicitly set to `null`. Defaults to `StandardV2_ZRS`.
 
 Type: `string`
 
-Default: `null`
+Default: `"StandardV2_ZRS"`
 
 ### <a name="input_account_tier"></a> [account\_tier](#input\_account\_tier)
 
-Description: (Optional) Defines the Tier to use for this storage account. Valid options are `Standard` and `Premium`. For `BlockBlobStorage` and `FileStorage` accounts only `Premium` is valid. Changing this forces a new resource to be created. Defaults to `Standard`.
+Description: [DEPRECATED] (Optional) Defines the Tier to use for this storage account. Valid options are `Standard` and `Premium`. For `BlockBlobStorage` and `FileStorage` accounts only `Premium` is valid. Changing this forces a new resource to be created. Defaults to `Standard`. This variable is only honoured when `account_sku_name` is set to `null`; otherwise `account_sku_name` wins. Prefer `account_sku_name`.
 
 Type: `string`
 
@@ -822,7 +822,7 @@ Default: `true`
 
 ### <a name="input_provisioned_billing_model_version"></a> [provisioned\_billing\_model\_version](#input\_provisioned\_billing\_model\_version)
 
-Description: (Optional) Specifies the version of the provisioned billing model (e.g. when `account_kind = "FileStorage"` for Storage File). Possible value is `V2`. Defaults to `null`. Changing this forces a new resource to be created.
+Description: [DEPRECATED] (Optional) Specifies the version of the provisioned billing model (e.g. when `account_kind = "FileStorage"` for Storage File). Possible value is `V2`. Defaults to `null`. Changing this forces a new resource to be created. This variable is only honoured when `account_sku_name` is set to `null`; otherwise `account_sku_name` wins. Prefer `account_sku_name` (use a `*V2_*` SKU such as `StandardV2_ZRS` or `PremiumV2_ZRS`).
 
 Type: `string`
 

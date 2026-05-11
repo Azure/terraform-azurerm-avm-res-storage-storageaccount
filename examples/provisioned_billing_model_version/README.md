@@ -122,12 +122,11 @@ resource "azapi_resource" "example_identity" {
 module "this" {
   source = "../.."
 
-  location                 = azapi_resource.resource_group.location
-  name                     = module.naming.storage_account.name_unique
-  parent_id                = azapi_resource.resource_group.id
-  account_kind             = "FileStorage"
-  account_replication_type = "ZRS"
-  account_tier             = "Premium"
+  location         = azapi_resource.resource_group.location
+  name             = module.naming.storage_account.name_unique
+  parent_id        = azapi_resource.resource_group.id
+  account_kind     = "FileStorage"
+  account_sku_name = "PremiumV2_ZRS"
   azure_files_authentication = {
     default_share_level_permission = "StorageFileDataSmbShareReader"
     directory_type                 = "AADKERB"
@@ -140,8 +139,7 @@ module "this" {
   network_rules = {
     virtual_network_subnet_ids = toset([azapi_resource.subnet.id])
   }
-  provisioned_billing_model_version = "V2"
-  public_network_access_enabled     = false
+  public_network_access_enabled = false
   role_assignments = {
     role_assignment_1 = {
       role_definition_id_or_name       = "Contributor"
