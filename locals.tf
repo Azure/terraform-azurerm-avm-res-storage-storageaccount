@@ -1,15 +1,4 @@
 locals {
-  # tflint-ignore: terraform_unused_declarations
-  avm_azapi_header = join(" ", [for k, v in local.avm_azapi_headers : "${k}=${v}"])
-  avm_azapi_headers = !var.enable_telemetry ? {} : (local.fork_avm ? {
-    fork_avm  = "true"
-    random_id = one(random_uuid.telemetry).result
-    } : {
-    avm                = "true"
-    random_id          = one(random_uuid.telemetry).result
-    avm_module_source  = one(data.modtm_module_source.telemetry).module_source
-    avm_module_version = one(data.modtm_module_source.telemetry).module_version
-  })
   # Azure Files identity-based auth mapping
   azure_files_identity_based_authentication = var.azure_files_authentication == null ? null : {
     directoryServiceOptions = var.azure_files_authentication.directory_type
@@ -76,8 +65,6 @@ locals {
     name = var.edge_zone
     type = "EdgeZone"
   }
-  fork_avm              = !anytrue([for r in local.valid_module_source_regex : can(regex(r, one(data.modtm_module_source.telemetry).module_source))])
-  has_management_policy = length(var.storage_management_policy_rule) > 0
   # Account-level immutability policy (immutableStorageWithVersioning)
   immutable_storage_with_versioning = var.immutability_policy == null ? null : {
     enabled = true
@@ -88,7 +75,6 @@ locals {
     }
   }
   large_file_shares_state = var.large_file_share_enabled == null ? null : (var.large_file_share_enabled ? "Enabled" : "Disabled")
-  main_location           = var.location
   # Identity composition. Returns null when no identity is configured so the
   # body omits the field entirely.
   managed_identity_type = (
@@ -130,10 +116,4 @@ locals {
   # When `var.account_sku_name` is supplied it wins over the derived value.
   sku_name       = coalesce(var.account_sku_name, var.provisioned_billing_model_version == "V2" ? "${var.account_tier}V2_${var.account_replication_type}" : "${var.account_tier}_${var.account_replication_type}")
   table_endpoint = length(var.tables) == 0 ? [] : ["table"]
-  valid_module_source_regex = [
-    "registry.terraform.io/[A|a]zure/.+",
-    "registry.opentofu.io/[A|a]zure/.+",
-    "git::https://github\\.com/[A|a]zure/.+",
-    "git::ssh:://git@github\\.com/[A|a]zure/.+",
-  ]
 }
