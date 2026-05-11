@@ -171,6 +171,7 @@ resource "azapi_resource" "event_hub_namespace" {
     properties = {
       isAutoInflateEnabled   = true
       maximumThroughputUnits = 3
+      minimumTlsVersion      = "1.2"
       zoneRedundant          = true
     }
   }
