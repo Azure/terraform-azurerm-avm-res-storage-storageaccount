@@ -4,7 +4,7 @@ resource "azapi_resource" "lock" {
 
   name      = coalesce(var.lock.name, "lock-${var.name}")
   parent_id = azapi_resource.this.id
-  type      = "Microsoft.Authorization/locks@2020-05-01"
+  type      = var.resource_types.lock
   body = {
     properties = {
       level = var.lock.kind

@@ -1,7 +1,7 @@
 resource "azapi_resource" "this" {
   name      = "default"
   parent_id = var.storage_account_id
-  type      = "Microsoft.Storage/storageAccounts/managementPolicies@2025-06-01"
+  type      = var.resource_type
   body = {
     properties = {
       policy = {

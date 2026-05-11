@@ -175,6 +175,41 @@ variable "private_endpoints_manage_dns_zone_group" {
   nullable    = false
 }
 
+variable "resource_types" {
+  type = object({
+    storage_account            = optional(string, "Microsoft.Storage/storageAccounts@2025-06-01")
+    customer_managed_key_vault = optional(string, "Microsoft.KeyVault/vaults@2024-11-01")
+    lock                       = optional(string, "Microsoft.Authorization/locks@2020-05-01")
+    blob_container             = optional(string, "Microsoft.Storage/storageAccounts/blobServices/containers@2025-06-01")
+    blob_service               = optional(string, "Microsoft.Storage/storageAccounts/blobServices@2025-06-01")
+    queue                      = optional(string, "Microsoft.Storage/storageAccounts/queueServices/queues@2025-06-01")
+    table                      = optional(string, "Microsoft.Storage/storageAccounts/tableServices/tables@2025-06-01")
+    share                      = optional(string, "Microsoft.Storage/storageAccounts/fileServices/shares@2025-06-01")
+    local_user                 = optional(string, "Microsoft.Storage/storageAccounts/localUsers@2025-06-01")
+    management_policy          = optional(string, "Microsoft.Storage/storageAccounts/managementPolicies@2025-06-01")
+    private_endpoint           = optional(string, "Microsoft.Network/privateEndpoints@2025-05-01")
+    private_dns_zone_group     = optional(string, "Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2025-05-01")
+  })
+  default     = {}
+  description = <<DESCRIPTION
+Override the AzAPI `<provider>/<resource>@<api-version>` strings used by this module. Each key defaults to a tested value; supply only the keys you want to override. Useful when targeting a sovereign cloud with older API versions, or when opting into a newer preview API.
+
+- `storage_account`            - The storage account itself, used by both the create call and the customer-managed-key patch.
+- `customer_managed_key_vault` - The Key Vault data source used to look up the vault URI when CMK is enabled.
+- `lock`                       - Management lock applied to the storage account (and to private endpoints when configured).
+- `blob_container`             - Blob containers (also used by Data Lake Gen2 filesystems, which are blob containers in ARM).
+- `blob_service`               - The `blobServices/default` sub-resource, patched by the static-website submodule.
+- `queue`                      - Storage queues.
+- `table`                      - Storage tables.
+- `share`                      - File shares.
+- `local_user`                 - SFTP local users.
+- `management_policy`          - The lifecycle-management policy.
+- `private_endpoint`           - Private endpoints created for the storage account.
+- `private_dns_zone_group`     - The private DNS zone group resource attached to a private endpoint.
+DESCRIPTION
+  nullable    = false
+}
+
 variable "retry" {
   type = object({
     error_message_regex  = optional(list(string))

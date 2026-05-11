@@ -75,6 +75,14 @@ Type: `map(string)`
 
 Default: `{}`
 
+### <a name="input_dns_zone_group_resource_type"></a> [dns\_zone\_group\_resource\_type](#input\_dns\_zone\_group\_resource\_type)
+
+Description: (Optional) Override the AzAPI `<provider>/<resource>@<api-version>` string used to manage the private DNS zone group attached to the private endpoint. Defaults to the value tested with this module version.
+
+Type: `string`
+
+Default: `"Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2025-05-01"`
+
 ### <a name="input_ip_configurations"></a> [ip\_configurations](#input\_ip\_configurations)
 
 Description: (Optional) Static IP configurations for the private endpoint. Defaults to `{}` (the platform allocates IPs). The map key is arbitrary; each value supports:
@@ -110,6 +118,14 @@ object({
 ```
 
 Default: `null`
+
+### <a name="input_lock_resource_type"></a> [lock\_resource\_type](#input\_lock\_resource\_type)
+
+Description: (Optional) Override the AzAPI `<provider>/<resource>@<api-version>` string used to manage the management lock applied to the private endpoint. Defaults to the value tested with this module version.
+
+Type: `string`
+
+Default: `"Microsoft.Authorization/locks@2020-05-01"`
 
 ### <a name="input_manage_dns_zone_group"></a> [manage\_dns\_zone\_group](#input\_manage\_dns\_zone\_group)
 
@@ -150,6 +166,14 @@ Description: (Optional) The name of the private service connection. Defaults to 
 Type: `string`
 
 Default: `null`
+
+### <a name="input_resource_type"></a> [resource\_type](#input\_resource\_type)
+
+Description: (Optional) Override the AzAPI `<provider>/<resource>@<api-version>` string used to manage the private endpoint. Defaults to the value tested with this module version.
+
+Type: `string`
+
+Default: `"Microsoft.Network/privateEndpoints@2025-05-01"`
 
 ### <a name="input_retry"></a> [retry](#input\_retry)
 

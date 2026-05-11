@@ -9,13 +9,16 @@ module "private_endpoints" {
   subnet_resource_id                        = each.value.subnet_resource_id
   subresource_name                          = each.value.subresource_name
   application_security_group_resource_ids   = each.value.application_security_group_associations
+  dns_zone_group_resource_type              = var.resource_types.private_dns_zone_group
   ip_configurations                         = each.value.ip_configurations
   lock                                      = each.value.lock
+  lock_resource_type                        = var.resource_types.lock
   manage_dns_zone_group                     = var.private_endpoints_manage_dns_zone_group
   network_interface_name                    = each.value.network_interface_name
   private_dns_zone_group_name               = each.value.private_dns_zone_group_name
   private_dns_zone_resource_ids             = each.value.private_dns_zone_resource_ids
   private_service_connection_name           = each.value.private_service_connection_name
+  resource_type                             = var.resource_types.private_endpoint
   retry                                     = var.retry
   role_assignment_definition_lookup_enabled = var.role_assignment_definition_lookup_enabled
   role_assignments                          = each.value.role_assignments

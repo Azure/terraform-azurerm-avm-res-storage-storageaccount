@@ -41,6 +41,13 @@ variable "application_security_group_resource_ids" {
   nullable    = false
 }
 
+variable "dns_zone_group_resource_type" {
+  type        = string
+  default     = "Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2025-05-01"
+  description = "(Optional) Override the AzAPI `<provider>/<resource>@<api-version>` string used to manage the private DNS zone group attached to the private endpoint. Defaults to the value tested with this module version."
+  nullable    = false
+}
+
 variable "ip_configurations" {
   type = map(object({
     name               = string
@@ -68,6 +75,13 @@ variable "lock" {
 - `kind` - (Required) The kind of lock. Possible values are `CanNotDelete` and `ReadOnly`.
 - `name` - (Optional) The name of the lock. Defaults to `null` (auto-generated).
 EOT
+}
+
+variable "lock_resource_type" {
+  type        = string
+  default     = "Microsoft.Authorization/locks@2020-05-01"
+  description = "(Optional) Override the AzAPI `<provider>/<resource>@<api-version>` string used to manage the management lock applied to the private endpoint. Defaults to the value tested with this module version."
+  nullable    = false
 }
 
 variable "manage_dns_zone_group" {
@@ -100,6 +114,13 @@ variable "private_service_connection_name" {
   type        = string
   default     = null
   description = "(Optional) The name of the private service connection. Defaults to `null` (auto-generated as `pse-<endpoint name>`)."
+}
+
+variable "resource_type" {
+  type        = string
+  default     = "Microsoft.Network/privateEndpoints@2025-05-01"
+  description = "(Optional) Override the AzAPI `<provider>/<resource>@<api-version>` string used to manage the private endpoint. Defaults to the value tested with this module version."
+  nullable    = false
 }
 
 variable "retry" {

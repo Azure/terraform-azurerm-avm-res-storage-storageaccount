@@ -2,7 +2,7 @@ resource "azapi_resource" "this" {
   location  = var.location
   name      = var.name
   parent_id = var.parent_id
-  type      = "Microsoft.Network/privateEndpoints@2025-05-01"
+  type      = var.resource_type
   body = {
     properties = {
       subnet = {
@@ -48,7 +48,7 @@ resource "azapi_resource" "private_dns_zone_group" {
 
   name      = var.private_dns_zone_group_name
   parent_id = azapi_resource.this.id
-  type      = "Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2025-05-01"
+  type      = var.dns_zone_group_resource_type
   body = {
     properties = {
       privateDnsZoneConfigs = [
@@ -86,7 +86,7 @@ resource "azapi_resource" "lock" {
 
   name      = coalesce(var.lock.name, "lock-${var.name}")
   parent_id = azapi_resource.this.id
-  type      = "Microsoft.Authorization/locks@2020-05-01"
+  type      = var.lock_resource_type
   body = {
     properties = {
       level = var.lock.kind

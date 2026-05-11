@@ -1,7 +1,7 @@
 resource "azapi_resource" "this" {
   name      = var.name
   parent_id = "${var.storage_account_id}/tableServices/default"
-  type      = "Microsoft.Storage/storageAccounts/tableServices/tables@2025-06-01"
+  type      = var.resource_type
   body = {
     properties = {
       signedIdentifiers = local.signed_identifiers_body

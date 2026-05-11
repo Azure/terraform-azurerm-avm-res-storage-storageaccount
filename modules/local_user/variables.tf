@@ -43,6 +43,13 @@ variable "permission_scope" {
 EOT
 }
 
+variable "resource_type" {
+  type        = string
+  default     = "Microsoft.Storage/storageAccounts/localUsers@2025-06-01"
+  description = "(Optional) Override the AzAPI `<provider>/<resource>@<api-version>` string used to manage the local user. Defaults to the value tested with this module version."
+  nullable    = false
+}
+
 variable "retry" {
   type = object({
     error_message_regex  = optional(list(string))

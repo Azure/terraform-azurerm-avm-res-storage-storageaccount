@@ -17,6 +17,7 @@ module "data_lake_filesystems" {
   storage_account_id       = azapi_resource.this.id
   default_encryption_scope = each.value.default_encryption_scope
   metadata                 = each.value.properties
+  resource_type            = var.resource_types.blob_container
   retry                    = var.retry
   timeouts                 = each.value.timeouts != null ? each.value.timeouts : var.timeouts
   tracing_tags_header      = var.enable_telemetry ? local.avm_azapi_header : null

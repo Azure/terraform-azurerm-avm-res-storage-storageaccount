@@ -41,6 +41,14 @@ Type: `string`
 
 The following input variables are optional (have default values):
 
+### <a name="input_resource_type"></a> [resource\_type](#input\_resource\_type)
+
+Description: (Optional) Override the AzAPI `<provider>/<resource>@<api-version>` string used to manage the table. Defaults to the value tested with this module version.
+
+Type: `string`
+
+Default: `"Microsoft.Storage/storageAccounts/tableServices/tables@2025-06-01"`
+
 ### <a name="input_retry"></a> [retry](#input\_retry)
 
 Description: (Optional) Retry configuration applied to AzAPI resources managed by this module. Defaults to `null` (no custom retry).

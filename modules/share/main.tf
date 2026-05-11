@@ -1,7 +1,7 @@
 resource "azapi_resource" "this" {
   name      = var.name
   parent_id = "${var.storage_account_id}/fileServices/default"
-  type      = "Microsoft.Storage/storageAccounts/fileServices/shares@2025-06-01"
+  type      = var.resource_type
   body = {
     properties = {
       accessTier        = var.access_tier

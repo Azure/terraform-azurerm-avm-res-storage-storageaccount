@@ -16,6 +16,13 @@ variable "index_document" {
   description = "(Optional) The webpage that Azure Storage serves for requests to the root of a website or any subfolder. Defaults to `null` (no index document configured)."
 }
 
+variable "resource_type" {
+  type        = string
+  default     = "Microsoft.Storage/storageAccounts/blobServices@2025-06-01"
+  description = "(Optional) Override the AzAPI `<provider>/<resource>@<api-version>` string used to patch the blob service for static-website hosting. Defaults to the value tested with this module version."
+  nullable    = false
+}
+
 variable "retry" {
   type = object({
     error_message_regex  = optional(list(string))

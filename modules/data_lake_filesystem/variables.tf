@@ -22,6 +22,13 @@ variable "metadata" {
   description = "(Optional) A mapping of key-value pairs assigned to this filesystem. Defaults to `null` (no metadata)."
 }
 
+variable "resource_type" {
+  type        = string
+  default     = "Microsoft.Storage/storageAccounts/blobServices/containers@2025-06-01"
+  description = "(Optional) Override the AzAPI `<provider>/<resource>@<api-version>` string used to manage the Data Lake Gen2 filesystem (a blob container in ARM). Defaults to the value tested with this module version."
+  nullable    = false
+}
+
 variable "retry" {
   type = object({
     error_message_regex  = optional(list(string))

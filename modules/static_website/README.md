@@ -51,6 +51,14 @@ Type: `string`
 
 Default: `null`
 
+### <a name="input_resource_type"></a> [resource\_type](#input\_resource\_type)
+
+Description: (Optional) Override the AzAPI `<provider>/<resource>@<api-version>` string used to patch the blob service for static-website hosting. Defaults to the value tested with this module version.
+
+Type: `string`
+
+Default: `"Microsoft.Storage/storageAccounts/blobServices@2025-06-01"`
+
 ### <a name="input_retry"></a> [retry](#input\_retry)
 
 Description: (Optional) Retry configuration applied to the AzAPI resource. Defaults to `null` (no custom retry).

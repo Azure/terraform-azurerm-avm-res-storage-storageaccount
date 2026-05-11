@@ -1,7 +1,7 @@
 resource "azapi_resource" "this" {
   name      = var.name
   parent_id = "${var.storage_account_id}/blobServices/default"
-  type      = "Microsoft.Storage/storageAccounts/blobServices/containers@2025-06-01"
+  type      = var.resource_type
   body = {
     properties = local.body_properties
   }

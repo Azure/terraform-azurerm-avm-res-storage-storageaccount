@@ -1,7 +1,7 @@
 resource "azapi_resource" "this" {
   name      = var.name
   parent_id = "${var.storage_account_id}/queueServices/default"
-  type      = "Microsoft.Storage/storageAccounts/queueServices/queues@2025-06-01"
+  type      = var.resource_type
   body = {
     properties = {
       metadata = var.metadata == null ? {} : var.metadata

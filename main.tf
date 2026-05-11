@@ -2,7 +2,7 @@ resource "azapi_resource" "this" {
   location  = var.location
   name      = var.name
   parent_id = var.parent_id
-  type      = "Microsoft.Storage/storageAccounts@2025-06-01"
+  type      = var.resource_types.storage_account
   body = {
     kind             = var.account_kind
     extendedLocation = local.extended_location
@@ -86,7 +86,7 @@ resource "azapi_update_resource" "customer_managed_key" {
   count = local.customer_managed_key_enabled ? 1 : 0
 
   resource_id = azapi_resource.this.id
-  type        = "Microsoft.Storage/storageAccounts@2025-06-01"
+  type        = var.resource_types.storage_account
   body = {
     properties = {
       encryption = local.encryption_cmk

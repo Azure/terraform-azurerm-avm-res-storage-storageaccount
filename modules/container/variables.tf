@@ -58,6 +58,13 @@ variable "public_access" {
   description = "(Optional) Specifies the level of public access. Valid values: `None`, `Blob`, `Container`. Defaults to `None`."
 }
 
+variable "resource_type" {
+  type        = string
+  default     = "Microsoft.Storage/storageAccounts/blobServices/containers@2025-06-01"
+  description = "(Optional) Override the AzAPI `<provider>/<resource>@<api-version>` string used to manage the blob container. Defaults to the value tested with this module version."
+  nullable    = false
+}
+
 variable "retry" {
   type = object({
     error_message_regex  = optional(list(string))
