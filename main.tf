@@ -267,12 +267,17 @@ resource "azurerm_storage_account_customer_managed_key" "this" {
   storage_account_id        = azurerm_storage_account.this.id
   key_vault_id              = var.customer_managed_key.key_vault_resource_id
   key_version               = var.customer_managed_key.key_version
+  managed_hsm_key_id        = var.customer_managed_key.managed_hsm_key_id
   user_assigned_identity_id = try(var.customer_managed_key.user_assigned_identity.resource_id, null)
 
   lifecycle {
     precondition {
       condition     = (var.account_kind == "StorageV2" || var.account_tier == "Premium")
       error_message = "`var.customer_managed_key` can only be set when the `account_kind` is set to `StorageV2` or `account_tier` set to `Premium`, and the identity type is `UserAssigned`."
+    }
+    precondition {
+      condition     = !(var.customer_managed_key.key_vault_resource_id != null && var.customer_managed_key.managed_hsm_key_id != null)
+      error_message = "Exactly one of managed_hsm_key_id or key_vault_id must be specified."
     }
   }
 }

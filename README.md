@@ -358,6 +358,7 @@ Description:     Defines a customer managed key to use for encryption.
     object({  
       key\_vault\_resource\_id              = (Required) - The full Azure Resource ID of the key\_vault where the customer managed key will be referenced from.  
       key\_name                           = (Required) - The key name for the customer managed key in the key vault.  
+      managed\_hsm\_key\_id                 = (Optional) - The full Azure Resource ID of the managed HSM Key (versioned\_id) where key will be referenced from.  
       key\_version                        = (Optional) - The version of the key to use  
       user\_assigned\_identity\_resource\_id = (Optional) - The user assigned identity to use when access the key vault
     })
@@ -375,8 +376,9 @@ Type:
 
 ```hcl
 object({
-    key_vault_resource_id = string
+    key_vault_resource_id = optional(string, null)
     key_name              = string
+    managed_hsm_key_id    = optional(string, null)
     key_version           = optional(string, null)
     user_assigned_identity = optional(object({
       resource_id = string
