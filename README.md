@@ -101,11 +101,11 @@ Default: `"ZRS"`
 
 ### <a name="input_account_sku_name"></a> [account\_sku\_name](#input\_account\_sku\_name)
 
-Description: (Optional) Explicit storage account SKU name (e.g. `Standard_LRS`, `Premium_ZRS`, `PremiumV2_LRS`, `StandardV2_GZRS`). When set, this value is sent to Azure verbatim and overrides the SKU derived from `account_tier`, `account_replication_type` and `provisioned_billing_model_version` - those variables are only honoured when `account_sku_name` is explicitly set to `null`. Defaults to `StandardV2_ZRS`.
+Description: (Optional) Explicit storage account SKU name (e.g. `Standard_LRS`, `Premium_ZRS`, `PremiumV2_LRS`, `StandardV2_GZRS`). When set, this value is sent to Azure verbatim and overrides the SKU derived from `account_tier`, `account_replication_type` and `provisioned_billing_model_version` - those variables are only honoured when `account_sku_name` is explicitly set to `null`. Defaults to `Standard_ZRS`. Note: the `*V2_*` SKUs (e.g. `StandardV2_ZRS`, `PremiumV2_ZRS`) require `account_kind = "FileStorage"`.
 
 Type: `string`
 
-Default: `"StandardV2_ZRS"`
+Default: `"Standard_ZRS"`
 
 ### <a name="input_account_tier"></a> [account\_tier](#input\_account\_tier)
 

@@ -36,8 +36,8 @@ variable "account_replication_type" {
 
 variable "account_sku_name" {
   type        = string
-  default     = "StandardV2_ZRS"
-  description = "(Optional) Explicit storage account SKU name (e.g. `Standard_LRS`, `Premium_ZRS`, `PremiumV2_LRS`, `StandardV2_GZRS`). When set, this value is sent to Azure verbatim and overrides the SKU derived from `account_tier`, `account_replication_type` and `provisioned_billing_model_version` - those variables are only honoured when `account_sku_name` is explicitly set to `null`. Defaults to `StandardV2_ZRS`."
+  default     = "Standard_ZRS"
+  description = "(Optional) Explicit storage account SKU name (e.g. `Standard_LRS`, `Premium_ZRS`, `PremiumV2_LRS`, `StandardV2_GZRS`). When set, this value is sent to Azure verbatim and overrides the SKU derived from `account_tier`, `account_replication_type` and `provisioned_billing_model_version` - those variables are only honoured when `account_sku_name` is explicitly set to `null`. Defaults to `Standard_ZRS`. Note: the `*V2_*` SKUs (e.g. `StandardV2_ZRS`, `PremiumV2_ZRS`) require `account_kind = \"FileStorage\"`."
 
   validation {
     condition     = var.account_sku_name == null || can(regex("^(Standard|Premium)(V2)?_(LRS|GRS|RAGRS|ZRS|GZRS|RAGZRS)$", coalesce(var.account_sku_name, "Standard_LRS")))

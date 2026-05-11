@@ -85,8 +85,8 @@ run "default_sku_name" {
   command = plan
 
   assert {
-    condition     = azapi_resource.this.body.sku.name == "StandardV2_ZRS"
-    error_message = "Expected default sku.name == StandardV2_ZRS"
+    condition     = azapi_resource.this.body.sku.name == "Standard_ZRS"
+    error_message = "Expected default sku.name == Standard_ZRS"
   }
 }
 
