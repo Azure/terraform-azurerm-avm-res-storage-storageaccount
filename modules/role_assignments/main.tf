@@ -2,9 +2,10 @@ module "interfaces" {
   source  = "Azure/avm-utl-interfaces/azure"
   version = "0.6.0"
 
-  enable_telemetry                 = false
-  role_assignment_definition_scope = var.scope
-  role_assignments                 = var.role_assignments
+  enable_telemetry                          = false
+  role_assignment_definition_lookup_enabled = var.role_assignment_definition_lookup_enabled
+  role_assignment_definition_scope          = var.scope
+  role_assignments                          = var.role_assignments
 }
 
 resource "azapi_resource" "this" {

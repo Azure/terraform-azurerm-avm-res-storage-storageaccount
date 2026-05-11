@@ -55,6 +55,14 @@ object({
 
 Default: `null`
 
+### <a name="input_role_assignment_definition_lookup_enabled"></a> [role\_assignment\_definition\_lookup\_enabled](#input\_role\_assignment\_definition\_lookup\_enabled)
+
+Description: (Optional) Whether the `Azure/avm-utl-interfaces/azure` module should resolve role definition names supplied via `role_definition_id_or_name` by querying the Azure Authorization API. Defaults to `true`. Set to `false` if you only ever supply fully-qualified role definition resource IDs and want to skip the lookup (for example to avoid the API call in air-gapped or permission-restricted environments).
+
+Type: `bool`
+
+Default: `true`
+
 ### <a name="input_role_assignments"></a> [role\_assignments](#input\_role\_assignments)
 
 Description: (Optional) A map of role assignments to create at the supplied scope. Defaults to `{}` (no role assignments). The map key is deliberate so that consumers can manage these resources predictably. Each value supports:

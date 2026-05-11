@@ -20,6 +20,13 @@ variable "retry" {
 EOT
 }
 
+variable "role_assignment_definition_lookup_enabled" {
+  type        = bool
+  default     = true
+  description = "(Optional) Whether the `Azure/avm-utl-interfaces/azure` module should resolve role definition names supplied via `role_definition_id_or_name` by querying the Azure Authorization API. Defaults to `true`. Set to `false` if you only ever supply fully-qualified role definition resource IDs and want to skip the lookup (for example to avoid the API call in air-gapped or permission-restricted environments)."
+  nullable    = false
+}
+
 variable "role_assignments" {
   type = map(object({
     role_definition_id_or_name             = string

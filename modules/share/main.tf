@@ -41,9 +41,10 @@ module "role_assignments" {
   # tflint-ignore: required_module_source_tffr1 # relative source is intentional: this is an in-module composition of the role_assignments submodule
   source = "../role_assignments"
 
-  scope               = azapi_resource.this.id
-  retry               = var.retry
-  role_assignments    = var.role_assignments
-  timeouts            = var.timeouts
-  tracing_tags_header = var.tracing_tags_header
+  scope                                     = azapi_resource.this.id
+  retry                                     = var.retry
+  role_assignment_definition_lookup_enabled = var.role_assignment_definition_lookup_enabled
+  role_assignments                          = var.role_assignments
+  timeouts                                  = var.timeouts
+  tracing_tags_header                       = var.tracing_tags_header
 }

@@ -13,9 +13,10 @@
 module "role_assignments" {
   source = "./modules/role_assignments"
 
-  scope               = azapi_resource.this.id
-  retry               = var.retry
-  role_assignments    = var.role_assignments
-  timeouts            = var.timeouts
-  tracing_tags_header = var.enable_telemetry ? local.avm_azapi_header : null
+  scope                                     = azapi_resource.this.id
+  retry                                     = var.retry
+  role_assignment_definition_lookup_enabled = var.role_assignment_definition_lookup_enabled
+  role_assignments                          = var.role_assignments
+  timeouts                                  = var.timeouts
+  tracing_tags_header                       = var.enable_telemetry ? local.avm_azapi_header : null
 }

@@ -74,6 +74,13 @@ variable "retry" {
 EOT
 }
 
+variable "role_assignment_definition_lookup_enabled" {
+  type        = bool
+  default     = true
+  description = "(Optional) Whether the `role_assignments` submodule should resolve role definition names supplied via `role_definition_id_or_name` by querying the Azure Authorization API. Defaults to `true`. See the `role_assignments` submodule for details."
+  nullable    = false
+}
+
 variable "role_assignments" {
   type = map(object({
     role_definition_id_or_name             = string

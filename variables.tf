@@ -193,6 +193,17 @@ See <https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/r
 DESCRIPTION
 }
 
+variable "role_assignment_definition_lookup_enabled" {
+  type        = bool
+  default     = true
+  description = <<DESCRIPTION
+Whether the `Azure/avm-utl-interfaces/azure` module composed by the internal `role_assignments` submodule should resolve role definition names supplied via `role_definition_id_or_name` by querying the Azure Authorization API. Applies to every role assignment created by this module: the storage account scope (`var.role_assignments`), every container/queue/share/table scope and every private endpoint scope. Defaults to `true`.
+
+Set to `false` if you only ever supply fully-qualified role definition resource IDs (`/subscriptions/.../providers/Microsoft.Authorization/roleDefinitions/<guid>`) in `role_definition_id_or_name`. Disabling the lookup avoids the API call, which is useful in air-gapped or permission-restricted environments where the calling identity lacks `Microsoft.Authorization/roleDefinitions/read` at the parent scope.
+DESCRIPTION
+  nullable    = false
+}
+
 variable "role_assignments" {
   type = map(object({
     role_definition_id_or_name             = string
