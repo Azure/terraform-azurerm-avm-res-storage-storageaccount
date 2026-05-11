@@ -1,72 +1,69 @@
 locals {
-  blob_endpoint = length(var.containers) == 0 ? [] : ["blob"]
-  # Role assignments for containers
-  containers_role_assignments = { for ra in flatten([
-    for ck, cv in var.containers : [
-      for rk, rv in cv.role_assignments : {
-        container_key   = ck
-        ra_key          = rk
-        role_assignment = rv
+  # Azure Files identity-based auth mapping
+  azure_files_identity_based_authentication = var.azure_files_authentication == null ? null : {
+    directoryServiceOptions = var.azure_files_authentication.directory_type
+    defaultSharePermission  = var.azure_files_authentication.default_share_level_permission
+    activeDirectoryProperties = var.azure_files_authentication.active_directory == null ? null : {
+      domainGuid        = var.azure_files_authentication.active_directory.domain_guid
+      domainName        = var.azure_files_authentication.active_directory.domain_name
+      domainSid         = var.azure_files_authentication.active_directory.domain_sid
+      forestName        = var.azure_files_authentication.active_directory.forest_name
+      netBiosDomainName = var.azure_files_authentication.active_directory.netbios_domain_name
+      azureStorageSid   = var.azure_files_authentication.active_directory.storage_sid
+    }
+  }
+  # Custom domain
+  custom_domain = var.custom_domain == null ? null : {
+    name             = var.custom_domain.name
+    useSubDomainName = var.custom_domain.use_subdomain
+  }
+  extended_location = var.edge_zone == null ? null : {
+    name = var.edge_zone
+    type = "EdgeZone"
+  }
+  # Account-level immutability policy (immutableStorageWithVersioning)
+  immutable_storage_with_versioning = var.immutability_policy == null ? null : {
+    enabled = true
+    immutabilityPolicy = {
+      allowProtectedAppendWrites            = var.immutability_policy.allow_protected_append_writes
+      immutabilityPeriodSinceCreationInDays = var.immutability_policy.period_since_creation_in_days
+      state                                 = var.immutability_policy.state
+    }
+  }
+  large_file_shares_state = var.large_file_share_enabled == null ? null : (var.large_file_share_enabled ? "Enabled" : "Disabled")
+  # Identity composition. Returns null when no identity is configured so the
+  # body omits the field entirely.
+  managed_identity_type = (
+    var.managed_identities.system_assigned && length(var.managed_identities.user_assigned_resource_ids) > 0 ? "SystemAssigned, UserAssigned" :
+    var.managed_identities.system_assigned ? "SystemAssigned" :
+    length(var.managed_identities.user_assigned_resource_ids) > 0 ? "UserAssigned" :
+    null
+  )
+  # Network ACLs mapping
+  network_acls = var.network_rules == null ? null : {
+    bypass        = var.network_rules.bypass == null ? null : (length(var.network_rules.bypass) == 0 ? "None" : join(", ", tolist(var.network_rules.bypass)))
+    defaultAction = var.network_rules.default_action
+    ipRules       = var.network_rules.ip_rules == null ? null : [for ip in var.network_rules.ip_rules : { value = ip, action = "Allow" }]
+    virtualNetworkRules = var.network_rules.virtual_network_subnet_ids == null ? null : [
+      for id in var.network_rules.virtual_network_subnet_ids : { id = id, action = "Allow" }
+    ]
+    resourceAccessRules = var.network_rules.private_link_access == null ? null : [
+      for r in var.network_rules.private_link_access : {
+        resourceId = r.endpoint_resource_id
+        tenantId   = r.endpoint_tenant_id
       }
     ]
-  ]) : "${ra.container_key}-${ra.ra_key}" => ra }
-  endpoints = toset(concat(local.blob_endpoint, local.queue_endpoint, local.table_endpoint))
-  # private endpoint role assignments
-  pe_role_assignments = { for ra in flatten([
-    for pe_k, pe_v in var.private_endpoints : [
-      for rk, rv in pe_v.role_assignments : {
-        private_endpoint_key = pe_k
-        ra_key               = rk
-        role_assignment      = rv
-      }
-    ]
-  ]) : "${ra.private_endpoint_key}-${ra.ra_key}" => ra }
-  # Private endpsoint application security group associations
-  private_endpoint_application_security_group_associations = { for assoc in flatten([
-    for pe_k, pe_v in var.private_endpoints : [
-      for asg_k, asg_v in pe_v.application_security_group_associations : {
-        asg_key         = asg_k
-        pe_key          = pe_k
-        asg_resource_id = asg_v
-      }
-    ]
-  ]) : "${assoc.pe_key}-${assoc.asg_key}" => assoc }
-  queue_endpoint = length(var.queues) == 0 ? [] : ["queue"]
-  # Role assignments for queues
-  queues_role_assignments = { for ra in flatten([
-    for qk, qv in var.queues : [
-      for rk, rv in qv.role_assignments : {
-        queue_key       = qk
-        ra_key          = rk
-        role_assignment = rv
-      }
-    ]
-  ]) : "${ra.queue_key}-${ra.ra_key}" => ra }
-  role_definition_resource_substring = "/providers/Microsoft.Authorization/roleDefinitions"
-  # Role assignments for shares
-  shares_role_assignments = { for ra in flatten([
-    for sk, sv in var.shares : [
-      for rk, rv in sv.role_assignments : {
-        share_key       = sk
-        ra_key          = rk
-        role_assignment = rv
-      }
-    ]
-  ]) : "${ra.share_key}-${ra.ra_key}" => ra }
-  table_endpoint = length(var.tables) == 0 ? [] : ["table"]
-  # Role assignments for tables
-  tables_role_assignments = { for ra in flatten([
-    for tk, tv in var.tables : [
-      for rk, rv in tv.role_assignments : {
-        table_key       = tk
-        ra_key          = rk
-        role_assignment = rv
-      }
-    ]
-  ]) : "${ra.table_key}-${ra.ra_key}" => ra }
+  }
+  public_network_access_setting = var.public_network_access_enabled == null ? null : (var.public_network_access_enabled ? "Enabled" : "Disabled")
+  # Routing preference
+  routing_preference = var.routing == null ? null : {
+    routingChoice             = var.routing.choice
+    publishInternetEndpoints  = var.routing.publish_internet_endpoints
+    publishMicrosoftEndpoints = var.routing.publish_microsoft_endpoints
+  }
+  # SAS policy
+  sas_policy = var.sas_policy == null ? null : {
+    sasExpirationPeriod = var.sas_policy.expiration_period
+    expirationAction    = var.sas_policy.expiration_action
+  }
 }
-
-locals {
-  has_management_policy = length(var.storage_management_policy_rule) > 0
-}
-

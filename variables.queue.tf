@@ -1,95 +1,12 @@
+# NOTE: var.queue_properties (queue service-level CORS, logging, hour_metrics,
+# minute_metrics) was removed in v1.0.0 (azapi rewrite). Configure those
+# settings directly via `Microsoft.Storage/storageAccounts/queueServices` if
+# needed; this module no longer exposes them.
+
 variable "queue_encryption_key_type" {
   type        = string
   default     = null
-  description = "(Optional) The encryption type of the queue service. Possible values are `Service` and `Account`. Changing this forces a new resource to be created. Default value is `Service`."
-}
-
-variable "queue_properties" {
-  type = map(object({
-    cors_rule = optional(map(object({
-      allowed_headers    = list(string)
-      allowed_methods    = list(string)
-      allowed_origins    = list(string)
-      exposed_headers    = list(string)
-      max_age_in_seconds = number
-    })), {})
-    # diagnostic_settings = optional(map(object({
-    #   name                                     = optional(string, null)
-    #   log_categories                           = optional(set(string), [])
-    #   log_groups                               = optional(set(string), ["allLogs"])
-    #   metric_categories                        = optional(set(string), ["AllMetrics"])
-    #   log_analytics_destination_type           = optional(string, "Dedicated")
-    #   workspace_resource_id                    = optional(string, null)
-    #   resource_id                              = optional(string, null)
-    #   event_hub_authorization_rule_resource_id = optional(string, null)
-    #   event_hub_name                           = optional(string, null)
-    #   marketplace_partner_resource_id          = optional(string, null)
-    # })), {})
-    hour_metrics = optional(object({
-      include_apis          = optional(bool)
-      retention_policy_days = optional(number)
-      version               = string
-    }))
-    logging = optional(object({
-      delete                = bool
-      read                  = bool
-      retention_policy_days = optional(number)
-      version               = string
-      write                 = bool
-    }))
-    minute_metrics = optional(object({
-      include_apis          = optional(bool)
-      retention_policy_days = optional(number)
-      version               = string
-    }))
-  }))
-  default     = {}
-  description = <<-EOT
-
- ---
- `cors_rule` block supports the following:
- - `allowed_headers` - (Required) A list of headers that are allowed to be a part of the cross-origin request.
- - `allowed_methods` - (Required) A list of HTTP methods that are allowed to be executed by the origin. Valid options are `DELETE`, `GET`, `HEAD`, `MERGE`, `POST`, `OPTIONS`, `PUT` or `PATCH`.
- - `allowed_origins` - (Required) A list of origin domains that will be allowed by CORS.
- - `exposed_headers` - (Required) A list of response headers that are exposed to CORS clients.
- - `max_age_in_seconds` - (Required) The number of seconds the client should cache a preflight response.
-
- ---
- `diagnostic_settings` block supports the following:
- - `name` - (Optional) The name of the diagnostic setting. Defaults to `null`.
- - `log_categories` - (Optional) A set of log categories to enable. Defaults to an empty set.
- - `log_groups` - (Optional) A set of log groups to enable. Defaults to `["allLogs"]`.
- - `metric_categories` - (Optional) A set of metric categories to enable. Defaults to `["AllMetrics"]`.
- - `log_analytics_destination_type` - (Optional) The destination type for log analytics. Defaults to `"Dedicated"`.
- - `workspace_resource_id` - (Optional) The resource ID of the Log Analytics workspace. Defaults to `null`.
- - `resource_id` - (Optional) The resource ID of the target resource for diagnostics. Defaults to `null`.
- - `event_hub_authorization_rule_resource_id` - (Optional) The resource ID of the Event Hub authorization rule. Defaults to `null`.
- - `event_hub_name` - (Optional) The name of the Event Hub. Defaults to `null`.
- - `marketplace_partner_resource_id` - (Optional) The resource ID of the marketplace partner. Defaults to `null`.
-
- ---
- `hour_metrics` block supports the following:
- - `enabled` - (Required) Indicates whether hour metrics are enabled for the Queue service.
- - `include_apis` - (Optional) Indicates whether metrics should generate summary statistics for called API operations.
- - `retention_policy_days` - (Optional) Specifies the number of days that logs will be retained.
- - `version` - (Required) The version of storage analytics to configure.
-
- ---
- `logging` block supports the following:
- - `delete` - (Required) Indicates whether all delete requests should be logged.
- - `read` - (Required) Indicates whether all read requests should be logged.
- - `retention_policy_days` - (Optional) Specifies the number of days that logs will be retained.
- - `version` - (Required) The version of storage analytics to configure.
- - `write` - (Required) Indicates whether all write requests should be logged.
-
- ---
- `minute_metrics` block supports the following:
- - `enabled` - (Required) Indicates whether minute metrics are enabled for the Queue service.
- - `include_apis` - (Optional) Indicates whether metrics should generate summary statistics for called API operations.
- - `retention_policy_days` - (Optional) Specifies the number of days that logs will be retained.
- - `version` - (Required) The version of storage analytics to configure.
-
-EOT
+  description = "(Optional) The encryption type of the queue service. Possible values are `Service` and `Account`. Defaults to `null` (Azure platform default of `Service`). Changing this forces a new resource to be created."
 }
 
 variable "queues" {
@@ -115,17 +32,16 @@ variable "queues" {
   }))
   default     = {}
   description = <<-EOT
- - `metadata` - (Optional) A mapping of MetaData which should be assigned to this Storage Queue.
- - `name` - (Required) The name of the Queue which should be created within the Storage Account. Must be unique within the storage account the queue is located. Changing this forces a new resource to be created.
+A map of queues to create on the storage account. The map key is arbitrary; the value supports the following attributes. Defaults to `{}` (no queues).
 
-Supply role assignments in the same way as for `var.role_assignments`.
-
- ---
- `timeouts` block supports the following:
- - `create` - (Defaults to 30 minutes) Used when creating the Storage Queue.
- - `delete` - (Defaults to 30 minutes) Used when deleting the Storage Queue.
- - `read` - (Defaults to 5 minutes) Used when retrieving the Storage Queue.
- - `update` - (Defaults to 30 minutes) Used when updating the Storage Queue.
+- `name` - (Required) The name of the Queue which should be created within the Storage Account. Must be unique within the storage account. Changing this forces a new resource to be created.
+- `metadata` - (Optional) A mapping of MetaData which should be assigned to this Storage Queue. Defaults to `null`.
+- `role_assignments` - (Optional) A map of role assignments to create on the queue. Defaults to `{}`. See `var.role_assignments` for the attribute schema.
+- `timeouts` - (Optional) Per-operation timeouts for the queue resource. Defaults to `null` (uses provider defaults inherited from `var.timeouts`). Supports:
+  - `create` - (Optional) Timeout for create operations.
+  - `delete` - (Optional) Timeout for delete operations.
+  - `read` - (Optional) Timeout for read operations.
+  - `update` - (Optional) Timeout for update operations.
 EOT
   nullable    = false
 }

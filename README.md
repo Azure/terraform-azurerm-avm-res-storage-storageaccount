@@ -19,7 +19,7 @@ This Terraform module is designed to create Azure Storage Accounts and its relat
 * The storage account name must be globally unique.
 * The module creates resources in the same region as the storage account.
 
-> **IMPORTANT** We recommend using Azure AD authentication over Shared Key for provisioning Storage Containers, Blobs, and other items. To achieve this, add the `storage_use_azuread` flag in the Provider block. However, it’s important to note that not all Azure Storage services support Active Directory authentication.(https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs#storage_use_azuread) In the absence of the `storage_use_azuread` flag, you will need to enable Shared Key Access by setting the `shared_access_key_enabled` flag `True`.
+> **IMPORTANT** This module manages the Storage Account itself, plus its child containers, queues, tables, file shares, private endpoints and role assignments, through the AzAPI provider, which always authenticates with Microsoft Entra ID and never requires a Storage shared key. We recommend leaving `shared_access_key_enabled = false` (the module default) so that any data-plane access from your own code is also Entra-ID-authenticated. If you also use the [`azurerm` provider](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs#storage_use_azuread) to manage Storage data-plane resources (for example `azurerm_storage_blob`), set `storage_use_azuread = true` in that provider block. Note that not every Storage service supports Microsoft Entra ID authentication; for those services you will need to enable shared-key access by setting `shared_access_key_enabled = true` on this module.
 
 <!-- markdownlint-disable MD033 -->
 ## Requirements
@@ -28,51 +28,23 @@ The following requirements are needed by this module:
 
 - <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.10.0)
 
-- <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) (~> 2.4)
-
-- <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (>= 4.37.0, < 5.0.0)
+- <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) (~> 2.8)
 
 - <a name="requirement_modtm"></a> [modtm](#requirement\_modtm) (~> 0.3)
 
 - <a name="requirement_random"></a> [random](#requirement\_random) (>= 3.5.0, < 4.0.0)
 
-- <a name="requirement_time"></a> [time](#requirement\_time) (>= 0.9.0, < 1.0.0)
-
 ## Resources
 
 The following resources are used by this module:
 
-- [azapi_resource.containers](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
-- [azapi_resource.queue](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
-- [azapi_resource.share](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
-- [azapi_resource.table](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
-- [azurerm_management_lock.this_storage_account](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/management_lock) (resource)
-- [azurerm_monitor_diagnostic_setting.azure_file](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_diagnostic_setting) (resource)
-- [azurerm_monitor_diagnostic_setting.blob](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_diagnostic_setting) (resource)
-- [azurerm_monitor_diagnostic_setting.queue](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_diagnostic_setting) (resource)
-- [azurerm_monitor_diagnostic_setting.storage_account](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_diagnostic_setting) (resource)
-- [azurerm_monitor_diagnostic_setting.table](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_diagnostic_setting) (resource)
-- [azurerm_private_endpoint.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint) (resource)
-- [azurerm_private_endpoint.this_unmanaged_dns_zone_groups](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint) (resource)
-- [azurerm_private_endpoint_application_security_group_association.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint_application_security_group_association) (resource)
-- [azurerm_role_assignment.containers](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) (resource)
-- [azurerm_role_assignment.private_endpoint](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) (resource)
-- [azurerm_role_assignment.queues](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) (resource)
-- [azurerm_role_assignment.shares](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) (resource)
-- [azurerm_role_assignment.storage_account](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) (resource)
-- [azurerm_role_assignment.tables](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) (resource)
-- [azurerm_storage_account.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account) (resource)
-- [azurerm_storage_account_customer_managed_key.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account_customer_managed_key) (resource)
-- [azurerm_storage_account_local_user.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account_local_user) (resource)
-- [azurerm_storage_account_queue_properties.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account_queue_properties) (resource)
-- [azurerm_storage_account_static_website.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account_static_website) (resource)
-- [azurerm_storage_data_lake_gen2_filesystem.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_data_lake_gen2_filesystem) (resource)
-- [azurerm_storage_data_lake_gen2_path.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_data_lake_gen2_path) (resource)
-- [azurerm_storage_management_policy.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_management_policy) (resource)
+- [azapi_resource.lock](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
+- [azapi_resource.this](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
+- [azapi_update_resource.customer_managed_key](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/update_resource) (resource)
 - [modtm_telemetry.telemetry](https://registry.terraform.io/providers/Azure/modtm/latest/docs/resources/telemetry) (resource)
 - [random_uuid.telemetry](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/uuid) (resource)
-- [time_sleep.wait_for_rbac](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/sleep) (resource)
 - [azapi_client_config.telemetry](https://registry.terraform.io/providers/Azure/azapi/latest/docs/data-sources/client_config) (data source)
+- [azapi_resource.customer_managed_key_vault](https://registry.terraform.io/providers/Azure/azapi/latest/docs/data-sources/resource) (data source)
 - [modtm_module_source.telemetry](https://registry.terraform.io/providers/Azure/modtm/latest/docs/data-sources/module_source) (data source)
 
 <!-- markdownlint-disable MD013 -->
@@ -93,9 +65,9 @@ Description: The name of the resource.
 
 Type: `string`
 
-### <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name)
+### <a name="input_parent_id"></a> [parent\_id](#input\_parent\_id)
 
-Description: The resource group where the resources will be deployed.
+Description: The Azure resource ID of the parent resource group, in the form `/subscriptions/{subscription_id}/resourceGroups/{resource_group_name}`.
 
 Type: `string`
 
@@ -121,15 +93,23 @@ Default: `"StorageV2"`
 
 ### <a name="input_account_replication_type"></a> [account\_replication\_type](#input\_account\_replication\_type)
 
-Description: (Required) Defines the type of replication to use for this storage account. Valid options are `LRS`, `GRS`, `RAGRS`, `ZRS`, `GZRS` and `RAGZRS`.  Defaults to `ZRS`
+Description: [DEPRECATED] (Optional) Defines the type of replication to use for this storage account. Valid options are `LRS`, `GRS`, `RAGRS`, `ZRS`, `GZRS` and `RAGZRS`. Defaults to `ZRS`. This variable is only honoured when `account_sku_name` is set to `null`; otherwise `account_sku_name` wins. Prefer `account_sku_name`.
 
 Type: `string`
 
 Default: `"ZRS"`
 
+### <a name="input_account_sku_name"></a> [account\_sku\_name](#input\_account\_sku\_name)
+
+Description: (Optional) Explicit storage account SKU name (e.g. `Standard_LRS`, `Premium_ZRS`, `PremiumV2_LRS`, `StandardV2_GZRS`). When set, this value is sent to Azure verbatim and overrides the SKU derived from `account_tier`, `account_replication_type` and `provisioned_billing_model_version` - those variables are only honoured when `account_sku_name` is explicitly set to `null`. Defaults to `Standard_ZRS`. Note: the `*V2_*` SKUs (e.g. `StandardV2_ZRS`, `PremiumV2_ZRS`) require `account_kind = "FileStorage"`.
+
+Type: `string`
+
+Default: `"Standard_ZRS"`
+
 ### <a name="input_account_tier"></a> [account\_tier](#input\_account\_tier)
 
-Description: (Required) Defines the Tier to use for this storage account. Valid options are `Standard` and `Premium`. For `BlockBlobStorage` and `FileStorage` accounts only `Premium` is valid. Changing this forces a new resource to be created.
+Description: [DEPRECATED] (Optional) Defines the Tier to use for this storage account. Valid options are `Standard` and `Premium`. For `BlockBlobStorage` and `FileStorage` accounts only `Premium` is valid. Changing this forces a new resource to be created. Defaults to `Standard`. This variable is only honoured when `account_sku_name` is set to `null`; otherwise `account_sku_name` wins. Prefer `account_sku_name`.
 
 Type: `string`
 
@@ -145,7 +125,7 @@ Default: `false`
 
 ### <a name="input_allowed_copy_scope"></a> [allowed\_copy\_scope](#input\_allowed\_copy\_scope)
 
-Description: (Optional) Restrict copy to and from Storage Accounts within an AAD tenant or with Private Links to the same VNet. Possible values are `AAD` and `PrivateLink`.
+Description: (Optional) Restrict copy to and from Storage Accounts within an AAD tenant or with Private Links to the same VNet. Possible values are `AAD` and `PrivateLink`. Defaults to `null` (no restriction).
 
 Type: `string`
 
@@ -153,17 +133,17 @@ Default: `null`
 
 ### <a name="input_azure_files_authentication"></a> [azure\_files\_authentication](#input\_azure\_files\_authentication)
 
-Description: - `directory_type` - (Required) Specifies the directory service used. Possible values are `AADDS`, `AD` and `AADKERB`.
-- `default_share_level_permission` - (Optional) Specifies the default share level permissions applied to all users. Possible values are StorageFileDataSmbShareReader, StorageFileDataSmbShareContributor, StorageFileDataSmbShareElevatedContributor, or None.
+Description: Configures Azure Files identity-based authentication on the storage account. Defaults to `null` (no Files authentication configured).
 
----
-`active_directory`-(Optional) A active\_directory block as defined below. Required when directory\_type is `AD`.:
-- `domain_guid` - (Required) Specifies the domain GUID.
-- `domain_name` - (Required) Specifies the primary domain that the AD DNS server is authoritative for.
-- `domain_sid` - (Optional) Specifies the security identifier (SID).This is required when `directory_type` is set to `AD`.
-- `forest_name` - (Optional) Specifies the Active Directory forest. This is required when `directory_type` is set to `AD`.
-- `netbios_domain_name` - (Optional) Specifies the NetBIOS domain name.This is required when `directory_type` is set to `AD`.
-- `storage_sid` - (Optional) Specifies the security identifier (SID) for Azure Storage.This is required when `directory_type` is set to `AD`.
+- `directory_type` - (Optional) Specifies the directory service used. Possible values are `AADDS`, `AD`, and `AADKERB`. Defaults to `AADKERB`.
+- `default_share_level_permission` - (Optional) Specifies the default share-level permission applied to all users. Possible values are `StorageFileDataSmbShareReader`, `StorageFileDataSmbShareContributor`, `StorageFileDataSmbShareElevatedContributor`, or `None`. Defaults to `null`.
+- `active_directory` - (Optional) An Active Directory configuration block. Required when `directory_type` is `AD`. Defaults to `null`. Supports:
+  - `domain_guid` - (Required) Specifies the domain GUID.
+  - `domain_name` - (Required) Specifies the primary domain that the AD DNS server is authoritative for.
+  - `domain_sid` - (Optional) Specifies the security identifier (SID). Required when `directory_type` is `AD`. Defaults to `null`.
+  - `forest_name` - (Optional) Specifies the Active Directory forest. Required when `directory_type` is `AD`. Defaults to `null`.
+  - `netbios_domain_name` - (Optional) Specifies the NetBIOS domain name. Required when `directory_type` is `AD`. Defaults to `null`.
+  - `storage_sid` - (Optional) Specifies the security identifier (SID) for Azure Storage. Required when `directory_type` is `AD`. Defaults to `null`.
 
 Type:
 
@@ -185,110 +165,25 @@ object({
 
 Default: `null`
 
-### <a name="input_blob_properties"></a> [blob\_properties](#input\_blob\_properties)
-
-Description: - `change_feed_enabled` - (Optional) Is the blob service properties for change feed events enabled? Default to `false`.
-- `change_feed_retention_in_days` - (Optional) The duration of change feed events retention in days. The possible values are between 1 and 146000 days (400 years). Setting this to null (or omit this in the configuration file) indicates an infinite retention of the change feed.
-- `default_service_version` - (Optional) The API Version which should be used by default for requests to the Data Plane API if an incoming request doesn't specify an API Version.
-- `last_access_time_enabled` - (Optional) Is the last access time based tracking enabled? Default to `false`.
-- `versioning_enabled` - (Optional) Is versioning enabled? Default to `true`.
-
----
-`container_delete_retention_policy` block supports the following:
-- `days` - (Optional) Specifies the number of days that the container should be retained, between `1` and `365` days. Defaults to `7`.
-- `enabled` - (Optional) Is delete retention policy enabled for containers. Defaults to `true`.
-
----
-`cors_rule` block supports the following:
-- `allowed_headers` - (Required) A list of headers that are allowed to be a part of the cross-origin request.
-- `allowed_methods` - (Required) A list of HTTP methods that are allowed to be executed by the origin. Valid options are `DELETE`, `GET`, `HEAD`, `MERGE`, `POST`, `OPTIONS`, `PUT` or `PATCH`.
-- `allowed_origins` - (Required) A list of origin domains that will be allowed by CORS.
-- `exposed_headers` - (Required) A list of response headers that are exposed to CORS clients.
-- `max_age_in_seconds` - (Required) The number of seconds the client should cache a preflight response.
-
----
-`delete_retention_policy` block supports the following:
-- `days` - (Optional) Specifies the number of days that the blob should be retained, between `1` and `365` days. Defaults to `7`.
-- `enabled` - (Optional) Is delete retention policy enabled for blobs. Defaults to `true`.
-
----
-`diagnostic_settings` block supports the following:
-- `name` - (Optional) The name of the diagnostic setting. Defaults to `null`.
-- `log_categories` - (Optional) A set of log categories to enable. Defaults to an empty set.
-- `log_groups` - (Optional) A set of log groups to enable. Defaults to `["allLogs"]`.
-- `metric_categories` - (Optional) A set of metric categories to enable. Defaults to `["AllMetrics"]`.
-- `log_analytics_destination_type` - (Optional) The destination type for log analytics. Defaults to `"Dedicated"`.
-- `workspace_resource_id` - (Optional) The resource ID of the Log Analytics workspace. Defaults to `null`.
-- `resource_id` - (Optional) The resource ID of the target resource for diagnostics. Defaults to `null`.
-- `event_hub_authorization_rule_resource_id` - (Optional) The resource ID of the Event Hub authorization rule. Defaults to `null`.
-- `event_hub_name` - (Optional) The name of the Event Hub. Defaults to `null`.
-- `marketplace_partner_resource_id` - (Optional) The resource ID of the marketplace partner. Defaults to `null`.
-
----
-`restore_policy` block supports the following:
-- `days` - (Required) Specifies the number of days that the blob can be restored, between `1` and `365` days. This must be less than the `days` specified for `delete_retention_policy`.
-
-Type:
-
-```hcl
-object({
-    change_feed_enabled           = optional(bool)
-    change_feed_retention_in_days = optional(number)
-    default_service_version       = optional(string)
-    last_access_time_enabled      = optional(bool)
-    versioning_enabled            = optional(bool, true)
-    container_delete_retention_policy = optional(object({
-      enabled = optional(bool, true)
-      days    = optional(number, 7)
-
-    }), {})
-
-    cors_rule = optional(list(object({
-      allowed_headers    = list(string)
-      allowed_methods    = list(string)
-      allowed_origins    = list(string)
-      exposed_headers    = list(string)
-      max_age_in_seconds = number
-    })))
-    delete_retention_policy = optional(object({
-      enabled                  = optional(bool, true)
-      days                     = optional(number, 7)
-      permanent_delete_enabled = optional(bool, false)
-    }), {})
-    diagnostic_settings = optional(map(object({
-      name                                     = optional(string, null)
-      log_categories                           = optional(set(string), [])
-      log_groups                               = optional(set(string), ["allLogs"])
-      metric_categories                        = optional(set(string), ["AllMetrics"])
-      log_analytics_destination_type           = optional(string, "Dedicated")
-      workspace_resource_id                    = optional(string, null)
-      resource_id                              = optional(string, null)
-      event_hub_authorization_rule_resource_id = optional(string, null)
-      event_hub_name                           = optional(string, null)
-      marketplace_partner_resource_id          = optional(string, null)
-    })), {})
-    restore_policy = optional(object({
-      days = number
-    }))
-  })
-```
-
-Default: `null`
-
 ### <a name="input_containers"></a> [containers](#input\_containers)
 
-Description: - `public_access` - (Optional) Specifies whether data in the container may be accessed publicly and the level of access. Possible values are `Container`, `Blob`, and `None`. Defaults to `None`. Changing this forces a new resource to be created.
-- `metadata` - (Optional) A mapping of MetaData for this Container. All metadata keys should be lowercase.
+Description: A map of containers to create on the storage account. The map key is arbitrary; the value supports the following attributes. Defaults to `{}` (no containers).
+
 - `name` - (Required) The name of the Container which should be created within the Storage Account. Changing this forces a new resource to be created.
-
-Supply role assignments in the same way as for `var.role_assignments`.
-
----
-`timeouts` block supports the following:
-- `create` - (Defaults to 30 minutes) Used when creating the Storage Container.
-- `delete` - (Defaults to 30 minutes) Used when deleting the Storage Container.
-- `read` - (Defaults to 5 minutes) Used when retrieving the Storage Container.
-- `update` - (Defaults to 30 minutes) Used when updating the Storage Container.
+- `public_access` - (Optional) Specifies whether data in the container may be accessed publicly and the level of access. Possible values are `Container`, `Blob`, and `None`. Defaults to `None`. Changing this forces a new resource to be created.
+- `metadata` - (Optional) A mapping of MetaData for this Container. All metadata keys should be lowercase. Defaults to `null`.
+- `default_encryption_scope` - (Optional) The default encryption scope to use for blob operations on this container. Defaults to `null`.
+- `deny_encryption_scope_override` - (Optional) When set to `true`, blocks blob uploads from specifying a different encryption scope. Defaults to `null`.
+- `enable_nfs_v3_all_squash` - (Optional) Enable NFSv3 all squash (only valid for NFSv3 enabled accounts). Defaults to `null`.
+- `enable_nfs_v3_root_squash` - (Optional) Enable NFSv3 root squash (only valid for NFSv3 enabled accounts). Defaults to `null`.
+- `immutable_storage_with_versioning` - (Optional) Configures container-level immutability with version-level WORM. Defaults to `null`. Supports:
+  - `enabled` - (Required) Whether immutable storage with versioning is enabled.
+- `role_assignments` - (Optional) A map of role assignments to create on the container. Defaults to `{}`. See `var.role_assignments` for the attribute schema.
+- `timeouts` - (Optional) Per-operation timeouts for the container resource. Defaults to `null` (uses provider defaults inherited from `var.timeouts`). Supports:
+  - `create` - (Optional) Timeout for create operations.
+  - `delete` - (Optional) Timeout for delete operations.
+  - `read` - (Optional) Timeout for read operations.
+  - `update` - (Optional) Timeout for update operations.
 
 Type:
 
@@ -337,8 +232,10 @@ Default: `false`
 
 ### <a name="input_custom_domain"></a> [custom\_domain](#input\_custom\_domain)
 
-Description: - `name` - (Required) The Custom Domain Name to use for the Storage Account, which will be validated by Azure.
-- `use_subdomain` - (Optional) Should the Custom Domain Name be validated by using indirect CNAME validation?
+Description: Configures a custom domain for the storage account. Defaults to `null` (no custom domain).
+
+- `name` - (Required) The Custom Domain Name to use for the Storage Account, which will be validated by Azure.
+- `use_subdomain` - (Optional) Should the Custom Domain Name be validated by using indirect CNAME validation? Defaults to `null`.
 
 Type:
 
@@ -353,22 +250,20 @@ Default: `null`
 
 ### <a name="input_customer_managed_key"></a> [customer\_managed\_key](#input\_customer\_managed\_key)
 
-Description:     Defines a customer managed key to use for encryption.
+Description: Defines a customer managed key to use for encryption. Defaults to `null` (Microsoft-managed keys).
 
-    object({  
-      key\_vault\_resource\_id              = (Required) - The full Azure Resource ID of the key\_vault where the customer managed key will be referenced from.  
-      key\_name                           = (Required) - The key name for the customer managed key in the key vault.  
-      key\_version                        = (Optional) - The version of the key to use  
-      user\_assigned\_identity\_resource\_id = (Optional) - The user assigned identity to use when access the key vault
-    })
+- `key_vault_resource_id` - (Required) The full Azure Resource ID of the key vault where the customer managed key will be referenced from.
+- `key_name` - (Required) The key name for the customer managed key in the key vault.
+- `key_version` - (Optional) The version of the key to use. If `null`, the latest version is tracked automatically.
+- `user_assigned_identity` - (Optional) A user assigned identity used to access the key vault. Defaults to `null`, in which case the storage account's system-assigned identity is used.
+  - `resource_id` - (Required) The full Azure Resource ID of the user assigned identity.
 
-    Example Inputs:
-    ```terraform
-    customer_managed_key = {
-      key_vault_resource_id = "/subscriptions/0000000-0000-0000-0000-000000000000/resourceGroups/test-resource-group/providers/Microsoft.KeyVault/vaults/example-key-vault"
-      key_name              = "sample-customer-key"
-    }
-    
+Example Inputs:
+```terraform
+customer_managed_key = {
+  key_vault_resource_id = "/subscriptions/0000000-0000-0000-0000-000000000000/resourceGroups/test-resource-group/providers/Microsoft.KeyVault/vaults/example-key-vault"
+  key_name              = "sample-customer-key"
+}
 ```
 
 Type:
@@ -388,7 +283,7 @@ Default: `null`
 
 ### <a name="input_default_to_oauth_authentication"></a> [default\_to\_oauth\_authentication](#input\_default\_to\_oauth\_authentication)
 
-Description: (Optional) Default to Azure Active Directory authorization in the Azure portal when accessing the Storage Account. The default value is `false`
+Description: (Optional) Default to Azure Active Directory authorization in the Azure portal when accessing the Storage Account. Defaults to `null` (Azure platform default of `false`).
 
 Type: `bool`
 
@@ -398,25 +293,47 @@ Default: `null`
 
 Description: A map of diagnostic settings to create on the Blob Storage within Storage Account. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
 
+This variable uses the v2 diagnostic settings interface from `Azure/avm-utl-interfaces/azure`, which fully supports all features of the Azure Diagnostic Settings API.
+
 - `name` - (Optional) The name of the diagnostic setting. One will be generated if not set, however this will not be unique if you want to create multiple diagnostic setting resources.
-- `log_categories` - (Optional) A set of log categories to send to the log analytics workspace. Defaults to `[]`.
-- `log_groups` - (Optional) A set of log groups to send to the log analytics workspace. Defaults to `["allLogs"]`.
-- `metric_categories` - (Optional) A set of metric categories to send to the log analytics workspace. Defaults to `["AllMetrics"]`.
+- `logs` - (Optional) A set of log entries to enable. Each entry has the following attributes:
+  - `category` - (Optional) The name of an individual log category (e.g. `StorageWrite`).
+  - `category_group` - (Optional) The name of a log category group (e.g. `allLogs`, `audit`). Mutually exclusive with `category`.
+  - `enabled` - (Optional) Whether the log entry is enabled. Defaults to `true`.
+  - `retention_policy` - (Optional) Retention policy for the log entry. Object with `days` (default `0`) and `enabled` (default `false`).
+- `metrics` - (Optional) A set of metric entries to enable. Each entry has the following attributes:
+  - `category` - (Optional) The name of the metric category (e.g. `AllMetrics`, `Transaction`).
+  - `enabled` - (Optional) Whether the metric entry is enabled. Defaults to `true`.
+  - `retention_policy` - (Optional) Retention policy for the metric entry. Object with `days` (default `0`) and `enabled` (default `false`).
 - `log_analytics_destination_type` - (Optional) The destination type for the diagnostic setting. Possible values are `Dedicated` and `AzureDiagnostics`. Defaults to `Dedicated`.
 - `workspace_resource_id` - (Optional) The resource ID of the log analytics workspace to send logs and metrics to.
 - `storage_account_resource_id` - (Optional) The resource ID of the storage account to send logs and metrics to.
 - `event_hub_authorization_rule_resource_id` - (Optional) The resource ID of the event hub authorization rule to send logs and metrics to.
 - `event_hub_name` - (Optional) The name of the event hub. If none is specified, the default event hub will be selected.
-- `marketplace_partner_resource_id` - (Optional) The full ARM resource ID of the Marketplace resource to which you would like to send Diagnostic LogsLogs.
+- `marketplace_partner_resource_id` - (Optional) The full ARM resource ID of the Marketplace resource to which you would like to send Diagnostic Logs.
 
 Type:
 
 ```hcl
 map(object({
-    name                                     = optional(string, null)
-    log_categories                           = optional(set(string), [])
-    log_groups                               = optional(set(string), ["allLogs"])
-    metric_categories                        = optional(set(string), ["AllMetrics"])
+    name = optional(string, null)
+    logs = optional(set(object({
+      category       = optional(string, null)
+      category_group = optional(string, null)
+      enabled        = optional(bool, true)
+      retention_policy = optional(object({
+        days    = optional(number, 0)
+        enabled = optional(bool, false)
+      }), {})
+    })), [])
+    metrics = optional(set(object({
+      category = optional(string, null)
+      enabled  = optional(bool, true)
+      retention_policy = optional(object({
+        days    = optional(number, 0)
+        enabled = optional(bool, false)
+      }), {})
+    })), [])
     log_analytics_destination_type           = optional(string, "Dedicated")
     workspace_resource_id                    = optional(string, null)
     storage_account_resource_id              = optional(string, null)
@@ -432,32 +349,38 @@ Default: `{}`
 
 Description: A map of diagnostic settings to create on the Azure Files Storage within Storage Account. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
 
-- `name` - (Optional) The name of the diagnostic setting. One will be generated if not set, however this will not be unique if you want to create multiple diagnostic setting resources.
-- `log_categories` - (Optional) A set of log categories to send to the log analytics workspace. Defaults to `[]`.
-- `log_groups` - (Optional) A set of log groups to send to the log analytics workspace. Defaults to `["allLogs"]`.
-- `metric_categories` - (Optional) A set of metric categories to send to the log analytics workspace. Defaults to `["AllMetrics"]`.
-- `log_analytics_destination_type` - (Optional) The destination type for the diagnostic setting. Possible values are `Dedicated` and `AzureDiagnostics`. Defaults to `Dedicated`.
-- `workspace_resource_id` - (Optional) The resource ID of the log analytics workspace to send logs and metrics to.
-- `storage_account_resource_id` - (Optional) The resource ID of the storage account to send logs and metrics to.
-- `event_hub_authorization_rule_resource_id` - (Optional) The resource ID of the event hub authorization rule to send logs and metrics to.
-- `event_hub_name` - (Optional) The name of the event hub. If none is specified, the default event hub will be selected.
-- `marketplace_partner_resource_id` - (Optional) The full ARM resource ID of the Marketplace resource to which you would like to send Diagnostic LogsLogs.
+This variable uses the v2 diagnostic settings interface from `Azure/avm-utl-interfaces/azure`, which fully supports all features of the Azure Diagnostic Settings API.
+
+See `var.diagnostic_settings_blob` for full attribute documentation; the schema is identical.
 
 Type:
 
 ```hcl
 map(object({
-    name                                     = optional(string, null)
-    log_categories                           = optional(set(string), [])
-    log_groups                               = optional(set(string), ["allLogs"])
-    metric_categories                        = optional(set(string), ["AllMetrics"])
+    name = optional(string, null)
+    logs = optional(set(object({
+      category       = optional(string, null)
+      category_group = optional(string, null)
+      enabled        = optional(bool, true)
+      retention_policy = optional(object({
+        days    = optional(number, 0)
+        enabled = optional(bool, false)
+      }), {})
+    })), [])
+    metrics = optional(set(object({
+      category = optional(string, null)
+      enabled  = optional(bool, true)
+      retention_policy = optional(object({
+        days    = optional(number, 0)
+        enabled = optional(bool, false)
+      }), {})
+    })), [])
     log_analytics_destination_type           = optional(string, "Dedicated")
     workspace_resource_id                    = optional(string, null)
     storage_account_resource_id              = optional(string, null)
     event_hub_authorization_rule_resource_id = optional(string, null)
     event_hub_name                           = optional(string, null)
     marketplace_partner_resource_id          = optional(string, null)
-    category                                 = optional(set(string), [])
   }))
 ```
 
@@ -467,25 +390,32 @@ Default: `{}`
 
 Description: A map of diagnostic settings to create on the Queue Storage within Storage Account. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
 
-- `name` - (Optional) The name of the diagnostic setting. One will be generated if not set, however this will not be unique if you want to create multiple diagnostic setting resources.
-- `log_categories` - (Optional) A set of log categories to send to the log analytics workspace. Defaults to `[]`.
-- `log_groups` - (Optional) A set of log groups to send to the log analytics workspace. Defaults to `["allLogs"]`.
-- `metric_categories` - (Optional) A set of metric categories to send to the log analytics workspace. Defaults to `["AllMetrics"]`.
-- `log_analytics_destination_type` - (Optional) The destination type for the diagnostic setting. Possible values are `Dedicated` and `AzureDiagnostics`. Defaults to `Dedicated`.
-- `workspace_resource_id` - (Optional) The resource ID of the log analytics workspace to send logs and metrics to.
-- `storage_account_resource_id` - (Optional) The resource ID of the storage account to send logs and metrics to.
-- `event_hub_authorization_rule_resource_id` - (Optional) The resource ID of the event hub authorization rule to send logs and metrics to.
-- `event_hub_name` - (Optional) The name of the event hub. If none is specified, the default event hub will be selected.
-- `marketplace_partner_resource_id` - (Optional) The full ARM resource ID of the Marketplace resource to which you would like to send Diagnostic LogsLogs.
+This variable uses the v2 diagnostic settings interface from `Azure/avm-utl-interfaces/azure`, which fully supports all features of the Azure Diagnostic Settings API.
+
+See `var.diagnostic_settings_blob` for full attribute documentation; the schema is identical.
 
 Type:
 
 ```hcl
 map(object({
-    name                                     = optional(string, null)
-    log_categories                           = optional(set(string), [])
-    log_groups                               = optional(set(string), ["allLogs"])
-    metric_categories                        = optional(set(string), ["AllMetrics"])
+    name = optional(string, null)
+    logs = optional(set(object({
+      category       = optional(string, null)
+      category_group = optional(string, null)
+      enabled        = optional(bool, true)
+      retention_policy = optional(object({
+        days    = optional(number, 0)
+        enabled = optional(bool, false)
+      }), {})
+    })), [])
+    metrics = optional(set(object({
+      category = optional(string, null)
+      enabled  = optional(bool, true)
+      retention_policy = optional(object({
+        days    = optional(number, 0)
+        enabled = optional(bool, false)
+      }), {})
+    })), [])
     log_analytics_destination_type           = optional(string, "Dedicated")
     workspace_resource_id                    = optional(string, null)
     storage_account_resource_id              = optional(string, null)
@@ -499,25 +429,36 @@ Default: `{}`
 
 ### <a name="input_diagnostic_settings_storage_account"></a> [diagnostic\_settings\_storage\_account](#input\_diagnostic\_settings\_storage\_account)
 
-Description: A map of diagnostic settings to create on the Storage Account. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
+Description: A map of diagnostic settings to create on the Storage Account itself. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
 
-**Important:** Diagnostic settings on the Storage Account resource itself support only metric\_categories (logs are not supported). If you specify this block in a deployment, you must provide at least one metric category. Supported values are `Transaction` and `AllMetrics`.
+This variable uses the v2 diagnostic settings interface from `Azure/avm-utl-interfaces/azure`, which fully supports all features of the Azure Diagnostic Settings API.
 
-- `name` - (Optional) The name of the diagnostic setting. One will be generated if not set, however this will not be unique if you want to create multiple diagnostic setting resources.
-- `metric_categories` - (Optional) A set of metric categories to send to the log analytics workspace. Defaults to `["AllMetrics"]`.
-- `log_analytics_destination_type` - (Optional) The destination type for the diagnostic setting. Possible values are `Dedicated` and `AzureDiagnostics`. Defaults to `Dedicated`.
-- `workspace_resource_id` - (Optional) The resource ID of the log analytics workspace to send logs and metrics to.
-- `storage_account_resource_id` - (Optional) The resource ID of the storage account to send logs and metrics to.
-- `event_hub_authorization_rule_resource_id` - (Optional) The resource ID of the event hub authorization rule to send logs and metrics to.
-- `event_hub_name` - (Optional) The name of the event hub. If none is specified, the default event hub will be selected.
-- `marketplace_partner_resource_id` - (Optional) The full ARM resource ID of the Marketplace resource to which you would like to send Diagnostic LogsLogs.
+**Important:** Diagnostic settings on the Storage Account resource itself support only metrics (logs are not supported by the Azure API at this scope). Supplying any `logs` entries here will be rejected by Azure. Supported metric categories are `Transaction` and `AllMetrics`.
+
+See `var.diagnostic_settings_blob` for full attribute documentation; the schema is identical.
 
 Type:
 
 ```hcl
 map(object({
-    name                                     = optional(string, null)
-    metric_categories                        = optional(set(string), ["AllMetrics"])
+    name = optional(string, null)
+    logs = optional(set(object({
+      category       = optional(string, null)
+      category_group = optional(string, null)
+      enabled        = optional(bool, true)
+      retention_policy = optional(object({
+        days    = optional(number, 0)
+        enabled = optional(bool, false)
+      }), {})
+    })), [])
+    metrics = optional(set(object({
+      category = optional(string, null)
+      enabled  = optional(bool, true)
+      retention_policy = optional(object({
+        days    = optional(number, 0)
+        enabled = optional(bool, false)
+      }), {})
+    })), [])
     log_analytics_destination_type           = optional(string, "Dedicated")
     workspace_resource_id                    = optional(string, null)
     storage_account_resource_id              = optional(string, null)
@@ -533,25 +474,32 @@ Default: `{}`
 
 Description: A map of diagnostic settings to create on the Table Storage within the Storage Account. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
 
-- `name` - (Optional) The name of the diagnostic setting. One will be generated if not set, however this will not be unique if you want to create multiple diagnostic setting resources.
-- `log_categories` - (Optional) A set of log categories to send to the log analytics workspace. Defaults to `[]`.
-- `log_groups` - (Optional) A set of log groups to send to the log analytics workspace. Defaults to `["allLogs"]`.
-- `metric_categories` - (Optional) A set of metric categories to send to the log analytics workspace. Defaults to `["AllMetrics"]`.
-- `log_analytics_destination_type` - (Optional) The destination type for the diagnostic setting. Possible values are `Dedicated` and `AzureDiagnostics`. Defaults to `Dedicated`.
-- `workspace_resource_id` - (Optional) The resource ID of the log analytics workspace to send logs and metrics to.
-- `storage_account_resource_id` - (Optional) The resource ID of the storage account to send logs and metrics to.
-- `event_hub_authorization_rule_resource_id` - (Optional) The resource ID of the event hub authorization rule to send logs and metrics to.
-- `event_hub_name` - (Optional) The name of the event hub. If none is specified, the default event hub will be selected.
-- `marketplace_partner_resource_id` - (Optional) The full ARM resource ID of the Marketplace resource to which you would like to send Diagnostic LogsLogs.
+This variable uses the v2 diagnostic settings interface from `Azure/avm-utl-interfaces/azure`, which fully supports all features of the Azure Diagnostic Settings API.
+
+See `var.diagnostic_settings_blob` for full attribute documentation; the schema is identical.
 
 Type:
 
 ```hcl
 map(object({
-    name                                     = optional(string, null)
-    log_categories                           = optional(set(string), [])
-    log_groups                               = optional(set(string), ["allLogs"])
-    metric_categories                        = optional(set(string), ["AllMetrics"])
+    name = optional(string, null)
+    logs = optional(set(object({
+      category       = optional(string, null)
+      category_group = optional(string, null)
+      enabled        = optional(bool, true)
+      retention_policy = optional(object({
+        days    = optional(number, 0)
+        enabled = optional(bool, false)
+      }), {})
+    })), [])
+    metrics = optional(set(object({
+      category = optional(string, null)
+      enabled  = optional(bool, true)
+      retention_policy = optional(object({
+        days    = optional(number, 0)
+        enabled = optional(bool, false)
+      }), {})
+    })), [])
     log_analytics_destination_type           = optional(string, "Dedicated")
     workspace_resource_id                    = optional(string, null)
     storage_account_resource_id              = optional(string, null)
@@ -565,7 +513,7 @@ Default: `{}`
 
 ### <a name="input_edge_zone"></a> [edge\_zone](#input\_edge\_zone)
 
-Description: (Optional) Specifies the Edge Zone within the Azure Region where this Storage Account should exist. Changing this forces a new Storage Account to be created.
+Description: (Optional) Specifies the Edge Zone within the Azure Region where this Storage Account should exist. Defaults to `null`. Changing this forces a new Storage Account to be created.
 
 Type: `string`
 
@@ -591,9 +539,11 @@ Default: `true`
 
 ### <a name="input_immutability_policy"></a> [immutability\_policy](#input\_immutability\_policy)
 
-Description: - `allow_protected_append_writes` - (Required) When enabled, new blocks can be written to an append blob while maintaining immutability protection and compliance. Only new blocks can be added and any existing blocks cannot be modified or deleted.
+Description: Configures the account-level immutability policy. Defaults to `null` (no policy).
+
+- `allow_protected_append_writes` - (Required) When enabled, new blocks can be written to an append blob while maintaining immutability protection and compliance. Only new blocks can be added; any existing blocks cannot be modified or deleted.
 - `period_since_creation_in_days` - (Required) The immutability period for the blobs in the container since the policy creation, in days.
-- `state` - (Required) Defines the mode of the policy. `Disabled` state disables the policy, `Unlocked` state allows increase and decrease of immutability retention time and also allows toggling allowProtectedAppendWrites property, `Locked` state only allows the increase of the immutability retention time. A policy can only be created in a Disabled or Unlocked state and can be toggled between the two states. Only a policy in an Unlocked state can transition to a Locked state which cannot be reverted.
+- `state` - (Required) The mode of the policy. `Disabled` disables the policy; `Unlocked` allows the immutability retention time to be increased or decreased and toggling `allow_protected_append_writes`; `Locked` only allows the immutability retention time to be increased. A policy may only be created in `Disabled` or `Unlocked`, may be toggled between those two, and `Unlocked` may transition to `Locked` (which cannot be reverted).
 
 Type:
 
@@ -617,7 +567,7 @@ Default: `false`
 
 ### <a name="input_is_hns_enabled"></a> [is\_hns\_enabled](#input\_is\_hns\_enabled)
 
-Description: (Optional) Is Hierarchical Namespace enabled? This can be used with Azure Data Lake Storage Gen 2 ([see here for more information](https://docs.microsoft.com/azure/storage/blobs/data-lake-storage-quickstart-create-account/)). Changing this forces a new resource to be created.
+Description: (Optional) Is Hierarchical Namespace enabled? This can be used with Azure Data Lake Storage Gen 2 ([see here for more information](https://docs.microsoft.com/azure/storage/blobs/data-lake-storage-quickstart-create-account/)). Defaults to `null` (Azure platform default of `false`). Changing this forces a new resource to be created.
 
 Type: `bool`
 
@@ -625,7 +575,7 @@ Default: `null`
 
 ### <a name="input_large_file_share_enabled"></a> [large\_file\_share\_enabled](#input\_large\_file\_share\_enabled)
 
-Description: (Optional) Is Large File Share Enabled?
+Description: (Optional) Is large file share enabled? Defaults to `null` (Azure platform default of `false`).
 
 Type: `bool`
 
@@ -633,35 +583,29 @@ Default: `null`
 
 ### <a name="input_local_user"></a> [local\_user](#input\_local\_user)
 
-Description: - `home_directory` - (Optional) The home directory of the Storage Account Local User.
+Description: A map of Storage Account Local Users to create. The map key is arbitrary; the value supports the following attributes. Defaults to `{}` (no local users).
+
 - `name` - (Required) The name which should be used for this Storage Account Local User. Changing this forces a new Storage Account Local User to be created.
-- `ssh_key_enabled` - (Optional) Specifies whether SSH Key Authentication is enabled. Defaults to `false`.
-- `ssh_password_enabled` - (Optional) Specifies whether SSH Password Authentication is enabled. Defaults to `false`.
-
----
-`permission_scope` block supports the following:
-- `resource_name` - (Required) The container name (when `service` is set to `blob`) or the file share name (when `service` is set to `file`), used by the Storage Account Local User.
-- `service` - (Required) The storage service used by this Storage Account Local User. Possible values are `blob` and `file`.
-
----
-`permissions` block supports the following:
-- `create` - (Optional) Specifies if the Local User has the create permission for this scope. Defaults to `false`.
-- `delete` - (Optional) Specifies if the Local User has the delete permission for this scope. Defaults to `false`.
-- `list` - (Optional) Specifies if the Local User has the list permission for this scope. Defaults to `false`.
-- `read` - (Optional) Specifies if the Local User has the read permission for this scope. Defaults to `false`.
-- `write` - (Optional) Specifies if the Local User has the write permission for this scope. Defaults to `false`.
-
----
-`ssh_authorized_key` block supports the following:
-- `description` - (Optional) The description of this SSH authorized key.
-- `key` - (Required) The public key value of this SSH authorized key.
-
----
-`timeouts` block supports the following:
-- `create` - (Defaults to 30 minutes) Used when creating the Storage Account Local User.
-- `delete` - (Defaults to 30 minutes) Used when deleting the Storage Account Local User.
-- `read` - (Defaults to 5 minutes) Used when retrieving the Storage Account Local User.
-- `update` - (Defaults to 30 minutes) Used when updating the Storage Account Local User.
+- `home_directory` - (Optional) The home directory of the Storage Account Local User. Defaults to `null`.
+- `ssh_key_enabled` - (Optional) Specifies whether SSH Key Authentication is enabled. Defaults to `null` (Azure platform default of `false`).
+- `ssh_password_enabled` - (Optional) Specifies whether SSH Password Authentication is enabled. Defaults to `null` (Azure platform default of `false`).
+- `permission_scope` - (Optional) A list of permission scopes for the local user. Defaults to `null`. Each entry supports:
+  - `resource_name` - (Required) The container name (when `service` is set to `blob`) or the file share name (when `service` is set to `file`).
+  - `service` - (Required) The storage service used by this Storage Account Local User. Possible values are `blob` and `file`.
+  - `permissions` - (Required) An object describing the permissions granted at this scope. Supports:
+    - `create` - (Optional) Whether the local user has the create permission for this scope. Defaults to `null` (`false`).
+    - `delete` - (Optional) Whether the local user has the delete permission for this scope. Defaults to `null` (`false`).
+    - `list` - (Optional) Whether the local user has the list permission for this scope. Defaults to `null` (`false`).
+    - `read` - (Optional) Whether the local user has the read permission for this scope. Defaults to `null` (`false`).
+    - `write` - (Optional) Whether the local user has the write permission for this scope. Defaults to `null` (`false`).
+- `ssh_authorized_key` - (Optional) A list of SSH authorized keys for the local user. Defaults to `null`. Each entry supports:
+  - `key` - (Required) The public key value of this SSH authorized key.
+  - `description` - (Optional) The description of this SSH authorized key. Defaults to `null`.
+- `timeouts` - (Optional) Per-operation timeouts for the local user resource. Defaults to `null` (uses provider defaults inherited from `var.timeouts`). Supports:
+  - `create` - (Optional) Timeout for create operations.
+  - `delete` - (Optional) Timeout for delete operations.
+  - `read` - (Optional) Timeout for read operations.
+  - `update` - (Optional) Timeout for update operations.
 
 Type:
 
@@ -707,7 +651,10 @@ Default: `false`
 
 ### <a name="input_lock"></a> [lock](#input\_lock)
 
-Description: The lock level to apply. Default is `None`. Possible values are `None`, `CanNotDelete`, and `ReadOnly`.
+Description: Controls the management lock applied to the storage account. Defaults to `null` (no lock).
+
+- `kind` - (Required) The kind of lock to apply. Possible values are `CanNotDelete` and `ReadOnly`.
+- `name` - (Optional) The name of the lock. If not specified, a name will be generated.
 
 Type:
 
@@ -748,25 +695,22 @@ Default: `"TLS1_2"`
 
 ### <a name="input_network_rules"></a> [network\_rules](#input\_network\_rules)
 
-Description: > Note the default value for this variable will block all public access to the storage account. If you want to disable all network rules, set this value to `null`.
+Description: Network rules restricting access to the storage account. Defaults to `{}`, which applies the object's own per-attribute defaults (effectively `default_action = "Deny"` with `bypass = ["AzureServices"]`).
 
-- `bypass` - (Optional) Specifies whether traffic is bypassed for Logging/Metrics/AzureServices. Valid options are any combination of `Logging`, `Metrics`, `AzureServices`, or `None`.
-- `default_action` - (Required) Specifies the default action of allow or deny when no other rules match. Valid options are `Deny` or `Allow`.
-- `ip_rules` - (Optional) List of public IP or IP ranges in CIDR Format. Only IPv4 addresses are allowed. Private IP address ranges (as defined in [RFC 1918](https://tools.ietf.org/html/rfc1918#section-3)) are not allowed.
-- `storage_account_id` - (Required) Specifies the ID of the storage account. Changing this forces a new resource to be created.
-- `virtual_network_subnet_ids` - (Optional) A list of virtual network subnet ids to secure the storage account.
+> Note: the default value blocks all public access to the storage account. If you want to disable all network rules, set this value to `null`.
 
----
-`private_link_access` block supports the following:
-- `endpoint_resource_id` - (Required) The resource id of the resource access rule to be granted access.
-- `endpoint_tenant_id` - (Optional) The tenant id of the resource of the resource access rule to be granted access. Defaults to the current tenant id.
-
----
-`timeouts` block supports the following:
-- `create` - (Defaults to 60 minutes) Used when creating the  Network Rules for this Storage Account.
-- `delete` - (Defaults to 60 minutes) Used when deleting the Network Rules for this Storage Account.
-- `read` - (Defaults to 5 minutes) Used when retrieving the Network Rules for this Storage Account.
-- `update` - (Defaults to 60 minutes) Used when updating the Network Rules for this Storage Account.
+- `bypass` - (Optional) Specifies whether traffic is bypassed for Logging/Metrics/AzureServices. Valid options are any combination of `Logging`, `Metrics`, `AzureServices`, or `None`. Defaults to `["AzureServices"]`.
+- `default_action` - (Optional) Specifies the default action of allow or deny when no other rules match. Valid options are `Deny` or `Allow`. Defaults to `Deny`.
+- `ip_rules` - (Optional) List of public IP or IP ranges in CIDR format. Only IPv4 addresses are allowed. Private IP address ranges (as defined in [RFC 1918](https://tools.ietf.org/html/rfc1918#section-3)) are not allowed. Defaults to `[]`.
+- `virtual_network_subnet_ids` - (Optional) A set of virtual network subnet IDs to secure the storage account. Defaults to `[]`.
+- `private_link_access` - (Optional) A list of private link access rules. Defaults to `null`. Each entry supports:
+  - `endpoint_resource_id` - (Required) The resource ID of the resource access rule to be granted access.
+  - `endpoint_tenant_id` - (Optional) The tenant ID of the resource of the resource access rule to be granted access. Defaults to the current tenant ID.
+- `timeouts` - (Optional) Per-operation timeouts for the network rules resource. Defaults to `null` (uses provider defaults). Supports:
+  - `create` - (Optional) Timeout for create operations.
+  - `delete` - (Optional) Timeout for delete operations.
+  - `read` - (Optional) Timeout for read operations.
+  - `update` - (Optional) Timeout for update operations.
 
 Type:
 
@@ -801,24 +745,34 @@ Default: `false`
 
 ### <a name="input_private_endpoints"></a> [private\_endpoints](#input\_private\_endpoints)
 
-Description: A map of private endpoints to create on the resource. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
+Description: A map of private endpoints to create on the resource. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time. Defaults to `{}` (no private endpoints).
 
+- `subnet_resource_id` - (Required) The resource ID of the subnet to deploy the private endpoint in.
+- `subresource_name` - (Required) The service name of the private endpoint. Possible values are `blob`, `dfs`, `file`, `queue`, `table`, and `web`.
 - `name` - (Optional) The name of the private endpoint. One will be generated if not set. The name must be set if multiple private endpoints are created to avoid conflicting resources.
-- `role_assignments` - (Optional) A map of role assignments to create on the private endpoint. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time. See `var.role_assignments` for more information.
-- `lock` - (Optional) The lock level to apply to the private endpoint. Default is `None`. Possible values are `None`, `CanNotDelete`, and `ReadOnly`.
-- `tags` - (Optional) A mapping of tags to assign to the private endpoint.
-- `subnet_resource_id` - The resource ID of the subnet to deploy the private endpoint in.
-- `subresource_name` - The service name of the private endpoint.  Possible value are `blob`, 'dfs', 'file', `queue`, `table`, and `web`.
-- `private_dns_zone_group_name` - (Optional) The name of the private DNS zone group. One will be generated if not set.
-- `private_dns_zone_resource_ids` - (Optional) A set of resource IDs of private DNS zones to associate with the private endpoint. If not set, no zone groups will be created and the private endpoint will not be associated with any private DNS zones. DNS records must be managed external to this module.
-- `application_security_group_resource_ids` - (Optional) A map of resource IDs of application security groups to associate with the private endpoint. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
-- `private_service_connection_name` - (Optional) The name of the private service connection. One will be generated if not set.
-- `network_interface_name` - (Optional) The name of the network interface. One will be generated if not set.
-- `location` - (Optional) The Azure location where the resources will be deployed. Defaults to the location of the resource group.
-- `resource_group_name` - (Optional) The resource group where the resources will be deployed. Defaults to the resource group of the resource.
-- `ip_configurations` - (Optional) A map of IP configurations to create on the private endpoint. If not specified the platform will create one. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
-  - `name` - The name of the IP configuration.
-  - `private_ip_address` - The private IP address of the IP configuration.
+- `role_assignments` - (Optional) A map of role assignments to create on the private endpoint. Defaults to `{}`. The map key is deliberately arbitrary to avoid issues where map keys may be unknown at plan time. Each value supports:
+  - `role_definition_id_or_name` - (Required) The ID or name of the role definition to assign to the principal.
+  - `principal_id` - (Required) The ID of the principal to assign the role to.
+  - `description` - (Optional) The description of the role assignment. Defaults to `null`.
+  - `skip_service_principal_aad_check` - (Optional) Retained for backwards compatibility with the legacy `azurerm` schema. Not honoured under AzAPI: the field is accepted but has no effect on the underlying role assignment. Defaults to `false`.
+  - `condition` - (Optional) The condition which will be used to scope the role assignment. Defaults to `null`.
+  - `condition_version` - (Optional) The version of the condition syntax. Valid value is `2.0`. Defaults to `null`.
+  - `delegated_managed_identity_resource_id` - (Optional) The resource ID of the delegated managed identity. Defaults to `null`.
+  - `principal_type` - (Optional) The type of principal. One of `User`, `Group`, `ServicePrincipal`, `ForeignGroup`, `Device`. Defaults to `null`.
+- `lock` - (Optional) The management lock to apply to the private endpoint. Defaults to `null` (no lock). Supports:
+  - `kind` - (Required) The kind of lock. Possible values are `CanNotDelete` and `ReadOnly`.
+  - `name` - (Optional) The name of the lock. Defaults to `null` (auto-generated).
+- `tags` - (Optional) A mapping of tags to assign to the private endpoint. Defaults to `null`.
+- `private_dns_zone_group_name` - (Optional) The name of the private DNS zone group. Defaults to `default`.
+- `private_dns_zone_resource_ids` - (Optional) A set of resource IDs of private DNS zones to associate with the private endpoint. Defaults to `[]`. If empty, no zone groups will be created and the private endpoint will not be associated with any private DNS zones; DNS records must be managed external to this module.
+- `application_security_group_associations` - (Optional) A map of resource IDs of application security groups to associate with the private endpoint. Defaults to `{}`. The map key is deliberately arbitrary to avoid issues where map keys may be unknown at plan time; the value is the application security group resource ID.
+- `private_service_connection_name` - (Optional) The name of the private service connection. One will be generated if not set. Defaults to `null`.
+- `network_interface_name` - (Optional) The name of the network interface. One will be generated if not set. Defaults to `null`.
+- `location` - (Optional) The Azure location where the resources will be deployed. Defaults to the location of the storage account.
+- `resource_group_name` - (Optional) The resource group where the resources will be deployed. Defaults to the resource group of the storage account.
+- `ip_configurations` - (Optional) A map of IP configurations to create on the private endpoint. Defaults to `{}` (the platform allocates IPs). The map key is deliberately arbitrary to avoid issues where map keys may be unknown at plan time. Each value supports:
+  - `name` - (Required) The name of the IP configuration.
+  - `private_ip_address` - (Required) The private IP address of the IP configuration.
 
 Type:
 
@@ -860,7 +814,7 @@ Default: `{}`
 
 ### <a name="input_private_endpoints_manage_dns_zone_group"></a> [private\_endpoints\_manage\_dns\_zone\_group](#input\_private\_endpoints\_manage\_dns\_zone\_group)
 
-Description: Whether to manage private DNS zone groups with this module. If set to false, you must manage private DNS zone groups externally, e.g. using Azure Policy.
+Description: Whether to manage private DNS zone groups with this module. Defaults to `true`. If set to `false`, you must manage private DNS zone groups externally, e.g. using Azure Policy.
 
 Type: `bool`
 
@@ -868,7 +822,7 @@ Default: `true`
 
 ### <a name="input_provisioned_billing_model_version"></a> [provisioned\_billing\_model\_version](#input\_provisioned\_billing\_model\_version)
 
-Description: (Optional) Specifies the version of the provisioned billing model (e.g. when account\_kind = "FileStorage" for Storage File). Possible value is V2. Changing this forces a new resource to be created.
+Description: [DEPRECATED] (Optional) Specifies the version of the provisioned billing model (e.g. when `account_kind = "FileStorage"` for Storage File). Possible value is `V2`. Defaults to `null`. Changing this forces a new resource to be created. This variable is only honoured when `account_sku_name` is set to `null`; otherwise `account_sku_name` wins. Prefer `account_sku_name` (use a `*V2_*` SKU such as `StandardV2_ZRS` or `PremiumV2_ZRS`).
 
 Type: `string`
 
@@ -884,116 +838,24 @@ Default: `false`
 
 ### <a name="input_queue_encryption_key_type"></a> [queue\_encryption\_key\_type](#input\_queue\_encryption\_key\_type)
 
-Description: (Optional) The encryption type of the queue service. Possible values are `Service` and `Account`. Changing this forces a new resource to be created. Default value is `Service`.
+Description: (Optional) The encryption type of the queue service. Possible values are `Service` and `Account`. Defaults to `null` (Azure platform default of `Service`). Changing this forces a new resource to be created.
 
 Type: `string`
 
 Default: `null`
 
-### <a name="input_queue_properties"></a> [queue\_properties](#input\_queue\_properties)
-
-Description:
----
-`cors_rule` block supports the following:
-- `allowed_headers` - (Required) A list of headers that are allowed to be a part of the cross-origin request.
-- `allowed_methods` - (Required) A list of HTTP methods that are allowed to be executed by the origin. Valid options are `DELETE`, `GET`, `HEAD`, `MERGE`, `POST`, `OPTIONS`, `PUT` or `PATCH`.
-- `allowed_origins` - (Required) A list of origin domains that will be allowed by CORS.
-- `exposed_headers` - (Required) A list of response headers that are exposed to CORS clients.
-- `max_age_in_seconds` - (Required) The number of seconds the client should cache a preflight response.
-
----
-`diagnostic_settings` block supports the following:
-- `name` - (Optional) The name of the diagnostic setting. Defaults to `null`.
-- `log_categories` - (Optional) A set of log categories to enable. Defaults to an empty set.
-- `log_groups` - (Optional) A set of log groups to enable. Defaults to `["allLogs"]`.
-- `metric_categories` - (Optional) A set of metric categories to enable. Defaults to `["AllMetrics"]`.
-- `log_analytics_destination_type` - (Optional) The destination type for log analytics. Defaults to `"Dedicated"`.
-- `workspace_resource_id` - (Optional) The resource ID of the Log Analytics workspace. Defaults to `null`.
-- `resource_id` - (Optional) The resource ID of the target resource for diagnostics. Defaults to `null`.
-- `event_hub_authorization_rule_resource_id` - (Optional) The resource ID of the Event Hub authorization rule. Defaults to `null`.
-- `event_hub_name` - (Optional) The name of the Event Hub. Defaults to `null`.
-- `marketplace_partner_resource_id` - (Optional) The resource ID of the marketplace partner. Defaults to `null`.
-
----
-`hour_metrics` block supports the following:
-- `enabled` - (Required) Indicates whether hour metrics are enabled for the Queue service.
-- `include_apis` - (Optional) Indicates whether metrics should generate summary statistics for called API operations.
-- `retention_policy_days` - (Optional) Specifies the number of days that logs will be retained.
-- `version` - (Required) The version of storage analytics to configure.
-
----
-`logging` block supports the following:
-- `delete` - (Required) Indicates whether all delete requests should be logged.
-- `read` - (Required) Indicates whether all read requests should be logged.
-- `retention_policy_days` - (Optional) Specifies the number of days that logs will be retained.
-- `version` - (Required) The version of storage analytics to configure.
-- `write` - (Required) Indicates whether all write requests should be logged.
-
----
-`minute_metrics` block supports the following:
-- `enabled` - (Required) Indicates whether minute metrics are enabled for the Queue service.
-- `include_apis` - (Optional) Indicates whether metrics should generate summary statistics for called API operations.
-- `retention_policy_days` - (Optional) Specifies the number of days that logs will be retained.
-- `version` - (Required) The version of storage analytics to configure.
-
-Type:
-
-```hcl
-map(object({
-    cors_rule = optional(map(object({
-      allowed_headers    = list(string)
-      allowed_methods    = list(string)
-      allowed_origins    = list(string)
-      exposed_headers    = list(string)
-      max_age_in_seconds = number
-    })), {})
-    # diagnostic_settings = optional(map(object({
-    #   name                                     = optional(string, null)
-    #   log_categories                           = optional(set(string), [])
-    #   log_groups                               = optional(set(string), ["allLogs"])
-    #   metric_categories                        = optional(set(string), ["AllMetrics"])
-    #   log_analytics_destination_type           = optional(string, "Dedicated")
-    #   workspace_resource_id                    = optional(string, null)
-    #   resource_id                              = optional(string, null)
-    #   event_hub_authorization_rule_resource_id = optional(string, null)
-    #   event_hub_name                           = optional(string, null)
-    #   marketplace_partner_resource_id          = optional(string, null)
-    # })), {})
-    hour_metrics = optional(object({
-      include_apis          = optional(bool)
-      retention_policy_days = optional(number)
-      version               = string
-    }))
-    logging = optional(object({
-      delete                = bool
-      read                  = bool
-      retention_policy_days = optional(number)
-      version               = string
-      write                 = bool
-    }))
-    minute_metrics = optional(object({
-      include_apis          = optional(bool)
-      retention_policy_days = optional(number)
-      version               = string
-    }))
-  }))
-```
-
-Default: `{}`
-
 ### <a name="input_queues"></a> [queues](#input\_queues)
 
-Description:  - `metadata` - (Optional) A mapping of MetaData which should be assigned to this Storage Queue.
- - `name` - (Required) The name of the Queue which should be created within the Storage Account. Must be unique within the storage account the queue is located. Changing this forces a new resource to be created.
+Description: A map of queues to create on the storage account. The map key is arbitrary; the value supports the following attributes. Defaults to `{}` (no queues).
 
-Supply role assignments in the same way as for `var.role_assignments`.
-
- ---
- `timeouts` block supports the following:
- - `create` - (Defaults to 30 minutes) Used when creating the Storage Queue.
- - `delete` - (Defaults to 30 minutes) Used when deleting the Storage Queue.
- - `read` - (Defaults to 5 minutes) Used when retrieving the Storage Queue.
- - `update` - (Defaults to 30 minutes) Used when updating the Storage Queue.
+- `name` - (Required) The name of the Queue which should be created within the Storage Account. Must be unique within the storage account. Changing this forces a new resource to be created.
+- `metadata` - (Optional) A mapping of MetaData which should be assigned to this Storage Queue. Defaults to `null`.
+- `role_assignments` - (Optional) A map of role assignments to create on the queue. Defaults to `{}`. See `var.role_assignments` for the attribute schema.
+- `timeouts` - (Optional) Per-operation timeouts for the queue resource. Defaults to `null` (uses provider defaults inherited from `var.timeouts`). Supports:
+  - `create` - (Optional) Timeout for create operations.
+  - `delete` - (Optional) Timeout for delete operations.
+  - `read` - (Optional) Timeout for read operations.
+  - `update` - (Optional) Timeout for update operations.
 
 Type:
 
@@ -1022,18 +884,88 @@ map(object({
 
 Default: `{}`
 
+### <a name="input_resource_types"></a> [resource\_types](#input\_resource\_types)
+
+Description: Override the AzAPI `<provider>/<resource>@<api-version>` strings used by this module. Each key defaults to a tested value; supply only the keys you want to override. Useful when targeting a sovereign cloud with older API versions, or when opting into a newer preview API.
+
+- `storage_account`            - The storage account itself, used by both the create call and the customer-managed-key patch.
+- `customer_managed_key_vault` - The Key Vault data source used to look up the vault URI when CMK is enabled.
+- `lock`                       - Management lock applied to the storage account (and to private endpoints when configured).
+- `blob_container`             - Blob containers (also used by Data Lake Gen2 filesystems, which are blob containers in ARM).
+- `blob_service`               - The `blobServices/default` sub-resource, patched by the static-website submodule.
+- `queue`                      - Storage queues.
+- `table`                      - Storage tables.
+- `share`                      - File shares.
+- `local_user`                 - SFTP local users.
+- `management_policy`          - The lifecycle-management policy.
+- `private_endpoint`           - Private endpoints created for the storage account.
+- `private_dns_zone_group`     - The private DNS zone group resource attached to a private endpoint.
+
+Type:
+
+```hcl
+object({
+    storage_account            = optional(string, "Microsoft.Storage/storageAccounts@2025-06-01")
+    customer_managed_key_vault = optional(string, "Microsoft.KeyVault/vaults@2024-11-01")
+    lock                       = optional(string, "Microsoft.Authorization/locks@2020-05-01")
+    blob_container             = optional(string, "Microsoft.Storage/storageAccounts/blobServices/containers@2025-06-01")
+    blob_service               = optional(string, "Microsoft.Storage/storageAccounts/blobServices@2025-06-01")
+    queue                      = optional(string, "Microsoft.Storage/storageAccounts/queueServices/queues@2025-06-01")
+    table                      = optional(string, "Microsoft.Storage/storageAccounts/tableServices/tables@2025-06-01")
+    share                      = optional(string, "Microsoft.Storage/storageAccounts/fileServices/shares@2025-06-01")
+    local_user                 = optional(string, "Microsoft.Storage/storageAccounts/localUsers@2025-06-01")
+    management_policy          = optional(string, "Microsoft.Storage/storageAccounts/managementPolicies@2025-06-01")
+    private_endpoint           = optional(string, "Microsoft.Network/privateEndpoints@2025-05-01")
+    private_dns_zone_group     = optional(string, "Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2025-05-01")
+  })
+```
+
+Default: `{}`
+
+### <a name="input_retry"></a> [retry](#input\_retry)
+
+Description: Retry configuration applied to every `azapi` resource managed by the module (root storage account and all submodules). Defaults to `null` (no custom retry).
+
+- `error_message_regex`  - (Optional) A list of regex patterns matching error messages that trigger a retry.
+- `interval_seconds`     - (Optional) Initial interval between retries in seconds.
+- `max_interval_seconds` - (Optional) Maximum interval between retries in seconds.
+
+See <https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource#retry> for full semantics.
+
+Type:
+
+```hcl
+object({
+    error_message_regex  = optional(list(string))
+    interval_seconds     = optional(number)
+    max_interval_seconds = optional(number)
+  })
+```
+
+Default: `null`
+
+### <a name="input_role_assignment_definition_lookup_enabled"></a> [role\_assignment\_definition\_lookup\_enabled](#input\_role\_assignment\_definition\_lookup\_enabled)
+
+Description: Whether the `Azure/avm-utl-interfaces/azure` module composed by the internal `role_assignments` submodule should resolve role definition names supplied via `role_definition_id_or_name` by querying the Azure Authorization API. Applies to every role assignment created by this module: the storage account scope (`var.role_assignments`), every container/queue/share/table scope and every private endpoint scope. Defaults to `true`.
+
+Set to `false` if you only ever supply fully-qualified role definition resource IDs (`/subscriptions/.../providers/Microsoft.Authorization/roleDefinitions/<guid>`) in `role_definition_id_or_name`. Disabling the lookup avoids the API call, which is useful in air-gapped or permission-restricted environments where the calling identity lacks `Microsoft.Authorization/roleDefinitions/read` at the parent scope.
+
+Type: `bool`
+
+Default: `true`
+
 ### <a name="input_role_assignments"></a> [role\_assignments](#input\_role\_assignments)
 
-Description: A map of role assignments to create on the resource. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
+Description: A map of role assignments to create on the resource. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time. Defaults to `{}`.
 
-- `role_definition_id_or_name` - The ID or name of the role definition to assign to the principal.
-- `principal_id` - The ID of the principal to assign the role to.
-- `description` - The description of the role assignment.
-- `skip_service_principal_aad_check` - If set to true, skips the Azure Active Directory check for the service principal in the tenant. Defaults to false.
-- `condition` - The condition which will be used to scope the role assignment.
-- `condition_version` - The version of the condition syntax. Valid values are '2.0'.
-
-> Note: only set `skip_service_principal_aad_check` to true if you are assigning a role to a service principal.
+- `role_definition_id_or_name` - (Required) The ID or name of the role definition to assign to the principal.
+- `principal_id` - (Required) The ID of the principal to assign the role to.
+- `description` - (Optional) The description of the role assignment. Defaults to `null`.
+- `skip_service_principal_aad_check` - (Optional) Retained for backwards compatibility with the legacy `azurerm` schema. Not honoured under AzAPI: the field is accepted but has no effect on the underlying role assignment. Defaults to `false`.
+- `condition` - (Optional) The condition which will be used to scope the role assignment. Defaults to `null`.
+- `condition_version` - (Optional) The version of the condition syntax. Valid value is `2.0`. Defaults to `null`.
+- `delegated_managed_identity_resource_id` - (Optional) The resource ID of the delegated managed identity. Defaults to `null`.
+- `principal_type` - (Optional) The type of principal. One of `User`, `Group`, `ServicePrincipal`, `ForeignGroup`, `Device`. Defaults to `null`.
 
 Type:
 
@@ -1054,7 +986,9 @@ Default: `{}`
 
 ### <a name="input_routing"></a> [routing](#input\_routing)
 
-Description: - `choice` - (Optional) Specifies the kind of network routing opted by the user. Possible values are `InternetRouting` and `MicrosoftRouting`. Defaults to `MicrosoftRouting`.
+Description: Configures the storage account routing preference. Defaults to `null` (Azure platform defaults).
+
+- `choice` - (Optional) Specifies the kind of network routing opted by the user. Possible values are `InternetRouting` and `MicrosoftRouting`. Defaults to `MicrosoftRouting`.
 - `publish_internet_endpoints` - (Optional) Should internet routing storage endpoints be published? Defaults to `false`.
 - `publish_microsoft_endpoints` - (Optional) Should Microsoft routing storage endpoints be published? Defaults to `false`.
 
@@ -1072,8 +1006,10 @@ Default: `null`
 
 ### <a name="input_sas_policy"></a> [sas\_policy](#input\_sas\_policy)
 
-Description: - `expiration_action` - (Optional) The SAS expiration action. The only possible value is `Log` at this moment. Defaults to `Log`.
-- `expiration_period` - (Required) The SAS expiration period in format of `DD.HH:MM:SS`.
+Description: Configures the SAS policy on the storage account. Defaults to `null` (no SAS policy).
+
+- `expiration_period` - (Required) The SAS expiration period in the format `DD.HH:MM:SS`.
+- `expiration_action` - (Optional) The SAS expiration action. The only possible value is `Log` at this moment. Defaults to `Log`.
 
 Type:
 
@@ -1094,83 +1030,9 @@ Type: `bool`
 
 Default: `false`
 
-### <a name="input_share_properties"></a> [share\_properties](#input\_share\_properties)
-
-Description:
----
-`cors_rule` block supports the following:
-- `allowed_headers` - (Required) A list of headers that are allowed to be a part of the cross-origin request.
-- `allowed_methods` - (Required) A list of HTTP methods that are allowed to be executed by the origin. Valid options are `DELETE`, `GET`, `HEAD`, `MERGE`, `POST`, `OPTIONS`, `PUT` or `PATCH`.
-- `allowed_origins` - (Required) A list of origin domains that will be allowed by CORS.
-- `exposed_headers` - (Required) A list of response headers that are exposed to CORS clients.
-- `max_age_in_seconds` - (Required) The number of seconds the client should cache a preflight response.
-
----
-`diagnostic_settings` block supports the following:
-- `name` - (Optional) The name of the diagnostic setting. Defaults to `null`.
-- `log_categories` - (Optional) A set of log categories to enable. Defaults to an empty set.
-- `log_groups` - (Optional) A set of log groups to enable. Defaults to `["allLogs"]`.
-- `metric_categories` - (Optional) A set of metric categories to enable. Defaults to `["AllMetrics"]`.
-- `log_analytics_destination_type` - (Optional) The destination type for log analytics. Defaults to `"Dedicated"`.
-- `workspace_resource_id` - (Optional) The resource ID of the Log Analytics workspace. Defaults to `null`.
-- `resource_id` - (Optional) The resource ID of the target resource for diagnostics. Defaults to `null`.
-- `event_hub_authorization_rule_resource_id` - (Optional) The resource ID of the Event Hub authorization rule. Defaults to `null`.
-- `event_hub_name` - (Optional) The name of the Event Hub. Defaults to `null`.
-- `marketplace_partner_resource_id` - (Optional) The resource ID of the marketplace partner. Defaults to `null`.
-
----
-`retention_policy` block supports the following:
-- `days` - (Optional) Specifies the number of days that the `azurerm_shares` should be retained, between `1` and `365` days. Defaults to `7`.
-
----
-`smb` block supports the following:
-- `authentication_types` - (Optional) A set of SMB authentication methods. Possible values are `NTLMv2`, and `Kerberos`.
-- `channel_encryption_type` - (Optional) A set of SMB channel encryption. Possible values are `AES-128-CCM`, `AES-128-GCM`, and `AES-256-GCM`.
-- `kerberos_ticket_encryption_type` - (Optional) A set of Kerberos ticket encryption. Possible values are `RC4-HMAC`, and `AES-256`.
-- `multichannel_enabled` - (Optional) Indicates whether multichannel is enabled. Defaults to `false`. This is only supported on Premium storage accounts.
-- `versions` - (Optional) A set of SMB protocol versions. Possible values are `SMB2.1`, `SMB3.0`, and `SMB3.1.1`.
-
-Type:
-
-```hcl
-object({
-    cors_rule = optional(list(object({
-      allowed_headers    = list(string)
-      allowed_methods    = list(string)
-      allowed_origins    = list(string)
-      exposed_headers    = list(string)
-      max_age_in_seconds = number
-    })))
-    diagnostic_settings = optional(map(object({
-      name                                     = optional(string, null)
-      log_categories                           = optional(set(string), [])
-      log_groups                               = optional(set(string), ["allLogs"])
-      metric_categories                        = optional(set(string), ["AllMetrics"])
-      log_analytics_destination_type           = optional(string, "Dedicated")
-      workspace_resource_id                    = optional(string, null)
-      resource_id                              = optional(string, null)
-      event_hub_authorization_rule_resource_id = optional(string, null)
-      event_hub_name                           = optional(string, null)
-      marketplace_partner_resource_id          = optional(string, null)
-    })), {})
-    retention_policy = optional(object({
-      days = optional(number)
-    }))
-    smb = optional(object({
-      authentication_types            = optional(set(string))
-      channel_encryption_type         = optional(set(string))
-      kerberos_ticket_encryption_type = optional(set(string))
-      multichannel_enabled            = optional(bool)
-      versions                        = optional(set(string))
-    }))
-  })
-```
-
-Default: `null`
-
 ### <a name="input_shared_access_key_enabled"></a> [shared\_access\_key\_enabled](#input\_shared\_access\_key\_enabled)
 
-Description: (Optional) Indicates whether the storage account permits requests to be authorized with the account access key via Shared Key. If false, then all requests, including shared access signatures, must be authorized with Azure Active Directory (Azure AD). The default value is `false`.
+Description: (Optional) Indicates whether the storage account permits requests to be authorized with the account access key via Shared Key. If `false`, then all requests, including shared access signatures, must be authorized with Azure Active Directory (Azure AD). Defaults to `false`.
 
 Type: `bool`
 
@@ -1178,30 +1040,26 @@ Default: `false`
 
 ### <a name="input_shares"></a> [shares](#input\_shares)
 
-Description:  - `access_tier` - (Optional) The access tier of the File Share. Possible values are `Hot`, `Cool` and `TransactionOptimized`, `Premium`.
- - `enabled_protocol` - (Optional) The protocol used for the share. Possible values are `SMB` and `NFS`. The `SMB` indicates the share can be accessed by SMBv3.0, SMBv2.1 and REST. The `NFS` indicates the share can be accessed by NFSv4.1. Defaults to `SMB`. Changing this forces a new resource to be created.
- - `metadata` - (Optional) A mapping of MetaData for this File Share.
- - `name` - (Required) The name of the share. Must be unique within the storage account where the share is located. Changing this forces a new resource to be created.
- - `quota` - (Required) The maximum size of the share, in gigabytes. For Standard storage accounts, this must be `1`GB (or higher) and at most `5120` GB (`5` TB). For Premium FileStorage storage accounts, this must be greater than 100 GB and at most `102400` GB (`100` TB).
+Description: A map of file shares to create on the storage account. The map key is arbitrary; the value supports the following attributes. Defaults to `{}` (no shares).
 
- ---
- `acl` block supports the following:
- - `id` - (Required) The ID which should be used for this Shared Identifier.
-
- ---
- `access_policy` block supports the following:
- - `expiry` - (Optional) The time at which this Access Policy should be valid until, in [ISO8601](https://en.wikipedia.org/wiki/ISO_8601) format.
- - `permissions` - (Required) The permissions which should be associated with this Shared Identifier. Possible value is combination of `r` (read), `w` (write), `d` (delete), and `l` (list).
- - `start` - (Optional) The time at which this Access Policy should be valid from, in [ISO8601](https://en.wikipedia.org/wiki/ISO_8601) format.
-
- ---
- `timeouts` block supports the following:
- - `create` - (Defaults to 30 minutes) Used when creating the Storage Share.
- - `delete` - (Defaults to 30 minutes) Used when deleting the Storage Share.
- - `read` - (Defaults to 5 minutes) Used when retrieving the Storage Share.
- - `update` - (Defaults to 30 minutes) Used when updating the Storage Share.
-
-Supply role assignments in the same way as for `var.role_assignments`.
+- `name` - (Required) The name of the share. Must be unique within the storage account. Changing this forces a new resource to be created.
+- `quota` - (Required) The maximum size of the share, in gigabytes. For Standard storage accounts, this must be `1` GB or higher and at most `5120` GB (5 TB). For Premium FileStorage accounts, this must be greater than 100 GB and at most `102400` GB (100 TB).
+- `access_tier` - (Optional) The access tier of the file share. Possible values are `Hot`, `Cool`, `TransactionOptimized`, `Premium`. Defaults to `null` (Azure platform default).
+- `enabled_protocol` - (Optional) The protocol used for the share. Possible values are `SMB` and `NFS`. `SMB` indicates the share can be accessed by SMBv3.0, SMBv2.1 and REST. `NFS` indicates the share can be accessed by NFSv4.1. Defaults to `null` (Azure platform default of `SMB`). Changing this forces a new resource to be created.
+- `metadata` - (Optional) A mapping of MetaData for this File Share. Defaults to `null`.
+- `root_squash` - (Optional) The root squash behaviour for an NFS share. Possible values are `NoRootSquash`, `RootSquash`, `AllSquash`. Defaults to `null`.
+- `signed_identifiers` - (Optional) A list of signed identifiers (stored access policies) to apply to the share. Defaults to `null`. Each entry supports:
+  - `id` - (Required) The ID for this signed identifier. Maximum 64 characters.
+  - `access_policy` - (Optional) The access policy for this identifier. Defaults to `null`. Supports:
+    - `expiry_time` - (Required) The [ISO8601](https://en.wikipedia.org/wiki/ISO_8601) UTC time at which this access policy should expire.
+    - `permission` - (Required) The permissions associated with this signed identifier. A combination of `r` (read), `w` (write), `d` (delete), and `l` (list).
+    - `start_time` - (Required) The [ISO8601](https://en.wikipedia.org/wiki/ISO_8601) UTC time at which this access policy becomes valid.
+- `role_assignments` - (Optional) A map of role assignments to create on the share. Defaults to `{}`. See `var.role_assignments` for the attribute schema.
+- `timeouts` - (Optional) Per-operation timeouts for the share resource. Defaults to `null` (uses provider defaults inherited from `var.timeouts`). Supports:
+  - `create` - (Optional) Timeout for create operations.
+  - `delete` - (Optional) Timeout for delete operations.
+  - `read` - (Optional) Timeout for read operations.
+  - `update` - (Optional) Timeout for update operations.
 
 Type:
 
@@ -1244,8 +1102,10 @@ Default: `{}`
 
 ### <a name="input_static_website"></a> [static\_website](#input\_static\_website)
 
-Description: - `error_404_document` - (Optional) The absolute path to a custom webpage that should be used when a request is made which does not correspond to an existing file.
-- `index_document` - (Optional) The webpage that Azure Storage serves for requests to the root of a website or any subfolder. For example, index.html. The value is case-sensitive.
+Description: A map of static website configurations to apply to the storage account. Defaults to `null` (static website disabled). The map key is arbitrary; only the first entry is used by the underlying API.
+
+- `error_404_document` - (Optional) The absolute path to a custom webpage that should be used when a request is made which does not correspond to an existing file. Defaults to `null`.
+- `index_document` - (Optional) The webpage that Azure Storage serves for requests to the root of a website or any subfolder. For example, `index.html`. The value is case-sensitive. Defaults to `null`.
 
 Type:
 
@@ -1258,139 +1118,28 @@ map(object({
 
 Default: `null`
 
-### <a name="input_storage_data_lake_gen2_filesystem"></a> [storage\_data\_lake\_gen2\_filesystem](#input\_storage\_data\_lake\_gen2\_filesystem)
-
-Description: DEPRECATED, please use `var.storage_data_lake_gen2_filesystems` instead.
-- `default_encryption_scope` - (Optional) The default encryption scope to use for this filesystem. Changing this forces a new resource to be created.
-- `group` - (Optional) Specifies the Object ID of the Azure Active Directory Group to make the owning group of the root path (i.e. `/`). Possible values also include `$superuser`.
-- `name` - (Required) The name of the Data Lake Gen2 File System which should be created within the Storage Account. Must be unique within the storage account the queue is located. Changing this forces a new resource to be created.
-- `owner` - (Optional) Specifies the Object ID of the Azure Active Directory User to make the owning user of the root path (i.e. `/`). Possible values also include `$superuser`.
-- `properties` - (Optional) A mapping of Key to Base64-Encoded Values which should be assigned to this Data Lake Gen2 File System.
----
-`ace` block supports the following:
-- `id` - (Optional) Specifies the Object ID of the Azure Active Directory User or Group that the entry relates to. Only valid for `user` or `group` entries.
-- `permissions` - (Required) Specifies the permissions for the entry in `rwx` form. For example, `rwx` gives full permissions but `r--` only gives read permissions.
-- `scope` - (Optional) Specifies whether the ACE represents an `access` entry or a `default` entry. Default value is `access`.
-- `type` - (Required) Specifies the type of entry. Can be `user`, `group`, `mask` or `other`.
-
----
-`timeouts` block supports the following:
-- `create` - (Defaults to 30 minutes) Used when creating the Data Lake Gen2 File System.
-- `delete` - (Defaults to 30 minutes) Used when deleting the Data Lake Gen2 File System.
-- `read` - (Defaults to 5 minutes) Used when retrieving the Data Lake Gen2 File System.
-- `update` - (Defaults to 30 minutes) Used when updating the Data Lake Gen2 File System.
-
-Type:
-
-```hcl
-object({
-    default_encryption_scope = optional(string)
-    group                    = optional(string)
-    name                     = string
-    owner                    = optional(string)
-    properties               = optional(map(string))
-    ace = optional(set(object({
-      id          = optional(string)
-      permissions = string
-      scope       = optional(string)
-      type        = string
-    })))
-    timeouts = optional(object({
-      create = optional(string)
-      delete = optional(string)
-      read   = optional(string)
-      update = optional(string)
-    }))
-  })
-```
-
-Default: `null`
-
 ### <a name="input_storage_data_lake_gen2_filesystems"></a> [storage\_data\_lake\_gen2\_filesystems](#input\_storage\_data\_lake\_gen2\_filesystems)
 
-Description: - `default_encryption_scope` - (Optional) The default encryption scope to use for this filesystem. Changing this forces a new resource to be created.
-- `group` - (Optional) Specifies the Object ID of the Azure Active Directory Group to make the owning group of the root path (i.e. `/`). Possible values also include `$superuser`.
-- `name` - (Required) The name of the Data Lake Gen2 File System which should be created within the Storage Account. Must be unique within the storage account the queue is located. Changing this forces a new resource to be created.
-- `owner` - (Optional) Specifies the Object ID of the Azure Active Directory User to make the owning user of the root path (i.e. `/`). Possible values also include `$superuser`.
-- `properties` - (Optional) A mapping of Key to Base64-Encoded Values which should be assigned to this Data Lake Gen2 File System.
----
-`ace` block supports the following:
-- `id` - (Optional) Specifies the Object ID of the Azure Active Directory User or Group that the entry relates to. Only valid for `user` or `group` entries.
-- `permissions` - (Required) Specifies the permissions for the entry in `rwx` form. For example, `rwx` gives full permissions but `r--` only gives read permissions.
-- `scope` - (Optional) Specifies whether the ACE represents an `access` entry or a `default` entry. Default value is `access`.
-- `type` - (Required) Specifies the type of entry. Can be `user`, `group`, `mask` or `other`.
+Description: A map of Data Lake Gen2 filesystems to create on the storage account. The map key is arbitrary; the value supports the following attributes. Defaults to `{}` (no filesystems).
 
----
-`timeouts` block supports the following:
-- `create` - (Defaults to 30 minutes) Used when creating the Data Lake Gen2 File System.
-- `delete` - (Defaults to 30 minutes) Used when deleting the Data Lake Gen2 File System.
-- `read` - (Defaults to 5 minutes) Used when retrieving the Data Lake Gen2 File System.
-- `update` - (Defaults to 30 minutes) Used when updating the Data Lake Gen2 File System.
+- `name` - (Required) The name of the Data Lake Gen2 File System which should be created within the Storage Account. Must be unique within the storage account. Changing this forces a new resource to be created.
+- `default_encryption_scope` - (Optional) The default encryption scope to use for this filesystem. Defaults to `null`. Changing this forces a new resource to be created.
+- `properties` - (Optional) A mapping of key/value pairs assigned to this filesystem (passed as ARM container metadata). Defaults to `null`.
+- `timeouts` - (Optional) Per-operation timeouts for the filesystem resource. Defaults to `null` (uses provider defaults inherited from `var.timeouts`). Supports:
+  - `create` - (Optional) Timeout for create operations.
+  - `delete` - (Optional) Timeout for delete operations.
+  - `read` - (Optional) Timeout for read operations.
+  - `update` - (Optional) Timeout for update operations.
+
+> **v1.0.0 BREAKING CHANGE**: The `owner`, `group` and `ace` (POSIX ACL) fields, plus the standalone `var.storage_data_lake_gen2_paths` variable, are no longer supported. Those features required Data Lake DFS data-plane API calls which the AzAPI provider does not exercise. Manage them externally if required (see `examples/data_lake_gen2/` for a recipe using `azurerm_storage_data_lake_gen2_path` alongside this module).
 
 Type:
 
 ```hcl
 map(object({
     default_encryption_scope = optional(string)
-    group                    = optional(string)
     name                     = string
-    owner                    = optional(string)
     properties               = optional(map(string))
-    ace = optional(set(object({
-      id          = optional(string)
-      permissions = string
-      scope       = optional(string)
-      type        = string
-    })))
-    timeouts = optional(object({
-      create = optional(string)
-      delete = optional(string)
-      read   = optional(string)
-      update = optional(string)
-    }))
-  }))
-```
-
-Default: `{}`
-
-### <a name="input_storage_data_lake_gen2_paths"></a> [storage\_data\_lake\_gen2\_paths](#input\_storage\_data\_lake\_gen2\_paths)
-
-Description: - `path` - (Required) The path which should be created within the Data Lake Gen2 File System in the Storage Account. Changing this forces a new resource to be created.
-- `filesystem_name` - (Required) The name of the Data Lake Gen2 File System which should be created within the Storage Account. Changing this forces a new resource to be created.
-- `storage_account_id` - (Required) The ID of the Storage Account where the Data Lake Gen2 File System exists. Changing this forces a new resource to be created.
-- `resource` - (Required) The type of resource. Possible values are `directory` or `file`. Changing this forces a new resource to be created.
-- `owner` - (Optional) Specifies the Object ID of the Azure Active Directory User to make the owning user. Possible values also include `$superuser`.
-- `group` - (Optional) Specifies the Object ID of the Azure Active Directory Group to make the owning group. Possible values also include `$superuser`.
-
----
-`ace` block supports the following:
-- `id` - (Optional) Specifies the Object ID of the Azure Active Directory User or Group that the entry relates to. Only valid for `user` or `group` entries.
-- `permissions` - (Required) Specifies the permissions for the entry in `rwx` form. For example, `rwx` gives full permissions but `r--` only gives read permissions.
-- `scope` - (Optional) Specifies whether the ACE represents an `access` entry or a `default` entry. Default value is `access`.
-- `type` - (Required) Specifies the type of entry. Can be `user`, `group`, `mask` or `other`.
-
----
-`timeouts` block supports the following:
-- `create` - (Defaults to 30 minutes) Used when creating the Data Lake Gen2 Path.
-- `delete` - (Defaults to 30 minutes) Used when deleting the Data Lake Gen2 Path.
-- `read` - (Defaults to 5 minutes) Used when retrieving the Data Lake Gen2 Path.
-- `update` - (Defaults to 30 minutes) Used when updating the Data Lake Gen2 Path.
-
-Type:
-
-```hcl
-map(object({
-    path            = string
-    filesystem_name = string
-    resource        = string
-    owner           = optional(string)
-    group           = optional(string)
-    ace = optional(set(object({
-      id          = optional(string)
-      permissions = string
-      scope       = optional(string)
-      type        = string
-    })))
     timeouts = optional(object({
       create = optional(string)
       delete = optional(string)
@@ -1404,55 +1153,56 @@ Default: `{}`
 
 ### <a name="input_storage_management_policy_rule"></a> [storage\_management\_policy\_rule](#input\_storage\_management\_policy\_rule)
 
-Description: - `enabled` - (Required) Boolean to specify whether the rule is enabled.
+Description: A map of management policy rules to apply to the storage account. The map key is arbitrary; the value supports the following attributes. Defaults to `{}` (no rules).
+
+- `enabled` - (Required) Boolean to specify whether the rule is enabled.
 - `name` - (Required) The name of the rule. Rule name is case-sensitive. It must be unique within a policy.
+- `actions` - (Required) An object describing the actions taken by the rule. Supports the following nested blocks (each `optional`, defaults to `null`):
 
----
-`actions` block supports the following:
+ ---
+ `base_blob` block supports the following:
+ - `auto_tier_to_hot_from_cool_enabled` - (Optional) Whether a blob should automatically be tiered from cool back to hot if it is accessed again after being tiered to cool. Defaults to `null` (Azure platform default of `false`).
+ - `delete_after_days_since_creation_greater_than` - (Optional) The age in days after creation to delete the blob. Must be between `0` and `99999`. Defaults to `null` (no policy applied).
+ - `delete_after_days_since_last_access_time_greater_than` - (Optional) The age in days after last access time to delete the blob. Must be between `0` and `99999`. Defaults to `null` (no policy applied).
+ - `delete_after_days_since_modification_greater_than` - (Optional) The age in days after last modification to delete the blob. Must be between `0` and `99999`. Defaults to `null` (no policy applied).
+ - `tier_to_archive_after_days_since_creation_greater_than` - (Optional) The age in days after creation to archive storage. Supports blob currently at Hot or Cool tier. Must be between `0` and `99999`. Defaults to `null` (no policy applied).
+ - `tier_to_archive_after_days_since_last_access_time_greater_than` - (Optional) The age in days after last access time to tier blobs to archive storage. Supports blob currently at Hot or Cool tier. Must be between `0` and `99999`. Defaults to `null` (no policy applied).
+ - `tier_to_archive_after_days_since_last_tier_change_greater_than` - (Optional) The age in days after last tier change to skip the blob being re-archived. Must be between `0` and `99999`. Defaults to `null` (no policy applied).
+ - `tier_to_archive_after_days_since_modification_greater_than` - (Optional) The age in days after last modification to tier blobs to archive storage. Supports blob currently at Hot or Cool tier. Must be between `0` and `99999`. Defaults to `null` (no policy applied).
+ - `tier_to_cold_after_days_since_creation_greater_than` - (Optional) The age in days after creation to tier blobs to cold storage. Supports blob currently at Hot tier. Must be between `0` and `99999`. Defaults to `null` (no policy applied).
+ - `tier_to_cold_after_days_since_last_access_time_greater_than` - (Optional) The age in days after last access time to tier blobs to cold storage. Supports blob currently at Hot tier. Must be between `0` and `99999`. Defaults to `null` (no policy applied).
+ - `tier_to_cold_after_days_since_modification_greater_than` - (Optional) The age in days after last modification to tier blobs to cold storage. Supports blob currently at Hot tier. Must be between `0` and `99999`. Defaults to `null` (no policy applied).
+ - `tier_to_cool_after_days_since_creation_greater_than` - (Optional) The age in days after creation to tier blobs to cool storage. Supports blob currently at Hot tier. Must be between `0` and `99999`. Defaults to `null` (no policy applied).
+ - `tier_to_cool_after_days_since_last_access_time_greater_than` - (Optional) The age in days after last access time to tier blobs to cool storage. Supports blob currently at Hot tier. Must be between `0` and `99999`. Defaults to `null` (no policy applied).
+ - `tier_to_cool_after_days_since_modification_greater_than` - (Optional) The age in days after last modification to tier blobs to cool storage. Supports blob currently at Hot tier. Must be between `0` and `99999`. Defaults to `null` (no policy applied).
 
----
-`base_blob` block supports the following:
-- `auto_tier_to_hot_from_cool_enabled` - (Optional) Whether a blob should automatically be tiered from cool back to hot if it's accessed again after being tiered to cool. Defaults to `false`.
-- `delete_after_days_since_creation_greater_than` - (Optional) The age in days after creation to delete the blob. Must be between `0` and `99999`. Defaults to `-1`.
-- `delete_after_days_since_last_access_time_greater_than` - (Optional) The age in days after last access time to delete the blob. Must be between `0` and `99999`. Defaults to `-1`.
-- `delete_after_days_since_modification_greater_than` - (Optional) The age in days after last modification to delete the blob. Must be between 0 and 99999. Defaults to `-1`.
-- `tier_to_archive_after_days_since_creation_greater_than` - (Optional) The age in days after creation to archive storage. Supports blob currently at Hot or Cool tier. Must be between `0` and`99999`. Defaults to `-1`.
-- `tier_to_archive_after_days_since_last_access_time_greater_than` - (Optional) The age in days after last access time to tier blobs to archive storage. Supports blob currently at Hot or Cool tier. Must be between `0` and`99999`. Defaults to `-1`.
-- `tier_to_archive_after_days_since_last_tier_change_greater_than` - (Optional) The age in days after last tier change to the blobs to skip to be archved. Must be between 0 and 99999. Defaults to `-1`.
-- `tier_to_archive_after_days_since_modification_greater_than` - (Optional) The age in days after last modification to tier blobs to archive storage. Supports blob currently at Hot or Cool tier. Must be between 0 and 99999. Defaults to `-1`.
-- `tier_to_cold_after_days_since_creation_greater_than` - (Optional) The age in days after creation to cold storage. Supports blob currently at Hot tier. Must be between `0` and `99999`. Defaults to `-1`.
-- `tier_to_cold_after_days_since_last_access_time_greater_than` - (Optional) The age in days after last access time to tier blobs to cold storage. Supports blob currently at Hot tier. Must be between `0` and `99999`. Defaults to `-1`.
-- `tier_to_cold_after_days_since_modification_greater_than` - (Optional) The age in days after last modification to tier blobs to cold storage. Supports blob currently at Hot tier. Must be between 0 and 99999. Defaults to `-1`.
-- `tier_to_cool_after_days_since_creation_greater_than` - (Optional) The age in days after creation to cool storage. Supports blob currently at Hot tier. Must be between `0` and `99999`. Defaults to `-1`.
-- `tier_to_cool_after_days_since_last_access_time_greater_than` - (Optional) The age in days after last access time to tier blobs to cool storage. Supports blob currently at Hot tier. Must be between `0` and `99999`. Defaults to `-1`.
-- `tier_to_cool_after_days_since_modification_greater_than` - (Optional) The age in days after last modification to tier blobs to cool storage. Supports blob currently at Hot tier. Must be between 0 and 99999. Defaults to `-1`.
+ ---
+ `snapshot` block supports the following:
+ - `change_tier_to_archive_after_days_since_creation` - (Optional) The age in days after creation to tier blob snapshot to archive storage. Must be between `0` and `99999`. Defaults to `null` (no policy applied).
+ - `change_tier_to_cool_after_days_since_creation` - (Optional) The age in days after creation to tier blob snapshot to cool storage. Must be between `0` and `99999`. Defaults to `null` (no policy applied).
+ - `delete_after_days_since_creation_greater_than` - (Optional) The age in days after creation to delete the blob snapshot. Must be between `0` and `99999`. Defaults to `null` (no policy applied).
+ - `tier_to_archive_after_days_since_last_tier_change_greater_than` - (Optional) The age in days after last tier change to skip the snapshot being re-archived. Must be between `0` and `99999`. Defaults to `null` (no policy applied).
+ - `tier_to_cold_after_days_since_creation_greater_than` - (Optional) The age in days after creation to tier blob snapshots to cold storage. Supports snapshots currently at Hot tier. Must be between `0` and `99999`. Defaults to `null` (no policy applied).
 
----
-`snapshot` block supports the following:
-- `change_tier_to_archive_after_days_since_creation` - (Optional) The age in days after creation to tier blob snapshot to archive storage. Must be between 0 and 99999. Defaults to `-1`.
-- `change_tier_to_cool_after_days_since_creation` - (Optional) The age in days after creation to tier blob snapshot to cool storage. Must be between 0 and 99999. Defaults to `-1`.
-- `delete_after_days_since_creation_greater_than` - (Optional) The age in days after creation to delete the blob snapshot. Must be between 0 and 99999. Defaults to `-1`.
-- `tier_to_archive_after_days_since_last_tier_change_greater_than` - (Optional) The age in days after last tier change to the blobs to skip to be archved. Must be between 0 and 99999. Defaults to `-1`.
-- `tier_to_cold_after_days_since_creation_greater_than` - (Optional) The age in days after creation to cold storage. Supports blob currently at Hot tier. Must be between `0` and `99999`. Defaults to `-1`.
+ ---
+ `version` block supports the following:
+ - `change_tier_to_archive_after_days_since_creation` - (Optional) The age in days after creation to tier blob version to archive storage. Must be between `0` and `99999`. Defaults to `null` (no policy applied).
+ - `change_tier_to_cool_after_days_since_creation` - (Optional) The age in days after creation to tier blob version to cool storage. Must be between `0` and `99999`. Defaults to `null` (no policy applied).
+ - `delete_after_days_since_creation` - (Optional) The age in days after creation to delete the blob version. Must be between `0` and `99999`. Defaults to `null` (no policy applied).
+ - `tier_to_archive_after_days_since_last_tier_change_greater_than` - (Optional) The age in days after last tier change to skip the blob version being re-archived. Must be between `0` and `99999`. Defaults to `null` (no policy applied).
+ - `tier_to_cold_after_days_since_creation_greater_than` - (Optional) The age in days after creation to tier blob versions to cold storage. Supports versions currently at Hot tier. Must be between `0` and `99999`. Defaults to `null` (no policy applied).
 
----
-`version` block supports the following:
-- `change_tier_to_archive_after_days_since_creation` - (Optional) The age in days after creation to tier blob version to archive storage. Must be between 0 and 99999. Defaults to `-1`.
-- `change_tier_to_cool_after_days_since_creation` - (Optional) The age in days creation create to tier blob version to cool storage. Must be between 0 and 99999. Defaults to `-1`.
-- `delete_after_days_since_creation` - (Optional) The age in days after creation to delete the blob version. Must be between 0 and 99999. Defaults to `-1`.
-- `tier_to_archive_after_days_since_last_tier_change_greater_than` - (Optional) The age in days after last tier change to the blobs to skip to be archved. Must be between 0 and 99999. Defaults to `-1`.
-- `tier_to_cold_after_days_since_creation_greater_than` - (Optional) The age in days after creation to cold storage. Supports blob currently at Hot tier. Must be between `0` and `99999`. Defaults to `-1`.
+ ---
+ `filters` block (Required) supports the following:
+ - `blob_types` - (Required) A set of predefined values. Valid options are `blockBlob` and `appendBlob`.
+ - `prefix_match` - (Optional) A set of strings for prefixes to be matched. Defaults to `null`.
+ - `match_blob_index_tag` - (Optional) A set of blob index tag filters. Defaults to `null`. Each entry supports the attributes documented in the `match_blob_index_tag` block below.
 
----
-`filters` block supports the following:
-- `blob_types` - (Required) An array of predefined values. Valid options are `blockBlob` and `appendBlob`.
-- `prefix_match` - (Optional) An array of strings for prefixes to be matched.
-
----
-`match_blob_index_tag` block supports the following:
-- `name` - (Required) The filter tag name used for tag based filtering for blob objects.
-- `operation` - (Optional) The comparison operator which is used for object comparison and filtering. Possible value is `==`. Defaults to `==`.
-- `value` - (Required) The filter tag value used for tag based filtering for blob objects.
+ ---
+ `match_blob_index_tag` block supports the following:
+ - `name` - (Required) The filter tag name used for tag based filtering for blob objects.
+ - `value` - (Required) The filter tag value used for tag based filtering for blob objects.
+ - `operation` - (Optional) The comparison operator which is used for object comparison and filtering. Possible value is `==`. Defaults to `null` (Azure platform default of `==`).
 
 Type:
 
@@ -1508,10 +1258,12 @@ Default: `{}`
 
 ### <a name="input_storage_management_policy_timeouts"></a> [storage\_management\_policy\_timeouts](#input\_storage\_management\_policy\_timeouts)
 
-Description: - `create` - (Defaults to 30 minutes) Used when creating the Storage Account Management Policy.
-- `delete` - (Defaults to 30 minutes) Used when deleting the Storage Account Management Policy.
-- `read` - (Defaults to 5 minutes) Used when retrieving the Storage Account Management Policy.
-- `update` - (Defaults to 30 minutes) Used when updating the Storage Account Management Policy.
+Description: Per-operation timeouts for the storage account management policy resource. Defaults to `null` (uses provider defaults).
+
+- `create` - (Optional) Timeout for create operations. Defaults to `null`.
+- `delete` - (Optional) Timeout for delete operations. Defaults to `null`.
+- `read` - (Optional) Timeout for read operations. Defaults to `null`.
+- `update` - (Optional) Timeout for update operations. Defaults to `null`.
 
 Type:
 
@@ -1528,7 +1280,7 @@ Default: `null`
 
 ### <a name="input_table_encryption_key_type"></a> [table\_encryption\_key\_type](#input\_table\_encryption\_key\_type)
 
-Description: (Optional) The encryption type of the table service. Possible values are `Service` and `Account`. Changing this forces a new resource to be created. Default value is `Service`.
+Description: (Optional) The encryption type of the table service. Possible values are `Service` and `Account`. Defaults to `null` (Azure platform default of `Service`). Changing this forces a new resource to be created.
 
 Type: `string`
 
@@ -1536,26 +1288,21 @@ Default: `null`
 
 ### <a name="input_tables"></a> [tables](#input\_tables)
 
-Description:  - `name` - (Required) The name of the storage table. Only Alphanumeric characters allowed, starting with a letter. Must be unique within the storage account the table is located. Changing this forces a new resource to be created.
+Description: A map of tables to create on the storage account. The map key is arbitrary; the value supports the following attributes. Defaults to `{}` (no tables).
 
- ---
- `acl` block supports the following:
- - `id` - (Required) The ID which should be used for this Shared Identifier.
-
- ---
- `access_policy` block supports the following:
- - `expiry` - (Required) The ISO8061 UTC time at which this Access Policy should be valid until.
- - `permissions` - (Required) The permissions which should associated with this Shared Identifier.
- - `start` - (Required) The ISO8061 UTC time at which this Access Policy should be valid from.
-
- ---
- `timeouts` block supports the following:
- - `create` - (Defaults to 30 minutes) Used when creating the Storage Table.
- - `delete` - (Defaults to 30 minutes) Used when deleting the Storage Table.
- - `read` - (Defaults to 5 minutes) Used when retrieving the Storage Table.
- - `update` - (Defaults to 30 minutes) Used when updating the Storage Table.
-
-Supply role assignments in the same way as for `var.role_assignments`.
+- `name` - (Required) The name of the storage table. Only alphanumeric characters allowed, starting with a letter. Must be unique within the storage account. Changing this forces a new resource to be created.
+- `signed_identifiers` - (Optional) A list of signed identifiers (stored access policies) to apply to the table. Defaults to `null`. Each entry supports:
+  - `id` - (Required) The ID for this signed identifier. Maximum 64 characters.
+  - `access_policy` - (Optional) The access policy for this identifier. Defaults to `null`. Supports:
+    - `expiry_time` - (Required) The ISO8601 UTC time at which this access policy should expire.
+    - `permission` - (Required) The permissions associated with this signed identifier. A combination of `r` (read), `a` (add), `u` (update), and `d` (delete).
+    - `start_time` - (Required) The ISO8601 UTC time at which this access policy becomes valid.
+- `role_assignments` - (Optional) A map of role assignments to create on the table. Defaults to `{}`. See `var.role_assignments` for the attribute schema.
+- `timeouts` - (Optional) Per-operation timeouts for the table resource. Defaults to `null` (uses provider defaults inherited from `var.timeouts`). Supports:
+  - `create` - (Optional) Timeout for create operations.
+  - `delete` - (Optional) Timeout for delete operations.
+  - `read` - (Optional) Timeout for read operations.
+  - `update` - (Optional) Timeout for update operations.
 
 Type:
 
@@ -1603,19 +1350,23 @@ Default: `null`
 
 ### <a name="input_timeouts"></a> [timeouts](#input\_timeouts)
 
-Description: - `create` - (Defaults to 60 minutes) Used when creating the Storage Account.
-- `delete` - (Defaults to 60 minutes) Used when deleting the Storage Account.
-- `read` - (Defaults to 5 minutes) Used when retrieving the Storage Account.
-- `update` - (Defaults to 60 minutes) Used when updating the Storage Account.
+Description: Default per-operation timeouts applied to every `azapi` resource managed by the module. Defaults to `null` (provider defaults). Each value is a Go duration string (e.g. `30m`, `1h`).
+
+- `create` - (Optional) Timeout for create operations. Defaults to `null`.
+- `read` - (Optional) Timeout for read operations. Defaults to `null`.
+- `update` - (Optional) Timeout for update operations. Defaults to `null`.
+- `delete` - (Optional) Timeout for delete operations. Defaults to `null`.
+
+The root storage account uses these values directly. Submodules (containers, queues, shares, tables, diagnostic settings, private endpoints, management policy, local users, role assignments, Data Lake Gen2 filesystems) use these as a default that can be overridden per-item via the item's own `timeouts` field.
 
 Type:
 
 ```hcl
 object({
     create = optional(string)
-    delete = optional(string)
     read   = optional(string)
     update = optional(string)
+    delete = optional(string)
   })
 ```
 
@@ -1639,28 +1390,38 @@ Description: Fqdns for storage services.
 
 ### <a name="output_local_users"></a> [local\_users](#output\_local\_users)
 
-Description: A map of Storage Account Local Users. The map key is the supplied input to var.local\_user. Contains sensitive information including passwords when ssh\_password\_enabled is true.
+Description: A map of Storage Account Local Users. The map key matches `var.local_user`.
 
 The map value contains the following attributes:
 - `id` - The ID of the Storage Account Local User.
 - `name` - The name of the Storage Account Local User.
 - `home_directory` - The home directory of the Storage Account Local User.
-- `password` - The password of the Storage Account Local User (sensitive).
 - `sid` - The unique Security Identifier (SID) of the Storage Account Local User.
 - `ssh_key_enabled` - Specifies whether SSH Key authentication is enabled.
 - `ssh_password_enabled` - Specifies whether SSH password authentication is enabled.
 
+NOTE: The local user `password` attribute is no longer exported. The Storage RP  
+only returns the password from the `regeneratePassword` ARM action (the
+`listKeys` action returns an empty body because the password is not persisted  
+server-side). Declare a managed `azapi_resource_action` resource with
+`action = "regeneratePassword"` and `response_export_values = ["sshPassword"]`  
+in the consuming root module; the default `apply_after_create` behavior calls  
+the action exactly once at create so the password is stable. Pipe the result  
+through `value_wo` on `azurerm_key_vault_secret` to keep it out of state.
+
 ### <a name="output_name"></a> [name](#output\_name)
 
-Description: The name of the storage account
-
-### <a name="output_primary_access_key"></a> [primary\_access\_key](#output\_primary\_access\_key)
-
-Description: The primary access key for the Storage Account.
+Description: The name of the storage account.
 
 ### <a name="output_private_endpoints"></a> [private\_endpoints](#output\_private\_endpoints)
 
-Description: A map of private endpoints. The map key is the supplied input to var.private\_endpoints. The map value is the entire azurerm\_private\_endpoint resource.
+Description: A map of private endpoints created by the module. The map key matches `var.private_endpoints`.
+
+Each value is an object with:
+- `id` - The resource ID of the private endpoint.
+- `name` - The name of the private endpoint.
+- `private_dns_zone_group_id` - The resource ID of the managed private DNS zone group, or `null` if not managed by this module.
+- `role_assignments` - Map of role assignments created at the private endpoint scope.
 
 ### <a name="output_queues"></a> [queues](#output\_queues)
 
@@ -1668,19 +1429,15 @@ Description: Map of storage queues that are created.
 
 ### <a name="output_resource"></a> [resource](#output\_resource)
 
-Description: This is the full resource output for the Storage Account resource.
+Description: The full Storage Account azapi\_resource.
 
 ### <a name="output_resource_id"></a> [resource\_id](#output\_resource\_id)
 
 Description: The ID of the Storage Account.
 
-### <a name="output_secondary_access_key"></a> [secondary\_access\_key](#output\_secondary\_access\_key)
-
-Description: The secondary access key for the Storage Account.
-
 ### <a name="output_shares"></a> [shares](#output\_shares)
 
-Description: Map of storage storage shares that are created.
+Description: Map of storage file shares that are created.
 
 ### <a name="output_tables"></a> [tables](#output\_tables)
 
@@ -1688,7 +1445,97 @@ Description: Map of storage tables that are created.
 
 ## Modules
 
-No modules.
+The following Modules are called:
+
+### <a name="module_containers"></a> [containers](#module\_containers)
+
+Source: ./modules/container
+
+Version:
+
+### <a name="module_data_lake_filesystems"></a> [data\_lake\_filesystems](#module\_data\_lake\_filesystems)
+
+Source: ./modules/data_lake_filesystem
+
+Version:
+
+### <a name="module_diagnostic_setting_blob"></a> [diagnostic\_setting\_blob](#module\_diagnostic\_setting\_blob)
+
+Source: ./modules/diagnostic_setting
+
+Version:
+
+### <a name="module_diagnostic_setting_file"></a> [diagnostic\_setting\_file](#module\_diagnostic\_setting\_file)
+
+Source: ./modules/diagnostic_setting
+
+Version:
+
+### <a name="module_diagnostic_setting_queue"></a> [diagnostic\_setting\_queue](#module\_diagnostic\_setting\_queue)
+
+Source: ./modules/diagnostic_setting
+
+Version:
+
+### <a name="module_diagnostic_setting_storage_account"></a> [diagnostic\_setting\_storage\_account](#module\_diagnostic\_setting\_storage\_account)
+
+Source: ./modules/diagnostic_setting
+
+Version:
+
+### <a name="module_diagnostic_setting_table"></a> [diagnostic\_setting\_table](#module\_diagnostic\_setting\_table)
+
+Source: ./modules/diagnostic_setting
+
+Version:
+
+### <a name="module_local_users"></a> [local\_users](#module\_local\_users)
+
+Source: ./modules/local_user
+
+Version:
+
+### <a name="module_management_policy"></a> [management\_policy](#module\_management\_policy)
+
+Source: ./modules/management_policy
+
+Version:
+
+### <a name="module_private_endpoints"></a> [private\_endpoints](#module\_private\_endpoints)
+
+Source: ./modules/private_endpoint
+
+Version:
+
+### <a name="module_queues"></a> [queues](#module\_queues)
+
+Source: ./modules/queue
+
+Version:
+
+### <a name="module_role_assignments"></a> [role\_assignments](#module\_role\_assignments)
+
+Source: ./modules/role_assignments
+
+Version:
+
+### <a name="module_shares"></a> [shares](#module\_shares)
+
+Source: ./modules/share
+
+Version:
+
+### <a name="module_static_website"></a> [static\_website](#module\_static\_website)
+
+Source: ./modules/static_website
+
+Version:
+
+### <a name="module_tables"></a> [tables](#module\_tables)
+
+Source: ./modules/table
+
+Version:
 
 <!-- markdownlint-disable-next-line MD041 -->
 ## Data Collection
