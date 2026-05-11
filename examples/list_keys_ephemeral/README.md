@@ -41,6 +41,10 @@ terraform {
       source  = "hashicorp/random"
       version = ">= 3.5.0, < 4.0.0"
     }
+    time = {
+      source  = "hashicorp/time"
+      version = ">= 0.9.0, < 1.0.0"
+    }
   }
 }
 
@@ -127,6 +131,16 @@ module "avm_res_keyvault_vault" {
   }
 }
 
+# Key Vault data-plane RBAC can take a few minutes to propagate after the role
+# assignment above is created. The keyvault module's own wait only gates its
+# internal secret operations, so we add an explicit delay before the external
+# `azurerm_key_vault_secret` resource below to avoid 403 ForbiddenByRbac errors.
+resource "time_sleep" "wait_for_keyvault_rbac" {
+  create_duration = "120s"
+
+  depends_on = [module.avm_res_keyvault_vault]
+}
+
 # Read the storage account access keys at apply time without ever writing
 # them to Terraform state.
 ephemeral "azapi_resource_action" "storage_keys" {
@@ -144,6 +158,8 @@ resource "azurerm_key_vault_secret" "primary_key" {
   name             = "${module.naming.storage_account.name_unique}-primary-key"
   value_wo         = ephemeral.azapi_resource_action.storage_keys.output.keys[0].value
   value_wo_version = "1"
+
+  depends_on = [time_sleep.wait_for_keyvault_rbac]
 }
 ```
 
@@ -160,6 +176,8 @@ The following requirements are needed by this module:
 
 - <a name="requirement_random"></a> [random](#requirement\_random) (>= 3.5.0, < 4.0.0)
 
+- <a name="requirement_time"></a> [time](#requirement\_time) (>= 0.9.0, < 1.0.0)
+
 ## Resources
 
 The following resources are used by this module:
@@ -168,6 +186,7 @@ The following resources are used by this module:
 - [azurerm_key_vault_secret.primary_key](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault_secret) (resource)
 - [random_integer.region_index](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/integer) (resource)
 - [random_string.this](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/string) (resource)
+- [time_sleep.wait_for_keyvault_rbac](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/sleep) (resource)
 - [azurerm_client_config.current](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/client_config) (data source)
 
 <!-- markdownlint-disable MD013 -->
