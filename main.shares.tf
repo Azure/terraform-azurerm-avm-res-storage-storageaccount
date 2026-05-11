@@ -15,8 +15,3 @@ module "shares" {
   timeouts            = each.value.timeouts != null ? each.value.timeouts : var.timeouts
   tracing_tags_header = var.enable_telemetry ? local.avm_azapi_header : null
 }
-
-moved {
-  from = azapi_resource.share
-  to   = module.shares.azapi_resource.this
-}

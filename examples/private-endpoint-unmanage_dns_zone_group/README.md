@@ -48,7 +48,7 @@ resource "azapi_resource" "resource_group" {
   location               = local.test_regions[random_integer.region_index.result]
   name                   = module.naming.resource_group.name_unique
   parent_id              = "/subscriptions/${data.azapi_client_config.current.subscription_id}"
-  type                   = "Microsoft.Resources/resourceGroups@2021-04-01"
+  type                   = "Microsoft.Resources/resourceGroups@2025-04-01"
   response_export_values = []
 }
 
@@ -56,7 +56,7 @@ resource "azapi_resource" "virtual_network" {
   location  = azapi_resource.resource_group.location
   name      = module.naming.virtual_network.name_unique
   parent_id = azapi_resource.resource_group.id
-  type      = "Microsoft.Network/virtualNetworks@2023-11-01"
+  type      = "Microsoft.Network/virtualNetworks@2025-05-01"
   body = {
     properties = {
       addressSpace = {
@@ -71,7 +71,7 @@ resource "azapi_resource" "network_security_group" {
   location  = azapi_resource.resource_group.location
   name      = module.naming.network_security_group.name_unique
   parent_id = azapi_resource.resource_group.id
-  type      = "Microsoft.Network/networkSecurityGroups@2023-11-01"
+  type      = "Microsoft.Network/networkSecurityGroups@2025-05-01"
   body = {
     properties = {}
   }
@@ -81,7 +81,7 @@ resource "azapi_resource" "network_security_group" {
 resource "azapi_resource" "subnet" {
   name      = module.naming.subnet.name_unique
   parent_id = azapi_resource.virtual_network.id
-  type      = "Microsoft.Network/virtualNetworks/subnets@2023-11-01"
+  type      = "Microsoft.Network/virtualNetworks/subnets@2025-05-01"
   body = {
     properties = {
       addressPrefix = "192.168.0.0/24"
@@ -99,7 +99,7 @@ resource "azapi_resource" "subnet" {
 resource "azapi_resource" "no_internet_rule" {
   name      = module.naming.network_security_rule.name_unique
   parent_id = azapi_resource.network_security_group.id
-  type      = "Microsoft.Network/networkSecurityGroups/securityRules@2023-11-01"
+  type      = "Microsoft.Network/networkSecurityGroups/securityRules@2025-05-01"
   body = {
     properties = {
       access                   = "Deny"
@@ -125,7 +125,7 @@ resource "azapi_resource" "private_dns_zone" {
   location  = "global"
   name      = "privatelink.${each.value}.core.windows.net"
   parent_id = azapi_resource.resource_group.id
-  type      = "Microsoft.Network/privateDnsZones@2020-06-01"
+  type      = "Microsoft.Network/privateDnsZones@2024-06-01"
   body = {
     properties = {}
   }
@@ -146,7 +146,7 @@ resource "azapi_resource" "private_dns_link" {
   location  = "global"
   name      = "${each.key}_${azapi_resource.virtual_network.name}-link"
   parent_id = each.value.id
-  type      = "Microsoft.Network/privateDnsZones/virtualNetworkLinks@2020-06-01"
+  type      = "Microsoft.Network/privateDnsZones/virtualNetworkLinks@2024-06-01"
   body = {
     properties = {
       registrationEnabled = false
@@ -162,7 +162,7 @@ resource "azapi_resource" "example_identity" {
   location               = azapi_resource.resource_group.location
   name                   = module.naming.user_assigned_identity.name_unique
   parent_id              = azapi_resource.resource_group.id
-  type                   = "Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31"
+  type                   = "Microsoft.ManagedIdentity/userAssignedIdentities@2024-11-30"
   body                   = {}
   response_export_values = []
 }

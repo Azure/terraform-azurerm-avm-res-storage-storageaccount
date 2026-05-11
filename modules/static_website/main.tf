@@ -3,7 +3,7 @@
 # object — only the staticWebsite property.
 resource "azapi_update_resource" "this" {
   resource_id = "${var.storage_account_id}/blobServices/default"
-  type        = "Microsoft.Storage/storageAccounts/blobServices@2024-01-01"
+  type        = "Microsoft.Storage/storageAccounts/blobServices@2025-06-01"
   body = {
     properties = {
       staticWebsite = {

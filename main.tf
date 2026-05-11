@@ -1,18 +1,8 @@
-# Customer-managed key vault data source. We need the vault URI for the
-# encryption block; the user supplies a vault resource ID.
-data "azapi_resource" "customer_managed_key_vault" {
-  count = local.customer_managed_key_enabled ? 1 : 0
-
-  resource_id            = var.customer_managed_key.key_vault_resource_id
-  type                   = "Microsoft.KeyVault/vaults@2023-07-01"
-  response_export_values = ["properties.vaultUri"]
-}
-
 resource "azapi_resource" "this" {
   location  = var.location
   name      = var.name
   parent_id = var.parent_id
-  type      = "Microsoft.Storage/storageAccounts@2024-01-01"
+  type      = "Microsoft.Storage/storageAccounts@2025-06-01"
   body = {
     kind             = var.account_kind
     extendedLocation = local.extended_location
@@ -96,7 +86,7 @@ resource "azapi_update_resource" "customer_managed_key" {
   count = local.customer_managed_key_enabled ? 1 : 0
 
   resource_id = azapi_resource.this.id
-  type        = "Microsoft.Storage/storageAccounts@2024-01-01"
+  type        = "Microsoft.Storage/storageAccounts@2025-06-01"
   body = {
     properties = {
       encryption = local.encryption_cmk
@@ -115,12 +105,4 @@ resource "azapi_update_resource" "customer_managed_key" {
       update = timeouts.value.update
     }
   }
-}
-
-# State migration: the storage account previously was azurerm_storage_account.this
-# but maps to the same ARM resource ID, so a moved block lets state transition
-# without recreation.
-moved {
-  from = azurerm_storage_account.this
-  to   = azapi_resource.this
 }

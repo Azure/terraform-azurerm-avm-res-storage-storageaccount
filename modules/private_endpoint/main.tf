@@ -2,7 +2,7 @@ resource "azapi_resource" "this" {
   location  = var.location
   name      = var.name
   parent_id = var.parent_id
-  type      = "Microsoft.Network/privateEndpoints@2024-05-01"
+  type      = "Microsoft.Network/privateEndpoints@2025-05-01"
   body = {
     properties = {
       subnet = {
@@ -48,7 +48,7 @@ resource "azapi_resource" "private_dns_zone_group" {
 
   name      = var.private_dns_zone_group_name
   parent_id = azapi_resource.this.id
-  type      = "Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2024-05-01"
+  type      = "Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2025-05-01"
   body = {
     properties = {
       privateDnsZoneConfigs = [

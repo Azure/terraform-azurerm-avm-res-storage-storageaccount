@@ -1,7 +1,7 @@
 resource "azapi_resource" "this" {
   name      = var.name
   parent_id = var.storage_account_id
-  type      = "Microsoft.Storage/storageAccounts/localUsers@2024-01-01"
+  type      = "Microsoft.Storage/storageAccounts/localUsers@2025-06-01"
   body = {
     properties = {
       homeDirectory     = var.home_directory

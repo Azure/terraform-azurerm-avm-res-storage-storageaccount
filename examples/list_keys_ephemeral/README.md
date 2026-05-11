@@ -86,7 +86,7 @@ resource "azapi_resource" "resource_group" {
   location               = local.test_regions[random_integer.region_index.result]
   name                   = module.naming.resource_group.name_unique
   parent_id              = "/subscriptions/${data.azurerm_client_config.current.subscription_id}"
-  type                   = "Microsoft.Resources/resourceGroups@2021-04-01"
+  type                   = "Microsoft.Resources/resourceGroups@2025-04-01"
   response_export_values = []
 }
 
@@ -136,7 +136,7 @@ module "avm_res_keyvault_vault" {
 ephemeral "azapi_resource_action" "storage_keys" {
   action                 = "listKeys"
   resource_id            = module.this.resource_id
-  type                   = "Microsoft.Storage/storageAccounts@2024-01-01"
+  type                   = "Microsoft.Storage/storageAccounts@2025-08-01"
   response_export_values = ["keys"]
 }
 

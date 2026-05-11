@@ -16,11 +16,3 @@ module "containers" {
   timeouts                          = each.value.timeouts != null ? each.value.timeouts : var.timeouts
   tracing_tags_header               = var.enable_telemetry ? local.avm_azapi_header : null
 }
-
-# State migration: the previously root-level azapi_resource.containers maps
-# 1-to-1 to the AzAPI container resource managed by the submodule, so a moved
-# block lets state transition without recreation.
-moved {
-  from = azapi_resource.containers
-  to   = module.containers.azapi_resource.this
-}
