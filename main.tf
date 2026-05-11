@@ -124,15 +124,3 @@ moved {
   from = azurerm_storage_account.this
   to   = azapi_resource.this
 }
-
-# v1.0.0 BREAKING CHANGE: Storage account access keys are no longer exposed by
-# this module. Consumers needing programmatic access can declare their own
-# ephemeral listKeys action against the storage account ID exported by this
-# module:
-#
-#   ephemeral "azapi_resource_action" "keys" {
-#     type        = "Microsoft.Storage/storageAccounts@2024-01-01"
-#     resource_id = module.storage_account.resource_id
-#     action      = "listKeys"
-#     response_export_values = ["keys"]
-#   }

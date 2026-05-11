@@ -1,10 +1,8 @@
-# v1.0.0 BREAKING CHANGE: `primary_access_key` / `secondary_access_key`
-# outputs are removed because the access keys are now retrieved via the
-# ephemeral `azapi_resource_action.storage_account_keys` resource inside the
-# module and Terraform does not permit ephemeral outputs at the root module
-# level. Consumers needing programmatic access to the keys should instantiate
-# their own `ephemeral "azapi_resource_action"` block targeting the storage
-# account `id` exported from this module (`module.<name>.resource_id`).
+# `primary_access_key` / `secondary_access_key` are intentionally not exported.
+# Terraform does not allow ephemeral outputs at the root module level, so
+# consumers needing programmatic access to the keys should declare their own
+# `ephemeral "azapi_resource_action"` block targeting `module.<name>.resource_id`.
+# See the `examples/list_keys_ephemeral` example for the recommended pattern.
 
 output "containers" {
   description = "Map of storage containers that are created."
