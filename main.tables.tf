@@ -15,10 +15,3 @@ moved {
   from = azapi_resource.table
   to   = module.tables.azapi_resource.this
 }
-
-# Per-table role assignments are now created inside the table submodule.
-# Migrate state from the historical root-level module to the nested module.
-moved {
-  from = module.table_role_assignments
-  to   = module.tables.module.role_assignments
-}

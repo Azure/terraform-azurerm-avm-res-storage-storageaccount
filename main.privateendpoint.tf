@@ -22,11 +22,3 @@ module "private_endpoints" {
   timeouts                                = var.timeouts
   tracing_tags_header                     = var.enable_telemetry ? local.avm_azapi_header : null
 }
-
-# Per-private-endpoint role assignments are now created inside the
-# private_endpoint submodule. Migrate state from the historical root-level
-# module to the nested module.
-moved {
-  from = module.private_endpoint_role_assignments
-  to   = module.private_endpoints.module.role_assignments
-}

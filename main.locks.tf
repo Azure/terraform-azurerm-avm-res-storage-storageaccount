@@ -31,6 +31,6 @@ resource "azapi_resource" "lock" {
 }
 
 moved {
-  from = azurerm_management_lock.this_storage_account
-  to   = azapi_resource.lock
+  from = azurerm_management_lock.this_storage_account[0]
+  to   = azapi_resource.lock[0]
 }

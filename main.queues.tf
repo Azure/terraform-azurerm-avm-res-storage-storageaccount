@@ -15,10 +15,3 @@ moved {
   from = azapi_resource.queue
   to   = module.queues.azapi_resource.this
 }
-
-# Per-queue role assignments are now created inside the queue submodule.
-# Migrate state from the historical root-level module to the nested module.
-moved {
-  from = module.queue_role_assignments
-  to   = module.queues.module.role_assignments
-}

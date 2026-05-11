@@ -20,10 +20,3 @@ moved {
   from = azapi_resource.share
   to   = module.shares.azapi_resource.this
 }
-
-# Per-share role assignments are now created inside the share submodule.
-# Migrate state from the historical root-level module to the nested module.
-moved {
-  from = module.share_role_assignments
-  to   = module.shares.module.role_assignments
-}

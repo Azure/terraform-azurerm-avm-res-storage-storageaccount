@@ -17,18 +17,10 @@ module "containers" {
   tracing_tags_header               = var.enable_telemetry ? local.avm_azapi_header : null
 }
 
-# State migration: each azurerm_storage_container.this[<key>] (if any historical
-# state exists) maps 1-to-1 to the AzAPI container resource managed by the
-# submodule. The moved blocks below allow consumers to migrate without
-# resource recreation.
+# State migration: the previously root-level azapi_resource.containers maps
+# 1-to-1 to the AzAPI container resource managed by the submodule, so a moved
+# block lets state transition without recreation.
 moved {
   from = azapi_resource.containers
   to   = module.containers.azapi_resource.this
-}
-
-# Per-container role assignments are now created inside the container submodule.
-# Migrate state from the historical root-level module to the nested module.
-moved {
-  from = module.container_role_assignments
-  to   = module.containers.module.role_assignments
 }
