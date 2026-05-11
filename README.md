@@ -99,6 +99,14 @@ Type: `string`
 
 Default: `"ZRS"`
 
+### <a name="input_account_sku_name"></a> [account\_sku\_name](#input\_account\_sku\_name)
+
+Description: (Optional) Explicit storage account SKU name (e.g. `Standard_LRS`, `Premium_ZRS`, `PremiumV2_LRS`, `StandardV2_GZRS`). When set, this value is sent to Azure verbatim and overrides the SKU derived from `account_tier`, `account_replication_type` and `provisioned_billing_model_version`. Use this for SKU combinations the derived form cannot express.
+
+Type: `string`
+
+Default: `null`
+
 ### <a name="input_account_tier"></a> [account\_tier](#input\_account\_tier)
 
 Description: (Optional) Defines the Tier to use for this storage account. Valid options are `Standard` and `Premium`. For `BlockBlobStorage` and `FileStorage` accounts only `Premium` is valid. Changing this forces a new resource to be created. Defaults to `Standard`.

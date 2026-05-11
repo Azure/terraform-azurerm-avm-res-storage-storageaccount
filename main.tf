@@ -107,7 +107,8 @@ locals {
   }
   # SKU name combines tier + replication, with optional V2 suffix when the
   # provisioned billing model V2 is requested (StandardV2_*, PremiumV2_*).
-  sku_name = var.provisioned_billing_model_version == "V2" ? "${var.account_tier}V2_${var.account_replication_type}" : "${var.account_tier}_${var.account_replication_type}"
+  # When `var.account_sku_name` is supplied it wins over the derived value.
+  sku_name = coalesce(var.account_sku_name, var.provisioned_billing_model_version == "V2" ? "${var.account_tier}V2_${var.account_replication_type}" : "${var.account_tier}_${var.account_replication_type}")
 }
 
 # Customer-managed key vault data source. We need the vault URI for the

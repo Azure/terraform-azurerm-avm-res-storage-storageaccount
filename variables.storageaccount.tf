@@ -34,6 +34,17 @@ variable "account_replication_type" {
   }
 }
 
+variable "account_sku_name" {
+  type        = string
+  default     = null
+  description = "(Optional) Explicit storage account SKU name (e.g. `Standard_LRS`, `Premium_ZRS`, `PremiumV2_LRS`, `StandardV2_GZRS`). When set, this value is sent to Azure verbatim and overrides the SKU derived from `account_tier`, `account_replication_type` and `provisioned_billing_model_version`. Use this for SKU combinations the derived form cannot express."
+
+  validation {
+    condition     = var.account_sku_name == null || can(regex("^(Standard|Premium)(V2)?_(LRS|GRS|RAGRS|ZRS|GZRS|RAGZRS)$", coalesce(var.account_sku_name, "Standard_LRS")))
+    error_message = "Invalid value for `account_sku_name`. Must be in the form `<tier>[V2]_<replication>`, for example `Standard_LRS`, `Premium_ZRS`, `PremiumV2_LRS`, `StandardV2_GZRS`."
+  }
+}
+
 variable "account_tier" {
   type        = string
   default     = "Standard"
