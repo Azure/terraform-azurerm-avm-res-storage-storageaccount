@@ -25,11 +25,14 @@ terraform {
 locals {
   test_regions = ["eastus", "eastus2", "westus2", "westus3"]
 }
+
 resource "random_integer" "region_index" {
   max = length(local.test_regions) - 1
   min = 0
 }
+
 provider "azapi" {}
+
 provider "azurerm" {
   features {
     resource_group {
@@ -45,6 +48,7 @@ resource "random_string" "this" {
   special = false
   upper   = false
 }
+
 # This ensures we have unique CAF compliant names for our resources.
 module "naming" {
   source  = "Azure/naming/azurerm"
@@ -54,7 +58,6 @@ module "naming" {
 # We need this to get the object_id of the current user (used by avm-res-keyvault-vault module which is azurerm-based)
 data "azurerm_client_config" "current" {}
 
-# This is required for resource modules
 resource "azapi_resource" "resource_group" {
   location  = local.test_regions[random_integer.region_index.result]
   name      = module.naming.resource_group.name_unique
@@ -130,7 +133,6 @@ resource "azapi_resource" "example_identity" {
   response_export_values = ["properties"]
 }
 
-
 #create a keyvault for storing the credential with RBAC for the deployment user
 module "avm_res_keyvault_vault" {
   source  = "Azure/avm-res-keyvault-vault/azurerm"
@@ -175,7 +177,6 @@ module "this" {
     blob_container1 = {
       name = "blob-container-${random_string.this.result}-1"
     }
-
   }
   infrastructure_encryption_enabled = true
   is_hns_enabled                    = true
@@ -198,7 +199,6 @@ module "this" {
           permissions   = "rwdl"
         }
       }
-
     }
   }
   local_user_enabled = true
@@ -229,7 +229,6 @@ module "this" {
       principal_id                     = data.azurerm_client_config.current.object_id
       skip_service_principal_aad_check = false
     },
-
   }
   sftp_enabled              = true
   shared_access_key_enabled = true

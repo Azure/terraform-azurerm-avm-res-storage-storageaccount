@@ -29,11 +29,14 @@ terraform {
 locals {
   test_regions = ["eastus", "eastus2", "westus2", "westus3"]
 }
+
 resource "random_integer" "region_index" {
   max = length(local.test_regions) - 1
   min = 0
 }
+
 provider "azapi" {}
+
 provider "azurerm" {
   features {
     resource_group {
@@ -49,6 +52,7 @@ resource "random_string" "this" {
   special = false
   upper   = false
 }
+
 # This ensures we have unique CAF compliant names for our resources.
 module "naming" {
   source  = "Azure/naming/azurerm"
@@ -58,7 +62,6 @@ module "naming" {
 # We need this to get the object_id of the current user (used by avm-res-keyvault-vault module which is azurerm-based)
 data "azurerm_client_config" "current" {}
 
-# This is required for resource modules
 resource "azapi_resource" "resource_group" {
   location  = local.test_regions[random_integer.region_index.result]
   name      = module.naming.resource_group.name_unique
@@ -133,6 +136,7 @@ resource "azapi_resource" "example_identity" {
   body                   = {}
   response_export_values = ["properties"]
 }
+
 #Create a Customer Managed Key for a Storage Account.
 resource "azurerm_key_vault_key" "example" {
   key_opts = [
@@ -195,13 +199,11 @@ module "this" {
     blob_container1 = {
       name = "blob-container-${random_string.this.result}-1"
     }
-
   }
   customer_managed_key = {
     key_vault_resource_id  = module.avm_res_keyvault_vault.resource.id
     key_name               = azurerm_key_vault_key.example.name
     user_assigned_identity = { resource_id = azapi_resource.example_identity.id }
-
   }
   infrastructure_encryption_enabled = true
   managed_identities = {
@@ -231,7 +233,6 @@ module "this" {
       principal_id                     = data.azurerm_client_config.current.object_id
       skip_service_principal_aad_check = false
     },
-
   }
   shared_access_key_enabled = true
   shares = {
@@ -258,7 +259,6 @@ module "this" {
     dept  = "IT"
   }
 }
-
 
 # Retrieve storage account keys using ephemeral azapi_resource_action
 # This fetches keys dynamically without storing them in state

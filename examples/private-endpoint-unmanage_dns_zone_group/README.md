@@ -19,24 +19,26 @@ terraform {
     }
   }
 }
+
 provider "azapi" {}
 
 locals {
   test_regions = ["eastus", "eastus2", "westus2", "westus3"]
 }
-# We need this to get the object_id of the current user
+
 data "azapi_client_config" "current" {}
-# This allows us to randomize the region for the resource group.
+
 resource "random_integer" "region_index" {
   max = length(local.test_regions) - 1
   min = 0
 }
-# This allow use to randomize the name of resources
+
 resource "random_string" "this" {
   length  = 6
   special = false
   upper   = false
 }
+
 # This ensures we have unique CAF compliant names for our resources.
 module "naming" {
   source  = "Azure/naming/azurerm"
@@ -158,7 +160,6 @@ resource "azapi_resource" "example_identity" {
   body      = {}
 }
 
-#create azure storage account
 module "this" {
   source = "../.."
 
@@ -172,7 +173,6 @@ module "this" {
     blob_container1 = {
       name = "blob-container-${random_string.this.result}-1"
     }
-
   }
   managed_identities = {
     system_assigned            = true
@@ -207,8 +207,6 @@ module "this" {
         }
       }
     }
-
-
   }
   #Whether to manage private DNS zone groups with this module. If set to false, you must manage private DNS zone groups externally, e.g. using Azure Policy.
   private_endpoints_manage_dns_zone_group = false
@@ -232,7 +230,6 @@ module "this" {
       principal_id                     = data.azapi_client_config.current.object_id
       skip_service_principal_aad_check = false
     },
-
   }
   shares = {
     share0 = {

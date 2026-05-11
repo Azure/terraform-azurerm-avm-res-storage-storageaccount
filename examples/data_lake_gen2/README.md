@@ -29,6 +29,7 @@ terraform {
 }
 
 provider "azapi" {}
+
 provider "azurerm" {
   features {
     resource_group {
@@ -38,20 +39,22 @@ provider "azurerm" {
   resource_provider_registrations = "none"
   storage_use_azuread             = true
 }
+
 locals {
   test_regions = ["eastus", "eastus2", "westus2", "westus3"]
 }
+
 resource "random_integer" "region_index" {
   max = length(local.test_regions) - 1
   min = 0
 }
 
-# This allow use to randomize the name of resources
 resource "random_string" "this" {
   length  = 6
   special = false
   upper   = false
 }
+
 # This ensures we have unique CAF compliant names for resources.
 module "naming" {
   source  = "Azure/naming/azurerm"
@@ -61,7 +64,6 @@ module "naming" {
 # We need this to get the object_id and tenant_id of the current user (used for RBAC and DLG2 ACLs which use the azurerm provider data-plane).
 data "azurerm_client_config" "current" {}
 
-# This is required for resource modules
 resource "azapi_resource" "resource_group" {
   location  = local.test_regions[random_integer.region_index.result]
   name      = module.naming.resource_group.name_unique
@@ -119,7 +121,6 @@ module "this" {
     }
     data_lake_2 = {
       name = "datalake2"
-
     }
   }
   tags = {
