@@ -1,7 +1,3 @@
-locals {
-  tracing_headers = var.tracing_tags_header == null ? null : { "User-Agent" = var.tracing_tags_header }
-}
-
 resource "azapi_resource" "this" {
   name      = var.name
   parent_id = "${var.storage_account_id}/queueServices/default"

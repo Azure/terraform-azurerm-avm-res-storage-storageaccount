@@ -1,7 +1,3 @@
-locals {
-  tracing_headers = var.tracing_tags_header == null ? null : { "User-Agent" = var.tracing_tags_header }
-}
-
 # A Data Lake Gen2 filesystem on an HNS-enabled storage account is represented
 # in ARM as a blob container. We manage the control-plane-only properties here
 # (name, default encryption scope, metadata).
