@@ -41,10 +41,6 @@ terraform {
       source  = "hashicorp/random"
       version = ">= 3.5.0, < 4.0.0"
     }
-    time = {
-      source  = "hashicorp/time"
-      version = ">= 0.9.0, < 1.0.0"
-    }
   }
 }
 
@@ -163,8 +159,6 @@ The following requirements are needed by this module:
 - <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (>= 4.37.0, < 5.0.0)
 
 - <a name="requirement_random"></a> [random](#requirement\_random) (>= 3.5.0, < 4.0.0)
-
-- <a name="requirement_time"></a> [time](#requirement\_time) (>= 0.9.0, < 1.0.0)
 
 ## Resources
 
