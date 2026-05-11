@@ -123,6 +123,11 @@ resource "azapi_resource" "private_dns_zone" {
   body = {
     properties = {}
   }
+  retry = {
+    error_message_regex  = ["CannotDeleteResource"]
+    interval_seconds     = 15
+    max_interval_seconds = 60
+  }
   tags = {
     env = "Dev"
   }
