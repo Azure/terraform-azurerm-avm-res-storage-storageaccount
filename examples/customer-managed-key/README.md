@@ -266,7 +266,7 @@ module "this" {
 ephemeral "azapi_resource_action" "storage_keys" {
   action                 = "listKeys"
   resource_id            = module.this.resource_id
-  type                   = "Microsoft.Storage/storageAccounts@2025-08-01"
+  type                   = "Microsoft.Storage/storageAccounts@2025-06-01"
   response_export_values = ["keys"]
 }
 

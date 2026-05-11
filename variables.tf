@@ -145,7 +145,7 @@ A map of private endpoints to create on the resource. The map key is deliberatel
   - `role_definition_id_or_name` - (Required) The ID or name of the role definition to assign to the principal.
   - `principal_id` - (Required) The ID of the principal to assign the role to.
   - `description` - (Optional) The description of the role assignment. Defaults to `null`.
-  - `skip_service_principal_aad_check` - (Optional) If `true`, skips the Azure Active Directory check for the service principal in the tenant. Defaults to `false`.
+  - `skip_service_principal_aad_check` - (Optional) Retained for backwards compatibility with the legacy `azurerm` schema. Not honoured under AzAPI: the field is accepted but has no effect on the underlying role assignment. Defaults to `false`.
   - `condition` - (Optional) The condition which will be used to scope the role assignment. Defaults to `null`.
   - `condition_version` - (Optional) The version of the condition syntax. Valid value is `2.0`. Defaults to `null`.
   - `delegated_managed_identity_resource_id` - (Optional) The resource ID of the delegated managed identity. Defaults to `null`.
@@ -211,13 +211,11 @@ A map of role assignments to create on the resource. The map key is deliberately
 - `role_definition_id_or_name` - (Required) The ID or name of the role definition to assign to the principal.
 - `principal_id` - (Required) The ID of the principal to assign the role to.
 - `description` - (Optional) The description of the role assignment. Defaults to `null`.
-- `skip_service_principal_aad_check` - (Optional) If `true`, skips the Azure Active Directory check for the service principal in the tenant. Defaults to `false`.
+- `skip_service_principal_aad_check` - (Optional) Retained for backwards compatibility with the legacy `azurerm` schema. Not honoured under AzAPI: the field is accepted but has no effect on the underlying role assignment. Defaults to `false`.
 - `condition` - (Optional) The condition which will be used to scope the role assignment. Defaults to `null`.
 - `condition_version` - (Optional) The version of the condition syntax. Valid value is `2.0`. Defaults to `null`.
 - `delegated_managed_identity_resource_id` - (Optional) The resource ID of the delegated managed identity. Defaults to `null`.
 - `principal_type` - (Optional) The type of principal. One of `User`, `Group`, `ServicePrincipal`, `ForeignGroup`, `Device`. Defaults to `null`.
-
-> Note: only set `skip_service_principal_aad_check` to `true` if you are assigning a role to a service principal.
 DESCRIPTION
   nullable    = false
 }

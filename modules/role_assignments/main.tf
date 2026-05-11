@@ -1,20 +1,19 @@
-resource "azapi_resource" "this" {
-  for_each = var.role_assignments
+module "interfaces" {
+  source  = "Azure/avm-utl-interfaces/azure"
+  version = "0.6.0"
 
-  name      = uuidv5("oid", "${var.scope}|${each.value.principal_id}|${local.resolved_role_definition_ids[each.key]}")
-  parent_id = var.scope
-  type      = "Microsoft.Authorization/roleAssignments@2022-04-01"
-  body = {
-    properties = {
-      principalId                        = each.value.principal_id
-      principalType                      = each.value.principal_type
-      roleDefinitionId                   = local.resolved_role_definition_ids[each.key]
-      condition                          = each.value.condition
-      conditionVersion                   = each.value.condition_version
-      delegatedManagedIdentityResourceId = each.value.delegated_managed_identity_resource_id
-      description                        = each.value.description
-    }
-  }
+  enable_telemetry                 = false
+  role_assignment_definition_scope = var.scope
+  role_assignments                 = var.role_assignments
+}
+
+resource "azapi_resource" "this" {
+  for_each = module.interfaces.role_assignments_azapi
+
+  name                   = each.value.name
+  parent_id              = var.scope
+  type                   = each.value.type
+  body                   = each.value.body
   create_headers         = local.tracing_headers
   delete_headers         = local.tracing_headers
   read_headers           = local.tracing_headers

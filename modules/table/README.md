@@ -88,9 +88,9 @@ Description: (Optional) Signed identifiers / stored access policies for the tabl
 
 - `id` - (Required) The ID for this signed identifier (1-64 characters).
 - `access_policy` - (Optional) The access policy for this signed identifier. Defaults to `null`. Supports:
-  - `expiry_time` - (Required) The ISO-8061 UTC time at which the access policy expires.
+  - `expiry_time` - (Required) The ISO-8601 UTC time at which the access policy expires.
   - `permission` - (Required) The permissions granted by the access policy. Possible values include any combination of `r` (read), `a` (add), `u` (update), and `d` (delete).
-  - `start_time` - (Required) The ISO-8061 UTC time at which the access policy becomes valid.
+  - `start_time` - (Required) The ISO-8601 UTC time at which the access policy becomes valid.
 
 Type:
 

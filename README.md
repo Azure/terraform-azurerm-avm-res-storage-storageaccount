@@ -19,7 +19,7 @@ This Terraform module is designed to create Azure Storage Accounts and its relat
 * The storage account name must be globally unique.
 * The module creates resources in the same region as the storage account.
 
-> **IMPORTANT** We recommend using Azure AD authentication over Shared Key for provisioning Storage Containers, Blobs, and other items. To achieve this, add the `storage_use_azuread` flag in the Provider block. However, it’s important to note that not all Azure Storage services support Active Directory authentication.(https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs#storage_use_azuread) In the absence of the `storage_use_azuread` flag, you will need to enable Shared Key Access by setting the `shared_access_key_enabled` flag `True`.
+> **IMPORTANT** This module manages the Storage Account itself, plus its child containers, queues, tables, file shares, private endpoints and role assignments, through the AzAPI provider, which always authenticates with Microsoft Entra ID and never requires a Storage shared key. We recommend leaving `shared_access_key_enabled = false` (the module default) so that any data-plane access from your own code is also Entra-ID-authenticated. If you also use the [`azurerm` provider](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs#storage_use_azuread) to manage Storage data-plane resources (for example `azurerm_storage_blob`), set `storage_use_azuread = true` in that provider block. Note that not every Storage service supports Microsoft Entra ID authentication; for those services you will need to enable shared-key access by setting `shared_access_key_enabled = true` on this module.
 
 <!-- markdownlint-disable MD033 -->
 ## Requirements
@@ -754,7 +754,7 @@ Description: A map of private endpoints to create on the resource. The map key i
   - `role_definition_id_or_name` - (Required) The ID or name of the role definition to assign to the principal.
   - `principal_id` - (Required) The ID of the principal to assign the role to.
   - `description` - (Optional) The description of the role assignment. Defaults to `null`.
-  - `skip_service_principal_aad_check` - (Optional) If `true`, skips the Azure Active Directory check for the service principal in the tenant. Defaults to `false`.
+  - `skip_service_principal_aad_check` - (Optional) Retained for backwards compatibility with the legacy `azurerm` schema. Not honoured under AzAPI: the field is accepted but has no effect on the underlying role assignment. Defaults to `false`.
   - `condition` - (Optional) The condition which will be used to scope the role assignment. Defaults to `null`.
   - `condition_version` - (Optional) The version of the condition syntax. Valid value is `2.0`. Defaults to `null`.
   - `delegated_managed_identity_resource_id` - (Optional) The resource ID of the delegated managed identity. Defaults to `null`.
@@ -913,13 +913,11 @@ Description: A map of role assignments to create on the resource. The map key is
 - `role_definition_id_or_name` - (Required) The ID or name of the role definition to assign to the principal.
 - `principal_id` - (Required) The ID of the principal to assign the role to.
 - `description` - (Optional) The description of the role assignment. Defaults to `null`.
-- `skip_service_principal_aad_check` - (Optional) If `true`, skips the Azure Active Directory check for the service principal in the tenant. Defaults to `false`.
+- `skip_service_principal_aad_check` - (Optional) Retained for backwards compatibility with the legacy `azurerm` schema. Not honoured under AzAPI: the field is accepted but has no effect on the underlying role assignment. Defaults to `false`.
 - `condition` - (Optional) The condition which will be used to scope the role assignment. Defaults to `null`.
 - `condition_version` - (Optional) The version of the condition syntax. Valid value is `2.0`. Defaults to `null`.
 - `delegated_managed_identity_resource_id` - (Optional) The resource ID of the delegated managed identity. Defaults to `null`.
 - `principal_type` - (Optional) The type of principal. One of `User`, `Group`, `ServicePrincipal`, `ForeignGroup`, `Device`. Defaults to `null`.
-
-> Note: only set `skip_service_principal_aad_check` to `true` if you are assigning a role to a service principal.
 
 Type:
 
@@ -1115,36 +1113,36 @@ Description: A map of management policy rules to apply to the storage account. T
 
  ---
  `base_blob` block supports the following:
- - `auto_tier_to_hot_from_cool_enabled` - (Optional) Whether a blob should automatically be tiered from cool back to hot if it's accessed again after being tiered to cool. Defaults to `false`.
- - `delete_after_days_since_creation_greater_than` - (Optional) The age in days after creation to delete the blob. Must be between `0` and `99999`. Defaults to `-1`.
- - `delete_after_days_since_last_access_time_greater_than` - (Optional) The age in days after last access time to delete the blob. Must be between `0` and `99999`. Defaults to `-1`.
- - `delete_after_days_since_modification_greater_than` - (Optional) The age in days after last modification to delete the blob. Must be between 0 and 99999. Defaults to `-1`.
- - `tier_to_archive_after_days_since_creation_greater_than` - (Optional) The age in days after creation to archive storage. Supports blob currently at Hot or Cool tier. Must be between `0` and`99999`. Defaults to `-1`.
- - `tier_to_archive_after_days_since_last_access_time_greater_than` - (Optional) The age in days after last access time to tier blobs to archive storage. Supports blob currently at Hot or Cool tier. Must be between `0` and`99999`. Defaults to `-1`.
- - `tier_to_archive_after_days_since_last_tier_change_greater_than` - (Optional) The age in days after last tier change to the blobs to skip to be archved. Must be between 0 and 99999. Defaults to `-1`.
- - `tier_to_archive_after_days_since_modification_greater_than` - (Optional) The age in days after last modification to tier blobs to archive storage. Supports blob currently at Hot or Cool tier. Must be between 0 and 99999. Defaults to `-1`.
- - `tier_to_cold_after_days_since_creation_greater_than` - (Optional) The age in days after creation to cold storage. Supports blob currently at Hot tier. Must be between `0` and `99999`. Defaults to `-1`.
- - `tier_to_cold_after_days_since_last_access_time_greater_than` - (Optional) The age in days after last access time to tier blobs to cold storage. Supports blob currently at Hot tier. Must be between `0` and `99999`. Defaults to `-1`.
- - `tier_to_cold_after_days_since_modification_greater_than` - (Optional) The age in days after last modification to tier blobs to cold storage. Supports blob currently at Hot tier. Must be between 0 and 99999. Defaults to `-1`.
- - `tier_to_cool_after_days_since_creation_greater_than` - (Optional) The age in days after creation to cool storage. Supports blob currently at Hot tier. Must be between `0` and `99999`. Defaults to `-1`.
- - `tier_to_cool_after_days_since_last_access_time_greater_than` - (Optional) The age in days after last access time to tier blobs to cool storage. Supports blob currently at Hot tier. Must be between `0` and `99999`. Defaults to `-1`.
- - `tier_to_cool_after_days_since_modification_greater_than` - (Optional) The age in days after last modification to tier blobs to cool storage. Supports blob currently at Hot tier. Must be between 0 and 99999. Defaults to `-1`.
+ - `auto_tier_to_hot_from_cool_enabled` - (Optional) Whether a blob should automatically be tiered from cool back to hot if it is accessed again after being tiered to cool. Defaults to `null` (Azure platform default of `false`).
+ - `delete_after_days_since_creation_greater_than` - (Optional) The age in days after creation to delete the blob. Must be between `0` and `99999`. Defaults to `null` (no policy applied).
+ - `delete_after_days_since_last_access_time_greater_than` - (Optional) The age in days after last access time to delete the blob. Must be between `0` and `99999`. Defaults to `null` (no policy applied).
+ - `delete_after_days_since_modification_greater_than` - (Optional) The age in days after last modification to delete the blob. Must be between `0` and `99999`. Defaults to `null` (no policy applied).
+ - `tier_to_archive_after_days_since_creation_greater_than` - (Optional) The age in days after creation to archive storage. Supports blob currently at Hot or Cool tier. Must be between `0` and `99999`. Defaults to `null` (no policy applied).
+ - `tier_to_archive_after_days_since_last_access_time_greater_than` - (Optional) The age in days after last access time to tier blobs to archive storage. Supports blob currently at Hot or Cool tier. Must be between `0` and `99999`. Defaults to `null` (no policy applied).
+ - `tier_to_archive_after_days_since_last_tier_change_greater_than` - (Optional) The age in days after last tier change to skip the blob being re-archived. Must be between `0` and `99999`. Defaults to `null` (no policy applied).
+ - `tier_to_archive_after_days_since_modification_greater_than` - (Optional) The age in days after last modification to tier blobs to archive storage. Supports blob currently at Hot or Cool tier. Must be between `0` and `99999`. Defaults to `null` (no policy applied).
+ - `tier_to_cold_after_days_since_creation_greater_than` - (Optional) The age in days after creation to tier blobs to cold storage. Supports blob currently at Hot tier. Must be between `0` and `99999`. Defaults to `null` (no policy applied).
+ - `tier_to_cold_after_days_since_last_access_time_greater_than` - (Optional) The age in days after last access time to tier blobs to cold storage. Supports blob currently at Hot tier. Must be between `0` and `99999`. Defaults to `null` (no policy applied).
+ - `tier_to_cold_after_days_since_modification_greater_than` - (Optional) The age in days after last modification to tier blobs to cold storage. Supports blob currently at Hot tier. Must be between `0` and `99999`. Defaults to `null` (no policy applied).
+ - `tier_to_cool_after_days_since_creation_greater_than` - (Optional) The age in days after creation to tier blobs to cool storage. Supports blob currently at Hot tier. Must be between `0` and `99999`. Defaults to `null` (no policy applied).
+ - `tier_to_cool_after_days_since_last_access_time_greater_than` - (Optional) The age in days after last access time to tier blobs to cool storage. Supports blob currently at Hot tier. Must be between `0` and `99999`. Defaults to `null` (no policy applied).
+ - `tier_to_cool_after_days_since_modification_greater_than` - (Optional) The age in days after last modification to tier blobs to cool storage. Supports blob currently at Hot tier. Must be between `0` and `99999`. Defaults to `null` (no policy applied).
 
  ---
  `snapshot` block supports the following:
- - `change_tier_to_archive_after_days_since_creation` - (Optional) The age in days after creation to tier blob snapshot to archive storage. Must be between 0 and 99999. Defaults to `-1`.
- - `change_tier_to_cool_after_days_since_creation` - (Optional) The age in days after creation to tier blob snapshot to cool storage. Must be between 0 and 99999. Defaults to `-1`.
- - `delete_after_days_since_creation_greater_than` - (Optional) The age in days after creation to delete the blob snapshot. Must be between 0 and 99999. Defaults to `-1`.
- - `tier_to_archive_after_days_since_last_tier_change_greater_than` - (Optional) The age in days after last tier change to the blobs to skip to be archved. Must be between 0 and 99999. Defaults to `-1`.
- - `tier_to_cold_after_days_since_creation_greater_than` - (Optional) The age in days after creation to cold storage. Supports blob currently at Hot tier. Must be between `0` and `99999`. Defaults to `-1`.
+ - `change_tier_to_archive_after_days_since_creation` - (Optional) The age in days after creation to tier blob snapshot to archive storage. Must be between `0` and `99999`. Defaults to `null` (no policy applied).
+ - `change_tier_to_cool_after_days_since_creation` - (Optional) The age in days after creation to tier blob snapshot to cool storage. Must be between `0` and `99999`. Defaults to `null` (no policy applied).
+ - `delete_after_days_since_creation_greater_than` - (Optional) The age in days after creation to delete the blob snapshot. Must be between `0` and `99999`. Defaults to `null` (no policy applied).
+ - `tier_to_archive_after_days_since_last_tier_change_greater_than` - (Optional) The age in days after last tier change to skip the snapshot being re-archived. Must be between `0` and `99999`. Defaults to `null` (no policy applied).
+ - `tier_to_cold_after_days_since_creation_greater_than` - (Optional) The age in days after creation to tier blob snapshots to cold storage. Supports snapshots currently at Hot tier. Must be between `0` and `99999`. Defaults to `null` (no policy applied).
 
  ---
  `version` block supports the following:
- - `change_tier_to_archive_after_days_since_creation` - (Optional) The age in days after creation to tier blob version to archive storage. Must be between 0 and 99999. Defaults to `-1`.
- - `change_tier_to_cool_after_days_since_creation` - (Optional) The age in days creation create to tier blob version to cool storage. Must be between 0 and 99999. Defaults to `-1`.
- - `delete_after_days_since_creation` - (Optional) The age in days after creation to delete the blob version. Must be between 0 and 99999. Defaults to `-1`.
- - `tier_to_archive_after_days_since_last_tier_change_greater_than` - (Optional) The age in days after last tier change to the blobs to skip to be archved. Must be between 0 and 99999. Defaults to `-1`.
- - `tier_to_cold_after_days_since_creation_greater_than` - (Optional) The age in days after creation to cold storage. Supports blob currently at Hot tier. Must be between `0` and `99999`. Defaults to `-1`.
+ - `change_tier_to_archive_after_days_since_creation` - (Optional) The age in days after creation to tier blob version to archive storage. Must be between `0` and `99999`. Defaults to `null` (no policy applied).
+ - `change_tier_to_cool_after_days_since_creation` - (Optional) The age in days after creation to tier blob version to cool storage. Must be between `0` and `99999`. Defaults to `null` (no policy applied).
+ - `delete_after_days_since_creation` - (Optional) The age in days after creation to delete the blob version. Must be between `0` and `99999`. Defaults to `null` (no policy applied).
+ - `tier_to_archive_after_days_since_last_tier_change_greater_than` - (Optional) The age in days after last tier change to skip the blob version being re-archived. Must be between `0` and `99999`. Defaults to `null` (no policy applied).
+ - `tier_to_cold_after_days_since_creation_greater_than` - (Optional) The age in days after creation to tier blob versions to cold storage. Supports versions currently at Hot tier. Must be between `0` and `99999`. Defaults to `null` (no policy applied).
 
  ---
  `filters` block (Required) supports the following:

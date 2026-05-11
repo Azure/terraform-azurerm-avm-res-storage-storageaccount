@@ -19,8 +19,6 @@ The following requirements are needed by this module:
 The following resources are used by this module:
 
 - [azapi_resource.this](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
-- [azapi_client_config.current](https://registry.terraform.io/providers/Azure/azapi/latest/docs/data-sources/client_config) (data source)
-- [azapi_resource_list.role_definition_lookup](https://registry.terraform.io/providers/Azure/azapi/latest/docs/data-sources/resource_list) (data source)
 
 <!-- markdownlint-disable MD013 -->
 ## Required Inputs
@@ -131,7 +129,13 @@ Description: Map of role assignment resources keyed by the input map key.
 
 ## Modules
 
-No modules.
+The following Modules are called:
+
+### <a name="module_interfaces"></a> [interfaces](#module\_interfaces)
+
+Source: Azure/avm-utl-interfaces/azure
+
+Version: 0.6.0
 
 <!-- END\_TF\_DOCS -->
 <!-- END_TF_DOCS -->
