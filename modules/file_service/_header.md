@@ -1,5 +1,39 @@
 <!-- BEGIN_TF_DOCS -->
-# Internal submodule: file_service
+# File Service Submodule
 
-This is an internal submodule used by `terraform-azurerm-avm-res-storage-storageaccount`. Consumers MUST NOT call this submodule directly. Refer to the root module for supported inputs.
+This submodule configures file service properties for an Azure Storage Account using `azapi_update_resource` to PATCH `fileServices/default`.
 
+**ARM Resource Type**: `Microsoft.Storage/storageAccounts/fileServices@2025-06-01`
+
+## Features
+
+- SMB protocol settings (authentication methods, channel encryption, Kerberos ticket encryption, multichannel, versions)
+- Share delete (soft-delete) retention policy
+- CORS rules (up to 5 rules)
+
+## Usage
+
+This submodule is called by the root module when `file_service_properties` is set. It is not intended to be invoked directly.
+
+```hcl
+module "storage_account" {
+  source  = "Azure/avm-res-storage-storageaccount/azurerm"
+  version = "<version>"
+
+  # ... other configuration ...
+
+  file_service_properties = {
+    share_retention_policy = {
+      enabled = true
+      days    = 14
+    }
+    smb = {
+      versions                        = ["SMB3.0", "SMB3.1.1"]
+      authentication_types            = ["Kerberos"]
+      channel_encryption_types        = ["AES-256-GCM"]
+      kerberos_ticket_encryption_type = ["AES-256"]
+      multichannel_enabled            = true
+    }
+  }
+}
+```
