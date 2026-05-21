@@ -6,6 +6,16 @@ variable "storage_account_id" {
 
 variable "blob_properties" {
   type = object({
+    automatic_snapshot_policy_enabled = optional(bool)
+    change_feed = optional(object({
+      enabled           = optional(bool)
+      retention_in_days = optional(number)
+    }))
+    container_delete_retention_policy = optional(object({
+      allow_permanent_delete = optional(bool)
+      days                   = optional(number)
+      enabled                = optional(bool)
+    }))
     cors_rules = optional(list(object({
       allowed_headers    = list(string)
       allowed_methods    = list(string)
@@ -13,19 +23,23 @@ variable "blob_properties" {
       exposed_headers    = list(string)
       max_age_in_seconds = number
     })))
+    default_service_version = optional(string)
     delete_retention_policy = optional(object({
-      days                     = optional(number, 7)
-      permanent_delete_enabled = optional(bool, false)
+      allow_permanent_delete = optional(bool)
+      days                   = optional(number)
+      enabled                = optional(bool)
     }))
-    container_delete_retention_policy = optional(object({
-      days = optional(number, 7)
+    last_access_time_tracking_policy = optional(object({
+      blob_type                    = optional(list(string))
+      enable                       = bool
+      name                         = optional(string)
+      tracking_granularity_in_days = optional(number)
     }))
-    change_feed_enabled               = optional(bool)
-    change_feed_retention_in_days     = optional(number)
-    default_service_version           = optional(string)
-    last_access_time_tracking_enabled = optional(bool)
-    restore_policy_days               = optional(number)
-    versioning_enabled                = optional(bool)
+    restore_policy = optional(object({
+      days    = optional(number)
+      enabled = bool
+    }))
+    versioning_enabled = optional(bool)
   })
   description = "(Required) Blob service-level settings to apply. This variable is required because the module is only instantiated when `var.blob_properties` is non-null."
   nullable    = false

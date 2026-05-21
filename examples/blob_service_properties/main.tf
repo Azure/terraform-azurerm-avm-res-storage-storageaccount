@@ -53,13 +53,22 @@ module "this" {
   parent_id = azapi_resource.resource_group.id
 
   blob_properties = {
-    versioning_enabled  = true
-    change_feed_enabled = true
+    versioning_enabled = true
+    change_feed = {
+      enabled           = true
+      retention_in_days = 14
+    }
     delete_retention_policy = {
-      days = 14
+      enabled = true
+      days    = 14
     }
     container_delete_retention_policy = {
-      days = 14
+      enabled = true
+      days    = 14
+    }
+    restore_policy = {
+      enabled = true
+      days    = 7
     }
   }
 }
