@@ -165,6 +165,82 @@ object({
 
 Default: `null`
 
+### <a name="input_blob_properties"></a> [blob\_properties](#input\_blob\_properties)
+
+Description: Blob service-level settings for the storage account. Defaults to `null` (Azure platform defaults).
+
+- `automatic_snapshot_policy_enabled` - (Optional) Deprecated; use `versioning_enabled` instead. Defaults to `null`.
+- `change_feed` - (Optional) Blob change feed settings. Defaults to `null`.
+  - `enabled` - (Optional) Enable the blob change feed. Defaults to `null`.
+  - `retention_in_days` - (Optional) Retention period for the change feed in days (1–146000). `null` means infinite. Defaults to `null`.
+- `container_delete_retention_policy` - (Optional) Container soft-delete retention policy. Defaults to `null`.
+  - `allow_permanent_delete` - (Optional) Allow permanent delete of soft-deleted containers. Defaults to `null`.
+  - `days` - (Optional) Number of days to retain deleted containers (1–365). Defaults to `null`.
+  - `enabled` - (Optional) Enable container soft-delete. Defaults to `null`.
+- `cors_rules` - (Optional) A list of CORS rules (maximum 5). Each entry supports:
+  - `allowed_headers` - (Required) A list of headers allowed in cross-origin requests.
+  - `allowed_methods` - (Required) A list of HTTP methods allowed. Valid values: `DELETE`, `GET`, `HEAD`, `MERGE`, `POST`, `OPTIONS`, `PUT`, `PATCH`.
+  - `allowed_origins` - (Required) A list of origin domains allowed in cross-origin requests.
+  - `exposed_headers` - (Required) A list of response headers exposed to CORS clients.
+  - `max_age_in_seconds` - (Required) The number of seconds the browser should cache a preflight response.
+- `default_service_version` - (Optional) Default Blob service API version for requests without a version. Defaults to `null`.
+- `delete_retention_policy` - (Optional) Blob soft-delete retention policy. Defaults to `null`.
+  - `allow_permanent_delete` - (Optional) Allow permanent delete of soft-deleted blobs and snapshots. Cannot be used with `restore_policy`. Defaults to `null`.
+  - `days` - (Optional) Number of days to retain deleted blobs (1–365). Defaults to `null`.
+  - `enabled` - (Optional) Enable blob soft-delete. Defaults to `null`.
+- `last_access_time_tracking_policy` - (Optional) Last access time tracking policy. Defaults to `null`.
+  - `blob_type` - (Optional) Blob types to track. Only `["blockBlob"]` is supported (read-only). Defaults to `null`.
+  - `enable` - (Required) Enable last access time tracking.
+  - `name` - (Optional) Policy name. Must be `"AccessTimeTracking"` (read-only). Defaults to `null`.
+  - `tracking_granularity_in_days` - (Optional) Granularity in days (read-only, always `1`). Defaults to `null`.
+- `restore_policy` - (Optional) Point-in-time restore policy. Requires `versioning_enabled`, `change_feed.enabled`, and `delete_retention_policy.enabled`. Defaults to `null`.
+  - `days` - (Optional) Restore retention in days. Must be less than `delete_retention_policy.days`. Defaults to `null`.
+  - `enabled` - (Required) Enable point-in-time restore.
+- `versioning_enabled` - (Optional) Enable blob versioning. Defaults to `null`.
+
+Type:
+
+```hcl
+object({
+    automatic_snapshot_policy_enabled = optional(bool)
+    change_feed = optional(object({
+      enabled           = optional(bool)
+      retention_in_days = optional(number)
+    }))
+    container_delete_retention_policy = optional(object({
+      allow_permanent_delete = optional(bool)
+      days                   = optional(number)
+      enabled                = optional(bool)
+    }))
+    cors_rules = optional(list(object({
+      allowed_headers    = list(string)
+      allowed_methods    = list(string)
+      allowed_origins    = list(string)
+      exposed_headers    = list(string)
+      max_age_in_seconds = number
+    })))
+    default_service_version = optional(string)
+    delete_retention_policy = optional(object({
+      allow_permanent_delete = optional(bool)
+      days                   = optional(number)
+      enabled                = optional(bool)
+    }))
+    last_access_time_tracking_policy = optional(object({
+      blob_type                    = optional(list(string))
+      enable                       = bool
+      name                         = optional(string)
+      tracking_granularity_in_days = optional(number)
+    }))
+    restore_policy = optional(object({
+      days    = optional(number)
+      enabled = bool
+    }))
+    versioning_enabled = optional(bool)
+  })
+```
+
+Default: `null`
+
 ### <a name="input_containers"></a> [containers](#input\_containers)
 
 Description: A map of containers to create on the storage account. The map key is arbitrary; the value supports the following attributes. Defaults to `{}` (no containers).
@@ -529,6 +605,53 @@ Type: `bool`
 
 Default: `true`
 
+### <a name="input_file_service_properties"></a> [file\_service\_properties](#input\_file\_service\_properties)
+
+Description: File service-level settings for the storage account. Defaults to `null` (Azure platform defaults).
+
+- `cors_rules` - (Optional) A list of CORS rules for the file service. Defaults to `null`. Each entry supports:
+  - `allowed_headers` - (Required) A list of headers allowed in cross-origin requests.
+  - `allowed_methods` - (Required) A list of HTTP methods allowed.
+  - `allowed_origins` - (Required) A list of origin domains allowed.
+  - `exposed_headers` - (Required) A list of response headers exposed to CORS clients.
+  - `max_age_in_seconds` - (Required) Seconds the browser should cache a preflight response.
+- `share_retention_policy` - (Optional) File share soft-delete retention policy. Defaults to `null`.
+  - `days` - (Optional) Number of days to retain soft-deleted shares. Between 1 and 365. Defaults to `7`.
+  - `enabled` - (Optional) Whether soft-delete is enabled. Defaults to `true`.
+- `smb` - (Optional) SMB protocol settings. Defaults to `null`.
+  - `authentication_types` - (Optional) Set of authentication types. Valid values: `NTLMv2`, `Kerberos`. Defaults to `null`.
+  - `channel_encryption_types` - (Optional) Set of SMB channel encryption types. Valid values: `AES-128-CCM`, `AES-128-GCM`, `AES-256-GCM`. Defaults to `null`.
+  - `kerberos_ticket_encryption_type` - (Optional) Set of Kerberos ticket encryption types. Valid values: `RC4-HMAC`, `AES-256`. Defaults to `null`.
+  - `multichannel_enabled` - (Optional) Enable SMB multichannel (Premium file shares only). Defaults to `null`.
+  - `versions` - (Optional) Set of SMB protocol versions. Valid values: `SMB2.1`, `SMB3.0`, `SMB3.1.1`. Defaults to `null`.
+
+Type:
+
+```hcl
+object({
+    cors_rules = optional(list(object({
+      allowed_headers    = list(string)
+      allowed_methods    = list(string)
+      allowed_origins    = list(string)
+      exposed_headers    = list(string)
+      max_age_in_seconds = number
+    })))
+    share_retention_policy = optional(object({
+      days    = optional(number, 7)
+      enabled = optional(bool, true)
+    }))
+    smb = optional(object({
+      authentication_types            = optional(set(string))
+      channel_encryption_types        = optional(set(string))
+      kerberos_ticket_encryption_type = optional(set(string))
+      multichannel_enabled            = optional(bool)
+      versions                        = optional(set(string))
+    }))
+  })
+```
+
+Default: `null`
+
 ### <a name="input_https_traffic_only_enabled"></a> [https\_traffic\_only\_enabled](#input\_https\_traffic\_only\_enabled)
 
 Description: (Optional) Boolean flag which forces HTTPS if enabled, see [here](https://docs.microsoft.com/azure/storage/storage-require-secure-transfer/) for more information. Defaults to `true`.
@@ -844,6 +967,33 @@ Type: `string`
 
 Default: `null`
 
+### <a name="input_queue_properties"></a> [queue\_properties](#input\_queue\_properties)
+
+Description: Queue service-level settings for the storage account. Defaults to `null` (Azure platform defaults).
+
+- `cors_rules` - (Optional) A list of CORS rules for the queue service. Defaults to `null`. Each entry supports:
+  - `allowed_headers` - (Required) A list of headers allowed in cross-origin requests.
+  - `allowed_methods` - (Required) A list of HTTP methods allowed.
+  - `allowed_origins` - (Required) A list of origin domains allowed.
+  - `exposed_headers` - (Required) A list of response headers exposed to CORS clients.
+  - `max_age_in_seconds` - (Required) Seconds the browser should cache a preflight response.
+
+Type:
+
+```hcl
+object({
+    cors_rules = optional(list(object({
+      allowed_headers    = list(string)
+      allowed_methods    = list(string)
+      allowed_origins    = list(string)
+      exposed_headers    = list(string)
+      max_age_in_seconds = number
+    })))
+  })
+```
+
+Default: `null`
+
 ### <a name="input_queues"></a> [queues](#input\_queues)
 
 Description: A map of queues to create on the storage account. The map key is arbitrary; the value supports the following attributes. Defaults to `{}` (no queues).
@@ -892,12 +1042,15 @@ Description: Override the AzAPI `<provider>/<resource>@<api-version>` strings us
 - `customer_managed_key_vault` - The Key Vault data source used to look up the vault URI when CMK is enabled.
 - `lock`                       - Management lock applied to the storage account (and to private endpoints when configured).
 - `blob_container`             - Blob containers (also used by Data Lake Gen2 filesystems, which are blob containers in ARM).
-- `blob_service`               - The `blobServices/default` sub-resource, patched by the static-website submodule.
+- `blob_service`               - The `blobServices/default` sub-resource, patched by the static-website and blob-service submodules.
+- `file_service`               - The `fileServices/default` sub-resource, patched by the file-service submodule for CORS, soft-delete, and SMB settings.
 - `queue`                      - Storage queues.
 - `table`                      - Storage tables.
 - `share`                      - File shares.
 - `local_user`                 - SFTP local users.
 - `management_policy`          - The lifecycle-management policy.
+- `queue_service`              - The `queueServices/default` sub-resource, patched by the queue-service-properties submodule.
+- `table_service`              - The `tableServices/default` sub-resource, patched by the table-service-properties submodule.
 - `private_endpoint`           - Private endpoints created for the storage account.
 - `private_dns_zone_group`     - The private DNS zone group resource attached to a private endpoint.
 
@@ -910,11 +1063,14 @@ object({
     lock                       = optional(string, "Microsoft.Authorization/locks@2020-05-01")
     blob_container             = optional(string, "Microsoft.Storage/storageAccounts/blobServices/containers@2025-06-01")
     blob_service               = optional(string, "Microsoft.Storage/storageAccounts/blobServices@2025-06-01")
+    file_service               = optional(string, "Microsoft.Storage/storageAccounts/fileServices@2025-06-01")
     queue                      = optional(string, "Microsoft.Storage/storageAccounts/queueServices/queues@2025-06-01")
     table                      = optional(string, "Microsoft.Storage/storageAccounts/tableServices/tables@2025-06-01")
     share                      = optional(string, "Microsoft.Storage/storageAccounts/fileServices/shares@2025-06-01")
     local_user                 = optional(string, "Microsoft.Storage/storageAccounts/localUsers@2025-06-01")
     management_policy          = optional(string, "Microsoft.Storage/storageAccounts/managementPolicies@2025-06-01")
+    queue_service              = optional(string, "Microsoft.Storage/storageAccounts/queueServices@2025-06-01")
+    table_service              = optional(string, "Microsoft.Storage/storageAccounts/tableServices@2025-06-01")
     private_endpoint           = optional(string, "Microsoft.Network/privateEndpoints@2025-05-01")
     private_dns_zone_group     = optional(string, "Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2025-05-01")
   })
@@ -1286,6 +1442,33 @@ Type: `string`
 
 Default: `null`
 
+### <a name="input_table_properties"></a> [table\_properties](#input\_table\_properties)
+
+Description: Table service-level settings for the storage account. Defaults to `null` (Azure platform defaults).
+
+- `cors_rules` - (Optional) A list of CORS rules for the table service. Defaults to `null`. Each entry supports:
+  - `allowed_headers` - (Required) A list of headers allowed in cross-origin requests.
+  - `allowed_methods` - (Required) A list of HTTP methods allowed.
+  - `allowed_origins` - (Required) A list of origin domains allowed.
+  - `exposed_headers` - (Required) A list of response headers exposed to CORS clients.
+  - `max_age_in_seconds` - (Required) Seconds the browser should cache a preflight response.
+
+Type:
+
+```hcl
+object({
+    cors_rules = optional(list(object({
+      allowed_headers    = list(string)
+      allowed_methods    = list(string)
+      allowed_origins    = list(string)
+      exposed_headers    = list(string)
+      max_age_in_seconds = number
+    })))
+  })
+```
+
+Default: `null`
+
 ### <a name="input_tables"></a> [tables](#input\_tables)
 
 Description: A map of tables to create on the storage account. The map key is arbitrary; the value supports the following attributes. Defaults to `{}` (no tables).
@@ -1447,6 +1630,12 @@ Description: Map of storage tables that are created.
 
 The following Modules are called:
 
+### <a name="module_blob_service"></a> [blob\_service](#module\_blob\_service)
+
+Source: ./modules/blob_service
+
+Version:
+
 ### <a name="module_containers"></a> [containers](#module\_containers)
 
 Source: ./modules/container
@@ -1489,6 +1678,12 @@ Source: ./modules/diagnostic_setting
 
 Version:
 
+### <a name="module_file_service"></a> [file\_service](#module\_file\_service)
+
+Source: ./modules/file_service
+
+Version:
+
 ### <a name="module_local_users"></a> [local\_users](#module\_local\_users)
 
 Source: ./modules/local_user
@@ -1504,6 +1699,12 @@ Version:
 ### <a name="module_private_endpoints"></a> [private\_endpoints](#module\_private\_endpoints)
 
 Source: ./modules/private_endpoint
+
+Version:
+
+### <a name="module_queue_service"></a> [queue\_service](#module\_queue\_service)
+
+Source: ./modules/queue_service
 
 Version:
 
@@ -1528,6 +1729,12 @@ Version:
 ### <a name="module_static_website"></a> [static\_website](#module\_static\_website)
 
 Source: ./modules/static_website
+
+Version:
+
+### <a name="module_table_service"></a> [table\_service](#module\_table\_service)
+
+Source: ./modules/table_service
 
 Version:
 
