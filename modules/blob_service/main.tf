@@ -1,7 +1,11 @@
 resource "azapi_update_resource" "this" {
-  resource_id    = "${var.storage_account_id}/blobServices/default"
-  type           = var.resource_type
-  body           = { properties = local.body_properties }
+  resource_id = "${var.storage_account_id}/blobServices/default"
+  type        = var.resource_type
+  body        = local.resource_body
+  response_export_values = [
+    "properties.restorePolicy.lastEnabledTime",
+    "properties.restorePolicy.minRestoreTime",
+  ]
   read_headers   = local.tracing_headers
   retry          = var.retry
   update_headers = local.tracing_headers

@@ -93,4 +93,24 @@ EOT
     )
     error_message = "blob_properties.restore_policy.days must be between 1 and 365."
   }
+  validation {
+    condition = (
+      var.blob_properties == null ||
+      var.blob_properties.restore_policy == null ||
+      var.blob_properties.restore_policy.days == null ||
+      var.blob_properties.delete_retention_policy == null ||
+      var.blob_properties.delete_retention_policy.days == null ||
+      var.blob_properties.restore_policy.days < var.blob_properties.delete_retention_policy.days
+    )
+    error_message = "blob_properties.restore_policy.days must be less than blob_properties.delete_retention_policy.days."
+  }
+  validation {
+    condition = (
+      var.blob_properties == null ||
+      var.blob_properties.last_access_time_tracking_policy == null ||
+      var.blob_properties.last_access_time_tracking_policy.name == null ||
+      contains(["AccessTimeTracking"], var.blob_properties.last_access_time_tracking_policy.name)
+    )
+    error_message = "blob_properties.last_access_time_tracking_policy.name must be \"AccessTimeTracking\"."
+  }
 }

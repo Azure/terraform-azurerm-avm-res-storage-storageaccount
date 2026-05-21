@@ -43,6 +43,89 @@ variable "blob_properties" {
   })
   description = "(Required) Blob service-level settings to apply. This variable is required because the module is only instantiated when `var.blob_properties` is non-null."
   nullable    = false
+
+  validation {
+    condition = (
+      var.blob_properties.change_feed == null ||
+      var.blob_properties.change_feed.retention_in_days == null ||
+      var.blob_properties.change_feed.retention_in_days >= 1
+    )
+    error_message = "blob_properties.change_feed.retention_in_days must be greater than or equal to 1."
+  }
+  validation {
+    condition = (
+      var.blob_properties.change_feed == null ||
+      var.blob_properties.change_feed.retention_in_days == null ||
+      var.blob_properties.change_feed.retention_in_days <= 146000
+    )
+    error_message = "blob_properties.change_feed.retention_in_days must be less than or equal to 146000."
+  }
+  validation {
+    condition = (
+      var.blob_properties.delete_retention_policy == null ||
+      var.blob_properties.delete_retention_policy.days == null ||
+      var.blob_properties.delete_retention_policy.days >= 1
+    )
+    error_message = "blob_properties.delete_retention_policy.days must be greater than or equal to 1."
+  }
+  validation {
+    condition = (
+      var.blob_properties.delete_retention_policy == null ||
+      var.blob_properties.delete_retention_policy.days == null ||
+      var.blob_properties.delete_retention_policy.days <= 365
+    )
+    error_message = "blob_properties.delete_retention_policy.days must be less than or equal to 365."
+  }
+  validation {
+    condition = (
+      var.blob_properties.container_delete_retention_policy == null ||
+      var.blob_properties.container_delete_retention_policy.days == null ||
+      var.blob_properties.container_delete_retention_policy.days >= 1
+    )
+    error_message = "blob_properties.container_delete_retention_policy.days must be greater than or equal to 1."
+  }
+  validation {
+    condition = (
+      var.blob_properties.container_delete_retention_policy == null ||
+      var.blob_properties.container_delete_retention_policy.days == null ||
+      var.blob_properties.container_delete_retention_policy.days <= 365
+    )
+    error_message = "blob_properties.container_delete_retention_policy.days must be less than or equal to 365."
+  }
+  validation {
+    condition = (
+      var.blob_properties.restore_policy == null ||
+      var.blob_properties.restore_policy.days == null ||
+      var.blob_properties.restore_policy.days >= 1
+    )
+    error_message = "blob_properties.restore_policy.days must be greater than or equal to 1."
+  }
+  validation {
+    condition = (
+      var.blob_properties.restore_policy == null ||
+      var.blob_properties.restore_policy.days == null ||
+      var.blob_properties.restore_policy.days <= 365
+    )
+    error_message = "blob_properties.restore_policy.days must be less than or equal to 365."
+  }
+  validation {
+    condition = (
+      var.blob_properties.restore_policy == null ||
+      var.blob_properties.restore_policy.days == null ||
+      var.blob_properties.delete_retention_policy == null ||
+      var.blob_properties.delete_retention_policy.days == null ||
+      var.blob_properties.restore_policy.days < var.blob_properties.delete_retention_policy.days
+    )
+    error_message = "blob_properties.restore_policy.days must be less than blob_properties.delete_retention_policy.days."
+  }
+  validation {
+    condition = (
+      var.blob_properties.last_access_time_tracking_policy == null ||
+      var.blob_properties.last_access_time_tracking_policy.name == null ||
+      contains(["AccessTimeTracking"], var.blob_properties.last_access_time_tracking_policy.name)
+    )
+    error_message = "blob_properties.last_access_time_tracking_policy.name must be \"AccessTimeTracking\"."
+  }
 }
 
 variable "resource_type" {
