@@ -42,18 +42,43 @@ Queue service-level settings for the storage account. Defaults to `null` (Azure 
   - `read` - (Optional) Log read operations. Defaults to `false`.
   - `write` - (Optional) Log write operations. Defaults to `false`.
   - `version` - (Optional) Analytics version. Defaults to `1.0`.
-  - `retention_policy_days` - (Optional) Number of days to retain logs. `null` means infinite retention.
+  - `retention_policy_days` - (Optional) Number of days to retain logs (1–365). `null` means infinite retention.
 - `hour_metrics` - (Optional) Hourly metrics settings. Defaults to `null`.
   - `enabled` - (Optional) Enable hourly metrics. Defaults to `true`.
   - `include_apis` - (Optional) Include API summaries in the metrics. Defaults to `null`.
-  - `retention_policy_days` - (Optional) Retention in days.
+  - `retention_policy_days` - (Optional) Retention in days (1–365). `null` means infinite retention.
   - `version` - (Optional) Analytics version. Defaults to `1.0`.
 - `minute_metrics` - (Optional) Minute metrics settings. Defaults to `null`.
   - `enabled` - (Optional) Enable minute metrics. Defaults to `false`.
   - `include_apis` - (Optional) Include API summaries. Defaults to `null`.
-  - `retention_policy_days` - (Optional) Retention in days.
+  - `retention_policy_days` - (Optional) Retention in days (1–365). `null` means infinite retention.
   - `version` - (Optional) Analytics version. Defaults to `1.0`.
 EOT
+
+  validation {
+    condition     = var.queue_properties == null || var.queue_properties.logging == null || var.queue_properties.logging.retention_policy_days == null || var.queue_properties.logging.retention_policy_days >= 1
+    error_message = "queue_properties.logging.retention_policy_days must be greater than or equal to 1 when set."
+  }
+  validation {
+    condition     = var.queue_properties == null || var.queue_properties.logging == null || var.queue_properties.logging.retention_policy_days == null || var.queue_properties.logging.retention_policy_days <= 365
+    error_message = "queue_properties.logging.retention_policy_days must be less than or equal to 365 when set."
+  }
+  validation {
+    condition     = var.queue_properties == null || var.queue_properties.hour_metrics == null || var.queue_properties.hour_metrics.retention_policy_days == null || var.queue_properties.hour_metrics.retention_policy_days >= 1
+    error_message = "queue_properties.hour_metrics.retention_policy_days must be greater than or equal to 1 when set."
+  }
+  validation {
+    condition     = var.queue_properties == null || var.queue_properties.hour_metrics == null || var.queue_properties.hour_metrics.retention_policy_days == null || var.queue_properties.hour_metrics.retention_policy_days <= 365
+    error_message = "queue_properties.hour_metrics.retention_policy_days must be less than or equal to 365 when set."
+  }
+  validation {
+    condition     = var.queue_properties == null || var.queue_properties.minute_metrics == null || var.queue_properties.minute_metrics.retention_policy_days == null || var.queue_properties.minute_metrics.retention_policy_days >= 1
+    error_message = "queue_properties.minute_metrics.retention_policy_days must be greater than or equal to 1 when set."
+  }
+  validation {
+    condition     = var.queue_properties == null || var.queue_properties.minute_metrics == null || var.queue_properties.minute_metrics.retention_policy_days == null || var.queue_properties.minute_metrics.retention_policy_days <= 365
+    error_message = "queue_properties.minute_metrics.retention_policy_days must be less than or equal to 365 when set."
+  }
 }
 
 variable "queue_encryption_key_type" {

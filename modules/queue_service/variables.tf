@@ -35,6 +35,31 @@ variable "queue_properties" {
   })
   description = "(Required) Queue service-level settings to apply to the storage account's queueServices/default sub-resource."
   nullable    = false
+
+  validation {
+    condition     = var.queue_properties.logging == null || var.queue_properties.logging.retention_policy_days == null || var.queue_properties.logging.retention_policy_days >= 1
+    error_message = "queue_properties.logging.retention_policy_days must be greater than or equal to 1 when set."
+  }
+  validation {
+    condition     = var.queue_properties.logging == null || var.queue_properties.logging.retention_policy_days == null || var.queue_properties.logging.retention_policy_days <= 365
+    error_message = "queue_properties.logging.retention_policy_days must be less than or equal to 365 when set."
+  }
+  validation {
+    condition     = var.queue_properties.hour_metrics == null || var.queue_properties.hour_metrics.retention_policy_days == null || var.queue_properties.hour_metrics.retention_policy_days >= 1
+    error_message = "queue_properties.hour_metrics.retention_policy_days must be greater than or equal to 1 when set."
+  }
+  validation {
+    condition     = var.queue_properties.hour_metrics == null || var.queue_properties.hour_metrics.retention_policy_days == null || var.queue_properties.hour_metrics.retention_policy_days <= 365
+    error_message = "queue_properties.hour_metrics.retention_policy_days must be less than or equal to 365 when set."
+  }
+  validation {
+    condition     = var.queue_properties.minute_metrics == null || var.queue_properties.minute_metrics.retention_policy_days == null || var.queue_properties.minute_metrics.retention_policy_days >= 1
+    error_message = "queue_properties.minute_metrics.retention_policy_days must be greater than or equal to 1 when set."
+  }
+  validation {
+    condition     = var.queue_properties.minute_metrics == null || var.queue_properties.minute_metrics.retention_policy_days == null || var.queue_properties.minute_metrics.retention_policy_days <= 365
+    error_message = "queue_properties.minute_metrics.retention_policy_days must be less than or equal to 365 when set."
+  }
 }
 
 variable "resource_type" {
