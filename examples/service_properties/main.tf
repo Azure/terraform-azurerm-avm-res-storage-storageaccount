@@ -87,21 +87,8 @@ module "this" {
       }
     ]
   }
-  # Queue service-level settings: logging, metrics, and CORS.
+  # Queue service-level settings: CORS.
   queue_properties = {
-    logging = {
-      delete                = true
-      read                  = true
-      write                 = true
-      version               = "1.0"
-      retention_policy_days = 7
-    }
-    hour_metrics = {
-      enabled               = true
-      include_apis          = true
-      retention_policy_days = 7
-      version               = "1.0"
-    }
     cors_rules = [
       {
         allowed_headers    = ["x-ms-meta-data*", "x-ms-meta-target*"]
@@ -117,19 +104,8 @@ module "this" {
       name = "example-queue-${random_string.this.result}"
     }
   }
-  # Table service-level settings: logging, metrics, and CORS.
+  # Table service-level settings: CORS.
   table_properties = {
-    logging = {
-      delete                = true
-      read                  = true
-      write                 = true
-      retention_policy_days = 7
-    }
-    hour_metrics = {
-      enabled               = true
-      include_apis          = true
-      retention_policy_days = 7
-    }
     cors_rules = [
       {
         allowed_headers    = ["x-ms-meta-data*", "x-ms-meta-target*"]

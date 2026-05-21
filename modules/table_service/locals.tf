@@ -1,5 +1,7 @@
 locals {
   resource_body = {
+    # Table service logging and metrics are intentionally excluded here because
+    # the ARM tableServices/default PATCH path does not persist them reliably.
     properties = merge(
       var.table_properties.cors_rules == null ? {} : {
         cors = {
@@ -11,68 +13,6 @@ locals {
             maxAgeInSeconds = r.max_age_in_seconds
           }]
         }
-      },
-      var.table_properties.logging == null ? {} : {
-        logging = merge(
-          {
-            delete  = var.table_properties.logging.delete
-            read    = var.table_properties.logging.read
-            version = var.table_properties.logging.version
-            write   = var.table_properties.logging.write
-          },
-          {
-            retentionPolicy = merge(
-              {
-                enabled = var.table_properties.logging.retention_policy_days != null
-              },
-              var.table_properties.logging.retention_policy_days == null ? {} : {
-                days = var.table_properties.logging.retention_policy_days
-              },
-            )
-          },
-        )
-      },
-      var.table_properties.hour_metrics == null ? {} : {
-        hourMetrics = merge(
-          {
-            enabled = var.table_properties.hour_metrics.enabled
-            version = var.table_properties.hour_metrics.version
-          },
-          var.table_properties.hour_metrics.include_apis == null ? {} : {
-            includeAPIs = var.table_properties.hour_metrics.include_apis
-          },
-          {
-            retentionPolicy = merge(
-              {
-                enabled = var.table_properties.hour_metrics.retention_policy_days != null
-              },
-              var.table_properties.hour_metrics.retention_policy_days == null ? {} : {
-                days = var.table_properties.hour_metrics.retention_policy_days
-              },
-            )
-          },
-        )
-      },
-      var.table_properties.minute_metrics == null ? {} : {
-        minuteMetrics = merge(
-          {
-            enabled = var.table_properties.minute_metrics.enabled
-            version = var.table_properties.minute_metrics.version
-          },
-          var.table_properties.minute_metrics.include_apis == null ? {} : {
-            includeAPIs = var.table_properties.minute_metrics.include_apis
-          },
-          {
-            retentionPolicy = merge(
-              {
-                enabled = var.table_properties.minute_metrics.retention_policy_days != null
-              },
-              var.table_properties.minute_metrics.retention_policy_days == null ? {} : {
-                days = var.table_properties.minute_metrics.retention_policy_days
-              },
-            )
-          },
-        )
       },
     )
   }

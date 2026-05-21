@@ -7,53 +7,9 @@ variable "queue_properties" {
       exposed_headers    = list(string)
       max_age_in_seconds = number
     })))
-    logging = optional(object({
-      delete                = optional(bool, false)
-      read                  = optional(bool, false)
-      write                 = optional(bool, false)
-      version               = optional(string, "1.0")
-      retention_policy_days = optional(number)
-    }))
-    hour_metrics = optional(object({
-      enabled               = optional(bool, true)
-      include_apis          = optional(bool)
-      retention_policy_days = optional(number)
-      version               = optional(string, "1.0")
-    }))
-    minute_metrics = optional(object({
-      enabled               = optional(bool, false)
-      include_apis          = optional(bool)
-      retention_policy_days = optional(number)
-      version               = optional(string, "1.0")
-    }))
   })
   description = "(Required) Queue service-level settings to apply to the storage account's queueServices/default sub-resource."
   nullable    = false
-
-  validation {
-    condition     = var.queue_properties.logging == null || var.queue_properties.logging.retention_policy_days == null || var.queue_properties.logging.retention_policy_days >= 1
-    error_message = "queue_properties.logging.retention_policy_days must be greater than or equal to 1 when set."
-  }
-  validation {
-    condition     = var.queue_properties.logging == null || var.queue_properties.logging.retention_policy_days == null || var.queue_properties.logging.retention_policy_days <= 365
-    error_message = "queue_properties.logging.retention_policy_days must be less than or equal to 365 when set."
-  }
-  validation {
-    condition     = var.queue_properties.hour_metrics == null || var.queue_properties.hour_metrics.retention_policy_days == null || var.queue_properties.hour_metrics.retention_policy_days >= 1
-    error_message = "queue_properties.hour_metrics.retention_policy_days must be greater than or equal to 1 when set."
-  }
-  validation {
-    condition     = var.queue_properties.hour_metrics == null || var.queue_properties.hour_metrics.retention_policy_days == null || var.queue_properties.hour_metrics.retention_policy_days <= 365
-    error_message = "queue_properties.hour_metrics.retention_policy_days must be less than or equal to 365 when set."
-  }
-  validation {
-    condition     = var.queue_properties.minute_metrics == null || var.queue_properties.minute_metrics.retention_policy_days == null || var.queue_properties.minute_metrics.retention_policy_days >= 1
-    error_message = "queue_properties.minute_metrics.retention_policy_days must be greater than or equal to 1 when set."
-  }
-  validation {
-    condition     = var.queue_properties.minute_metrics == null || var.queue_properties.minute_metrics.retention_policy_days == null || var.queue_properties.minute_metrics.retention_policy_days <= 365
-    error_message = "queue_properties.minute_metrics.retention_policy_days must be less than or equal to 365 when set."
-  }
 }
 
 variable "storage_account_id" {

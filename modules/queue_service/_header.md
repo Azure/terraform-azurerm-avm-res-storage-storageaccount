@@ -8,9 +8,7 @@ This submodule configures queue service properties for an Azure Storage Account.
 ## Features
 
 - CORS rules configuration
-- Storage Analytics logging (read, write, delete operations)
-- Hourly metrics collection
-- Minute-level metrics collection
+- ARM-safe queue service patching
 
 ## Usage
 
@@ -23,17 +21,6 @@ module "storage_account" {
   # ... other configuration ...
 
   queue_properties = {
-    logging = {
-      delete                = true
-      read                  = true
-      write                 = true
-      retention_policy_days = 7
-    }
-    hour_metrics = {
-      enabled               = true
-      include_apis          = true
-      retention_policy_days = 7
-    }
     cors_rules = [
       {
         allowed_origins    = ["https://example.com"]
@@ -47,3 +34,4 @@ module "storage_account" {
 }
 ```
 
+Queue Storage analytics logging and metrics are not included here because the ARM `queueServices/default` patch path does not persist those settings reliably.
