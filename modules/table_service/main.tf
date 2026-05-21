@@ -4,11 +4,12 @@ resource "azapi_update_resource" "this" {
   body           = local.resource_body
   create_headers = local.tracing_headers
   read_headers   = local.tracing_headers
-  update_headers = local.tracing_headers
   retry          = var.retry
+  update_headers = local.tracing_headers
 
   dynamic "timeouts" {
     for_each = var.timeouts == null ? [] : [var.timeouts]
+
     content {
       create = timeouts.value.create
       read   = timeouts.value.read

@@ -1,9 +1,3 @@
-variable "storage_account_id" {
-  type        = string
-  description = "(Required) The full resource ID of the parent storage account."
-  nullable    = false
-}
-
 variable "queue_properties" {
   type = object({
     cors_rules = optional(list(object({
@@ -60,6 +54,12 @@ variable "queue_properties" {
     condition     = var.queue_properties.minute_metrics == null || var.queue_properties.minute_metrics.retention_policy_days == null || var.queue_properties.minute_metrics.retention_policy_days <= 365
     error_message = "queue_properties.minute_metrics.retention_policy_days must be less than or equal to 365 when set."
   }
+}
+
+variable "storage_account_id" {
+  type        = string
+  description = "(Required) The full resource ID of the parent storage account."
+  nullable    = false
 }
 
 variable "resource_type" {

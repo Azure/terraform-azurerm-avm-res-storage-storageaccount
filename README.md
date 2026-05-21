@@ -605,6 +605,53 @@ Type: `bool`
 
 Default: `true`
 
+### <a name="input_file_service_properties"></a> [file\_service\_properties](#input\_file\_service\_properties)
+
+Description: File service-level settings for the storage account. Defaults to `null` (Azure platform defaults).
+
+- `cors_rules` - (Optional) A list of CORS rules for the file service. Defaults to `null`. Each entry supports:
+  - `allowed_headers` - (Required) A list of headers allowed in cross-origin requests.
+  - `allowed_methods` - (Required) A list of HTTP methods allowed.
+  - `allowed_origins` - (Required) A list of origin domains allowed.
+  - `exposed_headers` - (Required) A list of response headers exposed to CORS clients.
+  - `max_age_in_seconds` - (Required) Seconds the browser should cache a preflight response.
+- `share_retention_policy` - (Optional) File share soft-delete retention policy. Defaults to `null`.
+  - `days` - (Optional) Number of days to retain soft-deleted shares. Between 1 and 365. Defaults to `7`.
+  - `enabled` - (Optional) Whether soft-delete is enabled. Defaults to `true`.
+- `smb` - (Optional) SMB protocol settings. Defaults to `null`.
+  - `authentication_types` - (Optional) Set of authentication types. Valid values: `NTLMv2`, `Kerberos`. Defaults to `null`.
+  - `channel_encryption_types` - (Optional) Set of SMB channel encryption types. Valid values: `AES-128-CCM`, `AES-128-GCM`, `AES-256-GCM`. Defaults to `null`.
+  - `kerberos_ticket_encryption_type` - (Optional) Set of Kerberos ticket encryption types. Valid values: `RC4-HMAC`, `AES-256`. Defaults to `null`.
+  - `multichannel_enabled` - (Optional) Enable SMB multichannel (Premium file shares only). Defaults to `null`.
+  - `versions` - (Optional) Set of SMB protocol versions. Valid values: `SMB2.1`, `SMB3.0`, `SMB3.1.1`. Defaults to `null`.
+
+Type:
+
+```hcl
+object({
+    cors_rules = optional(list(object({
+      allowed_headers    = list(string)
+      allowed_methods    = list(string)
+      allowed_origins    = list(string)
+      exposed_headers    = list(string)
+      max_age_in_seconds = number
+    })))
+    share_retention_policy = optional(object({
+      days    = optional(number, 7)
+      enabled = optional(bool, true)
+    }))
+    smb = optional(object({
+      authentication_types            = optional(set(string))
+      channel_encryption_types        = optional(set(string))
+      kerberos_ticket_encryption_type = optional(set(string))
+      multichannel_enabled            = optional(bool)
+      versions                        = optional(set(string))
+    }))
+  })
+```
+
+Default: `null`
+
 ### <a name="input_https_traffic_only_enabled"></a> [https\_traffic\_only\_enabled](#input\_https\_traffic\_only\_enabled)
 
 Description: (Optional) Boolean flag which forces HTTPS if enabled, see [here](https://docs.microsoft.com/azure/storage/storage-require-secure-transfer/) for more information. Defaults to `true`.
@@ -920,6 +967,68 @@ Type: `string`
 
 Default: `null`
 
+### <a name="input_queue_properties"></a> [queue\_properties](#input\_queue\_properties)
+
+Description: Queue service-level settings for the storage account. Defaults to `null` (Azure platform defaults).
+
+- `cors_rules` - (Optional) A list of CORS rules for the queue service. Defaults to `null`. Each entry supports:
+  - `allowed_headers` - (Required) A list of headers allowed in cross-origin requests.
+  - `allowed_methods` - (Required) A list of HTTP methods allowed.
+  - `allowed_origins` - (Required) A list of origin domains allowed.
+  - `exposed_headers` - (Required) A list of response headers exposed to CORS clients.
+  - `max_age_in_seconds` - (Required) Seconds the browser should cache a preflight response.
+- `logging` - (Optional) Storage analytics logging settings. Defaults to `null`.
+  - `delete` - (Optional) Log delete operations. Defaults to `false`.
+  - `read` - (Optional) Log read operations. Defaults to `false`.
+  - `write` - (Optional) Log write operations. Defaults to `false`.
+  - `version` - (Optional) Analytics version. Defaults to `1.0`.
+  - `retention_policy_days` - (Optional) Number of days to retain logs (1–365). `null` means infinite retention.
+- `hour_metrics` - (Optional) Hourly metrics settings. Defaults to `null`.
+  - `enabled` - (Optional) Enable hourly metrics. Defaults to `true`.
+  - `include_apis` - (Optional) Include API summaries in the metrics. Defaults to `null`.
+  - `retention_policy_days` - (Optional) Retention in days (1–365). `null` means infinite retention.
+  - `version` - (Optional) Analytics version. Defaults to `1.0`.
+- `minute_metrics` - (Optional) Minute metrics settings. Defaults to `null`.
+  - `enabled` - (Optional) Enable minute metrics. Defaults to `false`.
+  - `include_apis` - (Optional) Include API summaries. Defaults to `null`.
+  - `retention_policy_days` - (Optional) Retention in days (1–365). `null` means infinite retention.
+  - `version` - (Optional) Analytics version. Defaults to `1.0`.
+
+Type:
+
+```hcl
+object({
+    cors_rules = optional(list(object({
+      allowed_headers    = list(string)
+      allowed_methods    = list(string)
+      allowed_origins    = list(string)
+      exposed_headers    = list(string)
+      max_age_in_seconds = number
+    })))
+    logging = optional(object({
+      delete                = optional(bool, false)
+      read                  = optional(bool, false)
+      write                 = optional(bool, false)
+      version               = optional(string, "1.0")
+      retention_policy_days = optional(number)
+    }))
+    hour_metrics = optional(object({
+      enabled               = optional(bool, true)
+      include_apis          = optional(bool)
+      retention_policy_days = optional(number)
+      version               = optional(string, "1.0")
+    }))
+    minute_metrics = optional(object({
+      enabled               = optional(bool, false)
+      include_apis          = optional(bool)
+      retention_policy_days = optional(number)
+      version               = optional(string, "1.0")
+    }))
+  })
+```
+
+Default: `null`
+
 ### <a name="input_queues"></a> [queues](#input\_queues)
 
 Description: A map of queues to create on the storage account. The map key is arbitrary; the value supports the following attributes. Defaults to `{}` (no queues).
@@ -969,11 +1078,14 @@ Description: Override the AzAPI `<provider>/<resource>@<api-version>` strings us
 - `lock`                       - Management lock applied to the storage account (and to private endpoints when configured).
 - `blob_container`             - Blob containers (also used by Data Lake Gen2 filesystems, which are blob containers in ARM).
 - `blob_service`               - The `blobServices/default` sub-resource, patched by the static-website and blob-service submodules.
+- `file_service`               - The `fileServices/default` sub-resource, patched by the file-service submodule for CORS, soft-delete, and SMB settings.
 - `queue`                      - Storage queues.
 - `table`                      - Storage tables.
 - `share`                      - File shares.
 - `local_user`                 - SFTP local users.
 - `management_policy`          - The lifecycle-management policy.
+- `queue_service`              - The `queueServices/default` sub-resource, patched by the queue-service-properties submodule.
+- `table_service`              - The `tableServices/default` sub-resource, patched by the table-service-properties submodule.
 - `private_endpoint`           - Private endpoints created for the storage account.
 - `private_dns_zone_group`     - The private DNS zone group resource attached to a private endpoint.
 
@@ -986,11 +1098,14 @@ object({
     lock                       = optional(string, "Microsoft.Authorization/locks@2020-05-01")
     blob_container             = optional(string, "Microsoft.Storage/storageAccounts/blobServices/containers@2025-06-01")
     blob_service               = optional(string, "Microsoft.Storage/storageAccounts/blobServices@2025-06-01")
+    file_service               = optional(string, "Microsoft.Storage/storageAccounts/fileServices@2025-06-01")
     queue                      = optional(string, "Microsoft.Storage/storageAccounts/queueServices/queues@2025-06-01")
     table                      = optional(string, "Microsoft.Storage/storageAccounts/tableServices/tables@2025-06-01")
     share                      = optional(string, "Microsoft.Storage/storageAccounts/fileServices/shares@2025-06-01")
     local_user                 = optional(string, "Microsoft.Storage/storageAccounts/localUsers@2025-06-01")
     management_policy          = optional(string, "Microsoft.Storage/storageAccounts/managementPolicies@2025-06-01")
+    queue_service              = optional(string, "Microsoft.Storage/storageAccounts/queueServices@2025-06-01")
+    table_service              = optional(string, "Microsoft.Storage/storageAccounts/tableServices@2025-06-01")
     private_endpoint           = optional(string, "Microsoft.Network/privateEndpoints@2025-05-01")
     private_dns_zone_group     = optional(string, "Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2025-05-01")
   })
@@ -1362,6 +1477,68 @@ Type: `string`
 
 Default: `null`
 
+### <a name="input_table_properties"></a> [table\_properties](#input\_table\_properties)
+
+Description: Table service-level settings for the storage account. Defaults to `null` (Azure platform defaults).
+
+- `cors_rules` - (Optional) A list of CORS rules for the table service. Defaults to `null`. Each entry supports:
+  - `allowed_headers` - (Required) A list of headers allowed in cross-origin requests.
+  - `allowed_methods` - (Required) A list of HTTP methods allowed.
+  - `allowed_origins` - (Required) A list of origin domains allowed.
+  - `exposed_headers` - (Required) A list of response headers exposed to CORS clients.
+  - `max_age_in_seconds` - (Required) Seconds the browser should cache a preflight response.
+- `logging` - (Optional) Storage Analytics logging settings. Defaults to `null`.
+  - `delete` - (Optional) Log delete operations. Defaults to `false`.
+  - `read` - (Optional) Log read operations. Defaults to `false`.
+  - `write` - (Optional) Log write operations. Defaults to `false`.
+  - `version` - (Optional) Analytics version. Defaults to `1.0`.
+  - `retention_policy_days` - (Optional) Number of days to retain logs (1–365). `null` means infinite retention.
+- `hour_metrics` - (Optional) Hourly metrics settings. Defaults to `null`.
+  - `enabled` - (Optional) Enable hourly metrics. Defaults to `true`.
+  - `include_apis` - (Optional) Include API summaries in the metrics. Defaults to `null`.
+  - `retention_policy_days` - (Optional) Retention in days (1–365). `null` means infinite retention.
+  - `version` - (Optional) Analytics version. Defaults to `1.0`.
+- `minute_metrics` - (Optional) Minute metrics settings. Defaults to `null`.
+  - `enabled` - (Optional) Enable minute metrics. Defaults to `false`.
+  - `include_apis` - (Optional) Include API summaries. Defaults to `null`.
+  - `retention_policy_days` - (Optional) Retention in days (1–365). `null` means infinite retention.
+  - `version` - (Optional) Analytics version. Defaults to `1.0`.
+
+Type:
+
+```hcl
+object({
+    cors_rules = optional(list(object({
+      allowed_headers    = list(string)
+      allowed_methods    = list(string)
+      allowed_origins    = list(string)
+      exposed_headers    = list(string)
+      max_age_in_seconds = number
+    })))
+    logging = optional(object({
+      delete                = optional(bool, false)
+      read                  = optional(bool, false)
+      write                 = optional(bool, false)
+      version               = optional(string, "1.0")
+      retention_policy_days = optional(number)
+    }))
+    hour_metrics = optional(object({
+      enabled               = optional(bool, true)
+      include_apis          = optional(bool)
+      retention_policy_days = optional(number)
+      version               = optional(string, "1.0")
+    }))
+    minute_metrics = optional(object({
+      enabled               = optional(bool, false)
+      include_apis          = optional(bool)
+      retention_policy_days = optional(number)
+      version               = optional(string, "1.0")
+    }))
+  })
+```
+
+Default: `null`
+
 ### <a name="input_tables"></a> [tables](#input\_tables)
 
 Description: A map of tables to create on the storage account. The map key is arbitrary; the value supports the following attributes. Defaults to `{}` (no tables).
@@ -1571,6 +1748,12 @@ Source: ./modules/diagnostic_setting
 
 Version:
 
+### <a name="module_file_service"></a> [file\_service](#module\_file\_service)
+
+Source: ./modules/file_service
+
+Version:
+
 ### <a name="module_local_users"></a> [local\_users](#module\_local\_users)
 
 Source: ./modules/local_user
@@ -1586,6 +1769,12 @@ Version:
 ### <a name="module_private_endpoints"></a> [private\_endpoints](#module\_private\_endpoints)
 
 Source: ./modules/private_endpoint
+
+Version:
+
+### <a name="module_queue_service"></a> [queue\_service](#module\_queue\_service)
+
+Source: ./modules/queue_service
 
 Version:
 
@@ -1610,6 +1799,12 @@ Version:
 ### <a name="module_static_website"></a> [static\_website](#module\_static\_website)
 
 Source: ./modules/static_website
+
+Version:
+
+### <a name="module_table_service"></a> [table\_service](#module\_table\_service)
+
+Source: ./modules/table_service
 
 Version:
 

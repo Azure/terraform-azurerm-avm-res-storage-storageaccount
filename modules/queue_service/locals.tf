@@ -1,6 +1,4 @@
 locals {
-  tracing_headers = var.tracing_tags_header == null ? null : { "User-Agent" = var.tracing_tags_header }
-
   resource_body = {
     properties = {
       cors = var.queue_properties.cors_rules == null ? null : {
@@ -42,4 +40,5 @@ locals {
       }
     }
   }
+  tracing_headers = var.tracing_tags_header == null ? null : { "User-Agent" = var.tracing_tags_header }
 }

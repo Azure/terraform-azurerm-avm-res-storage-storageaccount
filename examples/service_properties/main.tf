@@ -51,7 +51,6 @@ module "this" {
   location  = azapi_resource.resource_group.location
   name      = module.naming.storage_account.name_unique
   parent_id = azapi_resource.resource_group.id
-
   # Blob service-level settings: versioning, soft-delete, change feed, and point-in-time restore.
   blob_properties = {
     versioning_enabled = true
@@ -72,7 +71,22 @@ module "this" {
       days    = 7
     }
   }
-
+  # File service-level settings: share soft-delete and CORS.
+  file_service_properties = {
+    share_retention_policy = {
+      enabled = true
+      days    = 14
+    }
+    cors_rules = [
+      {
+        allowed_headers    = ["x-ms-meta-data*", "x-ms-meta-target*"]
+        allowed_methods    = ["GET", "OPTIONS"]
+        allowed_origins    = ["https://example.com"]
+        exposed_headers    = ["x-ms-meta-*"]
+        max_age_in_seconds = 3600
+      }
+    ]
+  }
   # Queue service-level settings: logging, metrics, and CORS.
   queue_properties = {
     logging = {
@@ -98,24 +112,11 @@ module "this" {
       }
     ]
   }
-
-  # File service-level settings: share soft-delete and CORS.
-  file_service_properties = {
-    share_retention_policy = {
-      enabled = true
-      days    = 14
+  queues = {
+    example = {
+      name = "example-queue-${random_string.this.result}"
     }
-    cors_rules = [
-      {
-        allowed_headers    = ["x-ms-meta-data*", "x-ms-meta-target*"]
-        allowed_methods    = ["GET", "OPTIONS"]
-        allowed_origins    = ["https://example.com"]
-        exposed_headers    = ["x-ms-meta-*"]
-        max_age_in_seconds = 3600
-      }
-    ]
   }
-
   # Table service-level settings: logging, metrics, and CORS.
   table_properties = {
     logging = {
@@ -138,11 +139,5 @@ module "this" {
         max_age_in_seconds = 3600
       }
     ]
-  }
-
-  queues = {
-    example = {
-      name = "example-queue-${random_string.this.result}"
-    }
   }
 }

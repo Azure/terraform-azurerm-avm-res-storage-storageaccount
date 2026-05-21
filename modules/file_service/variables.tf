@@ -1,9 +1,3 @@
-variable "storage_account_id" {
-  type        = string
-  description = "(Required) The full resource ID of the parent storage account."
-  nullable    = false
-}
-
 variable "file_service_properties" {
   type = object({
     cors_rules = optional(list(object({
@@ -26,6 +20,12 @@ variable "file_service_properties" {
     }))
   })
   description = "(Required) File service-level settings to apply to the storage account."
+  nullable    = false
+}
+
+variable "storage_account_id" {
+  type        = string
+  description = "(Required) The full resource ID of the parent storage account."
   nullable    = false
 }
 
