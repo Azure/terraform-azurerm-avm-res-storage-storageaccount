@@ -198,7 +198,7 @@ Override the AzAPI `<provider>/<resource>@<api-version>` strings used by this mo
 - `customer_managed_key_vault` - The Key Vault data source used to look up the vault URI when CMK is enabled.
 - `lock`                       - Management lock applied to the storage account (and to private endpoints when configured).
 - `blob_container`             - Blob containers (also used by Data Lake Gen2 filesystems, which are blob containers in ARM).
-- `blob_service`               - The `blobServices/default` sub-resource, patched by the static-website submodule.
+- `blob_service`               - The `blobServices/default` sub-resource, patched by the static-website and blob-service submodules.
 - `queue`                      - Storage queues.
 - `table`                      - Storage tables.
 - `share`                      - File shares.

@@ -1,3 +1,9 @@
 # Blob service properties example
 
-This deploys a StorageV2 account with blob service properties configured, including soft-delete, versioning, and change feed.
+Deploys a StorageV2 storage account with blob service-level settings configured
+via `var.blob_properties`:
+
+- Blob versioning enabled.
+- Blob change feed enabled.
+- Blob soft-delete with a 14-day retention window.
+- Container soft-delete with a 14-day retention window.
