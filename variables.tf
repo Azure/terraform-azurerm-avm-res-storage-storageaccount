@@ -182,6 +182,7 @@ variable "resource_types" {
     lock                       = optional(string, "Microsoft.Authorization/locks@2020-05-01")
     blob_container             = optional(string, "Microsoft.Storage/storageAccounts/blobServices/containers@2025-06-01")
     blob_service               = optional(string, "Microsoft.Storage/storageAccounts/blobServices@2025-06-01")
+    file_service               = optional(string, "Microsoft.Storage/storageAccounts/fileServices@2025-06-01")
     queue                      = optional(string, "Microsoft.Storage/storageAccounts/queueServices/queues@2025-06-01")
     table                      = optional(string, "Microsoft.Storage/storageAccounts/tableServices/tables@2025-06-01")
     share                      = optional(string, "Microsoft.Storage/storageAccounts/fileServices/shares@2025-06-01")
@@ -199,6 +200,7 @@ Override the AzAPI `<provider>/<resource>@<api-version>` strings used by this mo
 - `lock`                       - Management lock applied to the storage account (and to private endpoints when configured).
 - `blob_container`             - Blob containers (also used by Data Lake Gen2 filesystems, which are blob containers in ARM).
 - `blob_service`               - The `blobServices/default` sub-resource, patched by the static-website submodule.
+- `file_service`               - The `fileServices/default` sub-resource, patched by the file-service submodule for CORS, soft-delete, and SMB settings.
 - `queue`                      - Storage queues.
 - `table`                      - Storage tables.
 - `share`                      - File shares.
