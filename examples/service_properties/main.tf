@@ -116,6 +116,30 @@ module "this" {
     ]
   }
 
+  # Table service-level settings: logging, metrics, and CORS.
+  table_properties = {
+    logging = {
+      delete                = true
+      read                  = true
+      write                 = true
+      retention_policy_days = 7
+    }
+    hour_metrics = {
+      enabled               = true
+      include_apis          = true
+      retention_policy_days = 7
+    }
+    cors_rules = [
+      {
+        allowed_headers    = ["x-ms-meta-data*", "x-ms-meta-target*"]
+        allowed_methods    = ["GET", "OPTIONS", "PUT"]
+        allowed_origins    = ["https://example.com"]
+        exposed_headers    = ["x-ms-meta-*"]
+        max_age_in_seconds = 3600
+      }
+    ]
+  }
+
   queues = {
     example = {
       name = "example-queue-${random_string.this.result}"
