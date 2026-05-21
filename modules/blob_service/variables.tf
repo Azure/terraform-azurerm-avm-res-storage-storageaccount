@@ -1,9 +1,3 @@
-variable "storage_account_id" {
-  type        = string
-  description = "(Required) The full resource ID of the parent storage account."
-  nullable    = false
-}
-
 variable "blob_properties" {
   type = object({
     automatic_snapshot_policy_enabled = optional(bool)
@@ -126,6 +120,12 @@ variable "blob_properties" {
     )
     error_message = "blob_properties.last_access_time_tracking_policy.name must be \"AccessTimeTracking\"."
   }
+}
+
+variable "storage_account_id" {
+  type        = string
+  description = "(Required) The full resource ID of the parent storage account."
+  nullable    = false
 }
 
 variable "resource_type" {
