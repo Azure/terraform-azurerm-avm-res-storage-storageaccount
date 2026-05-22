@@ -104,4 +104,16 @@ module "this" {
       name = "example-queue-${random_string.this.result}"
     }
   }
+  # Table service-level settings: CORS.
+  table_properties = {
+    cors_rules = [
+      {
+        allowed_headers    = ["x-ms-meta-data*", "x-ms-meta-target*"]
+        allowed_methods    = ["GET", "OPTIONS", "PUT"]
+        allowed_origins    = ["https://example.com"]
+        exposed_headers    = ["x-ms-meta-*"]
+        max_age_in_seconds = 3600
+      }
+    ]
+  }
 }

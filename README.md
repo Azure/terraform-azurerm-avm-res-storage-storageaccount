@@ -1050,6 +1050,7 @@ Description: Override the AzAPI `<provider>/<resource>@<api-version>` strings us
 - `local_user`                 - SFTP local users.
 - `management_policy`          - The lifecycle-management policy.
 - `queue_service`              - The `queueServices/default` sub-resource, patched by the queue-service-properties submodule.
+- `table_service`              - The `tableServices/default` sub-resource, patched by the table-service-properties submodule.
 - `private_endpoint`           - Private endpoints created for the storage account.
 - `private_dns_zone_group`     - The private DNS zone group resource attached to a private endpoint.
 
@@ -1069,6 +1070,7 @@ object({
     local_user                 = optional(string, "Microsoft.Storage/storageAccounts/localUsers@2025-06-01")
     management_policy          = optional(string, "Microsoft.Storage/storageAccounts/managementPolicies@2025-06-01")
     queue_service              = optional(string, "Microsoft.Storage/storageAccounts/queueServices@2025-06-01")
+    table_service              = optional(string, "Microsoft.Storage/storageAccounts/tableServices@2025-06-01")
     private_endpoint           = optional(string, "Microsoft.Network/privateEndpoints@2025-05-01")
     private_dns_zone_group     = optional(string, "Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2025-05-01")
   })
@@ -1440,6 +1442,33 @@ Type: `string`
 
 Default: `null`
 
+### <a name="input_table_properties"></a> [table\_properties](#input\_table\_properties)
+
+Description: Table service-level settings for the storage account. Defaults to `null` (Azure platform defaults).
+
+- `cors_rules` - (Optional) A list of CORS rules for the table service. Defaults to `null`. Each entry supports:
+  - `allowed_headers` - (Required) A list of headers allowed in cross-origin requests.
+  - `allowed_methods` - (Required) A list of HTTP methods allowed.
+  - `allowed_origins` - (Required) A list of origin domains allowed.
+  - `exposed_headers` - (Required) A list of response headers exposed to CORS clients.
+  - `max_age_in_seconds` - (Required) Seconds the browser should cache a preflight response.
+
+Type:
+
+```hcl
+object({
+    cors_rules = optional(list(object({
+      allowed_headers    = list(string)
+      allowed_methods    = list(string)
+      allowed_origins    = list(string)
+      exposed_headers    = list(string)
+      max_age_in_seconds = number
+    })))
+  })
+```
+
+Default: `null`
+
 ### <a name="input_tables"></a> [tables](#input\_tables)
 
 Description: A map of tables to create on the storage account. The map key is arbitrary; the value supports the following attributes. Defaults to `{}` (no tables).
@@ -1700,6 +1729,12 @@ Version:
 ### <a name="module_static_website"></a> [static\_website](#module\_static\_website)
 
 Source: ./modules/static_website
+
+Version:
+
+### <a name="module_table_service"></a> [table\_service](#module\_table\_service)
+
+Source: ./modules/table_service
 
 Version:
 
