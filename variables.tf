@@ -189,7 +189,6 @@ variable "resource_types" {
     local_user                 = optional(string, "Microsoft.Storage/storageAccounts/localUsers@2025-06-01")
     management_policy          = optional(string, "Microsoft.Storage/storageAccounts/managementPolicies@2025-06-01")
     queue_service              = optional(string, "Microsoft.Storage/storageAccounts/queueServices@2025-06-01")
-    table_service              = optional(string, "Microsoft.Storage/storageAccounts/tableServices@2025-06-01")
     private_endpoint           = optional(string, "Microsoft.Network/privateEndpoints@2025-05-01")
     private_dns_zone_group     = optional(string, "Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2025-05-01")
   })
@@ -209,7 +208,6 @@ Override the AzAPI `<provider>/<resource>@<api-version>` strings used by this mo
 - `local_user`                 - SFTP local users.
 - `management_policy`          - The lifecycle-management policy.
 - `queue_service`              - The `queueServices/default` sub-resource, patched by the queue-service-properties submodule.
-- `table_service`              - The `tableServices/default` sub-resource, patched by the table-service-properties submodule.
 - `private_endpoint`           - Private endpoints created for the storage account.
 - `private_dns_zone_group`     - The private DNS zone group resource attached to a private endpoint.
 DESCRIPTION
