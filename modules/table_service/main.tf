@@ -15,14 +15,18 @@ resource "azapi_update_resource" "this" {
       update = timeouts.value.update
     }
   }
+}
 
-  lifecycle {
-    # The ARM GET on tableServices/default does not faithfully echo back the
-    # corsRules that were PATCHed, which causes the next plan/refresh to see
-    # perpetual drift on body.properties.cors even though the PATCH succeeded.
-    # Ignore changes on this path so the configured CORS is applied on create
-    # but subsequent refresh drift on the read-back is suppressed. Updates to
-    # cors_rules will require tainting/replacing this resource.
-    ignore_changes = [body.properties.cors]
+# The ARM GET on tableServices/default is eventually consistent: immediately
+# after a successful PATCH the read can return without the corsRules that were
+# just applied, which makes a follow-up plan see perpetual drift on
+# body.properties.cors. In practice the read-back stabilises after roughly two
+# minutes, so wait `var.cors_propagation_wait` before allowing dependents (and
+# the post-apply idempotency plan) to refresh state.
+resource "time_sleep" "cors_propagation" {
+  create_duration = var.cors_propagation_wait
+  triggers = {
+    cors_rules = jsonencode(try(var.table_properties.cors_rules, null))
+    patched_id = azapi_update_resource.this.id
   }
 }

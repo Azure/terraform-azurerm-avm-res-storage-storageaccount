@@ -35,16 +35,19 @@ module "storage_account" {
 
 Table Storage analytics logging and metrics are not included here because the ARM `tableServices/default` patch path does not persist those settings reliably.
 
-## Idempotency note
+## Eventual consistency on CORS read-back
 
-The ARM `GET` on `tableServices/default` does not echo back the `corsRules`
-that were just `PATCH`ed, even though the `PATCH` itself succeeds and the
-rules are applied. To avoid perpetual plan drift, this submodule applies
-`lifecycle.ignore_changes = [body.properties.cors]`. As a result, CORS rules
-are applied when the resource is first created, but later changes to
-`cors_rules` will not be detected by `terraform plan`. To update the CORS
-rules, taint or replace the underlying resource, for example:
+The ARM `GET` on `tableServices/default` is eventually consistent for CORS:
+immediately after a successful `PATCH`, a follow-up read can return without
+the `corsRules` that were just applied, even though they are present in the
+service. This causes the next `terraform plan` (and the post-apply
+idempotency check that runs straight after `apply`) to see false drift on
+`body.properties.cors`. In practice the read-back stabilises after roughly
+two minutes.
 
-```bash
-terraform taint 'module.<storage_account>.module.table_service[0].azapi_update_resource.this'
-```
+To handle this, the submodule wires a `time_sleep` resource that waits after
+the PATCH before allowing dependents to refresh. The wait duration is
+configurable via the root module's `table_service_cors_propagation_wait`
+variable (default `"2m"`). Set it to `"0s"` to disable the wait entirely —
+this is not recommended when `cors_rules` is set, because subsequent plans
+may show transient drift.

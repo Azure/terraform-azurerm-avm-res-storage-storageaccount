@@ -1469,6 +1469,16 @@ object({
 
 Default: `null`
 
+### <a name="input_table_service_cors_propagation_wait"></a> [table\_service\_cors\_propagation\_wait](#input\_table\_service\_cors\_propagation\_wait)
+
+Description: (Optional) Duration to wait after the table service CORS PATCH before allowing dependents to refresh, expressed as a Go duration string (e.g. `2m`, `90s`). Defaults to `"2m"`.
+
+The ARM `GET` on `tableServices/default` is eventually consistent: immediately after a successful PATCH the read can omit the `corsRules` that were just applied, which causes a follow-up `terraform plan` (and the post-apply idempotency check) to see false drift. The read-back stabilises after roughly two minutes. Set to `"0s"` to disable the wait entirely (not recommended when `table_properties.cors_rules` is set).
+
+Type: `string`
+
+Default: `"2m"`
+
 ### <a name="input_tables"></a> [tables](#input\_tables)
 
 Description: A map of tables to create on the storage account. The map key is arbitrary; the value supports the following attributes. Defaults to `{}` (no tables).

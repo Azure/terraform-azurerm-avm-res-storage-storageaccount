@@ -64,3 +64,14 @@ variable "tracing_tags_header" {
   default     = null
   description = "(Optional) User-Agent string injected into AzAPI request headers. Defaults to `null` (no custom header)."
 }
+
+variable "cors_propagation_wait" {
+  type        = string
+  default     = "2m"
+  description = <<-EOT
+(Optional) Duration to wait after a successful CORS PATCH before allowing dependents to refresh, expressed as a Go duration string (e.g. `2m`, `90s`).
+
+The ARM `GET` on `tableServices/default` is eventually consistent: immediately after a successful PATCH the read can omit the `corsRules` that were just applied, which causes a follow-up `terraform plan` (and the post-apply idempotency check) to see false drift on `body.properties.cors`. The read-back stabilises after roughly two minutes, so this wait is applied via a `time_sleep` resource. Set to `"0s"` to disable the wait entirely (not recommended when `cors_rules` is set).
+EOT
+  nullable    = false
+}
