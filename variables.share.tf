@@ -1,8 +1,3 @@
-# NOTE: var.share_properties (file service-level CORS, retention policy, SMB
-# settings, diagnostics) was removed in v1.0.0 (azapi rewrite). Configure those
-# settings directly via Microsoft.Storage/storageAccounts/fileServices if
-# needed; this module no longer exposes them.
-
 variable "azure_files_authentication" {
   type = object({
     directory_type                 = optional(string, "AADKERB")

@@ -182,11 +182,14 @@ variable "resource_types" {
     lock                       = optional(string, "Microsoft.Authorization/locks@2020-05-01")
     blob_container             = optional(string, "Microsoft.Storage/storageAccounts/blobServices/containers@2025-06-01")
     blob_service               = optional(string, "Microsoft.Storage/storageAccounts/blobServices@2025-06-01")
+    file_service               = optional(string, "Microsoft.Storage/storageAccounts/fileServices@2025-06-01")
     queue                      = optional(string, "Microsoft.Storage/storageAccounts/queueServices/queues@2025-06-01")
     table                      = optional(string, "Microsoft.Storage/storageAccounts/tableServices/tables@2025-06-01")
     share                      = optional(string, "Microsoft.Storage/storageAccounts/fileServices/shares@2025-06-01")
     local_user                 = optional(string, "Microsoft.Storage/storageAccounts/localUsers@2025-06-01")
     management_policy          = optional(string, "Microsoft.Storage/storageAccounts/managementPolicies@2025-06-01")
+    queue_service              = optional(string, "Microsoft.Storage/storageAccounts/queueServices@2025-06-01")
+    table_service              = optional(string, "Microsoft.Storage/storageAccounts/tableServices@2025-06-01")
     private_endpoint           = optional(string, "Microsoft.Network/privateEndpoints@2025-05-01")
     private_dns_zone_group     = optional(string, "Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2025-05-01")
   })
@@ -198,12 +201,15 @@ Override the AzAPI `<provider>/<resource>@<api-version>` strings used by this mo
 - `customer_managed_key_vault` - The Key Vault data source used to look up the vault URI when CMK is enabled.
 - `lock`                       - Management lock applied to the storage account (and to private endpoints when configured).
 - `blob_container`             - Blob containers (also used by Data Lake Gen2 filesystems, which are blob containers in ARM).
-- `blob_service`               - The `blobServices/default` sub-resource, patched by the static-website submodule.
+- `blob_service`               - The `blobServices/default` sub-resource, patched by the static-website and blob-service submodules.
+- `file_service`               - The `fileServices/default` sub-resource, patched by the file-service submodule for CORS, soft-delete, and SMB settings.
 - `queue`                      - Storage queues.
 - `table`                      - Storage tables.
 - `share`                      - File shares.
 - `local_user`                 - SFTP local users.
 - `management_policy`          - The lifecycle-management policy.
+- `queue_service`              - The `queueServices/default` sub-resource, patched by the queue-service-properties submodule.
+- `table_service`              - The `tableServices/default` sub-resource, patched by the table-service-properties submodule.
 - `private_endpoint`           - Private endpoints created for the storage account.
 - `private_dns_zone_group`     - The private DNS zone group resource attached to a private endpoint.
 DESCRIPTION

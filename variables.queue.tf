@@ -1,8 +1,3 @@
-# NOTE: var.queue_properties (queue service-level CORS, logging, hour_metrics,
-# minute_metrics) was removed in v1.0.0 (azapi rewrite). Configure those
-# settings directly via `Microsoft.Storage/storageAccounts/queueServices` if
-# needed; this module no longer exposes them.
-
 variable "queue_encryption_key_type" {
   type        = string
   default     = null

@@ -1,9 +1,3 @@
-# NOTE: var.blob_properties (blob service-level versioning, change feed,
-# CORS, retention policies) was removed in v1.0.0 (azapi rewrite). Configure
-# those settings directly via
-# Microsoft.Storage/storageAccounts/blobServices@2024-01-01 if needed; this
-# module no longer exposes them.
-
 variable "containers" {
   type = map(object({
     public_access                  = optional(string, "None")
