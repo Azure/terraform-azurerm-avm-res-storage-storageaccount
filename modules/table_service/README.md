@@ -13,7 +13,7 @@ This submodule configures table service properties for an Azure Storage Account.
 
 ## Usage
 
-This submodule is used via the root module's `table_properties` variable. It is not intended to be called directly.
+This submodule can be consumed directly, or via the root module's `table_properties` variable.
 
 ```hcl
 module "storage_account" {
@@ -192,7 +192,7 @@ No modules.
 ## Notes
 
 - This submodule is automatically called by the root module when `table_properties` is configured
-- Do not invoke this submodule directly
+- This submodule can also be invoked directly when required inputs are provided
 - Uses `azapi_update_resource` (PATCH) so only the specified properties are modified; all other table service settings remain at their current values
 - See root module documentation for complete usage examples
 <!-- END_TF_DOCS -->

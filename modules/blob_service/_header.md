@@ -1,7 +1,7 @@
 <!-- BEGIN_TF_DOCS -->
-# Internal submodule: blob_service
+# Submodule: blob_service
 
-This is an internal submodule used by `terraform-azurerm-avm-res-storage-storageaccount`. Consumers MUST NOT call this submodule directly. Refer to the root module for supported inputs.
+This submodule is independently consumable and can be called directly. It is also used by `terraform-azurerm-avm-res-storage-storageaccount`.
 
 **ARM Resource Type**: `Microsoft.Storage/storageAccounts/blobServices@2025-06-01`
 
@@ -18,7 +18,7 @@ This is an internal submodule used by `terraform-azurerm-avm-res-storage-storage
 
 ## Usage
 
-Configure blob service properties via the root module's `blob_properties` variable:
+This submodule can be consumed directly, or via the root module's `blob_properties` variable:
 
 ```terraform
 module "storage_account" {

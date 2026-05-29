@@ -14,7 +14,7 @@ This submodule configures queue service properties for an Azure Storage Account.
 
 ## Usage
 
-This submodule is used via the root module's `queue_properties` variable. It is not intended to be called directly.
+This submodule can be consumed directly, or via the root module's `queue_properties` variable.
 
 ```hcl
 module "storage_account" {
@@ -163,7 +163,7 @@ No modules.
 ## Notes
 
 - This submodule is automatically called by the root module when `queue_properties` is configured
-- Do not invoke this submodule directly
+- This submodule can also be invoked directly when required inputs are provided
 - See root module documentation for complete usage examples
 <!-- END\_TF\_DOCS -->
 <!-- END_TF_DOCS -->

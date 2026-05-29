@@ -13,7 +13,7 @@ This submodule configures file service properties for an Azure Storage Account u
 
 ## Usage
 
-This submodule is called by the root module when `file_service_properties` is set. It is not intended to be invoked directly.
+This submodule can be consumed directly, and it is also called by the root module when `file_service_properties` is set.
 
 ```hcl
 module "storage_account" {
