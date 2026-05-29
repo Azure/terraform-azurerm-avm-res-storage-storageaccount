@@ -46,6 +46,8 @@ README-generated.md
 
 tfmod-scaffold/
 scripts
+!.agents/skills/avm-terraform-module-development/scripts/
+!.agents/skills/avm-terraform-module-development/scripts/Get-AzureSchema.ps1
 
 test/go.sum
 
