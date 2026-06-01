@@ -1,5 +1,5 @@
 <!-- BEGIN_TF_DOCS -->
-# Internal submodule: container
+# Submodule: container
 
-This is an internal submodule used by `terraform-azurerm-avm-res-storage-storageaccount`. Consumers MUST NOT call this submodule directly. Refer to the root module for supported inputs.
+This submodule is independently consumable and can be called directly. It is also used by `terraform-azurerm-avm-res-storage-storageaccount`.
 

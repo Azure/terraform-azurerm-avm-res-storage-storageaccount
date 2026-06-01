@@ -13,7 +13,7 @@ This submodule configures table service properties for an Azure Storage Account.
 
 ## Usage
 
-This submodule is used via the root module's `table_properties` variable. It is not intended to be called directly.
+This submodule can be consumed directly, or via the root module's `table_properties` variable.
 
 ```hcl
 module "storage_account" {
@@ -189,10 +189,8 @@ Description: The resource ID of the table service.
 
 No modules.
 
-## Notes
+<!-- markdownlint-disable-next-line MD041 -->
+## Data Collection
 
-- This submodule is automatically called by the root module when `table_properties` is configured
-- Do not invoke this submodule directly
-- Uses `azapi_update_resource` (PATCH) so only the specified properties are modified; all other table service settings remain at their current values
-- See root module documentation for complete usage examples
+The software may collect information about you and your use of the software and send it to Microsoft. Microsoft may use this information to provide services and improve our products and services. You may turn off the telemetry as described in the repository. There are also some features in the software that may enable you and Microsoft to collect data from users of your applications. If you use these features, you must comply with applicable law, including providing appropriate notices to users of your applications together with a copy of Microsoft’s privacy statement. Our privacy statement is located at <https://go.microsoft.com/fwlink/?LinkID=824704>. You can learn more about data collection and use in the help documentation and our privacy statement. Your use of the software operates as your consent to these practices.
 <!-- END_TF_DOCS -->
