@@ -207,12 +207,8 @@ Description: The minimum date and time from which the restore can be started.
 
 No modules.
 
-<!-- END\_TF\_DOCS -->
+<!-- markdownlint-disable-next-line MD041 -->
+## Data Collection
 
-## Notes
-
-- This submodule is automatically called by the root module when `blob_properties` is configured
-- This submodule can also be invoked directly when required inputs are provided
-- Uses `azapi_update_resource` (PATCH semantics) — only the specified properties are updated; unmanaged blob service settings are left unchanged
-- See root module documentation for complete usage examples
+The software may collect information about you and your use of the software and send it to Microsoft. Microsoft may use this information to provide services and improve our products and services. You may turn off the telemetry as described in the repository. There are also some features in the software that may enable you and Microsoft to collect data from users of your applications. If you use these features, you must comply with applicable law, including providing appropriate notices to users of your applications together with a copy of Microsoft’s privacy statement. Our privacy statement is located at <https://go.microsoft.com/fwlink/?LinkID=824704>. You can learn more about data collection and use in the help documentation and our privacy statement. Your use of the software operates as your consent to these practices.
 <!-- END_TF_DOCS -->

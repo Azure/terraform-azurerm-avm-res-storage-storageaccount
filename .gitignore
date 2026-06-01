@@ -37,48 +37,18 @@ override.tf.json
 terraform.rc
 avmmakefile
 README-generated.md
-
-
-**/override.tf
-
-.tflint.hcl
-.tflint_example.hcl
-
-tfmod-scaffold/
-scripts
-!.agents/skills/avm-terraform-module-development/scripts/
-!.agents/skills/avm-terraform-module-development/scripts/Get-AzureSchema.ps1
-
-test/go.sum
-
-TestRecord/
-**/TestRecord.md.tmp
-**/.terraform/*
-*.tfstate.*
-*.tfvars.json
-*_override.tf
-*_override.tf.json
-*tfplan*
-.terraform.lock.hcl
-.terraformrc
 avm.tflint.hcl
-avm.tflint.merged.hcl
 avm.tflint_example.hcl
-avm.tflint_example.merged.hcl
-avmmakefile
-crash.*.log
-crash.log
-override.tf
-override.tf.json
-terraform.rc
-*.md.tmp
-.DS_Store
 avm.tflint_module.hcl
+avm.tflint.merged.hcl
+avm.tflint_example.merged.hcl
 avm.tflint_module.merged.hcl
-avm-pre-commit.log
+*tfplan*
+*.md.tmp
+# MacOS
+.DS_Store
 
-#IntelliJ IDEA
-.idea/
+# conftest policy
 examples/*/policy
 *.mptfbackup
 .avm
