@@ -52,7 +52,7 @@ resource "random_string" "this" {
 
 module "naming" {
   source  = "Azure/naming/azurerm"
-  version = "0.4.0"
+  version = "0.4.3"
 }
 
 resource "azapi_resource" "resource_group" {
