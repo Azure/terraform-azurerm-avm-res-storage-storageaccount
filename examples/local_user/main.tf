@@ -133,7 +133,7 @@ resource "azapi_resource" "example_identity" {
 
 module "avm_res_keyvault_vault" {
   source  = "Azure/avm-res-keyvault-vault/azurerm"
-  version = "0.5.1"
+  version = "0.10.2"
 
   location            = azapi_resource.resource_group.location
   name                = module.naming.key_vault.name_unique
