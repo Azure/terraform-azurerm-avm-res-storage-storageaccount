@@ -68,6 +68,34 @@ resource "azapi_resource" "this" {
   }
 
   lifecycle {
+    # Smart access tier is only supported for StorageV2 accounts with
+    # ZRS, GZRS or RA-GZRS redundancy. Validate the account configuration
+    # early to provide a clear error message before calling the Azure API.
+    precondition {
+      condition = (
+        var.access_tier == "Smart"
+        ? (
+          var.account_kind == "StorageV2" &&
+          contains(["Standard_ZRS", "Standard_GZRS", "Standard_RAGZRS"], local.sku_name)
+        )
+        : true
+      )
+
+      error_message = "Smart access tier requires account_kind = StorageV2 and SKU Standard_ZRS, Standard_GZRS or Standard_RAGZRS."
+    }
+
+    # Smart access tier requires Storage API version 2025-08-01 or later.
+    # The api-version date is captured from the `@<date>` suffix, so any
+    # trailing qualifier (e.g. `-preview`) is ignored and preview versions
+    # at or above 2025-08-01 are accepted. ISO dates compare lexically.
+    precondition {
+      condition = var.access_tier != "Smart" || try(
+        regex("@(\\d{4}-\\d{2}-\\d{2})", var.resource_types.storage_account)[0] >= "2025-08-01",
+        false
+      )
+
+      error_message = "Smart access tier requires resource_types.storage_account to use Microsoft.Storage/storageAccounts@2025-08-01 or later (preview suffixes are allowed)."
+    }
     # CMK fields are owned by azapi_update_resource.customer_managed_key.
     ignore_changes = [
       body.properties.encryption.keySource,
