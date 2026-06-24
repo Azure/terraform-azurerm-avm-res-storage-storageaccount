@@ -23,6 +23,7 @@ resource "modtm_telemetry" "telemetry" {
 data "azapi_client_config" "telemetry" {
   count = var.enable_telemetry ? 1 : 0
 }
+
 locals {
   avm_azapi_headers = !var.enable_telemetry ? {} : (local.fork_avm ? {
     fork_avm  = "true"

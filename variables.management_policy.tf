@@ -4,6 +4,7 @@
 #   nullable    = false
 # }
 
+
 variable "storage_management_policy_rule" {
   type = map(object({
     enabled = bool

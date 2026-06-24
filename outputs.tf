@@ -4,6 +4,7 @@
 # `ephemeral "azapi_resource_action"` block targeting `module.<name>.resource_id`.
 # See the `examples/list_keys_ephemeral` example for the recommended pattern.
 
+
 output "containers" {
   description = "Map of storage containers that are created."
   value = {
