@@ -90,8 +90,6 @@ module "storage_account" {
       private_dns_zone_resource_ids = [module.private_dns_zone.resource_id]
       subnet_resource_id            = module.virtual_network.subnets["private_endpoints"].resource_id
       subresource_name              = "blob"
-      # Set explicitly so the custom NIC name round-trips cleanly and the plan stays idempotent.
-      network_interface_name = "nic-pe-blob-${module.naming.storage_account.name_unique}"
     }
   }
   public_network_access_enabled = false
