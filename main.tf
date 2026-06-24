@@ -56,6 +56,7 @@ resource "azapi_resource" "this" {
       identity_ids = var.managed_identities.user_assigned_resource_ids
     }
   }
+
   dynamic "timeouts" {
     for_each = var.timeouts == null ? [] : [var.timeouts]
 

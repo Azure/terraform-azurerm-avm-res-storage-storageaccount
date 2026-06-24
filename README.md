@@ -77,7 +77,7 @@ The following input variables are optional (have default values):
 
 ### <a name="input_access_tier"></a> [access\_tier](#input\_access\_tier)
 
-Description: (Optional) Defines the access tier for BlobStorage, FileStorage and StorageV2 accounts. Valid options are Hot, Cool, Cold and Premium. Defaults to Hot.
+Description: (Optional) Defines the access tier for BlobStorage, FileStorage and StorageV2 accounts. Valid options are Hot, Cool, Cold, Premium and Smart. Defaults to Hot.
 
 Type: `string`
 
