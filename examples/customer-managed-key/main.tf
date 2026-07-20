@@ -50,7 +50,7 @@ resource "random_string" "this" {
 
 module "naming" {
   source  = "Azure/naming/azurerm"
-  version = "0.4.0"
+  version = "0.4.3"
 }
 
 data "azurerm_client_config" "current" {}
@@ -154,7 +154,7 @@ resource "azurerm_key_vault_key" "example" {
 
 module "avm_res_keyvault_vault" {
   source  = "Azure/avm-res-keyvault-vault/azurerm"
-  version = "0.5.1"
+  version = "0.10.2"
 
   location            = azapi_resource.resource_group.location
   name                = module.naming.key_vault.name_unique
