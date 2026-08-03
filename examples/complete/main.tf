@@ -269,7 +269,7 @@ module "this" {
         { category = "StorageDelete" },
       ]
       metrics = [
-        { category = "Transaction" },
+        { category = "AllMetrics" },
       ]
     }
   }
@@ -283,7 +283,7 @@ module "this" {
         { category_group = "audit" },
       ]
       metrics = [
-        { category = "Transaction" },
+        { category = "AllMetrics" },
       ]
     }
   }
@@ -298,7 +298,7 @@ module "this" {
         { category = "StorageDelete" },
       ]
       metrics = [
-        { category = "Transaction" },
+        { category = "AllMetrics" },
       ]
     }
   }
@@ -323,7 +323,7 @@ module "this" {
         { category = "StorageWrite" },
       ]
       metrics = [
-        { category = "Transaction" },
+        { category = "AllMetrics" },
       ]
     }
   }
