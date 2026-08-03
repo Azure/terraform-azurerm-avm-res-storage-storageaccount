@@ -8,7 +8,7 @@ terraform {
     }
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = ">= 4.37.0, < 5.0.0"
+      version = ">= 4.37.0, < 5.0.2"
     }
     random = {
       source  = "hashicorp/random"
@@ -50,7 +50,7 @@ resource "random_string" "this" {
 
 module "naming" {
   source  = "Azure/naming/azurerm"
-  version = "0.4.0"
+  version = "0.4.3"
 }
 
 data "azurerm_client_config" "current" {}
