@@ -21,6 +21,25 @@ This Terraform module is designed to create Azure Storage Accounts and its relat
 
 > **IMPORTANT** This module manages the Storage Account itself, plus its child containers, queues, tables, file shares, private endpoints and role assignments, through the AzAPI provider, which always authenticates with Microsoft Entra ID and never requires a Storage shared key. We recommend leaving `shared_access_key_enabled = false` (the module default) so that any data-plane access from your own code is also Entra-ID-authenticated. If you also use the [`azurerm` provider](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs#storage_use_azuread) to manage Storage data-plane resources (for example `azurerm_storage_blob`), set `storage_use_azuread = true` in that provider block. Note that not every Storage service supports Microsoft Entra ID authentication; for those services you will need to enable shared-key access by setting `shared_access_key_enabled = true` on this module.
 
+## Upgrading
+
+This module requires AzAPI provider version 2.9.0 or later within the 2.x series (`>= 2.9.0, < 3.0.0`). When upgrading to a module release with this requirement, update any AzAPI constraint in your root module that excludes version 2.9.0, then refresh the provider selections recorded in your dependency lock file:
+
+```terraform
+terraform {
+  required_providers {
+    azapi = {
+      source  = "Azure/azapi"
+      version = "~> 2.9"
+    }
+  }
+}
+```
+
+```shell
+terraform init -upgrade
+```
+
 <!-- markdownlint-disable MD033 -->
 ## Requirements
 
@@ -28,7 +47,7 @@ The following requirements are needed by this module:
 
 - <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.10.0)
 
-- <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) (~> 2.8)
+- <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) (~> 2.9)
 
 - <a name="requirement_modtm"></a> [modtm](#requirement\_modtm) (~> 0.3)
 
