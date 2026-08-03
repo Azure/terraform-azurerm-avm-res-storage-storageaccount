@@ -12,7 +12,26 @@ variables {
   account_replication_type = "LRS"
 }
 
-run "retry_null_omitted" {
+run "retry_default_storage_contention" {
+  command = plan
+
+  assert {
+    condition     = length(azapi_resource.this.retry.error_message_regex) == 1 && azapi_resource.this.retry.error_message_regex[0] == "StorageAccountOperationInProgress"
+    error_message = "Expected the default retry to match only StorageAccountOperationInProgress"
+  }
+
+  assert {
+    condition     = azapi_resource.this.retry.interval_seconds == 5
+    error_message = "Expected the default retry.interval_seconds == 5"
+  }
+
+  assert {
+    condition     = azapi_resource.this.retry.max_interval_seconds == 60
+    error_message = "Expected the default retry.max_interval_seconds == 60"
+  }
+}
+
+run "retry_explicitly_disabled" {
   command = plan
 
   variables {
@@ -22,6 +41,31 @@ run "retry_null_omitted" {
   assert {
     condition     = azapi_resource.this.retry == null
     error_message = "Expected retry to be null when var.retry is null"
+  }
+}
+
+run "retry_regex_override" {
+  command = plan
+
+  variables {
+    retry = {
+      error_message_regex = ["TooManyRequests"]
+    }
+  }
+
+  assert {
+    condition     = length(azapi_resource.this.retry.error_message_regex) == 1 && azapi_resource.this.retry.error_message_regex[0] == "TooManyRequests"
+    error_message = "Expected a custom retry regex list to replace the default list"
+  }
+
+  assert {
+    condition     = azapi_resource.this.retry.interval_seconds == 5
+    error_message = "Expected the default retry.interval_seconds == 5 when only regexes are overridden"
+  }
+
+  assert {
+    condition     = azapi_resource.this.retry.max_interval_seconds == 60
+    error_message = "Expected the default retry.max_interval_seconds == 60 when only regexes are overridden"
   }
 }
 
