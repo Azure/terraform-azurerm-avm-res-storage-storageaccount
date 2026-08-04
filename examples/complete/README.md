@@ -391,7 +391,7 @@ module "this" {
   # Module-wide retry. Applies to every AzAPI resource managed by the module
   # and every submodule unless overridden per-item.
   retry = {
-    error_message_regex  = ["TooManyRequests", "ResourceNotFound", "RetryableError"]
+    error_message_regex  = ["StorageAccountOperationInProgress", "TooManyRequests", "ResourceNotFound", "RetryableError"]
     interval_seconds     = 5
     max_interval_seconds = 60
   }
