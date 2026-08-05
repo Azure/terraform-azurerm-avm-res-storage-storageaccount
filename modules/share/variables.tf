@@ -10,6 +10,12 @@ variable "quota" {
   nullable    = false
 }
 
+variable "storage_account_id" {
+  type        = string
+  description = "(Required) The full resource ID of the parent storage account."
+  nullable    = false
+}
+
 variable "provisioned_bandwidth_mibps" {
   type        = number
   default     = null
@@ -20,12 +26,6 @@ variable "provisioned_iops" {
   type        = number
   default     = null
   description = "(Optional) The provisioned IOPS of the file share for Files Provisioned v2 accounts."
-}
-
-variable "storage_account_id" {
-  type        = string
-  description = "(Required) The full resource ID of the parent storage account."
-  nullable    = false
 }
 
 variable "access_tier" {

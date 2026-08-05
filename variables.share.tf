@@ -88,6 +88,8 @@ A map of file shares to create on the storage account. The map key is arbitrary;
 
 - `name` - (Required) The name of the share. Must be unique within the storage account. Changing this forces a new resource to be created.
 - `quota` - (Required) The maximum size of the share, in gigabytes. For Standard storage accounts, this must be `1` GB or higher and at most `5120` GB (5 TB). For Premium FileStorage accounts, this must be greater than 100 GB and at most `102400` GB (100 TB).
+- `provisioned_bandwidth_mibps` - (Optional) The provisioned bandwidth of the share, in MiB/s. Only valid for Files Provisioned v2 accounts. Defaults to `null`.
+- `provisioned_iops` - (Optional) The provisioned IOPS of the share. Only valid for Files Provisioned v2 accounts. Defaults to `null`.
 - `access_tier` - (Optional) The access tier of the file share. Possible values are `Hot`, `Cool`, `TransactionOptimized`, `Premium`. Defaults to `null` (Azure platform default).
 - `enabled_protocol` - (Optional) The protocol used for the share. Possible values are `SMB` and `NFS`. `SMB` indicates the share can be accessed by SMBv3.0, SMBv2.1 and REST. `NFS` indicates the share can be accessed by NFSv4.1. Defaults to `null` (Azure platform default of `SMB`). Changing this forces a new resource to be created.
 - `metadata` - (Optional) A mapping of MetaData for this File Share. Defaults to `null`.
