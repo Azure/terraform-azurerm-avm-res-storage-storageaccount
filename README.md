@@ -1157,11 +1157,13 @@ Default: `{}`
 
 ### <a name="input_retry"></a> [retry](#input\_retry)
 
-Description: Retry configuration applied to every `azapi` resource managed by the module (root storage account and all submodules). Defaults to `null` (no custom retry).
+Description: Retry configuration applied to every `azapi` resource managed by the module (root storage account and all submodules). By default, retries only the transient `StorageAccountOperationInProgress` error, starting at 5 seconds and capping the interval at 60 seconds.
 
-- `error_message_regex`  - (Optional) A list of regex patterns matching error messages that trigger a retry.
-- `interval_seconds`     - (Optional) Initial interval between retries in seconds.
-- `max_interval_seconds` - (Optional) Maximum interval between retries in seconds.
+- `error_message_regex`  - (Optional) A list of regex patterns matching error messages that trigger a retry. Supplying this field replaces the default list; include `StorageAccountOperationInProgress` to retain the module's transient storage-operation retry.
+- `interval_seconds`     - (Optional) Initial interval between retries in seconds. Defaults to `5`.
+- `max_interval_seconds` - (Optional) Maximum interval between retries in seconds. Defaults to `60`.
+
+Set `retry = null` to disable custom retries. The default deliberately does not retry generic HTTP 403 or 409 responses, so authorization failures and permanent conflicts remain visible.
 
 See <https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource#retry> for full semantics.
 
@@ -1169,13 +1171,13 @@ Type:
 
 ```hcl
 object({
-    error_message_regex  = optional(list(string))
-    interval_seconds     = optional(number)
-    max_interval_seconds = optional(number)
+    error_message_regex  = optional(list(string), ["StorageAccountOperationInProgress"])
+    interval_seconds     = optional(number, 5)
+    max_interval_seconds = optional(number, 60)
   })
 ```
 
-Default: `null`
+Default: `{}`
 
 ### <a name="input_role_assignment_definition_lookup_enabled"></a> [role\_assignment\_definition\_lookup\_enabled](#input\_role\_assignment\_definition\_lookup\_enabled)
 
