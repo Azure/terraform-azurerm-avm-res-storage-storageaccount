@@ -48,6 +48,12 @@ variable "dns_zone_group_resource_type" {
   nullable    = false
 }
 
+variable "edge_zone" {
+  type        = string
+  default     = null
+  description = "(Optional) The Edge Zone within the Azure region where the private endpoint should exist. Defaults to `null`."
+}
+
 variable "ip_configurations" {
   type = map(object({
     name               = string

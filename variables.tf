@@ -128,6 +128,7 @@ variable "private_endpoints" {
     private_service_connection_name         = optional(string, null)
     network_interface_name                  = optional(string, null)
     location                                = optional(string, null)
+    edge_zone                               = optional(string, null)
     resource_group_name                     = optional(string, null)
     ip_configurations = optional(map(object({
       name               = string
@@ -160,6 +161,7 @@ A map of private endpoints to create on the resource. The map key is deliberatel
 - `private_service_connection_name` - (Optional) The name of the private service connection. One will be generated if not set. Defaults to `null`.
 - `network_interface_name` - (Optional) The name of the network interface. One will be generated if not set. Defaults to `null`.
 - `location` - (Optional) The Azure location where the resources will be deployed. Defaults to the location of the storage account.
+- `edge_zone` - (Optional) The Edge Zone within the Azure region where the private endpoint should exist. Defaults to the storage account's `edge_zone`.
 - `resource_group_name` - (Optional) The resource group where the resources will be deployed. Defaults to the resource group of the storage account.
 - `ip_configurations` - (Optional) A map of IP configurations to create on the private endpoint. Defaults to `{}` (the platform allocates IPs). The map key is deliberately arbitrary to avoid issues where map keys may be unknown at plan time. Each value supports:
   - `name` - (Required) The name of the IP configuration.
