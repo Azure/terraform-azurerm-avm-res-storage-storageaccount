@@ -16,18 +16,6 @@ variable "storage_account_id" {
   nullable    = false
 }
 
-variable "provisioned_bandwidth_mibps" {
-  type        = number
-  default     = null
-  description = "(Optional) The provisioned bandwidth of the file share, in MiB/s, for Files Provisioned v2 accounts."
-}
-
-variable "provisioned_iops" {
-  type        = number
-  default     = null
-  description = "(Optional) The provisioned IOPS of the file share for Files Provisioned v2 accounts."
-}
-
 variable "access_tier" {
   type        = string
   default     = null
@@ -44,6 +32,18 @@ variable "metadata" {
   type        = map(string)
   default     = null
   description = "(Optional) Metadata for the share. Defaults to `null` (no metadata)."
+}
+
+variable "provisioned_bandwidth_mibps" {
+  type        = number
+  default     = null
+  description = "(Optional) The provisioned bandwidth of the file share, in MiB/s, for Files Provisioned v2 accounts."
+}
+
+variable "provisioned_iops" {
+  type        = number
+  default     = null
+  description = "(Optional) The provisioned IOPS of the file share for Files Provisioned v2 accounts."
 }
 
 variable "resource_type" {
