@@ -1242,12 +1242,14 @@ Type:
 
 ```hcl
 map(object({
-    access_tier      = optional(string)
-    enabled_protocol = optional(string)
-    metadata         = optional(map(string))
-    name             = string
-    quota            = number
-    root_squash      = optional(string)
+    access_tier                 = optional(string)
+    enabled_protocol            = optional(string)
+    metadata                    = optional(map(string))
+    name                        = string
+    quota                       = number
+    provisioned_bandwidth_mibps = optional(number)
+    provisioned_iops            = optional(number)
+    root_squash                 = optional(string)
     signed_identifiers = optional(list(object({
       id = string
       access_policy = optional(object({

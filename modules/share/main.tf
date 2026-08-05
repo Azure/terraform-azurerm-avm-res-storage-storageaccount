@@ -8,6 +8,8 @@ resource "azapi_resource" "this" {
       enabledProtocols  = var.enabled_protocol
       metadata          = var.metadata
       shareQuota        = var.quota
+      provisionedBandwidthMibps = var.provisioned_bandwidth_mibps
+      provisionedIops           = var.provisioned_iops
       rootSquash        = var.root_squash
       signedIdentifiers = local.signed_identifiers_body
     }
