@@ -177,7 +177,7 @@ variable "private_endpoints_manage_dns_zone_group" {
 
 variable "resource_types" {
   type = object({
-    storage_account            = optional(string, "Microsoft.Storage/storageAccounts@2025-06-01")
+    storage_account            = optional(string, "Microsoft.Storage/storageAccounts@2025-08-01")
     customer_managed_key_vault = optional(string, "Microsoft.KeyVault/vaults@2024-11-01")
     lock                       = optional(string, "Microsoft.Authorization/locks@2020-05-01")
     blob_container             = optional(string, "Microsoft.Storage/storageAccounts/blobServices/containers@2025-06-01")
