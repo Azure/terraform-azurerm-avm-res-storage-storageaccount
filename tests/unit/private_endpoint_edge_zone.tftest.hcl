@@ -55,26 +55,3 @@ run "regional_private_endpoint_omits_extended_location" {
     error_message = "Expected a regional private endpoint request to omit extendedLocation entirely."
   }
 }
-
-run "private_endpoint_edge_zone_overrides_root" {
-  command = plan
-
-  variables {
-    edge_zone = "perth"
-    private_endpoints = {
-      overridden = {
-        edge_zone          = "losangeles"
-        subnet_resource_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-network/providers/Microsoft.Network/virtualNetworks/vnet-edge/subnets/snet-private-endpoints"
-        subresource_name   = "blob"
-      }
-    }
-  }
-
-  assert {
-    condition = module.private_endpoints["overridden"].extended_location == {
-      name = "losangeles"
-      type = "EdgeZone"
-    }
-    error_message = "Expected the private endpoint Edge Zone override to replace the storage account Edge Zone."
-  }
-}

@@ -10,7 +10,7 @@ module "private_endpoints" {
   subresource_name                          = each.value.subresource_name
   application_security_group_resource_ids   = each.value.application_security_group_associations
   dns_zone_group_resource_type              = var.resource_types.private_dns_zone_group
-  edge_zone                                 = each.value.edge_zone != null ? each.value.edge_zone : var.edge_zone
+  edge_zone                                 = var.edge_zone
   ip_configurations                         = each.value.ip_configurations
   lock                                      = each.value.lock
   lock_resource_type                        = var.resource_types.lock
