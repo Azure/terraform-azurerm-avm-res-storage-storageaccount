@@ -71,6 +71,22 @@ Type: `map(string)`
 
 Default: `null`
 
+### <a name="input_provisioned_bandwidth_mibps"></a> [provisioned\_bandwidth\_mibps](#input\_provisioned\_bandwidth\_mibps)
+
+Description: (Optional) The provisioned bandwidth of the file share, in MiB/s, for Files Provisioned v2 accounts.
+
+Type: `number`
+
+Default: `null`
+
+### <a name="input_provisioned_iops"></a> [provisioned\_iops](#input\_provisioned\_iops)
+
+Description: (Optional) The provisioned IOPS of the file share for Files Provisioned v2 accounts.
+
+Type: `number`
+
+Default: `null`
+
 ### <a name="input_resource_type"></a> [resource\_type](#input\_resource\_type)
 
 Description: (Optional) Override the AzAPI `<provider>/<resource>@<api-version>` string used to manage the file share. Defaults to the value tested with this module version.
