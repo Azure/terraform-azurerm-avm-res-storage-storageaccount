@@ -12,7 +12,7 @@ The following requirements are needed by this module:
 
 - <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.10.0)
 
-- <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) (~> 2.8)
+- <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) (~> 2.9)
 
 ## Resources
 
@@ -68,6 +68,22 @@ Default: `null`
 Description: (Optional) Metadata for the share. Defaults to `null` (no metadata).
 
 Type: `map(string)`
+
+Default: `null`
+
+### <a name="input_provisioned_bandwidth_mibps"></a> [provisioned\_bandwidth\_mibps](#input\_provisioned\_bandwidth\_mibps)
+
+Description: (Optional) The provisioned bandwidth of the file share, in MiB/s, for Files Provisioned v2 accounts.
+
+Type: `number`
+
+Default: `null`
+
+### <a name="input_provisioned_iops"></a> [provisioned\_iops](#input\_provisioned\_iops)
+
+Description: (Optional) The provisioned IOPS of the file share for Files Provisioned v2 accounts.
+
+Type: `number`
 
 Default: `null`
 

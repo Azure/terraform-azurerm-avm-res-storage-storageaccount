@@ -21,6 +21,25 @@ This Terraform module is designed to create Azure Storage Accounts and its relat
 
 > **IMPORTANT** This module manages the Storage Account itself, plus its child containers, queues, tables, file shares, private endpoints and role assignments, through the AzAPI provider, which always authenticates with Microsoft Entra ID and never requires a Storage shared key. We recommend leaving `shared_access_key_enabled = false` (the module default) so that any data-plane access from your own code is also Entra-ID-authenticated. If you also use the [`azurerm` provider](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs#storage_use_azuread) to manage Storage data-plane resources (for example `azurerm_storage_blob`), set `storage_use_azuread = true` in that provider block. Note that not every Storage service supports Microsoft Entra ID authentication; for those services you will need to enable shared-key access by setting `shared_access_key_enabled = true` on this module.
 
+## Upgrading
+
+This module requires AzAPI provider version 2.11.0 or later within the 2.x series (`>= 2.11.0, < 3.0.0`). When upgrading to a module release with this requirement, update any AzAPI constraint in your root module that excludes version 2.11.0, then refresh the provider selections recorded in your dependency lock file:
+
+```terraform
+terraform {
+  required_providers {
+    azapi = {
+      source  = "Azure/azapi"
+      version = "~> 2.11"
+    }
+  }
+}
+```
+
+```shell
+terraform init -upgrade
+```
+
 <!-- markdownlint-disable MD033 -->
 ## Requirements
 
@@ -1082,11 +1101,13 @@ Default: `{}`
 
 ### <a name="input_retry"></a> [retry](#input\_retry)
 
-Description: Retry configuration applied to every `azapi` resource managed by the module (root storage account and all submodules). Defaults to `null` (no custom retry).
+Description: Retry configuration applied to every `azapi` resource managed by the module (root storage account and all submodules). By default, retries only the transient `StorageAccountOperationInProgress` error, starting at 5 seconds and capping the interval at 60 seconds.
 
-- `error_message_regex`  - (Optional) A list of regex patterns matching error messages that trigger a retry.
-- `interval_seconds`     - (Optional) Initial interval between retries in seconds.
-- `max_interval_seconds` - (Optional) Maximum interval between retries in seconds.
+- `error_message_regex`  - (Optional) A list of regex patterns matching error messages that trigger a retry. Supplying this field replaces the default list; include `StorageAccountOperationInProgress` to retain the module's transient storage-operation retry.
+- `interval_seconds`     - (Optional) Initial interval between retries in seconds. Defaults to `5`.
+- `max_interval_seconds` - (Optional) Maximum interval between retries in seconds. Defaults to `60`.
+
+Set `retry = null` to disable custom retries. The default deliberately does not retry generic HTTP 403 or 409 responses, so authorization failures and permanent conflicts remain visible.
 
 See <https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource#retry> for full semantics.
 
@@ -1094,13 +1115,13 @@ Type:
 
 ```hcl
 object({
-    error_message_regex  = optional(list(string))
-    interval_seconds     = optional(number)
-    max_interval_seconds = optional(number)
+    error_message_regex  = optional(list(string), ["StorageAccountOperationInProgress"])
+    interval_seconds     = optional(number, 5)
+    max_interval_seconds = optional(number, 60)
   })
 ```
 
-Default: `null`
+Default: `{}`
 
 ### <a name="input_role_assignment_definition_lookup_enabled"></a> [role\_assignment\_definition\_lookup\_enabled](#input\_role\_assignment\_definition\_lookup\_enabled)
 
@@ -1202,6 +1223,8 @@ Description: A map of file shares to create on the storage account. The map key 
 
 - `name` - (Required) The name of the share. Must be unique within the storage account. Changing this forces a new resource to be created.
 - `quota` - (Required) The maximum size of the share, in gigabytes. For Standard storage accounts, this must be `1` GB or higher and at most `5120` GB (5 TB). For Premium FileStorage accounts, this must be greater than 100 GB and at most `102400` GB (100 TB).
+- `provisioned_bandwidth_mibps` - (Optional) The provisioned bandwidth of the share, in MiB/s. Only valid for Files Provisioned v2 accounts. Defaults to `null`.
+- `provisioned_iops` - (Optional) The provisioned IOPS of the share. Only valid for Files Provisioned v2 accounts. Defaults to `null`.
 - `access_tier` - (Optional) The access tier of the file share. Possible values are `Hot`, `Cool`, `TransactionOptimized`, `Premium`. Defaults to `null` (Azure platform default).
 - `enabled_protocol` - (Optional) The protocol used for the share. Possible values are `SMB` and `NFS`. `SMB` indicates the share can be accessed by SMBv3.0, SMBv2.1 and REST. `NFS` indicates the share can be accessed by NFSv4.1. Defaults to `null` (Azure platform default of `SMB`). Changing this forces a new resource to be created.
 - `metadata` - (Optional) A mapping of MetaData for this File Share. Defaults to `null`.
@@ -1223,12 +1246,14 @@ Type:
 
 ```hcl
 map(object({
-    access_tier      = optional(string)
-    enabled_protocol = optional(string)
-    metadata         = optional(map(string))
-    name             = string
-    quota            = number
-    root_squash      = optional(string)
+    access_tier                 = optional(string)
+    enabled_protocol            = optional(string)
+    metadata                    = optional(map(string))
+    name                        = string
+    quota                       = number
+    provisioned_bandwidth_mibps = optional(number)
+    provisioned_iops            = optional(number)
+    root_squash                 = optional(string)
     signed_identifiers = optional(list(object({
       id = string
       access_policy = optional(object({
