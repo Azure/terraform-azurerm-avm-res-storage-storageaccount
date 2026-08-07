@@ -4,7 +4,7 @@ output "name" {
 }
 
 output "extended_location" {
-  description = "The extended location sent in the private endpoint request, or `null` when the private endpoint is regional."
+  description = "The extended location sent in the private endpoint request as `{ name, type }`, or `null` when the private endpoint is regional. Consumed by the root module's `private_endpoints` output."
   value       = try(azapi_resource.this.body.extendedLocation, null)
 }
 

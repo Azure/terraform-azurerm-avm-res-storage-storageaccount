@@ -38,6 +38,29 @@ run "root_edge_zone_propagates_to_private_endpoint" {
     condition     = azapi_resource.this.body.extendedLocation == module.private_endpoints["inherited"].extended_location
     error_message = "Expected the storage account and its private endpoint to share one Edge Zone placement."
   }
+
+  assert {
+    condition     = output.private_endpoints["inherited"].edge_zone == "perth"
+    error_message = "Expected the root private_endpoints output to report the inherited Edge Zone."
+  }
+}
+
+run "regional_root_output_reports_null_edge_zone" {
+  command = plan
+
+  variables {
+    private_endpoints = {
+      regional = {
+        subnet_resource_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-network/providers/Microsoft.Network/virtualNetworks/vnet-regional/subnets/snet-private-endpoints"
+        subresource_name   = "blob"
+      }
+    }
+  }
+
+  assert {
+    condition     = output.private_endpoints["regional"].edge_zone == null
+    error_message = "Expected the root private_endpoints output to report a null Edge Zone for a regional endpoint."
+  }
 }
 
 run "regional_private_endpoint_omits_extended_location" {

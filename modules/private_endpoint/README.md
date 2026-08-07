@@ -276,7 +276,7 @@ The following outputs are exported:
 
 ### <a name="output_extended_location"></a> [extended\_location](#output\_extended\_location)
 
-Description: The extended location sent in the private endpoint request, or `null` when the private endpoint is regional.
+Description: The extended location sent in the private endpoint request as `{ name, type }`, or `null` when the private endpoint is regional. Consumed by the root module's `private_endpoints` output.
 
 ### <a name="output_name"></a> [name](#output\_name)
 
