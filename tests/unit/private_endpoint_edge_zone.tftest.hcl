@@ -31,6 +31,13 @@ run "root_edge_zone_propagates_to_private_endpoint" {
     }
     error_message = "Expected the private endpoint request to inherit the storage account Edge Zone."
   }
+
+  # Azure rejects an endpoint placed differently from its account with
+  # VnetSpanningForEdgeZonesNotEnabled, so pin the two together.
+  assert {
+    condition     = azapi_resource.this.body.extendedLocation == module.private_endpoints["inherited"].extended_location
+    error_message = "Expected the storage account and its private endpoint to share one Edge Zone placement."
+  }
 }
 
 run "regional_private_endpoint_omits_extended_location" {
