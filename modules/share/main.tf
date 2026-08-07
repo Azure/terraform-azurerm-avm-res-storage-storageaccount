@@ -4,12 +4,14 @@ resource "azapi_resource" "this" {
   type      = var.resource_type
   body = {
     properties = {
-      accessTier        = var.access_tier
-      enabledProtocols  = var.enabled_protocol
-      metadata          = var.metadata
-      shareQuota        = var.quota
-      rootSquash        = var.root_squash
-      signedIdentifiers = local.signed_identifiers_body
+      accessTier                = var.access_tier
+      enabledProtocols          = var.enabled_protocol
+      metadata                  = var.metadata
+      shareQuota                = var.quota
+      provisionedBandwidthMibps = var.provisioned_bandwidth_mibps
+      provisionedIops           = var.provisioned_iops
+      rootSquash                = var.root_squash
+      signedIdentifiers         = local.signed_identifiers_body
     }
   }
   create_headers            = local.tracing_headers
