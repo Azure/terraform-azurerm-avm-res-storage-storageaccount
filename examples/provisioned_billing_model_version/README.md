@@ -168,9 +168,11 @@ module "this" {
   shared_access_key_enabled = true
   shares = {
     premium_share = {
-      name             = "share-${random_string.this.result}-premium"
-      quota            = 100
-      enabled_protocol = "SMB"
+      name                        = "share-${random_string.this.result}-premium"
+      quota                       = 100
+      provisioned_iops            = 3000
+      provisioned_bandwidth_mibps = 100
+      enabled_protocol            = "SMB"
     }
   }
   tags = {

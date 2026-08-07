@@ -83,6 +83,14 @@ Type: `string`
 
 Default: `"Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2025-05-01"`
 
+### <a name="input_edge_zone"></a> [edge\_zone](#input\_edge\_zone)
+
+Description: (Optional) The Edge Zone within the Azure region where the private endpoint should exist. Defaults to `null`.
+
+Type: `string`
+
+Default: `null`
+
 ### <a name="input_ip_configurations"></a> [ip\_configurations](#input\_ip\_configurations)
 
 Description: (Optional) Static IP configurations for the private endpoint. Defaults to `{}` (the platform allocates IPs). The map key is arbitrary; each value supports:
@@ -265,6 +273,10 @@ Default: `null`
 ## Outputs
 
 The following outputs are exported:
+
+### <a name="output_extended_location"></a> [extended\_location](#output\_extended\_location)
+
+Description: The extended location sent in the private endpoint request as `{ name, type }`, or `null` when the private endpoint is regional. Consumed by the root module's `private_endpoints` output.
 
 ### <a name="output_name"></a> [name](#output\_name)
 

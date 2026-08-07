@@ -79,6 +79,7 @@ A map of private endpoints created by the module. The map key matches `var.priva
 Each value is an object with:
 - `id` - The resource ID of the private endpoint.
 - `name` - The name of the private endpoint.
+- `edge_zone` - The Edge Zone the private endpoint was placed in, inherited from `var.edge_zone`, or `null` when the private endpoint is regional.
 - `private_dns_zone_group_id` - The resource ID of the managed private DNS zone group, or `null` if not managed by this module.
 - `role_assignments` - Map of role assignments created at the private endpoint scope.
 DESCRIPTION
@@ -87,6 +88,7 @@ DESCRIPTION
     k => {
       id                        = m.resource_id
       name                      = m.name
+      edge_zone                 = try(m.extended_location.name, null)
       private_dns_zone_group_id = m.private_dns_zone_group_id
       role_assignments          = m.role_assignments
     }

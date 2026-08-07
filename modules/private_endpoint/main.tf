@@ -3,32 +3,40 @@ resource "azapi_resource" "this" {
   name      = var.name
   parent_id = var.parent_id
   type      = var.resource_type
-  body = {
-    # customNetworkInterfaceName is only included when set. Azure stores an unset
-    # custom NIC name as an empty string, so sending null would cause a perpetual
-    # "" -> null diff and break idempotency.
-    properties = merge(
-      {
-        subnet = {
-          id = var.subnet_resource_id
-        }
-        privateLinkServiceConnections = [
-          {
-            name = var.private_service_connection_name == null ? "pse-${var.name}" : var.private_service_connection_name
-            properties = {
-              privateLinkServiceId = var.private_connection_resource_id
-              groupIds             = [var.subresource_name]
-            }
+  body = merge(
+    {
+      # customNetworkInterfaceName is only included when set. Azure stores an unset
+      # custom NIC name as an empty string, so sending null would cause a perpetual
+      # "" -> null diff and break idempotency.
+      properties = merge(
+        {
+          subnet = {
+            id = var.subnet_resource_id
           }
-        ]
-        ipConfigurations          = local.ip_configurations_body
-        applicationSecurityGroups = local.asg_body
-      },
-      var.network_interface_name == null ? {} : {
-        customNetworkInterfaceName = var.network_interface_name
+          privateLinkServiceConnections = [
+            {
+              name = var.private_service_connection_name == null ? "pse-${var.name}" : var.private_service_connection_name
+              properties = {
+                privateLinkServiceId = var.private_connection_resource_id
+                groupIds             = [var.subresource_name]
+              }
+            }
+          ]
+          ipConfigurations          = local.ip_configurations_body
+          applicationSecurityGroups = local.asg_body
+        },
+        var.network_interface_name == null ? {} : {
+          customNetworkInterfaceName = var.network_interface_name
+        }
+      )
+    },
+    var.edge_zone == null ? {} : {
+      extendedLocation = {
+        name = var.edge_zone
+        type = "EdgeZone"
       }
-    )
-  }
+    }
+  )
   create_headers         = local.tracing_headers
   delete_headers         = local.tracing_headers
   read_headers           = local.tracing_headers
