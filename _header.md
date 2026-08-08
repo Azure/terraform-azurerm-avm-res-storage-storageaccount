@@ -21,14 +21,14 @@ This Terraform module is designed to create Azure Storage Accounts and its relat
 
 ## Upgrading
 
-This module requires AzAPI provider version 2.9.0 or later within the 2.x series (`>= 2.9.0, < 3.0.0`). When upgrading to a module release with this requirement, update any AzAPI constraint in your root module that excludes version 2.9.0, then refresh the provider selections recorded in your dependency lock file:
+This module requires AzAPI provider version 2.11.0 or later within the 2.x series (`>= 2.11.0, < 3.0.0`). When upgrading to a module release with this requirement, update any AzAPI constraint in your root module that excludes version 2.11.0, then refresh the provider selections recorded in your dependency lock file:
 
 ```terraform
 terraform {
   required_providers {
     azapi = {
       source  = "Azure/azapi"
-      version = "~> 2.9"
+      version = "~> 2.11"
     }
   }
 }

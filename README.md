@@ -23,14 +23,14 @@ This Terraform module is designed to create Azure Storage Accounts and its relat
 
 ## Upgrading
 
-This module requires AzAPI provider version 2.9.0 or later within the 2.x series (`>= 2.9.0, < 3.0.0`). When upgrading to a module release with this requirement, update any AzAPI constraint in your root module that excludes version 2.9.0, then refresh the provider selections recorded in your dependency lock file:
+This module requires AzAPI provider version 2.11.0 or later within the 2.x series (`>= 2.11.0, < 3.0.0`). When upgrading to a module release with this requirement, update any AzAPI constraint in your root module that excludes version 2.11.0, then refresh the provider selections recorded in your dependency lock file:
 
 ```terraform
 terraform {
   required_providers {
     azapi = {
       source  = "Azure/azapi"
-      version = "~> 2.9"
+      version = "~> 2.11"
     }
   }
 }
@@ -47,7 +47,7 @@ The following requirements are needed by this module:
 
 - <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.10.0)
 
-- <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) (~> 2.9)
+- <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) (~> 2.11)
 
 - <a name="requirement_modtm"></a> [modtm](#requirement\_modtm) (~> 0.3)
 
@@ -96,7 +96,9 @@ The following input variables are optional (have default values):
 
 ### <a name="input_access_tier"></a> [access\_tier](#input\_access\_tier)
 
-Description: (Optional) Defines the access tier for BlobStorage, FileStorage and StorageV2 accounts. Valid options are Hot, Cool, Cold and Premium. Defaults to Hot.
+Description: (Optional) Defines the access tier for BlobStorage, FileStorage and StorageV2 accounts. Valid options are Hot, Cool, Cold, Premium and Smart. Defaults to Hot.
+
+Smart requires a Standard GPv2 (`StorageV2`) account using `Standard_ZRS`, `Standard_GZRS` or `Standard_RAGZRS`, and Storage API `2025-08-01` or newer. Smart only manages block blobs that inherit the account's default access tier; page blobs, append blobs and explicitly tiered blobs are not supported.
 
 Type: `string`
 
@@ -1077,7 +1079,7 @@ Type:
 
 ```hcl
 object({
-    storage_account            = optional(string, "Microsoft.Storage/storageAccounts@2025-06-01")
+    storage_account            = optional(string, "Microsoft.Storage/storageAccounts@2025-08-01")
     customer_managed_key_vault = optional(string, "Microsoft.KeyVault/vaults@2024-11-01")
     lock                       = optional(string, "Microsoft.Authorization/locks@2020-05-01")
     blob_container             = optional(string, "Microsoft.Storage/storageAccounts/blobServices/containers@2025-06-01")
