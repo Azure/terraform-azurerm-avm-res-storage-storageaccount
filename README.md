@@ -528,7 +528,7 @@ Description: A map of diagnostic settings to create on the Storage Account itsel
 
 This variable uses the v2 diagnostic settings interface from `Azure/avm-utl-interfaces/azure`, which fully supports all features of the Azure Diagnostic Settings API.
 
-**Important:** Diagnostic settings on the Storage Account resource itself support only metrics (logs are not supported by the Azure API at this scope). Supplying any `logs` entries here will be rejected by Azure. Supported metric categories are `Transaction` and `AllMetrics`.
+**Important:** Diagnostic settings on the Storage Account resource itself support only metrics (logs are not supported by the Azure API at this scope). Supplying any `logs` entries here will be rejected by Azure. Supported metric categories are `Capacity`, `Transaction`, and `AllMetrics`.
 
 See `var.diagnostic_settings_blob` for full attribute documentation; the schema is identical.
 

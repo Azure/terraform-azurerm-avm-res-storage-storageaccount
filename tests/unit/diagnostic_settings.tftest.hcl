@@ -188,3 +188,42 @@ run "normalize_storage_service_metrics" {
     error_message = "Storage-account-scope AllMetrics must not be normalized."
   }
 }
+
+run "storage_account_accepts_capacity_metric_category" {
+  command = plan
+
+  variables {
+    diagnostic_settings_storage_account = {
+      capacity = {
+        name                  = "account-capacity-diagnostic-setting"
+        workspace_resource_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-unit-test/providers/Microsoft.OperationalInsights/workspaces/law-unit-test"
+        metrics = [
+          { category = "Capacity" },
+          { category = "Transaction" },
+        ]
+      }
+    }
+  }
+
+  assert {
+    condition = toset([
+      for metric in module.diagnostic_setting_storage_account.resources["capacity"].body.properties.metrics : metric.category
+    ]) == toset(["Capacity", "Transaction"])
+    error_message = "Capacity must be accepted at the storage account scope and sent to Azure unchanged."
+  }
+}
+
+run "storage_account_rejects_unsupported_metric_category" {
+  command = plan
+
+  variables {
+    diagnostic_settings_storage_account = {
+      invalid = {
+        workspace_resource_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-unit-test/providers/Microsoft.OperationalInsights/workspaces/law-unit-test"
+        metrics               = [{ category = "NotAMetricCategory" }]
+      }
+    }
+  }
+
+  expect_failures = [var.diagnostic_settings_storage_account]
+}
