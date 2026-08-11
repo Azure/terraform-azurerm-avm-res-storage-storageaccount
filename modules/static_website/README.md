@@ -53,11 +53,11 @@ Default: `null`
 
 ### <a name="input_resource_type"></a> [resource\_type](#input\_resource\_type)
 
-Description: (Optional) Override the AzAPI `<provider>/<resource>@<api-version>` string used to patch the blob service for static-website hosting. Defaults to the value tested with this module version.
+Description: (Optional) Override the AzAPI `<provider>/<resource>@<api-version>` string used to patch the blob service for static-website hosting. Defaults to the value tested with this module version. Must be `2025-08-01` or later; earlier API versions do not include `properties.staticWebsite` and will silently discard the configuration.
 
 Type: `string`
 
-Default: `"Microsoft.Storage/storageAccounts/blobServices@2025-06-01"`
+Default: `"Microsoft.Storage/storageAccounts/blobServices@2025-08-01"`
 
 ### <a name="input_retry"></a> [retry](#input\_retry)
 
@@ -98,6 +98,14 @@ object({
     delete = optional(string)
   })
 ```
+
+Default: `null`
+
+### <a name="input_tracing_tags_header"></a> [tracing\_tags\_header](#input\_tracing\_tags\_header)
+
+Description: (Optional) User-Agent string injected into AzAPI request headers. Defaults to `null` (no custom header).
+
+Type: `string`
 
 Default: `null`
 
