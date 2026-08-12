@@ -17,10 +17,21 @@ variable "index_document" {
 }
 
 variable "resource_type" {
-  type        = string
-  default     = "Microsoft.Storage/storageAccounts/blobServices@2025-06-01"
-  description = "(Optional) Override the AzAPI `<provider>/<resource>@<api-version>` string used to patch the blob service for static-website hosting. Defaults to the value tested with this module version."
+  type = string
+  # `properties.staticWebsite` was added to the blob service schema in the
+  # 2025-08-01 API version. Earlier versions silently drop the property, so the
+  # PATCH succeeds while the static website stays disabled.
+  default     = "Microsoft.Storage/storageAccounts/blobServices@2025-08-01"
+  description = "(Optional) Override the AzAPI `<provider>/<resource>@<api-version>` string used to patch the blob service for static-website hosting. Defaults to the value tested with this module version. Must be `2025-08-01` or later; earlier API versions do not include `properties.staticWebsite` and will silently discard the configuration."
   nullable    = false
+
+  validation {
+    condition = try(
+      tonumber(replace(regex("^\\d{4}-\\d{2}-\\d{2}", split("@", var.resource_type)[1]), "-", "")) >= 20250801,
+      false
+    )
+    error_message = "resource_type must use API version 2025-08-01 or later. Earlier versions omit `properties.staticWebsite` from the blob service schema, so the request succeeds but static website hosting is never enabled."
+  }
 }
 
 variable "retry" {
@@ -55,4 +66,10 @@ variable "timeouts" {
 - `update` - (Optional) Timeout for update operations. Defaults to `null`.
 - `delete` - (Optional) Timeout for delete operations. Defaults to `null`.
 EOT
+}
+
+variable "tracing_tags_header" {
+  type        = string
+  default     = null
+  description = "(Optional) User-Agent string injected into AzAPI request headers. Defaults to `null` (no custom header)."
 }

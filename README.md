@@ -1119,11 +1119,12 @@ Description: Override the AzAPI `<provider>/<resource>@<api-version>` strings us
 - `customer_managed_key_vault` - The Key Vault data source used to look up the vault URI when CMK is enabled.
 - `lock`                       - Management lock applied to the storage account (and to private endpoints when configured).
 - `blob_container`             - Blob containers (also used by Data Lake Gen2 filesystems, which are blob containers in ARM).
-- `blob_service`               - The `blobServices/default` sub-resource, patched by the static-website and blob-service submodules.
+- `blob_service`               - The `blobServices/default` sub-resource, patched by the blob-service submodule.
 - `file_service`               - The `fileServices/default` sub-resource, patched by the file-service submodule for CORS, soft-delete, and SMB settings.
 - `queue`                      - Storage queues.
 - `table`                      - Storage tables.
 - `share`                      - File shares.
+- `static_website`             - The `blobServices/default` sub-resource, patched by the static-website submodule. Pinned to a later API version than `blob_service` because `properties.staticWebsite` was only added to the blob service schema in `2025-08-01`; earlier versions silently drop it.
 - `local_user`                 - SFTP local users.
 - `management_policy`          - The lifecycle-management policy.
 - `queue_service`              - The `queueServices/default` sub-resource, patched by the queue-service-properties submodule.
@@ -1144,6 +1145,7 @@ object({
     queue                      = optional(string, "Microsoft.Storage/storageAccounts/queueServices/queues@2025-06-01")
     table                      = optional(string, "Microsoft.Storage/storageAccounts/tableServices/tables@2025-06-01")
     share                      = optional(string, "Microsoft.Storage/storageAccounts/fileServices/shares@2025-06-01")
+    static_website             = optional(string, "Microsoft.Storage/storageAccounts/blobServices@2025-08-01")
     local_user                 = optional(string, "Microsoft.Storage/storageAccounts/localUsers@2025-06-01")
     management_policy          = optional(string, "Microsoft.Storage/storageAccounts/managementPolicies@2025-06-01")
     queue_service              = optional(string, "Microsoft.Storage/storageAccounts/queueServices@2025-06-01")

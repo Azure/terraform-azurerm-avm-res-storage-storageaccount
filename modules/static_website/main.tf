@@ -13,7 +13,12 @@ resource "azapi_update_resource" "this" {
       }
     }
   }
-  retry = var.retry
+  retry        = var.retry
+  read_headers = local.tracing_headers
+  # Export the patched property so the read-back is anchored on staticWebsite
+  # rather than the whole blob service response.
+  response_export_values = ["properties.staticWebsite"]
+  update_headers         = local.tracing_headers
 
   dynamic "timeouts" {
     for_each = var.timeouts == null ? [] : [var.timeouts]
