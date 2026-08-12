@@ -34,7 +34,7 @@ resource "random_integer" "region_index" {
 # This ensures we have unique CAF compliant names for our resources.
 module "naming" {
   source  = "Azure/naming/azurerm"
-  version = "0.4.0"
+  version = "0.4.3"
 }
 
 # This is the resource group that all the resources will be deployed into.
@@ -49,7 +49,7 @@ module "resource_group" {
 # A virtual network with a dedicated subnet to host the private endpoint.
 module "virtual_network" {
   source  = "Azure/avm-res-network-virtualnetwork/azurerm"
-  version = "0.19.0"
+  version = "0.20.0"
 
   address_space    = ["10.0.0.0/16"]
   location         = module.resource_group.location
@@ -141,7 +141,7 @@ The following Modules are called:
 
 Source: Azure/naming/azurerm
 
-Version: 0.4.0
+Version: 0.4.3
 
 ### <a name="module_private_dns_zone"></a> [private\_dns\_zone](#module\_private\_dns\_zone)
 
@@ -165,7 +165,7 @@ Version:
 
 Source: Azure/avm-res-network-virtualnetwork/azurerm
 
-Version: 0.19.0
+Version: 0.20.0
 
 <!-- markdownlint-disable-next-line MD041 -->
 ## Data Collection

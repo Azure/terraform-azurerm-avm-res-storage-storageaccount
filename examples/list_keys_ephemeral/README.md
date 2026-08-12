@@ -35,7 +35,7 @@ terraform {
     }
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = ">= 4.37.0, < 5.0.0"
+      version = ">= 4.37.0, < 5.0.2"
     }
     random = {
       source  = "hashicorp/random"
@@ -79,7 +79,7 @@ resource "random_string" "this" {
 
 module "naming" {
   source  = "Azure/naming/azurerm"
-  version = "0.4.0"
+  version = "0.4.3"
 }
 
 resource "azapi_resource" "resource_group" {
@@ -111,7 +111,7 @@ module "this" {
 # stays consistent with the rest of the repository.
 module "avm_res_keyvault_vault" {
   source  = "Azure/avm-res-keyvault-vault/azurerm"
-  version = "0.5.1"
+  version = "0.10.2"
 
   location            = azapi_resource.resource_group.location
   name                = module.naming.key_vault.name_unique
@@ -172,7 +172,7 @@ The following requirements are needed by this module:
 
 - <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) (~> 2.8)
 
-- <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (>= 4.37.0, < 5.0.0)
+- <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (>= 4.37.0, < 5.0.2)
 
 - <a name="requirement_random"></a> [random](#requirement\_random) (>= 3.5.0, < 4.0.0)
 
@@ -218,13 +218,13 @@ The following Modules are called:
 
 Source: Azure/avm-res-keyvault-vault/azurerm
 
-Version: 0.5.1
+Version: 0.10.2
 
 ### <a name="module_naming"></a> [naming](#module\_naming)
 
 Source: Azure/naming/azurerm
 
-Version: 0.4.0
+Version: 0.4.3
 
 ### <a name="module_this"></a> [this](#module\_this)
 
