@@ -411,6 +411,8 @@ Description: Defines a customer managed key to use for encryption. Defaults to `
 - `user_assigned_identity` - (Optional) A user assigned identity used to access the key vault. Defaults to `null`, in which case the storage account's system-assigned identity is used.
   - `resource_id` - (Required) The full Azure Resource ID of the user assigned identity.
 
+The module does not create the Key Vault role assignment that permits the identity to use the key. Grant the identity `Key Vault Crypto Service Encryption User` on the vault before the storage account is created. Referencing the vault's resource ID does not make Terraform wait for that vault's role assignments to finish, so order the grant explicitly with `depends_on` on the module call. Alternatively, add a pattern such as `Forbidden` to `retry.error_message_regex` to retry while the assignment propagates.
+
 Example Inputs:
 ```terraform
 customer_managed_key = {
