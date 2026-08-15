@@ -42,11 +42,10 @@ resource "azapi_resource" "resource_group" {
 module "this" {
   source = "../.."
 
-  access_tier              = "Smart"
-  account_kind             = "StorageV2"
-  account_replication_type = "ZRS"
-  account_tier             = "Standard"
-  location                 = azapi_resource.resource_group.location
-  name                     = module.naming.storage_account.name_unique
-  parent_id                = azapi_resource.resource_group.id
+  access_tier      = "Smart"
+  account_kind     = "StorageV2"
+  account_sku_name = "Standard_ZRS"
+  location         = azapi_resource.resource_group.location
+  name             = module.naming.storage_account.name_unique
+  parent_id        = azapi_resource.resource_group.id
 }
