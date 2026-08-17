@@ -17,4 +17,8 @@ module "containers" {
   role_assignments                          = each.value.role_assignments
   timeouts                                  = each.value.timeouts != null ? each.value.timeouts : var.timeouts
   tracing_tags_header                       = var.enable_telemetry ? local.avm_azapi_header : null
+
+  # Azure rejects version-level immutability on a container while point-in-time
+  # restore is enabled on the blob service, so blob properties must settle first.
+  depends_on = [module.blob_service]
 }
