@@ -45,6 +45,15 @@ module "this" {
   location  = azapi_resource.resource_group.location
   name      = module.naming.storage_account.name_unique
   parent_id = azapi_resource.resource_group.id
+  # Written to the same blobServices/default object as the static website config,
+  # so this example covers both writers in one apply.
+  blob_properties = {
+    versioning_enabled = true
+    delete_retention_policy = {
+      enabled = true
+      days    = 7
+    }
+  }
   # Azure Storage serves the static site from the reserved $web container.
   containers = {
     web = {

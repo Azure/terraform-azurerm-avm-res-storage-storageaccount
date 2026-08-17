@@ -6,6 +6,8 @@ Enables static website hosting on a StorageV2 account and creates the reserved `
 
 Static website hosting is configured through the `properties.staticWebsite` block on the `blobServices/default` sub-resource, which requires API version `2025-08-01` or later.
 
+Blob service properties are set alongside it because they target that same sub-resource, so this example exercises both writers in a single apply.
+
 ```hcl
 terraform {
   required_version = ">= 1.10.0"
@@ -54,6 +56,15 @@ module "this" {
   location  = azapi_resource.resource_group.location
   name      = module.naming.storage_account.name_unique
   parent_id = azapi_resource.resource_group.id
+  # Written to the same blobServices/default object as the static website config,
+  # so this example covers both writers in one apply.
+  blob_properties = {
+    versioning_enabled = true
+    delete_retention_policy = {
+      enabled = true
+      days    = 7
+    }
+  }
   # Azure Storage serves the static site from the reserved $web container.
   containers = {
     web = {
