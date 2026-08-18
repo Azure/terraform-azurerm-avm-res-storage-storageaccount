@@ -11,4 +11,9 @@ module "static_website" {
   retry               = var.retry
   timeouts            = var.timeouts
   tracing_tags_header = var.enable_telemetry ? local.avm_azapi_header : null
+
+  # This submodule and blob_service patch the same blobServices/default object, and
+  # azapi_update_resource is GET + client-side merge + PUT, so concurrent writes
+  # would each overwrite the other's fields. Keep this ordering.
+  depends_on = [module.blob_service]
 }
