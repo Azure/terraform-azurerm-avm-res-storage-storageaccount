@@ -39,6 +39,24 @@ run "static_website_module_instantiated" {
   }
 }
 
+# Regression cover for #396: the root module orders static_website after
+# blob_service because both write blobServices/default. A cycle introduced by that
+# ordering fails here at graph construction, which `terraform validate` misses.
+run "static_website_coexists_with_blob_properties" {
+  command = plan
+
+  variables {
+    blob_properties = {
+      versioning_enabled = true
+    }
+  }
+
+  assert {
+    condition     = length(module.static_website) == 1 && length(module.blob_service) == 1
+    error_message = "Expected the static_website and blob_service submodules to coexist"
+  }
+}
+
 run "static_website_omitted_when_null" {
   command = plan
 

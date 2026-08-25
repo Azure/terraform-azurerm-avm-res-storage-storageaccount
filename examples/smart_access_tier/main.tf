@@ -42,29 +42,10 @@ resource "azapi_resource" "resource_group" {
 module "this" {
   source = "../.."
 
-  location  = azapi_resource.resource_group.location
-  name      = module.naming.storage_account.name_unique
-  parent_id = azapi_resource.resource_group.id
-  # Written to the same blobServices/default object as the static website config,
-  # so this example covers both writers in one apply.
-  blob_properties = {
-    versioning_enabled = true
-    delete_retention_policy = {
-      enabled = true
-      days    = 7
-    }
-  }
-  # Azure Storage serves the static site from the reserved $web container.
-  containers = {
-    web = {
-      name = "$web"
-    }
-  }
-  # Enables static website hosting on the blobServices/default sub-resource.
-  static_website = {
-    this = {
-      error_404_document = "404.html"
-      index_document     = "index.html"
-    }
-  }
+  access_tier      = "Smart"
+  account_kind     = "StorageV2"
+  account_sku_name = "Standard_ZRS"
+  location         = azapi_resource.resource_group.location
+  name             = module.naming.storage_account.name_unique
+  parent_id        = azapi_resource.resource_group.id
 }

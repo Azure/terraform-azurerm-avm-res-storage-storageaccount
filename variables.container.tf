@@ -40,7 +40,7 @@ A map of containers to create on the storage account. The map key is arbitrary; 
 - `deny_encryption_scope_override` - (Optional) When set to `true`, blocks blob uploads from specifying a different encryption scope. Defaults to `null`.
 - `enable_nfs_v3_all_squash` - (Optional) Enable NFSv3 all squash (only valid for NFSv3 enabled accounts). Defaults to `null`.
 - `enable_nfs_v3_root_squash` - (Optional) Enable NFSv3 root squash (only valid for NFSv3 enabled accounts). Defaults to `null`.
-- `immutable_storage_with_versioning` - (Optional) Configures container-level immutability with version-level WORM. Defaults to `null`. Supports:
+- `immutable_storage_with_versioning` - (Optional) Configures container-level immutability with version-level WORM. Defaults to `null`. Cannot be used together with `blob_properties.restore_policy`: Azure does not support point-in-time restore on an account that has version-level immutability on any container. Supports:
   - `enabled` - (Required) Whether immutable storage with versioning is enabled.
 - `role_assignments` - (Optional) A map of role assignments to create on the container. Defaults to `{}`. See `var.role_assignments` for the attribute schema.
 - `timeouts` - (Optional) Per-operation timeouts for the container resource. Defaults to `null` (uses provider defaults inherited from `var.timeouts`). Supports:
