@@ -28,8 +28,11 @@ output "data_lake_gen2_filesystems" {
 }
 
 output "fqdn" {
-  description = "Fqdns for storage services."
-  value       = { for svc in local.endpoints : svc => "${azapi_resource.this.name}.${svc}.core.windows.net" }
+  description = "Fqdns for storage services. Hostnames come from the endpoints Azure returns for the account, so they carry the DNS suffix of the target cloud (for example `core.usgovcloudapi.net` in Azure US Government)."
+  value = {
+    for svc in local.endpoints :
+    svc => try(local.primary_endpoint_hosts[svc], "${azapi_resource.this.name}.${svc}.${local.storage_dns_suffix}")
+  }
 }
 
 output "local_users" {

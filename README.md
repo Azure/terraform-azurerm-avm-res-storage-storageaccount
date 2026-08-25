@@ -1666,7 +1666,7 @@ Description: Map of Data Lake Gen2 filesystems that are created.
 
 ### <a name="output_fqdn"></a> [fqdn](#output\_fqdn)
 
-Description: Fqdns for storage services.
+Description: Fqdns for storage services. Hostnames come from the endpoints Azure returns for the account, so they carry the DNS suffix of the target cloud (for example `core.usgovcloudapi.net` in Azure US Government).
 
 ### <a name="output_local_users"></a> [local\_users](#output\_local\_users)
 
