@@ -108,6 +108,7 @@ variable "private_endpoints" {
   type = map(object({
     name = optional(string, null)
     role_assignments = optional(map(object({
+      name                                   = optional(string, null)
       role_definition_id_or_name             = string
       principal_id                           = string
       description                            = optional(string, null)
@@ -118,12 +119,13 @@ variable "private_endpoints" {
       principal_type                         = optional(string, null)
     })), {})
     lock = optional(object({
-      kind = string
-      name = optional(string, null)
+      kind  = string
+      name  = optional(string, null)
+      notes = optional(string, null)
     }), null)
     tags                                    = optional(map(string), null)
     subnet_resource_id                      = string
-    subresource_name                        = string
+    subresource_name                        = optional(string, null)
     private_dns_zone_group_name             = optional(string, "default")
     private_dns_zone_resource_ids           = optional(set(string), [])
     application_security_group_associations = optional(map(string), {})
@@ -134,6 +136,7 @@ variable "private_endpoints" {
     ip_configurations = optional(map(object({
       name               = string
       private_ip_address = string
+      member_name        = optional(string)
     })), {})
   }))
   default     = {}
@@ -141,9 +144,10 @@ variable "private_endpoints" {
 A map of private endpoints to create on the resource. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time. Defaults to `{}` (no private endpoints).
 
 - `subnet_resource_id` - (Required) The resource ID of the subnet to deploy the private endpoint in.
-- `subresource_name` - (Required) The service name of the private endpoint. Possible values are `blob`, `dfs`, `file`, `queue`, `table`, and `web`.
+- `subresource_name` - (Required) The service name of the private endpoint. Possible values are `blob`, `dfs`, `file`, `queue`, `table`, and `web`. Typed as optional to match the AVM `private_endpoints` interface, which allows resources with a single subresource to default it. A storage account exposes several, so this module cannot pick one for you and a validation rule requires it.
 - `name` - (Optional) The name of the private endpoint. One will be generated if not set. The name must be set if multiple private endpoints are created to avoid conflicting resources.
 - `role_assignments` - (Optional) A map of role assignments to create on the private endpoint. Defaults to `{}`. The map key is deliberately arbitrary to avoid issues where map keys may be unknown at plan time. Each value supports:
+  - `name` - (Optional) The name of the role assignment. Must be a lowercase GUID. A random UUID is generated if not set. Defaults to `null`.
   - `role_definition_id_or_name` - (Required) The ID or name of the role definition to assign to the principal.
   - `principal_id` - (Required) The ID of the principal to assign the role to.
   - `description` - (Optional) The description of the role assignment. Defaults to `null`.
@@ -155,6 +159,7 @@ A map of private endpoints to create on the resource. The map key is deliberatel
 - `lock` - (Optional) The management lock to apply to the private endpoint. Defaults to `null` (no lock). Supports:
   - `kind` - (Required) The kind of lock. Possible values are `CanNotDelete` and `ReadOnly`.
   - `name` - (Optional) The name of the lock. Defaults to `null` (auto-generated).
+  - `notes` - (Optional) A note describing why the lock exists. Defaults to `null`, which uses a note derived from `kind`.
 - `tags` - (Optional) A mapping of tags to assign to the private endpoint. Defaults to `null`.
 - `private_dns_zone_group_name` - (Optional) The name of the private DNS zone group. Defaults to `default`.
 - `private_dns_zone_resource_ids` - (Optional) A set of resource IDs of private DNS zones to associate with the private endpoint. Defaults to `[]`. If empty, no zone groups will be created and the private endpoint will not be associated with any private DNS zones; DNS records must be managed external to this module.
@@ -166,8 +171,14 @@ A map of private endpoints to create on the resource. The map key is deliberatel
 - `ip_configurations` - (Optional) A map of IP configurations to create on the private endpoint. Defaults to `{}` (the platform allocates IPs). The map key is deliberately arbitrary to avoid issues where map keys may be unknown at plan time. Each value supports:
   - `name` - (Required) The name of the IP configuration.
   - `private_ip_address` - (Required) The private IP address of the IP configuration.
+  - `member_name` - (Optional) The name of the group member the IP configuration targets. Defaults to `null`, which uses `subresource_name`. Set this when a subresource exposes several members, such as a Data Lake Storage Gen2 account serving both `blob` and `dfs`.
 DESCRIPTION
   nullable    = false
+
+  validation {
+    condition     = alltrue([for pe in var.private_endpoints : pe.subresource_name != null])
+    error_message = "Each private_endpoints entry must set `subresource_name`. A storage account exposes several subresources (blob, dfs, file, queue, table, web), so the module cannot choose one for you."
+  }
 }
 
 variable "private_endpoints_manage_dns_zone_group" {

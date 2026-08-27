@@ -7,7 +7,7 @@ locals {
       name = v.name
       properties = {
         groupId          = var.subresource_name
-        memberName       = var.subresource_name
+        memberName       = coalesce(v.member_name, var.subresource_name)
         privateIPAddress = v.private_ip_address
       }
     }

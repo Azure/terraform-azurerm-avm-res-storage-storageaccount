@@ -29,6 +29,7 @@ variable "role_assignment_definition_lookup_enabled" {
 
 variable "role_assignments" {
   type = map(object({
+    name                                   = optional(string, null)
     role_definition_id_or_name             = string
     principal_id                           = string
     description                            = optional(string, null)
@@ -42,6 +43,7 @@ variable "role_assignments" {
   description = <<-EOT
 (Optional) A map of role assignments to create at the supplied scope. Defaults to `{}` (no role assignments). The map key is deliberate so that consumers can manage these resources predictably. Each value supports:
 
+- `name` - (Optional) The name of the role assignment. Must be a lowercase GUID. A random UUID is generated if not set. Defaults to `null`.
 - `role_definition_id_or_name` - (Required) Either the full resource ID of the role definition (`/subscriptions/<sub>/providers/Microsoft.Authorization/roleDefinitions/<id>`) or the role name (e.g. `Storage Blob Data Owner`).
 - `principal_id` - (Required) The principal id to assign the role to.
 - `description` - (Optional) Description of the role assignment. Defaults to `null`.

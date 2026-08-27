@@ -97,6 +97,7 @@ Description: (Optional) Static IP configurations for the private endpoint. Defau
 
 - `name` - (Required) The name of the IP configuration.
 - `private_ip_address` - (Required) The static private IP address to assign.
+- `member_name` - (Optional) The group member the IP configuration targets. Defaults to `null`, which uses `subresource_name`.
 
 Type:
 
@@ -104,6 +105,7 @@ Type:
 map(object({
     name               = string
     private_ip_address = string
+    member_name        = optional(string)
   }))
 ```
 
@@ -115,13 +117,15 @@ Description: (Optional) Management lock to apply to the private endpoint. Defaul
 
 - `kind` - (Required) The kind of lock. Possible values are `CanNotDelete` and `ReadOnly`.
 - `name` - (Optional) The name of the lock. Defaults to `null` (auto-generated).
+- `notes` - (Optional) A note describing why the lock exists. Defaults to `null`, which uses a note derived from `kind`.
 
 Type:
 
 ```hcl
 object({
-    name = optional(string, null)
-    kind = string
+    name  = optional(string, null)
+    kind  = string
+    notes = optional(string, null)
   })
 ```
 
@@ -219,6 +223,7 @@ Type:
 
 ```hcl
 map(object({
+    name                                   = optional(string, null)
     role_definition_id_or_name             = string
     principal_id                           = string
     description                            = optional(string, null)

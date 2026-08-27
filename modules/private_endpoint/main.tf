@@ -105,7 +105,7 @@ resource "azapi_resource" "lock" {
   body = {
     properties = {
       level = var.lock.kind
-      notes = var.lock.kind == "CanNotDelete" ? "Cannot delete the resource or its child resources." : "Cannot delete or modify the resource or its child resources."
+      notes = coalesce(var.lock.notes, var.lock.kind == "CanNotDelete" ? "Cannot delete the resource or its child resources." : "Cannot delete or modify the resource or its child resources.")
     }
   }
   create_headers         = local.tracing_headers
