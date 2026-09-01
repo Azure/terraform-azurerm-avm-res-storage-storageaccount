@@ -94,4 +94,41 @@ Move an intermediate address to the configured address before applying:
 terraform state mv 'module.storage.module.containers.azapi_resource.this["logs"]' 'module.storage.module.containers["logs"].azapi_resource.this'
 ```
 Use the equivalent `queues`, `shares`, or `tables` address for the other resource types. Do not run a state move when the destination is already present. A state move only updates Terraform's bookkeeping; it cannot restore an Azure resource or its data if the resource was already deleted.
-Use the equivalent `queues`, `shares`, or `tables` address for the other resource types. Do not run a state move when the destination is already present. A state move only updates Terraform's bookkeeping; it cannot restore an Azure resource or its data if the resource was already deleted.
+
+### Unsupported API version during state migration in sovereign clouds
+
+Upgrading from v0.6.x in a sovereign cloud such as US Gov can fail at `terraform plan` with `NoRegisteredProviderFound`, naming an API version that appears nowhere in your configuration:
+
+```text
+No registered resource provider found for location 'usgovarizona' and API version
+'2026-04-01' for type 'storageAccounts'.
+```
+
+The version in that message is not the version this module requests. Version 0.7.0 migrated the storage account from `azurerm_storage_account` to `azapi_resource`, and the module ships a `moved` block for that change. When Terraform applies the move, the AzAPI provider rebuilds the resource state from the ARM resource ID alone. An ARM resource ID does not record an API version, so the provider falls back to the newest version in its own embedded index. The read that follows the move uses that version, and sovereign clouds often lag behind it.
+
+Overriding `resource_types.storage_account` does not help, because the provider cannot see that value while it is migrating state. This is tracked upstream as [Azure/terraform-provider-azapi#1216](https://github.com/Azure/terraform-provider-azapi/issues/1216).
+
+> [!WARNING]
+> Do not re-run the plan with `-refresh=false`. The same state move leaves `location` empty, and an empty `location` forces replacement. The read that follows the move is the only step that restores it, so suppressing the refresh turns a blocked plan into one that destroys and recreates the storage account.
+
+To work around this, take the old address out of state and import the account with an explicit API version. Once the source address is gone, the module's `moved` block has nothing left to match and does nothing.
+
+```shell
+terraform state pull > terraform-state-backup.json
+terraform state rm 'module.storage.azurerm_storage_account.this'
+```
+
+Then add an import block to the root module that calls this module, choosing an API version the target cloud supports:
+
+```hcl
+import {
+  to = module.storage.azapi_resource.this
+
+  identity = {
+    id   = "/subscriptions/<subscription-id>/resourceGroups/<resource-group>/providers/Microsoft.Storage/storageAccounts/<account-name>"
+    type = "Microsoft.Storage/storageAccounts@2025-08-01"
+  }
+}
+```
+
+Replace `module.storage` with the actual module address. Run `terraform plan` and confirm it does not propose replacing the storage account before you apply. If your state still contains `azurerm_storage_management_policy.this`, it is exposed to the same failure and needs the same treatment.
