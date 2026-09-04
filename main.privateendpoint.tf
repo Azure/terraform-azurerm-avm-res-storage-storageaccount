@@ -25,5 +25,4 @@ module "private_endpoints" {
   role_assignments                          = each.value.role_assignments
   tags                                      = each.value.tags
   timeouts                                  = var.timeouts
-  tracing_tags_header                       = var.enable_telemetry ? local.avm_azapi_header : null
 }

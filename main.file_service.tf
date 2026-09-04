@@ -7,5 +7,4 @@ module "file_service" {
   resource_type           = var.resource_types.file_service
   retry                   = var.retry
   timeouts                = var.timeouts
-  tracing_tags_header     = var.enable_telemetry ? local.avm_azapi_header : null
 }

@@ -33,10 +33,7 @@ resource "azapi_resource" "this" {
       supportsHttpsTrafficOnly              = var.https_traffic_only_enabled
     }
   }
-  create_headers       = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
-  delete_headers       = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
   ignore_null_property = true
-  read_headers         = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
   response_export_values = [
     "identity",
     "properties.primaryEndpoints",
@@ -44,9 +41,8 @@ resource "azapi_resource" "this" {
     "properties.primaryLocation",
     "properties.secondaryLocation",
   ]
-  retry          = var.retry
-  tags           = var.tags
-  update_headers = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
+  retry = var.retry
+  tags  = var.tags
 
   dynamic "identity" {
     for_each = local.managed_identity_type == null ? [] : [local.managed_identity_type]
@@ -123,9 +119,7 @@ resource "azapi_update_resource" "customer_managed_key" {
       encryption = local.encryption_cmk
     }
   }
-  read_headers   = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
-  retry          = var.retry
-  update_headers = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
+  retry = var.retry
 
   dynamic "timeouts" {
     for_each = var.timeouts == null ? [] : [var.timeouts]

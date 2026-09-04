@@ -6,7 +6,6 @@ module "diagnostic_setting_storage_account" {
   enable_telemetry    = var.enable_telemetry
   retry               = var.retry
   timeouts            = var.timeouts
-  tracing_tags_header = var.enable_telemetry ? local.avm_azapi_header : null
 }
 
 module "diagnostic_setting_blob" {
@@ -17,7 +16,6 @@ module "diagnostic_setting_blob" {
   enable_telemetry    = var.enable_telemetry
   retry               = var.retry
   timeouts            = var.timeouts
-  tracing_tags_header = var.enable_telemetry ? local.avm_azapi_header : null
 }
 
 module "diagnostic_setting_queue" {
@@ -28,7 +26,6 @@ module "diagnostic_setting_queue" {
   enable_telemetry    = var.enable_telemetry
   retry               = var.retry
   timeouts            = var.timeouts
-  tracing_tags_header = var.enable_telemetry ? local.avm_azapi_header : null
 }
 
 module "diagnostic_setting_table" {
@@ -39,7 +36,6 @@ module "diagnostic_setting_table" {
   enable_telemetry    = var.enable_telemetry
   retry               = var.retry
   timeouts            = var.timeouts
-  tracing_tags_header = var.enable_telemetry ? local.avm_azapi_header : null
 }
 
 module "diagnostic_setting_file" {
@@ -50,5 +46,4 @@ module "diagnostic_setting_file" {
   enable_telemetry    = var.enable_telemetry
   retry               = var.retry
   timeouts            = var.timeouts
-  tracing_tags_header = var.enable_telemetry ? local.avm_azapi_header : null
 }

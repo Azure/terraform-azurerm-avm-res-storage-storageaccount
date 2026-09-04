@@ -10,5 +10,4 @@ module "tables" {
   role_assignments                          = each.value.role_assignments
   signed_identifiers                        = each.value.signed_identifiers
   timeouts                                  = each.value.timeouts != null ? each.value.timeouts : var.timeouts
-  tracing_tags_header                       = var.enable_telemetry ? local.avm_azapi_header : null
 }

@@ -17,5 +17,4 @@ module "shares" {
   root_squash                               = each.value.root_squash
   signed_identifiers                        = each.value.signed_identifiers
   timeouts                                  = each.value.timeouts != null ? each.value.timeouts : var.timeouts
-  tracing_tags_header                       = var.enable_telemetry ? local.avm_azapi_header : null
 }

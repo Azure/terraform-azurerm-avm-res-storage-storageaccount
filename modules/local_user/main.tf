@@ -12,13 +12,9 @@ resource "azapi_resource" "this" {
       permissionScopes  = local.permission_string
     }
   }
-  create_headers         = local.tracing_headers
-  delete_headers         = local.tracing_headers
   ignore_null_property   = true
-  read_headers           = local.tracing_headers
   response_export_values = ["properties.sid"]
   retry                  = var.retry
-  update_headers         = local.tracing_headers
 
   dynamic "timeouts" {
     for_each = var.timeouts == null ? [] : [var.timeouts]
