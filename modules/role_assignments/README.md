@@ -117,14 +117,6 @@ object({
 
 Default: `null`
 
-### <a name="input_tracing_tags_header"></a> [tracing\_tags\_header](#input\_tracing\_tags\_header)
-
-Description: (Optional) User-Agent string injected as the `User-Agent` request header for all AzAPI requests. Pass `local.avm_azapi_header` from the calling module. Defaults to `null` (no custom header).
-
-Type: `string`
-
-Default: `null`
-
 ## Outputs
 
 The following outputs are exported:

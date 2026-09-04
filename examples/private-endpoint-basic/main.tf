@@ -44,11 +44,11 @@ module "virtual_network" {
   source  = "Azure/avm-res-network-virtualnetwork/azurerm"
   version = "0.19.0"
 
-  address_space    = ["10.0.0.0/16"]
   location         = module.resource_group.location
-  name             = module.naming.virtual_network.name_unique
   parent_id        = module.resource_group.resource_id
+  address_space    = ["10.0.0.0/16"]
   enable_telemetry = true
+  name             = module.naming.virtual_network.name_unique
   subnets = {
     private_endpoints = {
       name             = "subnet-private-endpoints"

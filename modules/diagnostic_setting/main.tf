@@ -13,8 +13,6 @@ resource "azapi_resource" "this" {
   parent_id            = var.parent_id
   type                 = each.value.type
   body                 = each.value.body
-  create_headers       = local.tracing_headers
-  delete_headers       = local.tracing_headers
   ignore_null_property = true
   ignore_other_items_in_list = [
     "properties.logs",
@@ -24,11 +22,9 @@ resource "azapi_resource" "this" {
     "properties.logs"    = "category, categoryGroup"
     "properties.metrics" = "category"
   }
-  read_headers              = local.tracing_headers
   response_export_values    = []
   retry                     = var.retry
   schema_validation_enabled = false
-  update_headers            = local.tracing_headers
 
   dynamic "timeouts" {
     for_each = var.timeouts == null ? [] : [var.timeouts]

@@ -12,5 +12,4 @@ module "local_users" {
   ssh_key_enabled      = each.value.ssh_key_enabled == null ? false : each.value.ssh_key_enabled
   ssh_password_enabled = each.value.ssh_password_enabled == null ? false : each.value.ssh_password_enabled
   timeouts             = each.value.timeouts != null ? each.value.timeouts : var.timeouts
-  tracing_tags_header  = var.enable_telemetry ? local.avm_azapi_header : null
 }

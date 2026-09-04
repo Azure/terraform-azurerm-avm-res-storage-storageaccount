@@ -37,13 +37,9 @@ resource "azapi_resource" "this" {
       }
     }
   )
-  create_headers         = local.tracing_headers
-  delete_headers         = local.tracing_headers
-  read_headers           = local.tracing_headers
   response_export_values = []
   retry                  = var.retry
   tags                   = var.tags
-  update_headers         = local.tracing_headers
 
   dynamic "timeouts" {
     for_each = var.timeouts == null ? [] : [var.timeouts]
@@ -76,12 +72,8 @@ resource "azapi_resource" "private_dns_zone_group" {
       ]
     }
   }
-  create_headers         = local.tracing_headers
-  delete_headers         = local.tracing_headers
-  read_headers           = local.tracing_headers
   response_export_values = []
   retry                  = var.retry
-  update_headers         = local.tracing_headers
 
   dynamic "timeouts" {
     for_each = var.timeouts == null ? [] : [var.timeouts]
@@ -108,12 +100,8 @@ resource "azapi_resource" "lock" {
       notes = coalesce(var.lock.notes, var.lock.kind == "CanNotDelete" ? "Cannot delete the resource or its child resources." : "Cannot delete or modify the resource or its child resources.")
     }
   }
-  create_headers         = local.tracing_headers
-  delete_headers         = local.tracing_headers
-  read_headers           = local.tracing_headers
   response_export_values = []
   retry                  = var.retry
-  update_headers         = local.tracing_headers
 
   dynamic "timeouts" {
     for_each = var.timeouts == null ? [] : [var.timeouts]
@@ -136,5 +124,4 @@ module "role_assignments" {
   role_assignment_definition_lookup_enabled = var.role_assignment_definition_lookup_enabled
   role_assignments                          = var.role_assignments
   timeouts                                  = var.timeouts
-  tracing_tags_header                       = var.tracing_tags_header
 }

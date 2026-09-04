@@ -1,10 +1,8 @@
 resource "azapi_update_resource" "this" {
-  resource_id    = "${var.storage_account_id}/tableServices/default"
-  type           = var.resource_type
-  body           = local.resource_body
-  read_headers   = local.tracing_headers
-  retry          = var.retry
-  update_headers = local.tracing_headers
+  resource_id = "${var.storage_account_id}/tableServices/default"
+  type        = var.resource_type
+  body        = local.resource_body
+  retry       = var.retry
 
   dynamic "timeouts" {
     for_each = var.timeouts == null ? [] : [var.timeouts]

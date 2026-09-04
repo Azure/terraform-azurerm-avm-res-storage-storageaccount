@@ -8,5 +8,4 @@ locals {
     enableNfsV3RootSquash          = var.enable_nfs_v3_root_squash
     immutableStorageWithVersioning = var.immutable_storage_with_versioning
   }
-  tracing_headers = var.tracing_tags_header == null ? null : { "User-Agent" = var.tracing_tags_header }
 }

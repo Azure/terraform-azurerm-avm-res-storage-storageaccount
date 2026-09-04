@@ -18,5 +18,4 @@ module "role_assignments" {
   role_assignment_definition_lookup_enabled = var.role_assignment_definition_lookup_enabled
   role_assignments                          = var.role_assignments
   timeouts                                  = var.timeouts
-  tracing_tags_header                       = var.enable_telemetry ? local.avm_azapi_header : null
 }

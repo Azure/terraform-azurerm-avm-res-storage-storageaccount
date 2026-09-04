@@ -20,5 +20,4 @@ module "data_lake_filesystems" {
   resource_type            = var.resource_types.blob_container
   retry                    = var.retry
   timeouts                 = each.value.timeouts != null ? each.value.timeouts : var.timeouts
-  tracing_tags_header      = var.enable_telemetry ? local.avm_azapi_header : null
 }

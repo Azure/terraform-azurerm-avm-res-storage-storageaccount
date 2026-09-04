@@ -15,12 +15,8 @@ resource "azapi_resource" "this" {
   parent_id              = var.scope
   type                   = each.value.type
   body                   = each.value.body
-  create_headers         = local.tracing_headers
-  delete_headers         = local.tracing_headers
-  read_headers           = local.tracing_headers
   response_export_values = []
   retry                  = var.retry
-  update_headers         = local.tracing_headers
 
   dynamic "timeouts" {
     for_each = var.timeouts == null ? [] : [var.timeouts]

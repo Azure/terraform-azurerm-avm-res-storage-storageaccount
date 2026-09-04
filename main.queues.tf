@@ -10,5 +10,4 @@ module "queues" {
   role_assignment_definition_lookup_enabled = var.role_assignment_definition_lookup_enabled
   role_assignments                          = each.value.role_assignments
   timeouts                                  = each.value.timeouts != null ? each.value.timeouts : var.timeouts
-  tracing_tags_header                       = var.enable_telemetry ? local.avm_azapi_header : null
 }
