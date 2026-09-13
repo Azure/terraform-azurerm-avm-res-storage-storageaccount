@@ -54,7 +54,7 @@ locals {
       }
     ]
   }
-  public_network_access_setting = var.public_network_access_enabled == null ? null : (var.public_network_access_enabled ? "Enabled" : "Disabled")
+  public_network_access_setting = var.secure_network_perimeter_enabled ? "SecuredByPerimeter" : (var.public_network_access_enabled ? "Enabled" : "Disabled")
   # Routing preference
   routing_preference = var.routing == null ? null : {
     routingChoice             = var.routing.choice
