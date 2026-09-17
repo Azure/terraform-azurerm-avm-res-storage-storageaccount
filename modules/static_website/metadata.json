@@ -3,5 +3,5 @@
   "moduleDisplayName": "Storage Account Static Website",
   "moduleDescription": "Configures static-website hosting on the blob service of an Azure Storage Account.",
   "canonicalType": "Microsoft.Storage/storageAccounts/blobServices",
-  "telemetryIdPrefix": "46d3xtrf.res.6ffd8703f52cddd1975f8ebcbe3318b1"
+  "telemetryIdPrefix": "46d3xtrf.res.1b465c1"
 }

@@ -3,5 +3,5 @@
   "moduleDisplayName": "Storage Account Local User",
   "moduleDescription": "Manages a local user in an Azure Storage Account.",
   "canonicalType": "Microsoft.Storage/storageAccounts/localUsers",
-  "telemetryIdPrefix": "46d3xtrf.res.1acc80127de113225f52ee8afedab4b6"
+  "telemetryIdPrefix": "46d3xtrf.res.4316e0f"
 }

@@ -3,5 +3,5 @@
   "moduleDisplayName": "Storage Account Blob Container",
   "moduleDescription": "Manages a blob container in an Azure Storage Account.",
   "canonicalType": "Microsoft.Storage/storageAccounts/blobServices/containers",
-  "telemetryIdPrefix": "46d3xtrf.res.376946dc7ffb4b693a21b663585ce595"
+  "telemetryIdPrefix": "46d3xtrf.res.551a930"
 }

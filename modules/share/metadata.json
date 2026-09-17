@@ -3,5 +3,5 @@
   "moduleDisplayName": "Storage Account File Share",
   "moduleDescription": "Manages a file share in an Azure Storage Account.",
   "canonicalType": "Microsoft.Storage/storageAccounts/fileServices/shares",
-  "telemetryIdPrefix": "46d3xtrf.res.a261cd873e85b42d2bcc08e78ad9481a"
+  "telemetryIdPrefix": "46d3xtrf.res.c057073"
 }

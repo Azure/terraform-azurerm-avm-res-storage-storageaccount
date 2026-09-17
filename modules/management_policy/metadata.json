@@ -3,5 +3,5 @@
   "moduleDisplayName": "Storage Account Management Policy",
   "moduleDescription": "Manages the lifecycle-management policy for an Azure Storage Account.",
   "canonicalType": "Microsoft.Storage/storageAccounts/managementPolicies",
-  "telemetryIdPrefix": "46d3xtrf.res.1b82d52e4ca3454dba776fac359e043e"
+  "telemetryIdPrefix": "46d3xtrf.res.d924c24"
 }

@@ -3,5 +3,5 @@
   "moduleDisplayName": "Storage Account Blob Service",
   "moduleDescription": "Configures storage account blob service properties including versioning, change feed, soft-delete retention, point-in-time restore, access tracking, and CORS rules.",
   "canonicalType": "Microsoft.Storage/storageAccounts/blobServices",
-  "telemetryIdPrefix": "46d3xtrf.res.bbca9c8c9ae543a08f004dcbf5473d4c"
+  "telemetryIdPrefix": "46d3xtrf.res.15d4019"
 }

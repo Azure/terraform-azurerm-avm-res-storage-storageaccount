@@ -3,5 +3,5 @@
   "moduleDisplayName": "Storage Account Queue",
   "moduleDescription": "Manages a queue in an Azure Storage Account.",
   "canonicalType": "Microsoft.Storage/storageAccounts/queueServices/queues",
-  "telemetryIdPrefix": "46d3xtrf.res.4fdd2261f10fb62cfa42362a538a61e9"
+  "telemetryIdPrefix": "46d3xtrf.res.9cc9971"
 }

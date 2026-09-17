@@ -3,5 +3,5 @@
   "moduleDisplayName": "Storage Account Table Service",
   "moduleDescription": "Configures table service properties for an Azure Storage Account.",
   "canonicalType": "Microsoft.Storage/storageAccounts/tableServices",
-  "telemetryIdPrefix": "46d3xtrf.res.d4c3a5e851262fd2e8120db9c6883272"
+  "telemetryIdPrefix": "46d3xtrf.res.5b7c96a"
 }
