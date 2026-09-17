@@ -1,0 +1,7 @@
+{
+  "$schema": "https://raw.githubusercontent.com/Azure/azure-verified-modules-tools/main/src/Avm.Authoring/Resources/Schemas/v1/avm-module-metadata.schema.json",
+  "moduleDisplayName": "Storage Account Blob Container",
+  "moduleDescription": "Manages a blob container in an Azure Storage Account.",
+  "canonicalType": "Microsoft.Storage/storageAccounts/blobServices/containers",
+  "telemetryIdPrefix": "46d3xtrf.res.551a930"
+}

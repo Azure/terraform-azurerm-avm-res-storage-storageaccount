@@ -1,0 +1,7 @@
+{
+  "$schema": "https://raw.githubusercontent.com/Azure/azure-verified-modules-tools/main/src/Avm.Authoring/Resources/Schemas/v1/avm-module-metadata.schema.json",
+  "moduleDisplayName": "Storage Account Local User",
+  "moduleDescription": "Manages a local user in an Azure Storage Account.",
+  "canonicalType": "Microsoft.Storage/storageAccounts/localUsers",
+  "telemetryIdPrefix": "46d3xtrf.res.4316e0f"
+}

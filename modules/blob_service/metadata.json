@@ -1,0 +1,7 @@
+{
+  "$schema": "https://raw.githubusercontent.com/Azure/azure-verified-modules-tools/main/src/Avm.Authoring/Resources/Schemas/v1/avm-module-metadata.schema.json",
+  "moduleDisplayName": "Storage Account Blob Service",
+  "moduleDescription": "Configures storage account blob service properties including versioning, change feed, soft-delete retention, point-in-time restore, access tracking, and CORS rules.",
+  "canonicalType": "Microsoft.Storage/storageAccounts/blobServices",
+  "telemetryIdPrefix": "46d3xtrf.res.15d4019"
+}

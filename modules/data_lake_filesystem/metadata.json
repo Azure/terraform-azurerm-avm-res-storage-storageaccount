@@ -1,0 +1,7 @@
+{
+  "$schema": "https://raw.githubusercontent.com/Azure/azure-verified-modules-tools/main/src/Avm.Authoring/Resources/Schemas/v1/avm-module-metadata.schema.json",
+  "moduleDisplayName": "Storage Account Data Lake Gen2 Filesystem",
+  "moduleDescription": "Manages a Data Lake Gen2 filesystem backed by a storage account blob container.",
+  "canonicalType": "Microsoft.Storage/storageAccounts/blobServices/containers",
+  "telemetryIdPrefix": "46d3xtrf.res.37705a8"
+}
