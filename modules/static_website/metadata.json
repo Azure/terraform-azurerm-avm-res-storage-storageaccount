@@ -1,0 +1,7 @@
+{
+  "$schema": "https://raw.githubusercontent.com/Azure/azure-verified-modules-tools/main/src/Avm.Authoring/Resources/Schemas/v1/avm-module-metadata.schema.json",
+  "moduleDisplayName": "Storage Account Static Website",
+  "moduleDescription": "Configures static-website hosting on the blob service of an Azure Storage Account.",
+  "canonicalType": "Microsoft.Storage/storageAccounts/blobServices",
+  "telemetryIdPrefix": "46d3xtrf.res.6ffd8703f52cddd1975f8ebcbe3318b1"
+}

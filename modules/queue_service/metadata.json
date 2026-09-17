@@ -1,0 +1,7 @@
+{
+  "$schema": "https://raw.githubusercontent.com/Azure/azure-verified-modules-tools/main/src/Avm.Authoring/Resources/Schemas/v1/avm-module-metadata.schema.json",
+  "moduleDisplayName": "Storage Account Queue Service",
+  "moduleDescription": "Configures queue service properties for an Azure Storage Account.",
+  "canonicalType": "Microsoft.Storage/storageAccounts/queueServices",
+  "telemetryIdPrefix": "46d3xtrf.res.312ad3c001f70a9f8cdd2a6111438412"
+}

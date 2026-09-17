@@ -1,0 +1,7 @@
+{
+  "$schema": "https://raw.githubusercontent.com/Azure/azure-verified-modules-tools/main/src/Avm.Authoring/Resources/Schemas/v1/avm-module-metadata.schema.json",
+  "moduleDisplayName": "Storage Account Table Service",
+  "moduleDescription": "Configures table service properties for an Azure Storage Account.",
+  "canonicalType": "Microsoft.Storage/storageAccounts/tableServices",
+  "telemetryIdPrefix": "46d3xtrf.res.d4c3a5e851262fd2e8120db9c6883272"
+}
