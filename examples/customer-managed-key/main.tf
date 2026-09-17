@@ -160,6 +160,7 @@ module "avm_res_keyvault_vault" {
   name                = module.naming.key_vault.name_unique
   resource_group_name = azapi_resource.resource_group.name
   tenant_id           = data.azurerm_client_config.current.tenant_id
+  enable_telemetry    = false
   network_acls = {
     default_action = "Allow"
   }
@@ -201,6 +202,7 @@ module "this" {
     key_name               = azurerm_key_vault_key.example.name
     user_assigned_identity = { resource_id = azapi_resource.example_identity.id }
   }
+  enable_telemetry                  = false
   infrastructure_encryption_enabled = true
   managed_identities = {
     system_assigned            = true

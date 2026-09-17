@@ -327,7 +327,7 @@ module "this" {
       ]
     }
   }
-  enable_telemetry = var.enable_telemetry
+  enable_telemetry = false
   managed_identities = {
     system_assigned            = true
     user_assigned_resource_ids = [azapi_resource.example_identity.id]

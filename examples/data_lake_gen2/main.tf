@@ -82,7 +82,8 @@ module "this" {
     default_share_level_permission = "StorageFileDataSmbShareReader"
     directory_type                 = "AADKERB"
   }
-  is_hns_enabled = true
+  enable_telemetry = false
+  is_hns_enabled   = true
   managed_identities = {
     system_assigned            = true
     user_assigned_resource_ids = [azapi_resource.example_identity.id]
