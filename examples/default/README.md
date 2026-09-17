@@ -63,6 +63,7 @@ module "this" {
       name = "blob-container-${random_string.this.result}-0"
     }
   }
+  enable_telemetry = false
 }
 ```
 

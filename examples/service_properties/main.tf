@@ -71,6 +71,7 @@ module "this" {
       days    = 7
     }
   }
+  enable_telemetry = false
   # File service-level settings: share soft-delete and CORS.
   file_service_properties = {
     share_retention_policy = {

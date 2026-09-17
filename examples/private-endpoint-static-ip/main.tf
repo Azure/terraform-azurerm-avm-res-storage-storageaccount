@@ -180,6 +180,7 @@ module "this" {
       name = "blob-container-${random_string.this.result}-1"
     }
   }
+  enable_telemetry = false
   managed_identities = {
     system_assigned            = true
     user_assigned_resource_ids = [azapi_resource.example_identity.id]

@@ -42,8 +42,9 @@ module "resource_group" {
   source  = "Azure/avm-res-resources-resourcegroup/azurerm"
   version = "0.4.0"
 
-  location = local.test_regions[random_integer.region_index.result]
-  name     = module.naming.resource_group.name_unique
+  location         = local.test_regions[random_integer.region_index.result]
+  name             = module.naming.resource_group.name_unique
+  enable_telemetry = false
 }
 
 # A virtual network with a dedicated subnet to host the private endpoint.
@@ -54,7 +55,7 @@ module "virtual_network" {
   location         = module.resource_group.location
   parent_id        = module.resource_group.resource_id
   address_space    = ["10.0.0.0/16"]
-  enable_telemetry = true
+  enable_telemetry = false
   name             = module.naming.virtual_network.name_unique
   subnets = {
     private_endpoints = {
@@ -69,8 +70,9 @@ module "private_dns_zone" {
   source  = "Azure/avm-res-network-privatednszone/azurerm"
   version = "0.5.0"
 
-  domain_name = "privatelink.blob.core.windows.net"
-  parent_id   = module.resource_group.resource_id
+  domain_name      = "privatelink.blob.core.windows.net"
+  parent_id        = module.resource_group.resource_id
+  enable_telemetry = false
   virtual_network_links = {
     vnetlink1 = {
       name               = "storage-account"
@@ -91,7 +93,7 @@ module "storage_account" {
       name = "demo"
     }
   }
-  enable_telemetry = true
+  enable_telemetry = false
   private_endpoints = {
     primary = {
       private_dns_zone_resource_ids = [module.private_dns_zone.resource_id]
