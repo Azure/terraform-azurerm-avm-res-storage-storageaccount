@@ -1,0 +1,6 @@
+{
+  "$schema": "https://raw.githubusercontent.com/Azure/azure-verified-modules-tools/main/src/Avm.Authoring/Resources/Schemas/v1/avm-module-metadata.schema.json",
+  "moduleDisplayName": "Submodule: diagnostic_setting",
+  "moduleDescription": "This submodule is independently consumable and can be called directly. It is also used by `terraform-azurerm-avm-res-storage-storageaccount`.",
+  "canonicalType": "helper"
+}
