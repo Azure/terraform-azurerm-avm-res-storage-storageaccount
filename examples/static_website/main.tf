@@ -60,7 +60,7 @@ module "this" {
       name = "$web"
     }
   }
-  enable_telemetry = false
+  enable_telemetry = var.enable_telemetry
   # Enables static website hosting on the blobServices/default sub-resource.
   static_website = {
     this = {

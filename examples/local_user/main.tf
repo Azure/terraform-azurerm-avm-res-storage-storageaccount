@@ -139,7 +139,7 @@ module "avm_res_keyvault_vault" {
   name                = module.naming.key_vault.name_unique
   resource_group_name = azapi_resource.resource_group.name
   tenant_id           = data.azurerm_client_config.current.tenant_id
-  enable_telemetry    = false
+  enable_telemetry    = var.enable_telemetry
   network_acls = {
     default_action = "Allow"
   }
@@ -176,7 +176,7 @@ module "this" {
       name = "blob-container-${random_string.this.result}-1"
     }
   }
-  enable_telemetry                  = false
+  enable_telemetry                  = var.enable_telemetry
   infrastructure_encryption_enabled = true
   is_hns_enabled                    = true
   local_user = {

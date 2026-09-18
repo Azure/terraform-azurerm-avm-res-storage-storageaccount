@@ -37,7 +37,7 @@ module "resource_group" {
 
   location         = local.test_regions[random_integer.region_index.result]
   name             = module.naming.resource_group.name_unique
-  enable_telemetry = false
+  enable_telemetry = var.enable_telemetry
 }
 
 # A virtual network with a dedicated subnet to host the private endpoint.
@@ -48,7 +48,7 @@ module "virtual_network" {
   location         = module.resource_group.location
   parent_id        = module.resource_group.resource_id
   address_space    = ["10.0.0.0/16"]
-  enable_telemetry = false
+  enable_telemetry = var.enable_telemetry
   name             = module.naming.virtual_network.name_unique
   subnets = {
     private_endpoints = {
@@ -65,7 +65,7 @@ module "private_dns_zone" {
 
   domain_name      = "privatelink.blob.core.windows.net"
   parent_id        = module.resource_group.resource_id
-  enable_telemetry = false
+  enable_telemetry = var.enable_telemetry
   virtual_network_links = {
     vnetlink1 = {
       name               = "storage-account"
@@ -86,7 +86,7 @@ module "storage_account" {
       name = "demo"
     }
   }
-  enable_telemetry = false
+  enable_telemetry = var.enable_telemetry
   private_endpoints = {
     primary = {
       private_dns_zone_resource_ids = [module.private_dns_zone.resource_id]

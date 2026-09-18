@@ -56,5 +56,5 @@ module "this" {
       name = "blob-container-${random_string.this.result}-0"
     }
   }
-  enable_telemetry = false
+  enable_telemetry = var.enable_telemetry
 }

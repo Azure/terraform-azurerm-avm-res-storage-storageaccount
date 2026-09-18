@@ -132,7 +132,7 @@ module "this" {
       name = "blob-container-${random_string.this.result}-1"
     }
   }
-  enable_telemetry = false
+  enable_telemetry = var.enable_telemetry
   managed_identities = {
     system_assigned = true
     user_assigned_resource_ids = [
