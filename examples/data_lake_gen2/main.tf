@@ -82,7 +82,7 @@ module "this" {
     default_share_level_permission = "StorageFileDataSmbShareReader"
     directory_type                 = "AADKERB"
   }
-  enable_telemetry = false
+  enable_telemetry = var.enable_telemetry
   is_hns_enabled   = true
   managed_identities = {
     system_assigned            = true

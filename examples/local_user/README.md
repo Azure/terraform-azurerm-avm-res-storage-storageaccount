@@ -153,7 +153,7 @@ module "avm_res_keyvault_vault" {
   name                = module.naming.key_vault.name_unique
   resource_group_name = azapi_resource.resource_group.name
   tenant_id           = data.azurerm_client_config.current.tenant_id
-  enable_telemetry    = false
+  enable_telemetry    = var.enable_telemetry
   network_acls = {
     default_action = "Allow"
   }
@@ -190,7 +190,7 @@ module "this" {
       name = "blob-container-${random_string.this.result}-1"
     }
   }
-  enable_telemetry                  = false
+  enable_telemetry                  = var.enable_telemetry
   infrastructure_encryption_enabled = true
   is_hns_enabled                    = true
   local_user = {
@@ -318,6 +318,16 @@ No required inputs.
 ## Optional Inputs
 
 The following input variables are optional (have default values):
+
+### <a name="input_enable_telemetry"></a> [enable\_telemetry](#input\_enable\_telemetry)
+
+Description: This variable controls whether or not telemetry is enabled for the module.  
+For more information see <https://aka.ms/avm/telemetryinfo>.  
+If it is set to false, then no telemetry will be collected.
+
+Type: `bool`
+
+Default: `false`
 
 ### <a name="input_msi_id"></a> [msi\_id](#input\_msi\_id)
 

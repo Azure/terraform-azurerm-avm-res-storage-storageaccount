@@ -189,7 +189,7 @@ module "this" {
       name = "blob-container-${random_string.this.result}-1"
     }
   }
-  enable_telemetry = false
+  enable_telemetry = var.enable_telemetry
   managed_identities = {
     system_assigned            = true
     user_assigned_resource_ids = [azapi_resource.example_identity.id]
@@ -313,6 +313,16 @@ No required inputs.
 ## Optional Inputs
 
 The following input variables are optional (have default values):
+
+### <a name="input_enable_telemetry"></a> [enable\_telemetry](#input\_enable\_telemetry)
+
+Description: This variable controls whether or not telemetry is enabled for the module.  
+For more information see <https://aka.ms/avm/telemetryinfo>.  
+If it is set to false, then no telemetry will be collected.
+
+Type: `bool`
+
+Default: `false`
 
 ### <a name="input_msi_id"></a> [msi\_id](#input\_msi\_id)
 

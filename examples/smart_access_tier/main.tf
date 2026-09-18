@@ -48,5 +48,5 @@ module "this" {
   access_tier      = "Smart"
   account_kind     = "StorageV2"
   account_sku_name = "Standard_ZRS"
-  enable_telemetry = false
+  enable_telemetry = var.enable_telemetry
 }
