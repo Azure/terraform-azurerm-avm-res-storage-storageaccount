@@ -244,7 +244,7 @@ variable "provisioned_billing_model_version" {
 variable "public_network_access_enabled" {
   type        = bool
   default     = false
-  description = "(Optional) Whether the public network access is enabled? Defaults to `false`."
+  description = "(Optional) Whether the public network access is enabled? Defaults to `false`. `secure_network_perimeter_enabled` takes precedence, if enabled."
 }
 
 variable "routing" {
@@ -275,6 +275,12 @@ Configures the SAS policy on the storage account. Defaults to `null` (no SAS pol
 - `expiration_period` - (Required) The SAS expiration period in the format `DD.HH:MM:SS`.
 - `expiration_action` - (Optional) The SAS expiration action. The only possible value is `Log` at this moment. Defaults to `Log`.
 EOT
+}
+
+variable "secure_network_perimeter_enabled" {
+  type        = bool
+  default     = false
+  description = "(Optional) Boolean, enable this setting if the storage account will be secured by a network perimeter. Defaults to `false`."
 }
 
 variable "sftp_enabled" {
