@@ -1,6 +1,7 @@
 mock_provider "azapi" {}
 mock_provider "modtm" {}
 mock_provider "random" {}
+mock_provider "time" {}
 
 run "create_pre_0_7_state" {
   command   = apply

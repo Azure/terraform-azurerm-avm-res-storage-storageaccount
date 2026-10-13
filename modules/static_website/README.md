@@ -5,6 +5,8 @@
 
 This submodule is independently consumable and can be called directly. It is also used by `terraform-azurerm-avm-res-storage-storageaccount`.
 
+Set `tracing_tags_header` to supply a custom User-Agent for the blob-service read and update requests. Omit it to leave the request headers unchanged.
+
 <!-- markdownlint-disable MD033 -->
 ## Requirements
 
@@ -98,6 +100,14 @@ object({
     delete = optional(string)
   })
 ```
+
+Default: `null`
+
+### <a name="input_tracing_tags_header"></a> [tracing\_tags\_header](#input\_tracing\_tags\_header)
+
+Description: (Optional) User-Agent string injected into AzAPI read and update request headers. Defaults to `null` (no custom header).
+
+Type: `string`
 
 Default: `null`
 

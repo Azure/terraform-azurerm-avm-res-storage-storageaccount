@@ -7,7 +7,7 @@
 # They are intended for CI-driven runs, not local execution.
 
 variables {
-  enable_telemetry = true
+  enable_telemetry = false
 }
 
 run "apply_default_example" {
