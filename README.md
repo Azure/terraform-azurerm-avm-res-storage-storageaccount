@@ -1077,7 +1077,7 @@ Default: `null`
 
 ### <a name="input_public_network_access_enabled"></a> [public\_network\_access\_enabled](#input\_public\_network\_access\_enabled)
 
-Description: (Optional) Whether the public network access is enabled? Defaults to `false`.
+Description: (Optional) Whether the public network access is enabled? Defaults to `false`. `secure_network_perimeter_enabled` takes precedence, if enabled.
 
 Type: `bool`
 
@@ -1305,6 +1305,14 @@ object({
 ```
 
 Default: `null`
+
+### <a name="input_secure_network_perimeter_enabled"></a> [secure\_network\_perimeter\_enabled](#input\_secure\_network\_perimeter\_enabled)
+
+Description: (Optional) Boolean, enable this setting if the storage account will be secured by a network perimeter. Defaults to `false`.
+
+Type: `bool`
+
+Default: `false`
 
 ### <a name="input_sftp_enabled"></a> [sftp\_enabled](#input\_sftp\_enabled)
 
