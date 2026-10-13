@@ -67,3 +67,9 @@ variable "timeouts" {
 - `delete` - (Optional) Timeout for delete operations. Defaults to `null`.
 EOT
 }
+
+variable "tracing_tags_header" {
+  type        = string
+  default     = null
+  description = "(Optional) User-Agent string injected into AzAPI read and update request headers. Defaults to `null` (no custom header)."
+}

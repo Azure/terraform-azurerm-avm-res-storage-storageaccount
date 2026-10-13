@@ -116,7 +116,6 @@ resource "azapi_resource" "lock" {
 }
 
 module "role_assignments" {
-  # tflint-ignore: required_module_source_tffr1 # relative source is intentional: this is an in-module composition of the role_assignments submodule
   source = "../role_assignments"
 
   scope                                     = azapi_resource.this.id

@@ -1,7 +1,3 @@
-rule "required_output_rmfr7" {
-  enabled = false
-}
-
-rule "diagnostic_settings" {
+rule "avm_output_resource_id_required" {
   enabled = false
 }

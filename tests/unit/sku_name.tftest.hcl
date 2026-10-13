@@ -10,6 +10,7 @@
 mock_provider "azapi" {}
 mock_provider "modtm" {}
 mock_provider "random" {}
+mock_provider "time" {}
 
 variables {
   location  = "eastus"
@@ -105,4 +106,3 @@ run "override_wins_over_legacy_vars" {
     error_message = "Expected account_sku_name override to win over account_tier/account_replication_type"
   }
 }
-

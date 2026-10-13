@@ -13,10 +13,12 @@ resource "azapi_update_resource" "this" {
       }
     }
   }
+  read_headers = var.tracing_tags_header == null ? null : { "User-Agent" = var.tracing_tags_header }
   # Export the patched property so the read-back is anchored on staticWebsite
   # rather than the whole blob service response.
   response_export_values = ["properties.staticWebsite"]
   retry                  = var.retry
+  update_headers         = var.tracing_tags_header == null ? null : { "User-Agent" = var.tracing_tags_header }
 
   dynamic "timeouts" {
     for_each = var.timeouts == null ? [] : [var.timeouts]
