@@ -48,7 +48,7 @@ module "resource_group" {
 # A virtual network with a dedicated subnet to host the private endpoint.
 module "virtual_network" {
   source    = "Azure/avm-res-network-virtualnetwork/azurerm"
-  version   = "0.19.0"
+  version   = "0.22.3"
   providers = { modtm = modtm }
 
   location         = module.resource_group.location
