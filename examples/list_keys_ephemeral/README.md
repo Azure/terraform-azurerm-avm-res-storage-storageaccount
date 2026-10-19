@@ -37,6 +37,10 @@ terraform {
       source  = "hashicorp/azurerm"
       version = ">= 4.37.0, < 5.0.0"
     }
+    modtm = {
+      source  = "registry.terraform.io/azure/modtm"
+      version = "~> 0.3"
+    }
     random = {
       source  = "hashicorp/random"
       version = ">= 3.5.0, < 4.0.0"
@@ -114,8 +118,9 @@ module "this" {
 # Key Vault to receive the key. Uses the AVM Key Vault module so the example
 # stays consistent with the rest of the repository.
 module "avm_res_keyvault_vault" {
-  source  = "Azure/avm-res-keyvault-vault/azurerm"
-  version = "0.5.1"
+  source    = "Azure/avm-res-keyvault-vault/azurerm"
+  version   = "0.12.0"
+  providers = { modtm = modtm }
 
   location            = azapi_resource.resource_group.location
   name                = module.naming.key_vault.name_unique
@@ -179,6 +184,8 @@ The following requirements are needed by this module:
 
 - <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (>= 4.37.0, < 5.0.0)
 
+- <a name="requirement_modtm"></a> [modtm](#requirement\_modtm) (~> 0.3)
+
 - <a name="requirement_random"></a> [random](#requirement\_random) (>= 3.5.0, < 4.0.0)
 
 - <a name="requirement_time"></a> [time](#requirement\_time) (>= 0.9.0, < 1.0.0)
@@ -197,7 +204,13 @@ The following resources are used by this module:
 <!-- markdownlint-disable MD013 -->
 ## Required Inputs
 
-No required inputs.
+The following input variables are required:
+
+### <a name="input_location"></a> [location](#input\_location)
+
+Description: The Azure region for this module's resources or telemetry deployment.
+
+Type: `string`
 
 ## Optional Inputs
 
@@ -233,7 +246,7 @@ The following Modules are called:
 
 Source: Azure/avm-res-keyvault-vault/azurerm
 
-Version: 0.5.1
+Version: 0.12.0
 
 ### <a name="module_naming"></a> [naming](#module\_naming)
 

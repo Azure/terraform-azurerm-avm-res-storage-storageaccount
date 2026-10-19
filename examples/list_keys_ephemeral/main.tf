@@ -10,6 +10,10 @@ terraform {
       source  = "hashicorp/azurerm"
       version = ">= 4.37.0, < 5.0.0"
     }
+    modtm = {
+      source  = "registry.terraform.io/azure/modtm"
+      version = "~> 0.3"
+    }
     random = {
       source  = "hashicorp/random"
       version = ">= 3.5.0, < 4.0.0"
@@ -87,8 +91,9 @@ module "this" {
 # Key Vault to receive the key. Uses the AVM Key Vault module so the example
 # stays consistent with the rest of the repository.
 module "avm_res_keyvault_vault" {
-  source  = "Azure/avm-res-keyvault-vault/azurerm"
-  version = "0.12.0"
+  source    = "Azure/avm-res-keyvault-vault/azurerm"
+  version   = "0.12.0"
+  providers = { modtm = modtm }
 
   location            = azapi_resource.resource_group.location
   name                = module.naming.key_vault.name_unique
