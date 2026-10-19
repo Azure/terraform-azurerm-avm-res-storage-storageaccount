@@ -1,7 +1,14 @@
 # Unit tests for Storage service diagnostic metric normalization.
-mock_provider "azapi" {}
-mock_provider "modtm" {}
+mock_provider "azapi" {
+  mock_data "azapi_client_config" {
+    defaults = {
+      subscription_resource_id = "/subscriptions/00000000-0000-0000-0000-000000000000"
+    }
+  }
+}
+
 mock_provider "random" {}
+
 mock_provider "time" {}
 
 variables {
@@ -188,6 +195,11 @@ run "normalize_storage_service_metrics" {
     ).category == "AllMetrics"
     error_message = "Storage-account-scope AllMetrics must not be normalized."
   }
+  providers = {
+    azapi  = azapi
+    random = random
+    time   = time
+  }
 }
 
 run "storage_account_accepts_capacity_metric_category" {
@@ -212,6 +224,11 @@ run "storage_account_accepts_capacity_metric_category" {
     ]) == toset(["Capacity", "Transaction"])
     error_message = "Capacity must be accepted at the storage account scope and sent to Azure unchanged."
   }
+  providers = {
+    azapi  = azapi
+    random = random
+    time   = time
+  }
 }
 
 run "storage_account_rejects_unsupported_metric_category" {
@@ -227,4 +244,9 @@ run "storage_account_rejects_unsupported_metric_category" {
   }
 
   expect_failures = [var.diagnostic_settings_storage_account]
+  providers = {
+    azapi  = azapi
+    random = random
+    time   = time
+  }
 }

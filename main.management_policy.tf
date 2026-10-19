@@ -2,8 +2,10 @@ module "management_policy" {
   source = "./modules/management_policy"
   count  = local.has_management_policy ? 1 : 0
 
+  location           = var.location
   rules              = var.storage_management_policy_rule
   storage_account_id = azapi_resource.this.id
+  enable_telemetry   = var.enable_telemetry
   resource_type      = var.resource_types.management_policy
   retry              = var.retry
   timeouts           = var.storage_management_policy_timeouts != null ? var.storage_management_policy_timeouts : var.timeouts

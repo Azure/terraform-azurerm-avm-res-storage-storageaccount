@@ -1,7 +1,14 @@
 # Unit tests for managed identity composition.
-mock_provider "azapi" {}
-mock_provider "modtm" {}
+mock_provider "azapi" {
+  mock_data "azapi_client_config" {
+    defaults = {
+      subscription_resource_id = "/subscriptions/00000000-0000-0000-0000-000000000000"
+    }
+  }
+}
+
 mock_provider "random" {}
+
 mock_provider "time" {}
 
 variables {
@@ -26,6 +33,11 @@ run "no_identity" {
     condition     = length(azapi_resource.this.identity) == 0
     error_message = "Expected no identity block when managed_identities is empty"
   }
+  providers = {
+    azapi  = azapi
+    random = random
+    time   = time
+  }
 }
 
 run "system_assigned" {
@@ -46,6 +58,11 @@ run "system_assigned" {
   assert {
     condition     = length(azapi_resource.this.identity[0].identity_ids) == 0
     error_message = "Expected empty identity_ids list when only system_assigned"
+  }
+  providers = {
+    azapi  = azapi
+    random = random
+    time   = time
   }
 }
 
@@ -68,6 +85,11 @@ run "user_assigned_only" {
     condition     = length(azapi_resource.this.identity[0].identity_ids) == 1
     error_message = "Expected 1 user-assigned identity"
   }
+  providers = {
+    azapi  = azapi
+    random = random
+    time   = time
+  }
 }
 
 run "system_and_user_assigned" {
@@ -88,5 +110,10 @@ run "system_and_user_assigned" {
   assert {
     condition     = length(azapi_resource.this.identity[0].identity_ids) == 1
     error_message = "Expected 1 user-assigned identity"
+  }
+  providers = {
+    azapi  = azapi
+    random = random
+    time   = time
   }
 }

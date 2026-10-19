@@ -4,7 +4,13 @@
 # blob service schema in API version 2025-08-01. On earlier versions AzAPI
 # silently drops the property, so the request succeeds while the static website
 # stays disabled and every subsequent plan shows the same drift.
-mock_provider "azapi" {}
+mock_provider "azapi" {
+  mock_data "azapi_client_config" {
+    defaults = {
+      subscription_resource_id = "/subscriptions/00000000-0000-0000-0000-000000000000"
+    }
+  }
+}
 
 variables {
   storage_account_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-unit-test/providers/Microsoft.Storage/storageAccounts/stunittest001"
@@ -19,6 +25,9 @@ run "api_version_supports_static_website" {
     condition     = tonumber(replace(regex("^\\d{4}-\\d{2}-\\d{2}", split("@", azapi_update_resource.this.type)[1]), "-", "")) >= 20250801
     error_message = "The default resource_type must use API version 2025-08-01 or later, otherwise properties.staticWebsite is silently discarded and the static website is never enabled"
   }
+  variables {
+    location = "eastus"
+  }
 }
 
 run "unsupported_api_version_is_rejected" {
@@ -26,6 +35,7 @@ run "unsupported_api_version_is_rejected" {
 
   variables {
     resource_type = "Microsoft.Storage/storageAccounts/blobServices@2025-06-01"
+    location      = "eastus"
   }
 
   expect_failures = [var.resource_type]
@@ -48,6 +58,9 @@ run "body_maps_inputs_to_arm_properties" {
     condition     = azapi_update_resource.this.body.properties.staticWebsite.errorDocument404Path == "404.html"
     error_message = "Expected error_404_document to map to staticWebsite.errorDocument404Path"
   }
+  variables {
+    location = "eastus"
+  }
 }
 
 run "patch_targets_blob_service_default" {
@@ -56,6 +69,9 @@ run "patch_targets_blob_service_default" {
   assert {
     condition     = azapi_update_resource.this.resource_id == "${var.storage_account_id}/blobServices/default"
     error_message = "Expected the patch to target the blobServices/default sub-resource"
+  }
+  variables {
+    location = "eastus"
   }
 }
 
@@ -66,6 +82,9 @@ run "tracing_headers_omitted_by_default" {
     condition     = azapi_update_resource.this.update_headers == null && azapi_update_resource.this.read_headers == null
     error_message = "Expected no custom headers when tracing_tags_header is null"
   }
+  variables {
+    location = "eastus"
+  }
 }
 
 run "tracing_headers_applied" {
@@ -73,6 +92,7 @@ run "tracing_headers_applied" {
 
   variables {
     tracing_tags_header = "avm-test-header"
+    location            = "eastus"
   }
 
   assert {

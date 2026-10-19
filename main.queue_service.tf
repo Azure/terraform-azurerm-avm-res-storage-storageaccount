@@ -2,8 +2,10 @@ module "queue_service" {
   source = "./modules/queue_service"
   count  = var.queue_properties != null ? 1 : 0
 
+  location           = var.location
   queue_properties   = var.queue_properties
   storage_account_id = azapi_resource.this.id
+  enable_telemetry   = var.enable_telemetry
   resource_type      = var.resource_types.queue_service
   retry              = var.retry
   timeouts           = var.timeouts

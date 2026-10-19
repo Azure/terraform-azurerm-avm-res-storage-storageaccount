@@ -4,9 +4,16 @@
 # `core.windows.net`, so every sovereign cloud got a hostname that does not
 # resolve. Hostnames now come from `properties.primaryEndpoints`, which Azure
 # returns with the DNS suffix of the cloud the account actually lives in.
-mock_provider "azapi" {}
-mock_provider "modtm" {}
+mock_provider "azapi" {
+  mock_data "azapi_client_config" {
+    defaults = {
+      subscription_resource_id = "/subscriptions/00000000-0000-0000-0000-000000000000"
+    }
+  }
+}
+
 mock_provider "random" {}
+
 mock_provider "time" {}
 
 variables {
@@ -66,6 +73,11 @@ run "fqdn_uses_commercial_suffix" {
     condition     = output.fqdn["table"] == "stunittest001.table.core.windows.net"
     error_message = "Commercial cloud table FQDN must be stunittest001.table.core.windows.net, got ${try(output.fqdn["table"], "<missing>")}"
   }
+  providers = {
+    azapi  = azapi
+    random = random
+    time   = time
+  }
 }
 
 run "fqdn_uses_us_government_suffix" {
@@ -97,6 +109,11 @@ run "fqdn_uses_us_government_suffix" {
     condition     = alltrue([for host in values(output.fqdn) : endswith(host, ".core.usgovcloudapi.net")])
     error_message = "No FQDN may fall back to a hardcoded commercial suffix in Azure US Government"
   }
+  providers = {
+    azapi  = azapi
+    random = random
+    time   = time
+  }
 }
 
 run "fqdn_uses_china_suffix" {
@@ -122,6 +139,11 @@ run "fqdn_uses_china_suffix" {
   assert {
     condition     = alltrue([for host in values(output.fqdn) : endswith(host, ".core.chinacloudapi.cn")])
     error_message = "No FQDN may fall back to a hardcoded commercial suffix in Azure China"
+  }
+  providers = {
+    azapi  = azapi
+    random = random
+    time   = time
   }
 }
 
@@ -171,6 +193,11 @@ run "fqdn_ignores_nested_routing_endpoints" {
     condition     = toset(keys(output.fqdn)) == toset(["blob", "queue", "table"])
     error_message = "internetEndpoints/microsoftEndpoints must not appear as fqdn keys, got ${join(", ", keys(output.fqdn))}"
   }
+  providers = {
+    azapi  = azapi
+    random = random
+    time   = time
+  }
 }
 
 # The output is keyed off declared sub-resources, not off everything Azure
@@ -207,6 +234,11 @@ run "fqdn_keys_track_declared_subresources" {
     condition     = toset(keys(output.fqdn)) == toset(["blob"])
     error_message = "Only declared sub-resources may appear in fqdn, got ${join(", ", keys(output.fqdn))}"
   }
+  providers = {
+    azapi  = azapi
+    random = random
+    time   = time
+  }
 }
 
 run "fqdn_empty_without_subresources" {
@@ -221,5 +253,10 @@ run "fqdn_empty_without_subresources" {
   assert {
     condition     = length(output.fqdn) == 0
     error_message = "fqdn must stay empty when no containers, queues, or tables are declared"
+  }
+  providers = {
+    azapi  = azapi
+    random = random
+    time   = time
   }
 }

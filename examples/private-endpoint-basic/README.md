@@ -11,7 +11,11 @@ terraform {
   required_providers {
     azapi = {
       source  = "Azure/azapi"
-      version = "~> 2.8"
+      version = "~> 2.12"
+    }
+    modtm = {
+      source  = "registry.terraform.io/azure/modtm"
+      version = "~> 0.3"
     }
     random = {
       source  = "hashicorp/random"
@@ -33,14 +37,15 @@ resource "random_integer" "region_index" {
 
 # This ensures we have unique CAF compliant names for our resources.
 module "naming" {
-  source  = "Azure/naming/azurerm"
-  version = "0.4.0"
+  source  = "Azure/avm-utl-naming/azure"
+  version = "0.2.0"
 }
 
 # This is the resource group that all the resources will be deployed into.
 module "resource_group" {
-  source  = "Azure/avm-res-resources-resourcegroup/azurerm"
-  version = "0.4.0"
+  source    = "Azure/avm-res-resources-resourcegroup/azurerm"
+  version   = "0.4.0"
+  providers = { modtm = modtm }
 
   location         = local.test_regions[random_integer.region_index.result]
   name             = module.naming.resource_group.name_unique
@@ -49,8 +54,9 @@ module "resource_group" {
 
 # A virtual network with a dedicated subnet to host the private endpoint.
 module "virtual_network" {
-  source  = "Azure/avm-res-network-virtualnetwork/azurerm"
-  version = "0.19.0"
+  source    = "Azure/avm-res-network-virtualnetwork/azurerm"
+  version   = "0.19.0"
+  providers = { modtm = modtm }
 
   location         = module.resource_group.location
   parent_id        = module.resource_group.resource_id
@@ -67,8 +73,9 @@ module "virtual_network" {
 
 # The private DNS zone used to resolve the storage account blob endpoint privately.
 module "private_dns_zone" {
-  source  = "Azure/avm-res-network-privatednszone/azurerm"
-  version = "0.5.0"
+  source    = "Azure/avm-res-network-privatednszone/azurerm"
+  version   = "0.5.0"
+  providers = { modtm = modtm }
 
   domain_name      = "privatelink.blob.core.windows.net"
   parent_id        = module.resource_group.resource_id
@@ -84,6 +91,9 @@ module "private_dns_zone" {
 # The storage account, exposed only through a blob private endpoint.
 module "storage_account" {
   source = "../.."
+  providers = {
+    azapi = azapi
+  }
 
   location  = module.resource_group.location
   name      = module.naming.storage_account.name_unique
@@ -112,7 +122,9 @@ The following requirements are needed by this module:
 
 - <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.10.0)
 
-- <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) (~> 2.8)
+- <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) (~> 2.12)
+
+- <a name="requirement_modtm"></a> [modtm](#requirement\_modtm) (~> 0.3)
 
 - <a name="requirement_random"></a> [random](#requirement\_random) (>= 3.5.0, < 4.0.0)
 
@@ -151,9 +163,9 @@ The following Modules are called:
 
 ### <a name="module_naming"></a> [naming](#module\_naming)
 
-Source: Azure/naming/azurerm
+Source: Azure/avm-utl-naming/azure
 
-Version: 0.4.0
+Version: 0.2.0
 
 ### <a name="module_private_dns_zone"></a> [private\_dns\_zone](#module\_private\_dns\_zone)
 

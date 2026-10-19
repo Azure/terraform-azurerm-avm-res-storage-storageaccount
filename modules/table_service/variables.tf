@@ -1,3 +1,9 @@
+variable "location" {
+  type        = string
+  description = "The Azure region for this module's resources or telemetry deployment."
+  nullable    = false
+}
+
 variable "storage_account_id" {
   type        = string
   description = "(Required) The full resource ID of the parent storage account."
@@ -26,6 +32,17 @@ variable "cors_propagation_wait" {
 
 The ARM `GET` on `tableServices/default` is eventually consistent: immediately after a successful PATCH the read can omit the `corsRules` that were just applied, which causes a follow-up `terraform plan` (and the post-apply idempotency check) to see false drift on `body.properties.cors`. The read-back stabilises after roughly two minutes, so this wait is applied via a `time_sleep` resource. Set to `"0s"` to disable the wait entirely (not recommended when `cors_rules` is set).
 EOT
+  nullable    = false
+}
+
+variable "enable_telemetry" {
+  type        = bool
+  default     = true
+  description = <<DESCRIPTION
+This variable controls whether or not telemetry is enabled for the module.
+For more information see <https://aka.ms/avm/telemetryinfo>.
+If it is set to false, then no telemetry will be collected.
+DESCRIPTION
   nullable    = false
 }
 

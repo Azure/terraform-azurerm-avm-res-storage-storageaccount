@@ -49,8 +49,8 @@ resource "random_string" "this" {
 }
 
 module "naming" {
-  source  = "Azure/naming/azurerm"
-  version = "0.4.0"
+  source  = "Azure/avm-utl-naming/azure"
+  version = "0.2.0"
 }
 
 data "azurerm_client_config" "current" {}
@@ -74,6 +74,9 @@ resource "azapi_resource" "example_identity" {
 
 module "this" {
   source = "../.."
+  providers = {
+    azapi = azapi
+  }
 
   location  = azapi_resource.resource_group.location
   name      = module.naming.storage_account.name_unique

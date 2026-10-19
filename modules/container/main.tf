@@ -22,7 +22,11 @@ resource "azapi_resource" "this" {
 
 module "role_assignments" {
   source = "../role_assignments"
+  providers = {
+    azapi = azapi
+  }
 
+  location                                  = var.location
   scope                                     = azapi_resource.this.id
   retry                                     = var.retry
   role_assignment_definition_lookup_enabled = var.role_assignment_definition_lookup_enabled

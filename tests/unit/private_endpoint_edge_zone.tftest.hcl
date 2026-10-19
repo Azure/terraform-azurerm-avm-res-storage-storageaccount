@@ -1,7 +1,14 @@
 # Unit tests for private endpoint Edge Zone propagation and request shaping.
-mock_provider "azapi" {}
-mock_provider "modtm" {}
+mock_provider "azapi" {
+  mock_data "azapi_client_config" {
+    defaults = {
+      subscription_resource_id = "/subscriptions/00000000-0000-0000-0000-000000000000"
+    }
+  }
+}
+
 mock_provider "random" {}
+
 mock_provider "time" {}
 
 variables {
@@ -44,6 +51,11 @@ run "root_edge_zone_propagates_to_private_endpoint" {
     condition     = output.private_endpoints["inherited"].edge_zone == "perth"
     error_message = "Expected the root private_endpoints output to report the inherited Edge Zone."
   }
+  providers = {
+    azapi  = azapi
+    random = random
+    time   = time
+  }
 }
 
 run "regional_root_output_reports_null_edge_zone" {
@@ -61,6 +73,11 @@ run "regional_root_output_reports_null_edge_zone" {
   assert {
     condition     = output.private_endpoints["regional"].edge_zone == null
     error_message = "Expected the root private_endpoints output to report a null Edge Zone for a regional endpoint."
+  }
+  providers = {
+    azapi  = azapi
+    random = random
+    time   = time
   }
 }
 
