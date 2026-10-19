@@ -1,11 +1,16 @@
 module "shares" {
-  source   = "./modules/share"
+  source = "./modules/share"
+  providers = {
+    azapi = azapi
+  }
   for_each = var.shares
 
+  location                                  = var.location
   name                                      = each.value.name
   quota                                     = each.value.quota
   storage_account_id                        = azapi_resource.this.id
   access_tier                               = each.value.access_tier
+  enable_telemetry                          = var.enable_telemetry
   enabled_protocol                          = each.value.enabled_protocol
   metadata                                  = each.value.metadata
   provisioned_bandwidth_mibps               = each.value.provisioned_bandwidth_mibps

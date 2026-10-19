@@ -25,6 +25,12 @@ The following resources are used by this module:
 
 The following input variables are required:
 
+### <a name="input_location"></a> [location](#input\_location)
+
+Description: The Azure region for this module's resources or telemetry deployment.
+
+Type: `string`
+
 ### <a name="input_parent_id"></a> [parent\_id](#input\_parent\_id)
 
 Description: (Required) The full resource ID of the parent resource that the diagnostic setting will be attached to (for example a Storage Account, blob service, queue service, table service, or file service).
@@ -165,7 +171,7 @@ The following Modules are called:
 
 Source: Azure/avm-utl-interfaces/azure
 
-Version: 0.6.0
+Version: 0.9.0
 
 <!-- markdownlint-disable-next-line MD041 -->
 ## Data Collection

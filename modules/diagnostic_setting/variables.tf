@@ -1,3 +1,10 @@
+# tflint-ignore: terraform_unused_declarations
+variable "location" {
+  type        = string
+  description = "The Azure region for this module's resources or telemetry deployment."
+  nullable    = false
+}
+
 variable "parent_id" {
   type        = string
   description = "(Required) The full resource ID of the parent resource that the diagnostic setting will be attached to (for example a Storage Account, blob service, queue service, table service, or file service)."

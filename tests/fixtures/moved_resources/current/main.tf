@@ -3,9 +3,6 @@ terraform {
     azapi = {
       source = "Azure/azapi"
     }
-    modtm = {
-      source = "Azure/modtm"
-    }
     random = {
       source = "hashicorp/random"
     }
@@ -14,7 +11,13 @@ terraform {
 
 module "storage" {
   source = "../../../.."
+  providers = {
+    azapi = azapi
+  }
 
+  location                 = "eastus"
+  name                     = "ststatemigration"
+  parent_id                = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test"
   account_replication_type = "LRS"
   account_tier             = "Standard"
   containers = {
@@ -23,9 +26,6 @@ module "storage" {
     }
   }
   enable_telemetry = false
-  location         = "eastus"
-  name             = "ststatemigration"
-  parent_id        = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test"
   queues = {
     queue = {
       name = "queue"

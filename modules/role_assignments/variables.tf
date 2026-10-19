@@ -1,3 +1,10 @@
+# tflint-ignore: terraform_unused_declarations
+variable "location" {
+  type        = string
+  description = "The Azure region for this module's resources or telemetry deployment."
+  nullable    = false
+}
+
 variable "scope" {
   type        = string
   description = "(Required) The fully-qualified Azure resource ID at which the role assignments should be created (the parent_id for the roleAssignment resource)."

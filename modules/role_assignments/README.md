@@ -25,6 +25,12 @@ The following resources are used by this module:
 
 The following input variables are required:
 
+### <a name="input_location"></a> [location](#input\_location)
+
+Description: The Azure region for this module's resources or telemetry deployment.
+
+Type: `string`
+
 ### <a name="input_scope"></a> [scope](#input\_scope)
 
 Description: (Required) The fully-qualified Azure resource ID at which the role assignments should be created (the parent\_id for the roleAssignment resource).
@@ -137,7 +143,7 @@ The following Modules are called:
 
 Source: Azure/avm-utl-interfaces/azure
 
-Version: 0.6.0
+Version: 0.9.0
 
 <!-- markdownlint-disable-next-line MD041 -->
 ## Data Collection

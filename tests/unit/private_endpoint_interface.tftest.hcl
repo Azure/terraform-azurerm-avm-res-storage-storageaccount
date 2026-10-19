@@ -1,8 +1,15 @@
 # Unit tests for the AVM `private_endpoints` interface fields: subresource_name
 # validation, ip_configurations.member_name, and lock.notes.
-mock_provider "azapi" {}
-mock_provider "modtm" {}
+mock_provider "azapi" {
+  mock_data "azapi_client_config" {
+    defaults = {
+      subscription_resource_id = "/subscriptions/00000000-0000-0000-0000-000000000000"
+    }
+  }
+}
+
 mock_provider "random" {}
+
 mock_provider "time" {}
 
 variables {
@@ -28,6 +35,11 @@ run "subresource_name_is_still_required" {
   }
 
   expect_failures = [var.private_endpoints]
+  providers = {
+    azapi  = azapi
+    random = random
+    time   = time
+  }
 }
 
 run "supplied_subresource_name_is_accepted" {
@@ -47,6 +59,11 @@ run "supplied_subresource_name_is_accepted" {
   assert {
     condition     = output.private_endpoints["supplied"].edge_zone == null
     error_message = "Expected a private endpoint with a supplied subresource_name to pass validation and plan."
+  }
+  providers = {
+    azapi  = azapi
+    random = random
+    time   = time
   }
 }
 

@@ -1,7 +1,14 @@
 # Unit tests for network_acls composition.
-mock_provider "azapi" {}
-mock_provider "modtm" {}
+mock_provider "azapi" {
+  mock_data "azapi_client_config" {
+    defaults = {
+      subscription_resource_id = "/subscriptions/00000000-0000-0000-0000-000000000000"
+    }
+  }
+}
+
 mock_provider "random" {}
+
 mock_provider "time" {}
 
 variables {
@@ -22,6 +29,11 @@ run "default_no_network_rules" {
   assert {
     condition     = azapi_resource.this.body.properties.networkAcls == null
     error_message = "Expected networkAcls to be null when network_rules is null"
+  }
+  providers = {
+    azapi  = azapi
+    random = random
+    time   = time
   }
 }
 
@@ -44,6 +56,11 @@ run "default_deny" {
     condition     = azapi_resource.this.body.properties.networkAcls.bypass == "AzureServices"
     error_message = "Expected bypass == AzureServices"
   }
+  providers = {
+    azapi  = azapi
+    random = random
+    time   = time
+  }
 }
 
 run "bypass_none_emits_string_none" {
@@ -59,6 +76,11 @@ run "bypass_none_emits_string_none" {
   assert {
     condition     = azapi_resource.this.body.properties.networkAcls.bypass == "None"
     error_message = "Expected empty bypass list to emit \"None\""
+  }
+  providers = {
+    azapi  = azapi
+    random = random
+    time   = time
   }
 }
 
@@ -81,6 +103,11 @@ run "ip_rules_mapped_to_action_allow" {
   assert {
     condition     = azapi_resource.this.body.properties.networkAcls.ipRules[0].action == "Allow"
     error_message = "Expected ipRules[*].action == Allow"
+  }
+  providers = {
+    azapi  = azapi
+    random = random
+    time   = time
   }
 }
 
@@ -106,5 +133,10 @@ run "private_link_access_emits_resource_access_rules" {
   assert {
     condition     = azapi_resource.this.body.properties.networkAcls.resourceAccessRules[0].tenantId == "00000000-0000-0000-0000-000000000001"
     error_message = "Expected tenantId on resource access rule"
+  }
+  providers = {
+    azapi  = azapi
+    random = random
+    time   = time
   }
 }

@@ -1,7 +1,14 @@
 # Unit tests for parent_id parsing and resource_group_name local extraction.
-mock_provider "azapi" {}
-mock_provider "modtm" {}
+mock_provider "azapi" {
+  mock_data "azapi_client_config" {
+    defaults = {
+      subscription_resource_id = "/subscriptions/00000000-0000-0000-0000-000000000000"
+    }
+  }
+}
+
 mock_provider "random" {}
+
 mock_provider "time" {}
 
 variables {
@@ -22,6 +29,11 @@ run "valid_parent_id_extracts_rg_name" {
     condition     = azapi_resource.this.parent_id == "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/my-test-rg"
     error_message = "Expected parent_id to be passed through verbatim to azapi_resource"
   }
+  providers = {
+    azapi  = azapi
+    random = random
+    time   = time
+  }
 }
 
 run "invalid_parent_id_rejected" {
@@ -32,4 +44,9 @@ run "invalid_parent_id_rejected" {
   }
 
   expect_failures = [var.parent_id]
+  providers = {
+    azapi  = azapi
+    random = random
+    time   = time
+  }
 }

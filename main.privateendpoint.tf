@@ -1,5 +1,8 @@
 module "private_endpoints" {
-  source   = "./modules/private_endpoint"
+  source = "./modules/private_endpoint"
+  providers = {
+    azapi = azapi
+  }
   for_each = var.private_endpoints
 
   location                                  = each.value.location != null ? each.value.location : var.location

@@ -1,9 +1,14 @@
 module "tables" {
-  source   = "./modules/table"
+  source = "./modules/table"
+  providers = {
+    azapi = azapi
+  }
   for_each = var.tables
 
+  location                                  = var.location
   name                                      = each.value.name
   storage_account_id                        = azapi_resource.this.id
+  enable_telemetry                          = var.enable_telemetry
   resource_type                             = var.resource_types.table
   retry                                     = var.retry
   role_assignment_definition_lookup_enabled = var.role_assignment_definition_lookup_enabled

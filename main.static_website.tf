@@ -4,7 +4,9 @@ module "static_website" {
   source   = "./modules/static_website"
   for_each = var.static_website == null ? {} : var.static_website
 
+  location           = var.location
   storage_account_id = azapi_resource.this.id
+  enable_telemetry   = var.enable_telemetry
   error_404_document = each.value.error_404_document
   index_document     = each.value.index_document
   resource_type      = var.resource_types.static_website

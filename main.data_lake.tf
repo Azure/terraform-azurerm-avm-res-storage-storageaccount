@@ -13,9 +13,11 @@ module "data_lake_filesystems" {
   source   = "./modules/data_lake_filesystem"
   for_each = var.storage_data_lake_gen2_filesystems
 
+  location                 = var.location
   name                     = each.value.name
   storage_account_id       = azapi_resource.this.id
   default_encryption_scope = each.value.default_encryption_scope
+  enable_telemetry         = var.enable_telemetry
   metadata                 = each.value.properties
   resource_type            = var.resource_types.blob_container
   retry                    = var.retry

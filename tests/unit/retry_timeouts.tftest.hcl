@@ -1,8 +1,15 @@
 # Unit tests for retry attribute and timeouts dynamic block on the root
 # storage account azapi_resource.
-mock_provider "azapi" {}
-mock_provider "modtm" {}
+mock_provider "azapi" {
+  mock_data "azapi_client_config" {
+    defaults = {
+      subscription_resource_id = "/subscriptions/00000000-0000-0000-0000-000000000000"
+    }
+  }
+}
+
 mock_provider "random" {}
+
 mock_provider "time" {}
 
 variables {
@@ -30,6 +37,11 @@ run "retry_default_storage_contention" {
     condition     = azapi_resource.this.retry.max_interval_seconds == 60
     error_message = "Expected the default retry.max_interval_seconds == 60"
   }
+  providers = {
+    azapi  = azapi
+    random = random
+    time   = time
+  }
 }
 
 run "retry_explicitly_disabled" {
@@ -42,6 +54,11 @@ run "retry_explicitly_disabled" {
   assert {
     condition     = azapi_resource.this.retry == null
     error_message = "Expected retry to be null when var.retry is null"
+  }
+  providers = {
+    azapi  = azapi
+    random = random
+    time   = time
   }
 }
 
@@ -67,6 +84,11 @@ run "retry_regex_override" {
   assert {
     condition     = azapi_resource.this.retry.max_interval_seconds == 60
     error_message = "Expected the default retry.max_interval_seconds == 60 when only regexes are overridden"
+  }
+  providers = {
+    azapi  = azapi
+    random = random
+    time   = time
   }
 }
 
@@ -95,6 +117,11 @@ run "retry_propagated" {
     condition     = length(azapi_resource.this.retry.error_message_regex) == 2
     error_message = "Expected 2 retry regex patterns"
   }
+  providers = {
+    azapi  = azapi
+    random = random
+    time   = time
+  }
 }
 
 run "timeouts_null_omitted" {
@@ -107,6 +134,11 @@ run "timeouts_null_omitted" {
   assert {
     condition     = azapi_resource.this.timeouts == null
     error_message = "Expected timeouts block omitted when var.timeouts is null"
+  }
+  providers = {
+    azapi  = azapi
+    random = random
+    time   = time
   }
 }
 
@@ -130,5 +162,10 @@ run "timeouts_emitted" {
   assert {
     condition     = azapi_resource.this.timeouts.delete == "60m"
     error_message = "Expected timeouts.delete == 60m"
+  }
+  providers = {
+    azapi  = azapi
+    random = random
+    time   = time
   }
 }

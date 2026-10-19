@@ -1,7 +1,14 @@
 # Unit tests for the Smart access tier preconditions.
-mock_provider "azapi" {}
-mock_provider "modtm" {}
+mock_provider "azapi" {
+  mock_data "azapi_client_config" {
+    defaults = {
+      subscription_resource_id = "/subscriptions/00000000-0000-0000-0000-000000000000"
+    }
+  }
+}
+
 mock_provider "random" {}
+
 mock_provider "time" {}
 
 variables {
@@ -18,6 +25,11 @@ run "smart_valid" {
   variables {
     access_tier = "Smart"
   }
+  providers = {
+    azapi  = azapi
+    random = random
+    time   = time
+  }
 }
 
 # Schema-supported api-versions above 2025-08-01 are accepted.
@@ -29,6 +41,11 @@ run "smart_valid_newer_api_version" {
     resource_types = {
       storage_account = "Microsoft.Storage/storageAccounts@2026-04-01"
     }
+  }
+  providers = {
+    azapi  = azapi
+    random = random
+    time   = time
   }
 }
 
@@ -47,6 +64,11 @@ run "smart_api_too_old" {
   expect_failures = [
     azapi_resource.this,
   ]
+  providers = {
+    azapi  = azapi
+    random = random
+    time   = time
+  }
 }
 
 # Smart on a non zone-redundant SKU must fail the precondition.
@@ -64,6 +86,11 @@ run "smart_invalid_sku" {
   expect_failures = [
     azapi_resource.this,
   ]
+  providers = {
+    azapi  = azapi
+    random = random
+    time   = time
+  }
 }
 
 # Non-Smart tiers are unaffected: default api-version and default SKU still plan.
@@ -72,5 +99,10 @@ run "hot_unaffected" {
 
   variables {
     access_tier = "Hot"
+  }
+  providers = {
+    azapi  = azapi
+    random = random
+    time   = time
   }
 }

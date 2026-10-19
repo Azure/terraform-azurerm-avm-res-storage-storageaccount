@@ -2,8 +2,10 @@ module "local_users" {
   source   = "./modules/local_user"
   for_each = var.local_user
 
+  location             = var.location
   name                 = each.value.name
   storage_account_id   = azapi_resource.this.id
+  enable_telemetry     = var.enable_telemetry
   home_directory       = each.value.home_directory
   permission_scope     = each.value.permission_scope
   resource_type        = var.resource_types.local_user

@@ -42,8 +42,8 @@ resource "random_string" "this" {
 }
 
 module "naming" {
-  source  = "Azure/naming/azurerm"
-  version = "0.4.0"
+  source  = "Azure/avm-utl-naming/azure"
+  version = "0.2.0"
 }
 
 resource "azapi_resource" "resource_group" {
@@ -177,6 +177,9 @@ resource "azapi_resource" "example_identity" {
 
 module "this" {
   source = "../.."
+  providers = {
+    azapi = azapi
+  }
 
   location  = azapi_resource.resource_group.location
   name      = module.naming.storage_account.name_unique
@@ -342,9 +345,9 @@ The following Modules are called:
 
 ### <a name="module_naming"></a> [naming](#module\_naming)
 
-Source: Azure/naming/azurerm
+Source: Azure/avm-utl-naming/azure
 
-Version: 0.4.0
+Version: 0.2.0
 
 ### <a name="module_this"></a> [this](#module\_this)
 
