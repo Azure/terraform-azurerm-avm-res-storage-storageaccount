@@ -13,6 +13,7 @@ terraform {
       source  = "Azure/azapi"
       version = "~> 2.12"
     }
+    # tflint-ignore: terraform_unused_required_providers
     modtm = {
       source  = "registry.terraform.io/azure/modtm"
       version = "~> 0.3"
@@ -43,9 +44,8 @@ module "naming" {
 
 # This is the resource group that all the resources will be deployed into.
 module "resource_group" {
-  source    = "Azure/avm-res-resources-resourcegroup/azurerm"
-  version   = "0.4.0"
-  providers = { modtm = modtm }
+  source  = "Azure/avm-res-resources-resourcegroup/azurerm"
+  version = "0.4.0"
 
   location         = local.test_regions[random_integer.region_index.result]
   name             = module.naming.resource_group.name_unique
@@ -54,9 +54,8 @@ module "resource_group" {
 
 # A virtual network with a dedicated subnet to host the private endpoint.
 module "virtual_network" {
-  source    = "Azure/avm-res-network-virtualnetwork/azurerm"
-  version   = "0.19.0"
-  providers = { modtm = modtm }
+  source  = "Azure/avm-res-network-virtualnetwork/azurerm"
+  version = "0.19.0"
 
   location         = module.resource_group.location
   parent_id        = module.resource_group.resource_id
@@ -73,9 +72,8 @@ module "virtual_network" {
 
 # The private DNS zone used to resolve the storage account blob endpoint privately.
 module "private_dns_zone" {
-  source    = "Azure/avm-res-network-privatednszone/azurerm"
-  version   = "0.5.0"
-  providers = { modtm = modtm }
+  source  = "Azure/avm-res-network-privatednszone/azurerm"
+  version = "0.5.0"
 
   domain_name      = "privatelink.blob.core.windows.net"
   parent_id        = module.resource_group.resource_id
@@ -91,9 +89,6 @@ module "private_dns_zone" {
 # The storage account, exposed only through a blob private endpoint.
 module "storage_account" {
   source = "../.."
-  providers = {
-    azapi = azapi
-  }
 
   location  = module.resource_group.location
   name      = module.naming.storage_account.name_unique

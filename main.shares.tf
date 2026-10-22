@@ -1,8 +1,5 @@
 module "shares" {
-  source = "./modules/share"
-  providers = {
-    azapi = azapi
-  }
+  source   = "./modules/share"
   for_each = var.shares
 
   location                                  = var.location

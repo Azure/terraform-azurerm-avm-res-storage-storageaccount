@@ -25,9 +25,6 @@ resource "azapi_resource" "this" {
 
 module "role_assignments" {
   source = "../role_assignments"
-  providers = {
-    azapi = azapi
-  }
 
   location                                  = var.location
   scope                                     = azapi_resource.this.id

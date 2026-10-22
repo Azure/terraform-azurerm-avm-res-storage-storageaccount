@@ -1,8 +1,5 @@
 module "diagnostic_setting_storage_account" {
   source = "./modules/diagnostic_setting"
-  providers = {
-    azapi = azapi
-  }
 
   location            = var.location
   parent_id           = azapi_resource.this.id
@@ -14,9 +11,6 @@ module "diagnostic_setting_storage_account" {
 
 module "diagnostic_setting_blob" {
   source = "./modules/diagnostic_setting"
-  providers = {
-    azapi = azapi
-  }
 
   location            = var.location
   parent_id           = "${azapi_resource.this.id}/blobServices/default"
@@ -28,9 +22,6 @@ module "diagnostic_setting_blob" {
 
 module "diagnostic_setting_queue" {
   source = "./modules/diagnostic_setting"
-  providers = {
-    azapi = azapi
-  }
 
   location            = var.location
   parent_id           = "${azapi_resource.this.id}/queueServices/default"
@@ -42,9 +33,6 @@ module "diagnostic_setting_queue" {
 
 module "diagnostic_setting_table" {
   source = "./modules/diagnostic_setting"
-  providers = {
-    azapi = azapi
-  }
 
   location            = var.location
   parent_id           = "${azapi_resource.this.id}/tableServices/default"
@@ -56,9 +44,6 @@ module "diagnostic_setting_table" {
 
 module "diagnostic_setting_file" {
   source = "./modules/diagnostic_setting"
-  providers = {
-    azapi = azapi
-  }
 
   location            = var.location
   parent_id           = "${azapi_resource.this.id}/fileServices/default"

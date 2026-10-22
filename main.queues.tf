@@ -1,8 +1,5 @@
 module "queues" {
-  source = "./modules/queue"
-  providers = {
-    azapi = azapi
-  }
+  source   = "./modules/queue"
   for_each = var.queues
 
   location                                  = var.location

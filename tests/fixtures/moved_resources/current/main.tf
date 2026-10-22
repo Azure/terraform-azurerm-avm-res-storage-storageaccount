@@ -1,8 +1,10 @@
 terraform {
   required_providers {
+    # tflint-ignore: terraform_unused_required_providers
     azapi = {
       source = "Azure/azapi"
     }
+    # tflint-ignore: terraform_unused_required_providers
     random = {
       source = "hashicorp/random"
     }
@@ -11,9 +13,6 @@ terraform {
 
 module "storage" {
   source = "../../../.."
-  providers = {
-    azapi = azapi
-  }
 
   location                 = "eastus"
   name                     = "ststatemigration"

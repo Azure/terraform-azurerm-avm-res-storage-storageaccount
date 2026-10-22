@@ -1,8 +1,5 @@
 module "containers" {
-  source = "./modules/container"
-  providers = {
-    azapi = azapi
-  }
+  source   = "./modules/container"
   for_each = var.containers
 
   location                                  = var.location

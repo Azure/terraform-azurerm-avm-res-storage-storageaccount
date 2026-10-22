@@ -236,9 +236,6 @@ data "azapi_resource_action" "event_hub_auth_rule_keys" {
 #   * A blob container with longer per-item timeout overrides.
 module "this" {
   source = "../.."
-  providers = {
-    azapi = azapi
-  }
 
   location  = azapi_resource.resource_group.location
   name      = module.naming.storage_account.name_unique

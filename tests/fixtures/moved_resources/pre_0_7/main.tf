@@ -1,10 +1,8 @@
 terraform {
   required_providers {
+    # tflint-ignore: terraform_unused_required_providers
     azapi = {
       source = "Azure/azapi"
-    }
-    random = {
-      source = "hashicorp/random"
     }
   }
 }
