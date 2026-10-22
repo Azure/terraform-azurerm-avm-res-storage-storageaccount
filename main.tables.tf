@@ -1,8 +1,5 @@
 module "tables" {
-  source = "./modules/table"
-  providers = {
-    azapi = azapi
-  }
+  source   = "./modules/table"
   for_each = var.tables
 
   location                                  = var.location

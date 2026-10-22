@@ -178,9 +178,6 @@ module "avm_res_keyvault_vault" {
 
 module "this" {
   source = "../.."
-  providers = {
-    azapi = azapi
-  }
 
   location  = azapi_resource.resource_group.location
   name      = module.naming.storage_account.name_unique

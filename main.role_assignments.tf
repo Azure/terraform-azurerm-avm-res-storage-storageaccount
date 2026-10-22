@@ -12,9 +12,6 @@
 # prior to apply.
 module "role_assignments" {
   source = "./modules/role_assignments"
-  providers = {
-    azapi = azapi
-  }
 
   location                                  = var.location
   scope                                     = azapi_resource.this.id
