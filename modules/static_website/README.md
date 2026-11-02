@@ -30,12 +30,6 @@ The following resources are used by this module:
 
 The following input variables are required:
 
-### <a name="input_location"></a> [location](#input\_location)
-
-Description: The Azure region for this module's resources or telemetry deployment.
-
-Type: `string`
-
 ### <a name="input_storage_account_id"></a> [storage\_account\_id](#input\_storage\_account\_id)
 
 Description: (Required) The full resource ID of the parent storage account.
@@ -67,6 +61,14 @@ Default: `null`
 ### <a name="input_index_document"></a> [index\_document](#input\_index\_document)
 
 Description: (Optional) The webpage that Azure Storage serves for requests to the root of a website or any subfolder. Defaults to `null` (no index document configured).
+
+Type: `string`
+
+Default: `null`
+
+### <a name="input_location"></a> [location](#input\_location)
+
+Description: The Azure region for this module's resources or telemetry deployment.
 
 Type: `string`
 
