@@ -52,7 +52,7 @@ resource "random_string" "this" {
 
 module "naming" {
   source  = "Azure/avm-utl-naming/azure"
-  version = "0.2.0"
+  version = "0.3.0"
 }
 
 resource "azapi_resource" "resource_group" {
@@ -85,7 +85,7 @@ module "this" {
 # stays consistent with the rest of the repository.
 module "avm_res_keyvault_vault" {
   source  = "Azure/avm-res-keyvault-vault/azurerm"
-  version = "0.5.1"
+  version = "0.12.0"
 
   location            = azapi_resource.resource_group.location
   name                = module.naming.key_vault.name_unique
