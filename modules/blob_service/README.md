@@ -118,12 +118,6 @@ object({
   })
 ```
 
-### <a name="input_location"></a> [location](#input\_location)
-
-Description: The Azure region for this module's resources or telemetry deployment.
-
-Type: `string`
-
 ### <a name="input_storage_account_id"></a> [storage\_account\_id](#input\_storage\_account\_id)
 
 Description: (Required) The full resource ID of the parent storage account.
@@ -143,6 +137,14 @@ If it is set to false, then no telemetry will be collected.
 Type: `bool`
 
 Default: `true`
+
+### <a name="input_location"></a> [location](#input\_location)
+
+Description: The Azure region for this module's resources or telemetry deployment.
+
+Type: `string`
+
+Default: `null`
 
 ### <a name="input_resource_type"></a> [resource\_type](#input\_resource\_type)
 

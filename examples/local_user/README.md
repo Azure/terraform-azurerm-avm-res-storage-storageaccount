@@ -60,7 +60,7 @@ resource "random_string" "this" {
 
 module "naming" {
   source  = "Azure/avm-utl-naming/azure"
-  version = "0.2.0"
+  version = "0.3.0"
 }
 
 data "azurerm_client_config" "current" {}
@@ -147,7 +147,7 @@ resource "azapi_resource" "example_identity" {
 
 module "avm_res_keyvault_vault" {
   source  = "Azure/avm-res-keyvault-vault/azurerm"
-  version = "0.5.1"
+  version = "0.12.0"
 
   location            = azapi_resource.resource_group.location
   name                = module.naming.key_vault.name_unique
@@ -353,13 +353,13 @@ The following Modules are called:
 
 Source: Azure/avm-res-keyvault-vault/azurerm
 
-Version: 0.5.1
+Version: 0.12.0
 
 ### <a name="module_naming"></a> [naming](#module\_naming)
 
 Source: Azure/avm-utl-naming/azure
 
-Version: 0.2.0
+Version: 0.3.0
 
 ### <a name="module_this"></a> [this](#module\_this)
 

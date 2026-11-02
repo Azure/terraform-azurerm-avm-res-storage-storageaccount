@@ -1,9 +1,3 @@
-variable "location" {
-  type        = string
-  description = "The Azure region for this module's resources or telemetry deployment."
-  nullable    = false
-}
-
 variable "storage_account_id" {
   type        = string
   description = "(Required) The full resource ID of the parent storage account."
@@ -31,6 +25,17 @@ variable "index_document" {
   type        = string
   default     = null
   description = "(Optional) The webpage that Azure Storage serves for requests to the root of a website or any subfolder. Defaults to `null` (no index document configured)."
+}
+
+variable "location" {
+  type        = string
+  default     = null
+  description = "The Azure region for this module's resources or telemetry deployment."
+
+  validation {
+    condition     = !var.enable_telemetry || var.location != null
+    error_message = "The location must not be null when telemetry is enabled."
+  }
 }
 
 variable "resource_type" {

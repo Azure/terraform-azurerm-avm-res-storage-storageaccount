@@ -61,12 +61,6 @@ The following resources are used by this module:
 
 The following input variables are required:
 
-### <a name="input_location"></a> [location](#input\_location)
-
-Description: The Azure region for this module's resources or telemetry deployment.
-
-Type: `string`
-
 ### <a name="input_queue_properties"></a> [queue\_properties](#input\_queue\_properties)
 
 Description: (Required) Queue service-level settings to apply to the storage account's queueServices/default sub-resource.
@@ -104,6 +98,14 @@ If it is set to false, then no telemetry will be collected.
 Type: `bool`
 
 Default: `true`
+
+### <a name="input_location"></a> [location](#input\_location)
+
+Description: The Azure region for this module's resources or telemetry deployment.
+
+Type: `string`
+
+Default: `null`
 
 ### <a name="input_resource_type"></a> [resource\_type](#input\_resource\_type)
 
