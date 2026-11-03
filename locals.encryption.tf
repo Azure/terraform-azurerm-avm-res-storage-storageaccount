@@ -1,13 +1,9 @@
 locals {
   # Whether a customer-managed key is configured.
   customer_managed_key_enabled = var.customer_managed_key != null
-  # Initial encryption block sent on storage account create. CMK fields
-  # (keySource = Microsoft.Keyvault, identity, keyvaultproperties) cannot be
-  # accepted by ARM in the same PUT that first associates the user-assigned
-  # identity with the account, so they are applied via azapi_update_resource
-  # in a second step (see azapi_update_resource.customer_managed_key).
+  # Leave key selection to the CMK PATCH. Omitting these fields lets Azure
+  # default new accounts to Microsoft-managed keys and retain existing CMKs.
   encryption = {
-    keySource                       = "Microsoft.Storage"
     requireInfrastructureEncryption = var.infrastructure_encryption_enabled ? true : null
     services                        = { for k, v in local.encryption_services : k => v if v != null }
   }
