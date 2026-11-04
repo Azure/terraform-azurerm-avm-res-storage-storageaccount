@@ -32,7 +32,7 @@ resource "random_integer" "region_index" {
 # This ensures we have unique CAF compliant names for our resources.
 module "naming" {
   source  = "Azure/avm-utl-naming/azure"
-  version = "0.2.0"
+  version = "0.3.0"
 }
 
 # This is the resource group that all the resources will be deployed into.
@@ -48,7 +48,7 @@ module "resource_group" {
 # A virtual network with a dedicated subnet to host the private endpoint.
 module "virtual_network" {
   source  = "Azure/avm-res-network-virtualnetwork/azurerm"
-  version = "0.19.0"
+  version = "0.22.3"
 
   location         = module.resource_group.location
   parent_id        = module.resource_group.resource_id
