@@ -4,7 +4,7 @@
 
 ```hcl
 terraform {
-  required_version = ">= 1.10.0"
+  required_version = ">= 1.11.0"
 
   required_providers {
     azapi = {
@@ -13,7 +13,7 @@ terraform {
     }
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = ">= 4.37.0, < 5.0.0"
+      version = ">= 4.81.0, < 5.0.0"
     }
     random = {
       source  = "hashicorp/random"
@@ -150,7 +150,7 @@ resource "azurerm_key_vault_key" "example" {
     "wrapKey"
   ]
   key_type     = "RSA"
-  key_vault_id = module.avm_res_keyvault_vault.resource.id
+  key_vault_id = module.avm_res_keyvault_vault.resource_id
   name         = module.naming.key_vault_key.name_unique
   key_size     = 2048
 
@@ -159,13 +159,13 @@ resource "azurerm_key_vault_key" "example" {
 
 module "avm_res_keyvault_vault" {
   source  = "Azure/avm-res-keyvault-vault/azurerm"
-  version = "0.5.1"
+  version = "0.13.0"
 
-  location            = azapi_resource.resource_group.location
-  name                = module.naming.key_vault.name_unique
-  resource_group_name = azapi_resource.resource_group.name
-  tenant_id           = data.azurerm_client_config.current.tenant_id
-  enable_telemetry    = var.enable_telemetry
+  location         = azapi_resource.resource_group.location
+  name             = module.naming.key_vault.name_unique
+  parent_id        = azapi_resource.resource_group.id
+  tenant_id        = data.azurerm_client_config.current.tenant_id
+  enable_telemetry = var.enable_telemetry
   network_acls = {
     default_action = "Allow"
   }
@@ -203,7 +203,7 @@ module "this" {
     }
   }
   customer_managed_key = {
-    key_vault_resource_id  = module.avm_res_keyvault_vault.resource.id
+    key_vault_resource_id  = module.avm_res_keyvault_vault.resource_id
     key_name               = azurerm_key_vault_key.example.name
     user_assigned_identity = { resource_id = azapi_resource.example_identity.id }
   }
@@ -284,7 +284,7 @@ resource "time_sleep" "wait_for_rbac" {
 # Store the primary access key in Key Vault
 # The ephemeral resource provides the key value without persisting it in module state
 resource "azurerm_key_vault_secret" "primary_key" {
-  key_vault_id     = module.avm_res_keyvault_vault.resource.id
+  key_vault_id     = module.avm_res_keyvault_vault.resource_id
   name             = "${module.naming.storage_account.name_unique}-primary-key"
   value_wo         = ephemeral.azapi_resource_action.storage_keys.output.keys[0].value
   value_wo_version = "1"
@@ -298,11 +298,11 @@ resource "azurerm_key_vault_secret" "primary_key" {
 
 The following requirements are needed by this module:
 
-- <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.10.0)
+- <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.11.0)
 
 - <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) (~> 2.8)
 
-- <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (>= 4.37.0, < 5.0.0)
+- <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (>= 4.81.0, < 5.0.0)
 
 - <a name="requirement_random"></a> [random](#requirement\_random) (>= 3.5.0, < 4.0.0)
 
@@ -364,7 +364,7 @@ The following Modules are called:
 
 Source: Azure/avm-res-keyvault-vault/azurerm
 
-Version: 0.5.1
+Version: 0.13.0
 
 ### <a name="module_naming"></a> [naming](#module\_naming)
 
