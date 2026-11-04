@@ -1,5 +1,5 @@
 terraform {
-  required_version = ">= 1.10.0"
+  required_version = ">= 1.11.0"
 
   required_providers {
     azapi = {
@@ -8,7 +8,7 @@ terraform {
     }
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = ">= 4.37.0, < 5.0.0"
+      version = ">= 4.81.0, < 5.0.0"
     }
     random = {
       source  = "hashicorp/random"
@@ -85,13 +85,13 @@ module "this" {
 # stays consistent with the rest of the repository.
 module "avm_res_keyvault_vault" {
   source  = "Azure/avm-res-keyvault-vault/azurerm"
-  version = "0.5.1"
+  version = "0.13.0"
 
-  location            = azapi_resource.resource_group.location
-  name                = module.naming.key_vault.name_unique
-  resource_group_name = azapi_resource.resource_group.name
-  tenant_id           = data.azurerm_client_config.current.tenant_id
-  enable_telemetry    = var.enable_telemetry
+  location         = azapi_resource.resource_group.location
+  name             = module.naming.key_vault.name_unique
+  parent_id        = azapi_resource.resource_group.id
+  tenant_id        = data.azurerm_client_config.current.tenant_id
+  enable_telemetry = var.enable_telemetry
   network_acls = {
     default_action = "Allow"
   }
@@ -129,7 +129,7 @@ ephemeral "azapi_resource_action" "storage_keys" {
 # never appears in state. Bump `value_wo_version` whenever the upstream key is
 # rotated to force the secret to be re-written.
 resource "azurerm_key_vault_secret" "primary_key" {
-  key_vault_id     = module.avm_res_keyvault_vault.resource.id
+  key_vault_id     = module.avm_res_keyvault_vault.resource_id
   name             = "${module.naming.storage_account.name_unique}-primary-key"
   value_wo         = ephemeral.azapi_resource_action.storage_keys.output.keys[0].value
   value_wo_version = "1"
