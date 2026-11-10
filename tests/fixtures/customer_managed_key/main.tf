@@ -62,10 +62,11 @@ resource "azapi_resource" "vault" {
   response_export_values = []
 }
 
-resource "azapi_resource" "key" {
-  name      = "storage"
-  parent_id = azapi_resource.vault.id
-  type      = "Microsoft.KeyVault/vaults/keys@2025-05-01"
+# ARM supports key creation but not deletion; deleting the vault cleans up the key.
+resource "azapi_resource_action" "key" {
+  method      = "PUT"
+  resource_id = "${azapi_resource.vault.id}/keys/storage"
+  type        = "Microsoft.KeyVault/vaults/keys@2025-05-01"
   body = {
     properties = {
       kty     = "RSA"
@@ -95,9 +96,11 @@ output "identity_id" {
 output "customer_managed_key" {
   value = {
     key_vault_resource_id = azapi_resource.vault.id
-    key_name              = azapi_resource.key.name
+    key_name              = "storage"
     user_assigned_identity = {
       resource_id = azapi_resource.identity.id
     }
+
+    depends_on = [azapi_resource_action.key]
   }
 }
