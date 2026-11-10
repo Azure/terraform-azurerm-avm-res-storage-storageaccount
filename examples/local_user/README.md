@@ -13,7 +13,7 @@ Terraform state.
 
 ```hcl
 terraform {
-  required_version = ">= 1.10.0"
+  required_version = ">= 1.11.0"
 
   required_providers {
     azapi = {
@@ -22,7 +22,7 @@ terraform {
     }
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = ">= 4.37.0, < 5.0.0"
+      version = ">= 4.81.0, < 5.0.0"
     }
     random = {
       source  = "hashicorp/random"
@@ -147,13 +147,13 @@ resource "azapi_resource" "example_identity" {
 
 module "avm_res_keyvault_vault" {
   source  = "Azure/avm-res-keyvault-vault/azurerm"
-  version = "0.5.1"
+  version = "0.13.0"
 
-  location            = azapi_resource.resource_group.location
-  name                = module.naming.key_vault.name_unique
-  resource_group_name = azapi_resource.resource_group.name
-  tenant_id           = data.azurerm_client_config.current.tenant_id
-  enable_telemetry    = var.enable_telemetry
+  location         = azapi_resource.resource_group.location
+  name             = module.naming.key_vault.name_unique
+  parent_id        = azapi_resource.resource_group.id
+  tenant_id        = data.azurerm_client_config.current.tenant_id
+  enable_telemetry = var.enable_telemetry
   network_acls = {
     default_action = "Allow"
   }
@@ -272,7 +272,7 @@ resource "azapi_resource_action" "regenerate_local_user_password" {
 # the azurerm_key_vault_secret state; value_wo_version stays stable so the
 # secret is written once and not re-applied on every plan.
 resource "azurerm_key_vault_secret" "sftp_password" {
-  key_vault_id     = module.avm_res_keyvault_vault.resource.id
+  key_vault_id     = module.avm_res_keyvault_vault.resource_id
   name             = module.this.local_users["user1"].name
   value_wo         = azapi_resource_action.regenerate_local_user_password.output.sshPassword
   value_wo_version = "1"
@@ -286,11 +286,11 @@ resource "azurerm_key_vault_secret" "sftp_password" {
 
 The following requirements are needed by this module:
 
-- <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.10.0)
+- <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.11.0)
 
 - <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) (~> 2.8)
 
-- <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (>= 4.37.0, < 5.0.0)
+- <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (>= 4.81.0, < 5.0.0)
 
 - <a name="requirement_random"></a> [random](#requirement\_random) (>= 3.5.0, < 4.0.0)
 
@@ -353,7 +353,7 @@ The following Modules are called:
 
 Source: Azure/avm-res-keyvault-vault/azurerm
 
-Version: 0.5.1
+Version: 0.13.0
 
 ### <a name="module_naming"></a> [naming](#module\_naming)
 
