@@ -100,7 +100,7 @@ output "customer_managed_key" {
     user_assigned_identity = {
       resource_id = azapi_resource.identity.id
     }
-
-    depends_on = [azapi_resource_action.key]
   }
+
+  depends_on = [azapi_resource_action.key]
 }
