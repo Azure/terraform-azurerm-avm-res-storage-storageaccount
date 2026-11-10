@@ -7,9 +7,11 @@ terraform {
   }
 }
 
-data "azapi_resource_list" "remaining_resources" {
-  parent_id = "/subscriptions/7f2966f6-23b7-4b11-94c3-ae8452328dc3/resourceGroups/rg-cmk-04lqcp0d894x"
-  type      = "Microsoft.Resources/resources@2021-04-01"
+data "azapi_resource_action" "remaining_resources" {
+  action      = "resources"
+  method      = "GET"
+  resource_id = "/subscriptions/7f2966f6-23b7-4b11-94c3-ae8452328dc3/resourceGroups/rg-cmk-04lqcp0d894x"
+  type        = "Microsoft.Resources/resourceGroups@2021-04-01"
   response_export_values = {
     ids = "value[].id"
   }
@@ -26,7 +28,7 @@ resource "azapi_resource_action" "cleanup" {
   lifecycle {
     precondition {
       condition = alltrue([
-        for id in data.azapi_resource_list.remaining_resources.output.ids : contains([
+        for id in data.azapi_resource_action.remaining_resources.output.ids : contains([
           "/subscriptions/7f2966f6-23b7-4b11-94c3-ae8452328dc3/resourcegroups/rg-cmk-04lqcp0d894x/providers/microsoft.managedidentity/userassignedidentities/id-cmk",
           "/subscriptions/7f2966f6-23b7-4b11-94c3-ae8452328dc3/resourcegroups/rg-cmk-04lqcp0d894x/providers/microsoft.keyvault/vaults/kv-cmk-04lqcp0d894x",
           "/subscriptions/7f2966f6-23b7-4b11-94c3-ae8452328dc3/resourcegroups/rg-cmk-04lqcp0d894x/providers/microsoft.storage/storageaccounts/stcmk04lqcp0d894x",
