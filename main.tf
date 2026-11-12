@@ -95,20 +95,14 @@ resource "azapi_resource" "this" {
 
       error_message = "Smart access tier requires resource_types.storage_account to use Microsoft.Storage/storageAccounts@2025-08-01 or later."
     }
-    # CMK fields are owned by azapi_update_resource.customer_managed_key.
-    ignore_changes = [
-      body.properties.encryption.keySource,
-      body.properties.encryption.identity,
-      body.properties.encryption.keyvaultproperties,
-    ]
   }
 }
 
 # Customer-managed key encryption is applied as a second step. Azure rejects a
 # single PUT that both associates a user-assigned identity with the storage
 # account and references that identity in `properties.encryption.identity`, so
-# the account is created with default Microsoft.Storage encryption and then
-# patched to Microsoft.Keyvault here.
+# the account uses Azure's default encryption on create and is patched here.
+# The main PUT omits key selection so later updates cannot reset an existing CMK.
 resource "azapi_update_resource" "customer_managed_key" {
   count = local.customer_managed_key_enabled ? 1 : 0
 
