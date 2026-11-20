@@ -21,6 +21,12 @@ This Terraform module is designed to create Azure Storage Accounts and its relat
 
 ## Upgrading
 
+### Customer-managed key updates
+
+Customer-managed keys are enabled in a separate PATCH after the storage account and its managed identity exist. The storage account PUT manages encryption services and infrastructure encryption, but omits the key source, encryption identity, and Key Vault properties. Azure supplies Microsoft-managed keys for new accounts and preserves the existing key selection on updates, including the first update after a v0.6.x state migration.
+
+Removing `customer_managed_key` stops managing the key configuration; it does not switch an existing account back to Microsoft-managed keys.
+
 ### AzAPI provider version
 
 This module requires AzAPI provider version 2.11.0 or later within the 2.x series (`>= 2.11.0, < 3.0.0`). When upgrading to a module release with this requirement, update any AzAPI constraint in your root module that excludes version 2.11.0, then refresh the provider selections recorded in your dependency lock file:
