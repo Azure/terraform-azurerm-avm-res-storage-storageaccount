@@ -28,12 +28,6 @@ The following resources are used by this module:
 
 The following input variables are required:
 
-### <a name="input_location"></a> [location](#input\_location)
-
-Description: The Azure region for this module's resources or telemetry deployment.
-
-Type: `string`
-
 ### <a name="input_name"></a> [name](#input\_name)
 
 Description: (Required) The name of the local user.
@@ -63,6 +57,14 @@ Default: `true`
 ### <a name="input_home_directory"></a> [home\_directory](#input\_home\_directory)
 
 Description: (Optional) The home directory of the storage account local user. Defaults to `null`.
+
+Type: `string`
+
+Default: `null`
+
+### <a name="input_location"></a> [location](#input\_location)
+
+Description: The Azure region for this module's resources or telemetry deployment.
 
 Type: `string`
 

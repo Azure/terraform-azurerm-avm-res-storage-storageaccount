@@ -1,9 +1,3 @@
-variable "location" {
-  type        = string
-  description = "The Azure region for this module's resources or telemetry deployment."
-  nullable    = false
-}
-
 variable "name" {
   type        = string
   description = "(Required) The name of the local user."
@@ -31,6 +25,17 @@ variable "home_directory" {
   type        = string
   default     = null
   description = "(Optional) The home directory of the storage account local user. Defaults to `null`."
+}
+
+variable "location" {
+  type        = string
+  default     = null
+  description = "The Azure region for this module's resources or telemetry deployment."
+
+  validation {
+    condition     = !var.enable_telemetry || var.location != null
+    error_message = "The location must not be null when telemetry is enabled."
+  }
 }
 
 variable "permission_scope" {
