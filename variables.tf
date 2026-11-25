@@ -39,7 +39,7 @@ variable "customer_managed_key" {
   })
   default     = null
   description = <<DESCRIPTION
-Defines a customer managed key to use for encryption. Defaults to `null` (Microsoft-managed keys).
+Defines a customer managed key to use for encryption. Defaults to `null` (Microsoft-managed keys for new accounts). Removing this configuration does not disable an existing customer-managed key.
 
 - `key_vault_resource_id` - (Required) The full Azure Resource ID of the key vault where the customer managed key will be referenced from.
 - `key_name` - (Required) The key name for the customer managed key in the key vault.
